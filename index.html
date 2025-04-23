@@ -39,8 +39,8 @@
             <span class="text-2xl md:text-3xl font-bold text-tan-900 select-none">mollis</span>
         </div>
         <div class="mt-3 md:mt-0 text-center md:text-right">
-          <h2 class="text-lg md:text-2xl font-semibold">SCAA 커피 관능 평가</h2>
-          <div class="text-xs text-gray-500 mt-1">최대 20개 샘플 다중 비교 | SCAA Flavor Wheel 기반</div>
+          <h2 class="text-lg md:text-2xl font-semibold">SCA 커피 관능 평가</h2>
+          <div class="text-xs text-gray-500 mt-1">최대 20개 샘플 다중 비교 | SCA Flavor Wheel 기반</div>
         </div>
     </header>
 
@@ -95,8 +95,8 @@
 
         <!-- SCAA FLAVOR WHEEL EVALUATION -->
         <section>
-            <h3 class="text-xl font-bold mb-1 border-b-2 pb-1 border-tan-200 flex items-center"><i class="fa fa-circle-half-stroke mr-2"></i>SCAA 향미 선택</h3>
-            <div class="text-sm mb-4 text-gray-600">[프래그런스] [아로마] [플레이버] [에프터테이스트] 항목별로 SCAA Flavor Wheel의 향미를 각각 선택해 주세요.</div>
+            <h3 class="text-xl font-bold mb-1 border-b-2 pb-1 border-tan-200 flex items-center"><i class="fa fa-circle-half-stroke mr-2"></i>SCA 향미 선택</h3>
+            <div class="text-sm mb-4 text-gray-600">[프래그런스] [아로마] [플레이버] [에프터테이스트] 항목별로 SCA Flavor Wheel의 향미를 각각 선택해 주세요.</div>
             <button type="button" class="mb-4 px-3 py-1 rounded bg-gray-100 text-xs" onclick="window.open('https://sca.coffee/research/coffee-tasters-flavor-wheel', '_blank');">플레이버 휠 공식자료 보기<i class="fas fa-external-link-alt ml-1 text-xs"></i></button>
             <div id="flavorTabs" class="flex flex-wrap gap-2 mb-2">
                 <button type="button" data-flavorphase="fragrance" class="flavor-phase-btn tab-btn-active font-bold rounded px-4 py-1">프래그런스</button>
@@ -210,6 +210,25 @@
                     <h4 class="font-semibold mb-2">SCA 평가 레이더 차트</h4>
                     <canvas id="cuppingRadar" class="" height="200"></canvas>
                 </div>
+<div class="bg-white rounded-lg p-4 shadow-md md:col-span-2 mt-2">
+        <h4 class="font-semibold mb-2">특성 강도 레벨</h4>
+        <div class="grid grid-cols-3 gap-4" id="attribute-strength">
+            <div>
+                <h5 class="text-sm font-medium mb-1">Acidity 산미 강도</h5>
+                <div class="w-full bg-gray-200 rounded-full h-6 mb-2" id="acidity-strength-bar">
+                    <div id="acidity-value" class="h-6 rounded-full transition-all duration-300 flex items-center justify-center text-xs text-white font-bold" style="width: 0%; background-color: #FF6B6B;"></div>
+                </div>
+            </div>
+            <div>
+                <h5 class="text-sm font-medium mb-1">Sweetness 단맛 강도</h5>
+                <div class="w-full bg-gray-200 rounded-full h-6 mb-2" id="sweetness-strength-bar">
+                    <div id="sweetness-value" class="h-6 rounded-full transition-all duration-300 flex items-center justify-center text-xs text-white font-bold" style="width: 0%; background-color: #51CF66;"></div>
+                </div>
+            </div>
+            <div>
+                <h5 class="text-sm font-medium mb-1">Body 바디감 강도</h5>
+                <div class="w-full bg-gray-200 rounded-full h-6 mb-2" id="body-strength-bar">
+                    <div id="body-value" class="h-6 rounded-full transition-all duration-300 flex items-center justify-center text-xs text-white font-bold" style="width: 0%; background-color: #339AF0;"></div>
             </div>
             <div class="flex flex-wrap space-x-2 mt-6 gap-2">
                 <button id="exportImgBtn" type="button" class="export-btn px-6 py-2 rounded flex items-center"><i class="fas fa-image mr-2"></i>이미지로 내보내기</button>
@@ -441,6 +460,7 @@ function renderSample(){
     updateFlavorsArea();
     updateRadar();
     updateTotalScore();
+    updateAttributeBars(); // 추가된 부분
 }
 
 function saveUiToSample(){
@@ -679,6 +699,38 @@ function getCheckedRadio(name){
     return r?r.value:"";
 }
 
+/* ---- 특성 강도 바 업데이트 함수 ---- */
+function updateAttributeBars() {
+    let s = samples[currentSampleIdx];
+    
+    // 값 매핑: Low=20%, Med-Low=40%, Medium=60%, Med-High=80%, High=100%
+    const valueMap = {
+        "Low": 20,
+        "Med-Low": 40,
+        "Medium": 60,
+        "Med-High": 80,
+        "High": 100
+    };
+    
+    // 액시디티 바 업데이트
+    const acidityBar = document.getElementById('acidity-value');
+    const acidityValue = valueMap[s.acidityLevel] || 0;
+    acidityBar.style.width = acidityValue + '%';
+    acidityBar.textContent = s.acidityLevel || '미선택';
+    
+    // 스윗니스 바 업데이트
+    const sweetnessBar = document.getElementById('sweetness-value');
+    const sweetnessValue = valueMap[s.sweetnessLevel] || 0;
+    sweetnessBar.style.width = sweetnessValue + '%';
+    sweetnessBar.textContent = s.sweetnessLevel || '미선택';
+    
+    // 바디 바 업데이트
+    const bodyBar = document.getElementById('body-value');
+    const bodyValue = valueMap[s.bodyLevel] || 0;
+    bodyBar.style.width = bodyValue + '%';
+    bodyBar.textContent = s.bodyLevel || '미선택';
+}
+
 /* ------ Event Handlers ------ */
 // score input handler
 ["scoreFragrance","scoreAroma","scoreFlavor","scoreAftertaste",
@@ -689,7 +741,10 @@ function getCheckedRadio(name){
  });
 ["acidityLevel","sweetnessLevel","bodyLevel"].forEach(gr=>{
     document.querySelectorAll('input[name="'+gr+'"]').forEach(r=>{
-        r.onchange = ()=>{ saveUiToSample();}
+        r.onchange = ()=>{ 
+            saveUiToSample();
+            updateAttributeBars(); // 추가된 부분
+        }
     });
 });
 ["coffeeName","origin","variety","process","roastDate","roastLevel","tastingNotes"].forEach(id=>{
@@ -848,6 +903,102 @@ document.getElementById('exportImgBtn').onclick = ()=>{
     visualColumns.appendChild(radarContainer);
     visualSection.appendChild(visualColumns);
     
+// 특성 강도 바 추가
+const attributeSection = document.createElement('div');
+attributeSection.style.marginTop = "20px";
+attributeSection.style.backgroundColor = "white";
+attributeSection.style.padding = "15px";
+attributeSection.style.borderRadius = "8px";
+attributeSection.style.boxShadow = "0 1px 3px rgba(0, 0, 0, 0.1)";
+
+const attributeTitle = document.createElement('h4');
+attributeTitle.textContent = "특성 강도 레벨";
+attributeTitle.style.fontSize = "16px";
+attributeTitle.style.fontWeight = "600";
+attributeTitle.style.marginBottom = "10px";
+attributeSection.appendChild(attributeTitle);
+
+// 강도 바 그리드 생성
+const strengthGrid = document.createElement('div');
+strengthGrid.style.display = "grid";
+strengthGrid.style.gridTemplateColumns = "repeat(3, 1fr)";
+strengthGrid.style.gap = "15px";
+
+// 값 매핑
+const valueMap = {
+    "Low": 20,
+    "Med-Low": 40,
+    "Medium": 60,
+    "Med-High": 80,
+    "High": 100
+};
+
+// 액시디티 바
+const acidityBarContainer = createAttributeBar(
+    "Acidity 산미 강도", 
+    valueMap[samples[currentSampleIdx].acidityLevel] || 0, 
+    samples[currentSampleIdx].acidityLevel || '미선택', 
+    "#FF6B6B"
+);
+strengthGrid.appendChild(acidityBarContainer);
+
+// 스윗니스 바
+const sweetnessBarContainer = createAttributeBar(
+    "Sweetness 단맛 강도", 
+    valueMap[samples[currentSampleIdx].sweetnessLevel] || 0, 
+    samples[currentSampleIdx].sweetnessLevel || '미선택', 
+    "#51CF66"
+);
+strengthGrid.appendChild(sweetnessBarContainer);
+
+// 바디 바
+const bodyBarContainer = createAttributeBar(
+    "Body 바디감 강도", 
+    valueMap[samples[currentSampleIdx].bodyLevel] || 0, 
+    samples[currentSampleIdx].bodyLevel || '미선택', 
+    "#339AF0"
+);
+strengthGrid.appendChild(bodyBarContainer);
+
+attributeSection.appendChild(strengthGrid);
+visualSection.appendChild(attributeSection);
+
+// 강도 바 생성 헬퍼 함수
+function createAttributeBar(label, percentage, value, color) {
+    const container = document.createElement('div');
+    
+    const title = document.createElement('h5');
+    title.textContent = label;
+    title.style.fontSize = "14px";
+    title.style.fontWeight = "500";
+    title.style.marginBottom = "5px";
+    container.appendChild(title);
+    
+    const barContainer = document.createElement('div');
+    barContainer.style.width = "100%";
+    barContainer.style.backgroundColor = "#f0f0f0";
+    barContainer.style.borderRadius = "9999px";
+    barContainer.style.height = "24px";
+    
+    const bar = document.createElement('div');
+    bar.style.width = percentage + "%";
+    bar.style.backgroundColor = color;
+    bar.style.height = "24px";
+    bar.style.borderRadius = "9999px";
+    bar.style.display = "flex";
+    bar.style.alignItems = "center";
+    bar.style.justifyContent = "center";
+    bar.style.color = "white";
+    bar.style.fontSize = "12px";
+    bar.style.fontWeight = "bold";
+    bar.textContent = value;
+    
+    barContainer.appendChild(bar);
+    container.appendChild(barContainer);
+    
+    return container;
+}
+
     // 테이스팅 노트 추가 (있을 경우)
     const tastingNotes = document.getElementById('tastingNotes').value;
     if (tastingNotes) {
@@ -886,7 +1037,7 @@ document.getElementById('exportImgBtn').onclick = ()=>{
     footer.style.paddingTop = "10px";
     
     const date = new Date();
-    footer.textContent = `평가일: ${date.getFullYear()}-${String(date.getMonth()+1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')} | mollis SCAA 커피 관능 평가`;
+    footer.textContent = `평가일: ${date.getFullYear()}-${String(date.getMonth()+1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')} | mollis SCA 커피 관능 평가`;
     tempContainer.appendChild(footer);
     
     // 임시 컨테이너를 문서에 추가 (안보이게)
@@ -974,4 +1125,3 @@ updateSampleTabs();
 </script>
 </body>
 </html>
-
