@@ -2,1777 +2,711 @@
 <html lang="ko">
 <head>
     <meta charset="UTF-8">
+    <title>Mollis SCAA 커피 관능 평가</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mollis 커피 관능 평가</title>
+    <!-- TailwindCSS -->
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
-    <link href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.2.1/css/all.min.css" rel="stylesheet">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <!-- Font Awesome -->
+    <link href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.5.2/css/all.min.css" rel="stylesheet">
+    <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&display=swap" rel="stylesheet">
-    <script src="https://cdn.jsdelivr.net/npm/chart.js@3.7.1/dist/chart.min.js"></script>
+    <!-- Chart.js 4.4.3 -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js"></script>
+    <!-- html2canvas for image export -->
     <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+    <!-- SheetJS for excel/csv export -->
+    <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
     <style>
-        :root {
-            --primary-color: #8B5A2B;
-            --secondary-color: #D2B48C;
-            --accent-color: #654321;
-            --background-color: #FFF8E7;
-            --text-color: #3E2723;
-            --chart-bg: rgba(255, 248, 231, 0.8);
-        }
-        
-        body {
-            font-family: 'Noto Sans KR', sans-serif;
-            background-color: var(--background-color);
-            color: var(--text-color);
-        }
-        
-        .coffee-btn {
-            background-color: var(--primary-color);
-            color: white;
-            transition: all 0.3s;
-        }
-        
-        .coffee-btn:hover {
-            background-color: var(--accent-color);
-        }
-        
-        .coffee-card {
-            background-color: white;
-            border-radius: 8px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-        }
-        
-        .coffee-input {
-            border: 1px solid var(--secondary-color);
-            border-radius: 4px;
-            padding: 8px 12px;
-            transition: border 0.3s;
-        }
-        
-        .coffee-input:focus {
-            border-color: var(--primary-color);
-            outline: none;
-        }
-        
-        .coffee-checkbox {
-            cursor: pointer;
-            display: inline-flex;
-            align-items: center;
-            margin-right: 12px;
-            margin-bottom: 8px;
-            user-select: none;
-            position: relative;
-        }
-        
-        .coffee-checkbox input {
-            position: absolute;
-            opacity: 0;
-            height: 0;
-            width: 0;
-        }
-        
-        .checkmark {
-            position: relative;
-            height: 20px;
-            width: 20px;
-            background-color: white;
-            border: 2px solid var(--secondary-color);
-            border-radius: 4px;
-            margin-right: 8px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: all 0.2s;
-        }
-        
-        .coffee-checkbox:hover input ~ .checkmark {
-            border-color: var(--primary-color);
-        }
-        
-        .coffee-checkbox input:checked ~ .checkmark {
-            background-color: var(--primary-color);
-            border-color: var(--primary-color);
-        }
-        
-        .checkmark:after {
-            content: "";
-            position: absolute;
-            display: none;
-            width: 5px;
-            height: 10px;
-            border: solid white;
-            border-width: 0 2px 2px 0;
-            transform: rotate(45deg);
-        }
-        
-        .coffee-checkbox input:checked ~ .checkmark:after {
-            display: block;
-        }
-        
-        .flavor-category {
-            padding: 15px;
-            border-radius: 8px;
-            background-color: white;
-            margin-bottom: 15px;
-        }
-        
-        .flavor-title {
-            font-weight: 600;
-            padding-bottom: 8px;
-            margin-bottom: 10px;
-            border-bottom: 1px solid var(--secondary-color);
-            display: flex;
-            justify-content: space-between;
-        }
-        
-        .category-section {
-            background-color: rgba(255, 255, 255, 0.5);
-            border-radius: 8px;
-            padding: 10px;
-            margin-bottom: 10px;
-        }
-        
-        .sub-category {
-            margin-left: 15px;
-        }
-        
-        .slider-container {
-            width: 100%;
-            margin: 15px 0;
-        }
-        
-        .slider {
-            -webkit-appearance: none;
-            width: 100%;
-            height: 8px;
-            border-radius: 5px;
-            background: var(--secondary-color);
-            outline: none;
-        }
-        
-        .slider::-webkit-slider-thumb {
-            -webkit-appearance: none;
-            appearance: none;
-            width: 20px;
-            height: 20px;
-            border-radius: 50%;
-            background: var(--primary-color);
-            cursor: pointer;
-        }
-        
-        .slider::-moz-range-thumb {
-            width: 20px;
-            height: 20px;
-            border-radius: 50%;
-            background: var(--primary-color);
-            cursor: pointer;
-        }
-        
-        .flavor-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
-            gap: 10px;
-        }
-        
-        .result-container {
-            max-width: 800px;
-            margin: 0 auto;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-        }
-        
-        .chart-container {
-            position: relative;
-            width: 100%;
-            max-width: 600px;
-            margin: 20px auto;
-        }
-        
-        @media (min-width: 768px) {
-            .score-grid {
-                display: grid;
-                grid-template-columns: repeat(2, 1fr);
-                gap: 15px;
-            }
-        }
-
-        /* Custom animation for logo */
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(-10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-        
-        .logo-animation {
-            animation: fadeIn 1.2s ease-out;
-        }
-        
-        /* The colors for the selected flavors */
-        .color-fruity { background-color: #E57373; }
-        .color-berry { background-color: #F06292; }
-        .color-citrus { background-color: #FF9800; }
-        .color-stone-fruit { background-color: #FFB74D; }
-        .color-tropical { background-color: #FFEB3B; }
-        
-        .color-floral { background-color: #9575CD; }
-        .color-herbal { background-color: #81C784; }
-        .color-spice { background-color: #A1887F; }
-        
-        .color-nutty { background-color: #8D6E63; }
-        .color-cocoa { background-color: #795548; }
-        .color-sweet { background-color: #FFCC80; }
-        
-        .color-caramel { background-color: #D2B48C; }
-        .color-vanilla { background-color: #F5DEB3; }
-        .color-honey { background-color: #FFA000; }
-        
-        /* Selected flavors display */
-        .selected-flavors-container {
-            border-radius: 8px;
-            background-color: white;
-            padding: 15px;
-            margin-bottom: 20px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-        }
-        
-        .flavor-group {
-            margin-bottom: 16px;
-        }
-        
-        .flavor-group-title {
-            font-weight: 600;
-            border-bottom: 1px solid var(--secondary-color);
-            padding-bottom: 6px;
-            margin-bottom: 10px;
-            display: flex;
-            align-items: center;
-        }
-        
-        .flavor-badge {
-            display: inline-block;
-            padding: 4px 8px;
-            margin: 4px;
-            border-radius: 16px;
-            font-size: 14px;
-            color: white;
-            background-color: var(--primary-color);
-        }
-        
-        /* Custom table styles */
-        .flavor-table {
-            width: 100%;
-            border-collapse: separate;
-            border-spacing: 0;
-            margin-bottom: 20px;
-        }
-        
-        .flavor-table th, .flavor-table td {
-            padding: 8px 12px;
-            text-align: left;
-            border: 1px solid var(--secondary-color);
-        }
-        
-        .flavor-table th {
-            background-color: var(--secondary-color);
-            color: var(--text-color);
-            font-weight: bold;
-        }
-        
-        .flavor-table tbody tr:nth-child(odd) {
-            background-color: rgba(210, 180, 140, 0.1);
-        }
-        
-        .flavor-table tbody tr:hover {
-            background-color: rgba(210, 180, 140, 0.2);
-        }
-
-        /* Radar chart font sizes */
-        .radar-label {
-            font-size: 16px !important;
-            font-weight: bold !important;
-        }
-        
-        /* Body descriptor section */
-        .body-descriptor-section {
-            margin-top: 20px;
-            padding: 15px;
-            background-color: rgba(255, 255, 255, 0.8);
-            border-radius: 8px;
-            border: 1px solid var(--secondary-color);
-        }
-        
-        .descriptor-group {
-            margin-bottom: 10px;
-        }
-        
-        .descriptor-title {
-            font-weight: 600;
-            margin-bottom: 5px;
-        }
-        
-        /* Indicator for selected flavors */
-        .flavor-indicator {
-            display: inline-block;
-            width: 16px;
-            height: 16px;
-            border-radius: 50%;
-            margin-right: 8px;
-        }
-        
-        /* Korean labels */
-        .kr-label {
-            font-size: 0.9em;
-            color: #555;
-            margin-left: 4px;
-        }
-        
-        .texture-checkbox {
-            display: block;
-            margin-bottom: 4px;
-        }
-        
-        .texture-group {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
-            gap: 10px;
-            margin-top: 8px;
-        }
-        
-        /* PDF-friendly styles */
-        @media print {
-            body {
-                background-color: white;
-            }
-            
-            .coffee-card {
-                box-shadow: none;
-                border: 1px solid #ddd;
-                margin-bottom: 15px;
-                break-inside: avoid;
-            }
-            
-            .no-print {
-                display: none !important;
-            }
+        body { font-family: 'Noto Sans KR', sans-serif; background-color: #fcfaf7; }
+        .tab-btn-active { background-color: #8B5A2B !important; color: #fff !important; }
+        .tab-btn-inactive { background-color: #f3efe8 !important; color: #675444; }
+        .flavor-badge { font-size: 13px; border-radius: 9999px; padding: 2px 10px; margin: 2px; display:inline-block;}
+        .export-btn { background-color:#8B5A2B;color:white;}
+        .export-btn:hover { background-color: #654321;}
+        .modal-bg {background: rgba(0,0,0,0.2);}
+        @media (max-width: 640px) {
+          .grid-cols-sample { grid-template-columns: 1fr!important;}
         }
     </style>
 </head>
-<body class="p-4 md:p-8">
-    <div class="container mx-auto">
-        <!-- Header with Logo -->
-        <header class="flex flex-col md:flex-row justify-between items-center mb-6 logo-animation">
-            <div class="flex items-center">
-                <svg width="80" height="80" viewBox="0 0 200 200" class="mr-3">
-                    <rect width="200" height="200" fill="black" />
-                    <path d="M100,40 L120,60 L110,60 L110,80 L115,90 L105,100 C105,100 120,110 130,120 C140,130 120,150 120,150 L80,150 C80,150 60,130 70,120 C80,110 95,100 95,100 L85,90 L90,80 L90,60 L80,60 Z" fill="#D2B48C" />
-                    <circle cx="95" cy="60" r="2" fill="#D2B48C" />
-                    <circle cx="105" cy="70" r="2" fill="#D2B48C" />
-                    <circle cx="115" cy="65" r="2" fill="#D2B48C" />
-                </svg>
-                <h1 class="text-3xl md:text-4xl font-bold text-accent-color">mollis</h1>
-            </div>
-            <h2 class="text-xl md:text-2xl font-semibold mt-3 md:mt-0">커피 관능 평가</h2>
-        </header>
+<body class="min-h-screen">
 
-        <!-- Coffee Information Card -->
-        <div class="coffee-card mb-8 p-6">
-            <h3 class="text-xl font-bold mb-4 border-b pb-2 border-secondary-color">커피 정보</h3>
-            <div class="grid md:grid-cols-2 gap-4">
+<div class="max-w-6xl mx-auto p-2 md:p-6">
+    <!-- HEADER -->
+    <header class="flex flex-col md:flex-row items-center justify-between py-6 mb-2 border-b border-tan-300 bg-white rounded-lg shadow-sm">
+        <div class="flex items-center">
+            <svg width="60" height="60" viewBox="0 0 200 200" class="mr-3"><rect width="200" height="200" fill="black"/><path d="M100,40 L120,60 L110,60 L110,80 L115,90 L105,100 C105,100 120,110 130,120 C140,130 120,150 120,150 L80,150 C80,150 60,130 70,120 C80,110 95,100 95,100 L85,90 L90,80 L90,60 L80,60 Z" fill="#D2B48C"/><circle cx="95" cy="60" r="2" fill="#D2B48C"/><circle cx="105" cy="70" r="2" fill="#D2B48C"/><circle cx="115" cy="65" r="2" fill="#D2B48C"/></svg>
+            <span class="text-2xl md:text-3xl font-bold text-tan-900 select-none">mollis</span>
+        </div>
+        <div class="mt-3 md:mt-0 text-center md:text-right">
+          <h2 class="text-lg md:text-2xl font-semibold">SCAA 커피 관능 평가</h2>
+          <div class="text-xs text-gray-500 mt-1">최대 20개 샘플 다중 비교 | SCAA Flavor Wheel 기반</div>
+        </div>
+    </header>
+
+    <!-- SAMPLE TABS -->
+    <nav id="sampleTabs" class="flex flex-wrap items-center mb-4 gap-2"></nav>
+    <div class="flex flex-wrap gap-2 mb-6">
+        <button id="addSampleBtn" class="rounded px-4 py-2 export-btn flex items-center text-sm"><i class="fas fa-plus mr-2"></i>샘플 추가</button>
+        <button id="duplicateSampleBtn" class="rounded px-4 py-2 bg-gray-200 flex items-center text-sm"><i class="fas fa-copy mr-2"></i>현재 복제</button>
+        <button id="removeSampleBtn" class="rounded px-4 py-2 bg-red-200 text-red-900 flex items-center text-sm"><i class="fas fa-trash mr-2"></i>샘플 삭제</button>
+        <button id="compareViewBtn" class="rounded px-4 py-2 bg-blue-200 text-blue-900 flex items-center text-sm"><i class="fas fa-bars mr-2"></i>비교 뷰</button>
+    </div>
+
+    <!-- EVALUATION FORM -->
+    <form id="cuppingForm" class="bg-white shadow rounded-lg p-4 md:p-8">
+        <!-- 샘플 정보 -->
+        <section class="mb-8">
+            <h3 class="text-xl font-bold mb-4 border-b-2 pb-1 border-tan-200 flex items-center"><i class="fas fa-mug-hot mr-2"></i>커피 정보</h3>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 grid-cols-sample">
                 <div>
-                    <label class="block text-sm font-medium mb-1">커피명</label>
-                    <input type="text" id="coffeeName" class="coffee-input w-full" placeholder="커피 이름을 입력하세요">
+                    <label class="block text-sm font-semibold mb-1">커피명</label>
+                    <input class="coffee-input w-full border border-tan-300 rounded p-2" id="coffeeName">
                 </div>
                 <div>
-                    <label class="block text-sm font-medium mb-1">원산지</label>
-                    <input type="text" id="origin" class="coffee-input w-full" placeholder="원산지를 입력하세요">
+                    <label class="block text-sm font-semibold mb-1">원산지</label>
+                    <input class="coffee-input w-full border border-tan-300 rounded p-2" id="origin">
                 </div>
                 <div>
-                    <label class="block text-sm font-medium mb-1">품종</label>
-                    <input type="text" id="variety" class="coffee-input w-full" placeholder="품종을 입력하세요">
+                    <label class="block text-sm font-semibold mb-1">품종(Variety)</label>
+                    <input class="coffee-input w-full border border-tan-300 rounded p-2" id="variety">
                 </div>
                 <div>
-                    <label class="block text-sm font-medium mb-1">가공방식</label>
-                    <input type="text" id="process" class="coffee-input w-full" placeholder="가공방식을 입력하세요">
+                    <label class="block text-sm font-semibold mb-1">가공방식(Process)</label>
+                    <input class="coffee-input w-full border border-tan-300 rounded p-2" id="process">
                 </div>
                 <div>
-                    <label class="block text-sm font-medium mb-1">로스팅 날짜</label>
-                    <input type="date" id="roastDate" class="coffee-input w-full">
+                    <label class="block text-sm font-semibold mb-1">로스팅 날짜</label>
+                    <input type="date" class="coffee-input w-full border border-tan-300 rounded p-2" id="roastDate">
                 </div>
                 <div>
-                    <label class="block text-sm font-medium mb-1">로스팅 레벨</label>
-                    <select id="roastLevel" class="coffee-input w-full">
-                        <option value="">로스팅 레벨 선택</option>
-                        <option value="light">라이트 로스트</option>
-                        <option value="medium-light">미디엄-라이트 로스트</option>
-                        <option value="medium">미디엄 로스트</option>
-                        <option value="medium-dark">미디엄-다크 로스트</option>
-                        <option value="dark">다크 로스트</option>
+                    <label class="block text-sm font-semibold mb-1">로스팅 레벨</label>
+                    <select class="coffee-input w-full border border-tan-300 rounded p-2" id="roastLevel">
+                        <option value="">선택</option>
+                        <option value="light">Light</option>
+                        <option value="medium-light">Medium-Light</option>
+                        <option value="medium">Medium</option>
+                        <option value="medium-dark">Medium-Dark</option>
+                        <option value="dark">Dark</option>
                     </select>
                 </div>
             </div>
-        </div>
+        </section>
 
-        <!-- Flavor Profile Card -->
-        <div class="coffee-card mb-8 p-6">
-            <h3 class="text-xl font-bold mb-4 border-b pb-2 border-secondary-color">향미 프로필 <span class="text-base font-normal">(Flavor Profile)</span></h3>
-            <p class="mb-4 text-sm">각 카테고리에서 감지된 향미를 체크하세요. 여러 항목 선택 가능합니다.</p>
-            
-            <!-- Flavor Categories -->
-            <div>
-                <!-- Fruity Category -->
-                <div class="flavor-category">
-                    <div class="flavor-title">
-                        <span>과일향 (Fruity) <span class="kr-label">과일</span></span>
-                        <label class="coffee-checkbox">
-                            <input type="checkbox" data-category="fruity" data-level="main">
-                            <span class="checkmark"></span>
-                            전체 선택
-                        </label>
-                    </div>
-                    <div class="category-section">
-                        <div class="mb-3">
-                            <div class="flex justify-between items-center">
-                                <label class="coffee-checkbox">
-                                    <input type="checkbox" data-category="fruity" data-subcategory="berry" data-level="sub">
-                                    <span class="checkmark"></span>
-                                    베리류 (Berry) <span class="kr-label">베리</span>
-                                </label>
-                                <span id="berry-status" class="text-xs text-gray-500"></span>
-                            </div>
-                            <div class="sub-category ml-6">
-                                <label class="coffee-checkbox">
-                                    <input type="checkbox" data-category="fruity" data-subcategory="berry" data-flavor="blackberry" data-level="flavor">
-                                    <span class="checkmark"></span>
-                                    블랙베리 (Blackberry)
-                                </label>
-                                <label class="coffee-checkbox">
-                                    <input type="checkbox" data-category="fruity" data-subcategory="berry" data-flavor="raspberry" data-level="flavor">
-                                    <span class="checkmark"></span>
-                                    라즈베리 (Raspberry)
-                                </label>
-                                <label class="coffee-checkbox">
-                                    <input type="checkbox" data-category="fruity" data-subcategory="berry" data-flavor="blueberry" data-level="flavor">
-                                    <span class="checkmark"></span>
-                                    블루베리 (Blueberry)
-                                </label>
-                                <label class="coffee-checkbox">
-                                    <input type="checkbox" data-category="fruity" data-subcategory="berry" data-flavor="strawberry" data-level="flavor">
-                                    <span class="checkmark"></span>
-                                    딸기 (Strawberry)
-                                </label>
-                                <label class="coffee-checkbox">
-                                    <input type="checkbox" data-category="fruity" data-subcategory="berry" data-flavor="cranberry" data-level="flavor">
-                                    <span class="checkmark"></span>
-                                    크랜베리 (Cranberry)
-                                </label>
-                            </div>
-                        </div>
-                        
-                        <div class="mb-3">
-                            <div class="flex justify-between items-center">
-                                <label class="coffee-checkbox">
-                                    <input type="checkbox" data-category="fruity" data-subcategory="citrus" data-level="sub">
-                                    <span class="checkmark"></span>
-                                    시트러스 (Citrus) <span class="kr-label">감귤류</span>
-                                </label>
-                                <span id="citrus-status" class="text-xs text-gray-500"></span>
-                            </div>
-                            <div class="sub-category ml-6">
-                                <label class="coffee-checkbox">
-                                    <input type="checkbox" data-category="fruity" data-subcategory="citrus" data-flavor="lemon" data-level="flavor">
-                                    <span class="checkmark"></span>
-                                    레몬 (Lemon)
-                                </label>
-                                <label class="coffee-checkbox">
-                                    <input type="checkbox" data-category="fruity" data-subcategory="citrus" data-flavor="orange" data-level="flavor">
-                                    <span class="checkmark"></span>
-                                    오렌지 (Orange)
-                                </label>
-                                <label class="coffee-checkbox">
-                                    <input type="checkbox" data-category="fruity" data-subcategory="citrus" data-flavor="grapefruit" data-level="flavor">
-                                    <span class="checkmark"></span>
-                                    자몽 (Grapefruit)
-                                </label>
-                                <label class="coffee-checkbox">
-                                    <input type="checkbox" data-category="fruity" data-subcategory="citrus" data-flavor="lime" data-level="flavor">
-                                    <span class="checkmark"></span>
-                                    라임 (Lime)
-                                </label>
-                                <label class="coffee-checkbox">
-                                    <input type="checkbox" data-category="fruity" data-subcategory="citrus" data-flavor="mandarin" data-level="flavor">
-                                    <span class="checkmark"></span>
-                                    귤 (Mandarin)
-                                </label>
-                            </div>
-                        </div>
-                        
-                        <div class="mb-3">
-                            <div class="flex justify-between items-center">
-                                <label class="coffee-checkbox">
-                                    <input type="checkbox" data-category="fruity" data-subcategory="stone-fruit" data-level="sub">
-                                    <span class="checkmark"></span>
-                                    핵과류 (Stone Fruit) <span class="kr-label">과일류</span>
-                                </label>
-                                <span id="stone-fruit-status" class="text-xs text-gray-500"></span>
-                            </div>
-                            <div class="sub-category ml-6">
-                                <label class="coffee-checkbox">
-                                    <input type="checkbox" data-category="fruity" data-subcategory="stone-fruit" data-flavor="peach" data-level="flavor">
-                                    <span class="checkmark"></span>
-                                    복숭아 (Peach)
-                                </label>
-                                <label class="coffee-checkbox">
-                                    <input type="checkbox" data-category="fruity" data-subcategory="stone-fruit" data-flavor="apricot" data-level="flavor">
-                                    <span class="checkmark"></span>
-                                    살구 (Apricot)
-                                </label>
-                                <label class="coffee-checkbox">
-                                    <input type="checkbox" data-category="fruity" data-subcategory="stone-fruit" data-flavor="cherry" data-level="flavor">
-                                    <span class="checkmark"></span>
-                                    체리 (Cherry)
-                                </label>
-                                <label class="coffee-checkbox">
-                                    <input type="checkbox" data-category="fruity" data-subcategory="stone-fruit" data-flavor="plum" data-level="flavor">
-                                    <span class="checkmark"></span>
-                                    자두 (Plum)
-                                </label>
-                                <label class="coffee-checkbox">
-                                    <input type="checkbox" data-category="fruity" data-subcategory="stone-fruit" data-flavor="nectarine" data-level="flavor">
-                                    <span class="checkmark"></span>
-                                    넥타린 (Nectarine)
-                                </label>
-                            </div>
-                        </div>
-                        
-                        <div class="mb-3">
-                            <div class="flex justify-between items-center">
-                                <label class="coffee-checkbox">
-                                    <input type="checkbox" data-category="fruity" data-subcategory="tropical" data-level="sub">
-                                    <span class="checkmark"></span>
-                                    열대과일 (Tropical) <span class="kr-label">트로피컬</span>
-                                </label>
-                                <span id="tropical-status" class="text-xs text-gray-500"></span>
-                            </div>
-                            <div class="sub-category ml-6">
-                                <label class="coffee-checkbox">
-                                    <input type="checkbox" data-category="fruity" data-subcategory="tropical" data-flavor="pineapple" data-level="flavor">
-                                    <span class="checkmark"></span>
-                                    파인애플 (Pineapple)
-                                </label>
-                                <label class="coffee-checkbox">
-                                    <input type="checkbox" data-category="fruity" data-subcategory="tropical" data-flavor="mango" data-level="flavor">
-                                    <span class="checkmark"></span>
-                                    망고 (Mango)
-                                </label>
-                                <label class="coffee-checkbox">
-                                    <input type="checkbox" data-category="fruity" data-subcategory="tropical" data-flavor="banana" data-level="flavor">
-                                    <span class="checkmark"></span>
-                                    바나나 (Banana)
-                                </label>
-                                <label class="coffee-checkbox">
-                                    <input type="checkbox" data-category="fruity" data-subcategory="tropical" data-flavor="passion-fruit" data-level="flavor">
-                                    <span class="checkmark"></span>
-                                    패션프루트 (Passion Fruit)
-                                </label>
-                                <label class="coffee-checkbox">
-                                    <input type="checkbox" data-category="fruity" data-subcategory="tropical" data-flavor="kiwi" data-level="flavor">
-                                    <span class="checkmark"></span>
-                                    키위 (Kiwi)
-                                </label>
-                            </div>
-                        </div>
-                        
-                        <div class="mb-3">
-                            <div class="flex justify-between items-center">
-                                <label class="coffee-checkbox">
-                                    <input type="checkbox" data-category="fruity" data-subcategory="dried" data-level="sub">
-                                    <span class="checkmark"></span>
-                                    건조 과일 (Dried) <span class="kr-label">건과일</span>
-                                </label>
-                                <span id="dried-status" class="text-xs text-gray-500"></span>
-                            </div>
-                            <div class="sub-category ml-6">
-                                <label class="coffee-checkbox">
-                                    <input type="checkbox" data-category="fruity" data-subcategory="dried" data-flavor="raisin" data-level="flavor">
-                                    <span class="checkmark"></span>
-                                    건포도 (Raisin)
-                                </label>
-                                <label class="coffee-checkbox">
-                                    <input type="checkbox" data-category="fruity" data-subcategory="dried" data-flavor="prune" data-level="flavor">
-                                    <span class="checkmark"></span>
-                                    프룬 (Prune)
-                                </label>
-                                <label class="coffee-checkbox">
-                                    <input type="checkbox" data-category="fruity" data-subcategory="dried" data-flavor="fig" data-level="flavor">
-                                    <span class="checkmark"></span>
-                                    무화과 (Fig)
-                                </label>
-                                <label class="coffee-checkbox">
-                                    <input type="checkbox" data-category="fruity" data-subcategory="dried" data-flavor="date" data-level="flavor">
-                                    <span class="checkmark"></span>
-                                    대추야자 (Date)
-                                </label>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                
-                <!-- Floral Category -->
-                <div class="flavor-category">
-                    <div class="flavor-title">
-                        <span>꽃향 (Floral) <span class="kr-label">플로럴</span></span>
-                        <label class="coffee-checkbox">
-                            <input type="checkbox" data-category="floral" data-level="main">
-                            <span class="checkmark"></span>
-                            전체 선택
-                        </label>
-                    </div>
-                    <div class="category-section">
-                        <div class="sub-category">
-                            <label class="coffee-checkbox">
-                                <input type="checkbox" data-category="floral" data-subcategory="floral" data-flavor="jasmine" data-level="flavor">
-                                <span class="checkmark"></span>
-                                자스민 (Jasmine)
-                            </label>
-                            <label class="coffee-checkbox">
-                                <input type="checkbox" data-category="floral" data-subcategory="floral" data-flavor="rose" data-level="flavor">
-                                <span class="checkmark"></span>
-                                장미 (Rose)
-                            </label>
-                            <label class="coffee-checkbox">
-                                <input type="checkbox" data-category="floral" data-subcategory="floral" data-flavor="elderflower" data-level="flavor">
-                                <span class="checkmark"></span>
-                                엘더플라워 (Elderflower)
-                            </label>
-                            <label class="coffee-checkbox">
-                                <input type="checkbox" data-category="floral" data-subcategory="floral" data-flavor="lavender" data-level="flavor">
-                                <span class="checkmark"></span>
-                                라벤더 (Lavender)
-                            </label>
-                            <label class="coffee-checkbox">
-                                <input type="checkbox" data-category="floral" data-subcategory="floral" data-flavor="chamomile" data-level="flavor">
-                                <span class="checkmark"></span>
-                                캐모마일 (Chamomile)
-                            </label>
-                            <label class="coffee-checkbox">
-                                <input type="checkbox" data-category="floral" data-subcategory="floral" data-flavor="honeysuckle" data-level="flavor">
-                                <span class="checkmark"></span>
-                                인동덩굴 (Honeysuckle)
-                            </label>
-                            <label class="coffee-checkbox">
-                                <input type="checkbox" data-category="floral" data-subcategory="floral" data-flavor="orchid" data-level="flavor">
-                                <span class="checkmark"></span>
-                                난초 (Orchid)
-                            </label>
-                        </div>
-                    </div>
-                </div>
-                
-                <!-- Herbal Category -->
-                <div class="flavor-category">
-                    <div class="flavor-title">
-                        <span>허브향 (Herbal) <span class="kr-label">허브</span></span>
-                        <label class="coffee-checkbox">
-                            <input type="checkbox" data-category="herbal" data-level="main">
-                            <span class="checkmark"></span>
-                            전체 선택
-                        </label>
-                    </div>
-                    <div class="category-section">
-                        <div class="sub-category">
-                            <label class="coffee-checkbox">
-                                <input type="checkbox" data-category="herbal" data-subcategory="herbal" data-flavor="mint" data-level="flavor">
-                                <span class="checkmark"></span>
-                                민트 (Mint)
-                            </label>
-                            <label class="coffee-checkbox">
-                                <input type="checkbox" data-category="herbal" data-subcategory="herbal" data-flavor="sage" data-level="flavor">
-                                <span class="checkmark"></span>
-                                세이지 (Sage)
-                            </label>
-                            <label class="coffee-checkbox">
-                                <input type="checkbox" data-category="herbal" data-subcategory="herbal" data-flavor="basil" data-level="flavor">
-                                <span class="checkmark"></span>
-                                바질 (Basil)
-                            </label>
-                            <label class="coffee-checkbox">
-                                <input type="checkbox" data-category="herbal" data-subcategory="herbal" data-flavor="thyme" data-level="flavor">
-                                <span class="checkmark"></span>
-                                타임 (Thyme)
-                            </label>
-                            <label class="coffee-checkbox">
-                                <input type="checkbox" data-category="herbal" data-subcategory="herbal" data-flavor="tea" data-level="flavor">
-                                <span class="checkmark"></span>
-                                차 (Tea)
-                            </label>
-                            <label class="coffee-checkbox">
-                                <input type="checkbox" data-category="herbal" data-subcategory="herbal" data-flavor="lemongrass" data-level="flavor">
-                                <span class="checkmark"></span>
-                                레몬그라스 (Lemongrass)
-                            </label>
-                            <label class="coffee-checkbox">
-                                <input type="checkbox" data-category="herbal" data-subcategory="herbal" data-flavor="eucalyptus" data-level="flavor">
-                                <span class="checkmark"></span>
-                                유칼립투스 (Eucalyptus)
-                            </label>
-                        </div>
-                    </div>
-                </div>
-                
-                <!-- Spice Category -->
-                <div class="flavor-category">
-                    <div class="flavor-title">
-                        <span>향신료 (Spice) <span class="kr-label">스파이스</span></span>
-                        <label class="coffee-checkbox">
-                            <input type="checkbox" data-category="spice" data-level="main">
-                            <span class="checkmark"></span>
-                            전체 선택
-                        </label>
-                    </div>
-                    <div class="category-section">
-                        <div class="sub-category">
-                            <label class="coffee-checkbox">
-                                <input type="checkbox" data-category="spice" data-subcategory="spice" data-flavor="cinnamon" data-level="flavor">
-                                <span class="checkmark"></span>
-                                시나몬 (Cinnamon)
-                            </label>
-                            <label class="coffee-checkbox">
-                                <input type="checkbox" data-category="spice" data-subcategory="spice" data-flavor="clove" data-level="flavor">
-                                <span class="checkmark"></span>
-                                클로브 (Clove)
-                            </label>
-                            <label class="coffee-checkbox">
-                                <input type="checkbox" data-category="spice" data-subcategory="spice" data-flavor="pepper" data-level="flavor">
-                                <span class="checkmark"></span>
-                                후추 (Pepper)
-                            </label>
-                            <label class="coffee-checkbox">
-                                <input type="checkbox" data-category="spice" data-subcategory="spice" data-flavor="anise" data-level="flavor">
-                                <span class="checkmark"></span>
-                                아니스 (Anise)
-                            </label>
-                            <label class="coffee-checkbox">
-                                <input type="checkbox" data-category="spice" data-subcategory="spice" data-flavor="cardamom" data-level="flavor">
-                                <span class="checkmark"></span>
-                                카다몸 (Cardamom)
-                            </label>
-                            <label class="coffee-checkbox">
-                                <input type="checkbox" data-category="spice" data-subcategory="spice" data-flavor="ginger" data-level="flavor">
-                                <span class="checkmark"></span>
-                                생강 (Ginger)
-                            </label>
-                            <label class="coffee-checkbox">
-                                <input type="checkbox" data-category="spice" data-subcategory="spice" data-flavor="nutmeg" data-level="flavor">
-                                <span class="checkmark"></span>
-                                넛맥 (Nutmeg)
-                            </label>
-                        </div>
-                    </div>
-                </div>
-                
-                <!-- Sweet/Nuts Category -->
-                <div class="flavor-category">
-                    <div class="flavor-title">
-                        <span>달콤함 & 견과류 (Sweet & Nuts) <span class="kr-label">달콤함 & 견과류</span></span>
-                        <label class="coffee-checkbox">
-                            <input type="checkbox" data-category="sweet" data-level="main">
-                            <span class="checkmark"></span>
-                            전체 선택
-                        </label>
-                    </div>
-                    <div class="category-section">
-                        <div class="mb-3">
-                            <div class="flex justify-between items-center">
-                                <label class="coffee-checkbox">
-                                    <input type="checkbox" data-category="sweet" data-subcategory="sweet" data-level="sub">
-                                    <span class="checkmark"></span>
-                                    달콤함 (Sweet) <span class="kr-label">달콤함</span>
-                                </label>
-                                <span id="sweet-status" class="text-xs text-gray-500"></span>
-                            </div>
-                            <div class="sub-category ml-6">
-                                <label class="coffee-checkbox">
-                                    <input type="checkbox" data-category="sweet" data-subcategory="sweet" data-flavor="caramel" data-level="flavor">
-                                    <span class="checkmark"></span>
-                                    카라멜 (Caramel)
-                                </label>
-                                <label class="coffee-checkbox">
-                                    <input type="checkbox" data-category="sweet" data-subcategory="sweet" data-flavor="honey" data-level="flavor">
-                                    <span class="checkmark"></span>
-                                    꿀 (Honey)
-                                </label>
-                                <label class="coffee-checkbox">
-                                    <input type="checkbox" data-category="sweet" data-subcategory="sweet" data-flavor="vanilla" data-level="flavor">
-                                    <span class="checkmark"></span>
-                                    바닐라 (Vanilla)
-                                </label>
-                                <label class="coffee-checkbox">
-                                    <input type="checkbox" data-category="sweet" data-subcategory="sweet" data-flavor="molasses" data-level="flavor">
-                                    <span class="checkmark"></span>
-                                    당밀 (Molasses)
-                                </label>
-                                <label class="coffee-checkbox">
-                                    <input type="checkbox" data-category="sweet" data-subcategory="sweet" data-flavor="maple-syrup" data-level="flavor">
-                                    <span class="checkmark"></span>
-                                    메이플 시럽 (Maple Syrup)
-                                </label>
-                                <label class="coffee-checkbox">
-                                    <input type="checkbox" data-category="sweet" data-subcategory="sweet" data-flavor="brown-sugar" data-level="flavor">
-                                    <span class="checkmark"></span>
-                                    흑설탕 (Brown Sugar)
-                                </label>
-                            </div>
-                        </div>
-                        
-                        <div class="mb-3">
-                            <div class="flex justify-between items-center">
-                                <label class="coffee-checkbox">
-                                    <input type="checkbox" data-category="nutty" data-subcategory="nutty" data-level="sub">
-                                    <span class="checkmark"></span>
-                                    견과류 (Nutty) <span class="kr-label">견과류</span>
-                                </label>
-                                <span id="nutty-status" class="text-xs text-gray-500"></span>
-                            </div>
-                            <div class="sub-category ml-6">
-                                <label class="coffee-checkbox">
-                                    <input type="checkbox" data-category="nutty" data-subcategory="nutty" data-flavor="almond" data-level="flavor">
-                                    <span class="checkmark"></span>
-                                    아몬드 (Almond)
-                                </label>
-                                <label class="coffee-checkbox">
-                                    <input type="checkbox" data-category="nutty" data-subcategory="nutty" data-flavor="hazelnut" data-level="flavor">
-                                    <span class="checkmark"></span>
-                                    헤이즐넛 (Hazelnut)
-                                </label>
-                                <label class="coffee-checkbox">
-                                    <input type="checkbox" data-category="nutty" data-subcategory="nutty" data-flavor="peanut" data-level="flavor">
-                                    <span class="checkmark"></span>
-                                    땅콩 (Peanut)
-                                </label>
-                                <label class="coffee-checkbox">
-                                    <input type="checkbox" data-category="nutty" data-subcategory="nutty" data-flavor="walnut" data-level="flavor">
-                                    <span class="checkmark"></span>
-                                    호두 (Walnut)
-                                </label>
-                                <label class="coffee-checkbox">
-                                    <input type="checkbox" data-category="nutty" data-subcategory="nutty" data-flavor="cashew" data-level="flavor">
-                                    <span class="checkmark"></span>
-                                    캐슈넛 (Cashew)
-                                </label>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                
-                <!-- Cocoa Category -->
-                <div class="flavor-category">
-                    <div class="flavor-title">
-                        <span>코코아 (Cocoa) <span class="kr-label">초콜릿</span></span>
-                        <label class="coffee-checkbox">
-                            <input type="checkbox" data-category="cocoa" data-level="main">
-                            <span class="checkmark"></span>
-                            전체 선택
-                        </label>
-                    </div>
-                    <div class="category-section">
-                        <div class="sub-category">
-                            <label class="coffee-checkbox">
-                                <input type="checkbox" data-category="cocoa" data-subcategory="cocoa" data-flavor="dark-chocolate" data-level="flavor">
-                                <span class="checkmark"></span>
-                                다크 초콜릿 (Dark Chocolate)
-                            </label>
-                            <label class="coffee-checkbox">
-                                <input type="checkbox" data-category="cocoa" data-subcategory="cocoa" data-flavor="milk-chocolate" data-level="flavor">
-                                <span class="checkmark"></span>
-                                밀크 초콜릿 (Milk Chocolate)
-                            </label>
-                            <label class="coffee-checkbox">
-                                <input type="checkbox" data-category="cocoa" data-subcategory="cocoa" data-flavor="cocoa-powder" data-level="flavor">
-                                <span class="checkmark"></span>
-                                코코아 파우더 (Cocoa Powder)
-                            </label>
-                            <label class="coffee-checkbox">
-                                <input type="checkbox" data-category="cocoa" data-subcategory="cocoa" data-flavor="baker-chocolate" data-level="flavor">
-                                <span class="checkmark"></span>
-                                베이커 초콜릿 (Baker's Chocolate)
-                            </label>
-                            <label class="coffee-checkbox">
-                                <input type="checkbox" data-category="cocoa" data-subcategory="cocoa" data-flavor="chocolate-liquor" data-level="flavor">
-                                <span class="checkmark"></span>
-                                초콜릿 리큐어 (Chocolate Liquor)
-                            </label>
-                        </div>
-                    </div>
-                </div>
-                
-                <!-- Body Descriptors - Integrated into Flavor Profile -->
-                <div class="flavor-category">
-                    <div class="flavor-title">
-                        <span>질감 표현 (Body Descriptors) <span class="kr-label">바디감</span></span>
-                    </div>
-                    <div class="category-section">
-                        <div class="texture-group">
-                            <div class="descriptor-group">
-                                <div class="descriptor-title">무게감 (Weight)</div>
-                                <label class="texture-checkbox coffee-checkbox">
-                                    <input type="checkbox" name="texture-weight" value="light">
-                                    <span class="checkmark"></span>
-                                    가벼운 (Light)
-                                </label>
-                                <label class="texture-checkbox coffee-checkbox">
-                                    <input type="checkbox" name="texture-weight" value="medium">
-                                    <span class="checkmark"></span>
-                                    중간 (Medium)
-                                </label>
-                                <label class="texture-checkbox coffee-checkbox">
-                                    <input type="checkbox" name="texture-weight" value="heavy">
-                                    <span class="checkmark"></span>
-                                    무거운 (Heavy)
-                                </label>
-                            </div>
-                            
-                            <div class="descriptor-group">
-                                <div class="descriptor-title">질감 (Texture)</div>
-                                <label class="texture-checkbox coffee-checkbox">
-                                    <input type="checkbox" name="texture-feel" value="smooth">
-                                    <span class="checkmark"></span>
-                                    부드러운 (Smooth)
-                                </label>
-                                <label class="texture-checkbox coffee-checkbox">
-                                    <input type="checkbox" name="texture-feel" value="grainy">
-                                    <span class="checkmark"></span>
-                                    까끌까끌한 (Grainy)
-                                </label>
-                                <label class="texture-checkbox coffee-checkbox">
-                                    <input type="checkbox" name="texture-feel" value="creamy">
-                                    <span class="checkmark"></span>
-                                    크리미한 (Creamy)
-                                </label>
-                            </div>
-                            
-                            <div class="descriptor-group">
-                                <div class="descriptor-title">입안 감촉 (Mouthfeel)</div>
-                                <label class="texture-checkbox coffee-checkbox">
-                                    <input type="checkbox" name="texture-mouthfeel" value="silky">
-                                    <span class="checkmark"></span>
-                                    실키한 (Silky)
-                                </label>
-                                <label class="texture-checkbox coffee-checkbox">
-                                    <input type="checkbox" name="texture-mouthfeel" value="velvety">
-                                    <span class="checkmark"></span>
-                                    벨벳같은 (Velvety)
-                                </label>
-                                <label class="texture-checkbox coffee-checkbox">
-                                    <input type="checkbox" name="texture-mouthfeel" value="dry">
-                                    <span class="checkmark"></span>
-                                    텁텁한 (Dry)
-                                </label>
-                            </div>
-                            
-                            <div class="descriptor-group">
-                                <div class="descriptor-title">기타 (Other)</div>
-                                <label class="texture-checkbox coffee-checkbox">
-                                    <input type="checkbox" name="texture-other" value="dense">
-                                    <span class="checkmark"></span>
-                                    밀도감 (Dense)
-                                </label>
-                                <label class="texture-checkbox coffee-checkbox">
-                                    <input type="checkbox" name="texture-other" value="rich">
-                                    <span class="checkmark"></span>
-                                    풍부한 (Rich)
-                                </label>
-                                <label class="texture-checkbox coffee-checkbox">
-                                    <input type="checkbox" name="texture-other" value="thin">
-                                    <span class="checkmark"></span>
-                                    얇은 (Thin)
-                                </label>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+        <!-- SCAA FLAVOR WHEEL EVALUATION -->
+        <section>
+            <h3 class="text-xl font-bold mb-1 border-b-2 pb-1 border-tan-200 flex items-center"><i class="fa fa-circle-half-stroke mr-2"></i>SCAA 향미 선택</h3>
+            <div class="text-sm mb-4 text-gray-600">[프래그런스] [아로마] [플레이버] [에프터테이스트] 항목별로 SCAA Flavor Wheel의 향미를 각각 선택해 주세요.</div>
+            <button type="button" class="mb-4 px-3 py-1 rounded bg-gray-100 text-xs" onclick="window.open('https://sca.coffee/research/coffee-tasters-flavor-wheel', '_blank');">플레이버 휠 공식자료 보기<i class="fas fa-external-link-alt ml-1 text-xs"></i></button>
+            <div id="flavorTabs" class="flex flex-wrap gap-2 mb-2">
+                <button type="button" data-flavorphase="fragrance" class="flavor-phase-btn tab-btn-active font-bold rounded px-4 py-1">프래그런스</button>
+                <button type="button" data-flavorphase="aroma" class="flavor-phase-btn tab-btn-inactive rounded px-4 py-1">아로마</button>
+                <button type="button" data-flavorphase="flavor" class="flavor-phase-btn tab-btn-inactive rounded px-4 py-1">플레이버</button>
+                <button type="button" data-flavorphase="aftertaste" class="flavor-phase-btn tab-btn-inactive rounded px-4 py-1">에프터테이스트</button>
             </div>
-            
-            <!-- Flavor Intensity Slider -->
-            <div class="mt-6">
-                <label class="block font-medium mb-2">전체 향미 강도 (Overall Flavor Intensity)</label>
-                <div class="slider-container">
-                    <input type="range" min="1" max="10" value="5" class="slider" id="flavorIntensity">
-                    <div class="flex justify-between text-sm mt-1">
-                        <span>약함 (Mild)</span>
-                        <span>중간 (Medium)</span>
-                        <span>강함 (Strong)</span>
-                    </div>
-                </div>
-            </div>
-        </div>
+            <div id="flavorWheelMultiSelectArea" class="mb-4"></div>
+        </section>
 
-        <!-- SCA Cupping Score Card -->
-        <div class="coffee-card mb-8 p-6">
-            <h3 class="text-xl font-bold mb-4 border-b pb-2 border-secondary-color">SCA 커핑 점수 <span class="text-base font-normal">(Cupping Score)</span></h3>
-            <p class="mb-4 text-sm">각 항목을 6-10점 사이로 평가하세요 (0.25점 단위).</p>
-            
-            <div class="score-grid">
-                <div class="mb-4">
-                    <label class="block text-sm font-medium mb-1">아로마 (Aroma)</label>
-                    <input type="number" id="scoreAroma" class="coffee-input w-full" min="0" max="10" step="0.25" value="7.5">
-                </div>
-                <div class="mb-4">
-                    <label class="block text-sm font-medium mb-1">플레이버 (Flavor)</label>
-                    <input type="number" id="scoreFlavor" class="coffee-input w-full" min="0" max="10" step="0.25" value="7.5">
-                </div>
-                <div class="mb-4">
-                    <label class="block text-sm font-medium mb-1">후미 (Aftertaste)</label>
-                    <input type="number" id="scoreAftertaste" class="coffee-input w-full" min="0" max="10" step="0.25" value="7.5">
-                </div>
-                <div class="mb-4">
-                    <label class="block text-sm font-medium mb-1">산미 (Acidity)</label>
-                    <input type="number" id="scoreAcidity" class="coffee-input w-full" min="0" max="10" step="0.25" value="7.5">
-                </div>
-                <div class="mb-4">
-                    <label class="block text-sm font-medium mb-1">바디 (Body)</label>
-                    <input type="number" id="scoreBody" class="coffee-input w-full" min="0" max="10" step="0.25" value="7.5">
-                </div>
-                <div class="mb-4">
-                    <label class="block text-sm font-medium mb-1">균형감 (Balance)</label>
-                    <input type="number" id="scoreBalance" class="coffee-input w-full" min="0" max="10" step="0.25" value="7.5">
-                </div>
-                <div class="mb-4">
-                    <label class="block text-sm font-medium mb-1">단맛 (Sweetness)</label>
-                    <input type="number" id="scoreSweetness" class="coffee-input w-full" min="0" max="10" step="0.25" value="7.5">
-                </div>
-                <div class="mb-4">
-                    <label class="block text-sm font-medium mb-1">클린컵 (Clean Cup)</label>
-                    <input type="number" id="scoreCleanCup" class="coffee-input w-full" min="0" max="10" step="0.25" value="7.5">
-                </div>
-            </div>
-            
-            <div class="mt-4 flex items-end">
-                <div class="flex-1">
-                    <label class="block text-sm font-medium mb-1">총점 (Total Score)</label>
-                    <div id="totalScore" class="coffee-input w-full font-bold text-center py-2">36.0</div>
-                </div>
-                <div class="ml-4 flex-none">
-                    <button id="calculateBtn" class="coffee-btn px-4 py-2 rounded">점수 계산 (Calculate)</button>
-                </div>
-            </div>
-        </div>
-
-        <!-- Notes section -->
-        <div class="coffee-card mb-8 p-6">
-            <h3 class="text-xl font-bold mb-4 border-b pb-2 border-secondary-color">테이스팅 노트 <span class="text-base font-normal">(Tasting Notes)</span></h3>
-            <textarea id="tastingNotes" class="coffee-input w-full h-32" placeholder="커피에 대한 추가 의견이나 느낌을 자유롭게 적어주세요."></textarea>
-        </div>
-
-        <!-- Result Visualization Card -->
-        <div class="coffee-card mb-8 p-6">
-            <h3 class="text-xl font-bold mb-4 border-b pb-2 border-secondary-color">결과 시각화 <span class="text-base font-normal">(Result Visualization)</span></h3>
-            <div class="result-container">
-                <h4 class="text-lg font-semibold text-center mb-4" id="result-title">커피 향미 프로필</h4>
-                
-                <!-- Selected Flavors Display -->
-                <div class="selected-flavors-container w-full mb-8">
-                    <h4 class="text-lg font-semibold mb-4">선택된 향미 특성 (Selected Flavor Profiles)</h4>
-                    <div id="selectedFlavors" class="text-base">선택된 향미가 없습니다.</div>
-                </div>
-                
-                <!-- SCA Score Radar Chart -->
-                <div class="chart-container mb-8">
-                    <canvas id="scoringRadar"></canvas>
-                </div>
-                
-                <!-- Coffee Adjectives -->
-                <div class="coffee-card p-4 w-full mb-6">
-                    <h4 class="font-semibold mb-2">커피를 표현하기 위한 형용사 (Coffee Adjectives)</h4>
-                    <div class="grid grid-cols-2 md:grid-cols-4 gap-2 mt-2">
-                        <div class="bg-yellow-100 p-2 rounded">
-                            <strong>달콤함 (Sweet)</strong><br>
-                            달콤한, 부드러운, 감미로운
-                        </div>
-                        <div class="bg-blue-100 p-2 rounded">
-                            <strong>깔끔함 (Clean)</strong><br>
-                            깔끔한, 선명한, 투명한
-                        </div>
-                        <div class="bg-purple-100 p-2 rounded">
-                            <strong>복합성 (Complex)</strong><br>
-                            복합적인, 다층적인, 심오한
-                        </div>
-                        <div class="bg-orange-100 p-2 rounded">
-                            <strong>균형감 (Balanced)</strong><br>
-                            균형 잡힌, 조화로운, 안정적인
-                        </div>
-                        <div class="bg-green-100 p-2 rounded">
-                            <strong>생동감 (Vibrant)</strong><br>
-                            생동감 있는, 활기찬, 역동적인
-                        </div>
-                        <div class="bg-red-100 p-2 rounded">
-                            <strong>깊이감 (Deep)</strong><br>
-                            깊은, 농후한, 풍부한
-                        </div>
-                        <div class="bg-gray-100 p-2 rounded">
-                            <strong>부드러움 (Soft)</strong><br>
-                            부드러운, 섬세한, 온화한
-                        </div>
-                        <div class="bg-pink-100 p-2 rounded">
-                            <strong>명료함 (Bright)</strong><br>
-                            밝은, 선명한, 또렷한
-                        </div>
+        <!-- STRUCTURED ATTRIBUTES -->
+        <section class="mb-8">
+            <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                <!-- Acidity -->
+                <div>
+                    <label class="block mb-1 font-medium">Acidity<br><span class="text-xs text-gray-500">산미 단계선택</span></label>
+                    <div class="flex gap-2 flex-wrap" id="acidity_level">
+                        <label><input type="radio" name="acidityLevel" value="Low"><span class="ml-1">Low</span></label>
+                        <label><input type="radio" name="acidityLevel" value="Med-Low"><span class="ml-1">Med-Low</span></label>
+                        <label><input type="radio" name="acidityLevel" value="Medium"><span class="ml-1">Medium</span></label>
+                        <label><input type="radio" name="acidityLevel" value="Med-High"><span class="ml-1">Med-High</span></label>
+                        <label><input type="radio" name="acidityLevel" value="High"><span class="ml-1">High</span></label>
                     </div>
                 </div>
-                
-                <!-- Export Button -->
-                <button id="exportBtn" class="coffee-btn px-6 py-3 rounded no-print">
-                    이미지로 내보내기 <i class="fas fa-download ml-2"></i>
-                </button>
+                <!-- Sweetness -->
+                <div>
+                    <label class="block mb-1 font-medium">Sweetness<br><span class="text-xs text-gray-500">단맛 단계선택</span></label>
+                    <div class="flex gap-2 flex-wrap" id="sweetness_level">
+                        <label><input type="radio" name="sweetnessLevel" value="Low"><span class="ml-1">Low</span></label>
+                        <label><input type="radio" name="sweetnessLevel" value="Med-Low"><span class="ml-1">Med-Low</span></label>
+                        <label><input type="radio" name="sweetnessLevel" value="Medium"><span class="ml-1">Medium</span></label>
+                        <label><input type="radio" name="sweetnessLevel" value="Med-High"><span class="ml-1">Med-High</span></label>
+                        <label><input type="radio" name="sweetnessLevel" value="High"><span class="ml-1">High</span></label>
+                    </div>
+                </div>
+                <!-- Body -->
+                <div>
+                    <label class="block mb-1 font-medium">Body<br><span class="text-xs text-gray-500">질감/바디 단계선택</span></label>
+                    <div class="flex gap-2 flex-wrap" id="body_level">
+                        <label><input type="radio" name="bodyLevel" value="Low"><span class="ml-1">Low</span></label>
+                        <label><input type="radio" name="bodyLevel" value="Med-Low"><span class="ml-1">Med-Low</span></label>
+                        <label><input type="radio" name="bodyLevel" value="Medium"><span class="ml-1">Medium</span></label>
+                        <label><input type="radio" name="bodyLevel" value="Med-High"><span class="ml-1">Med-High</span></label>
+                        <label><input type="radio" name="bodyLevel" value="High"><span class="ml-1">High</span></label>
+                    </div>
+                </div>
             </div>
+        </section>
+
+        <!-- SCORING -->
+        <section class="mb-8">
+            <h3 class="text-xl font-bold mb-2 border-b-2 pb-1 border-tan-200 flex items-center"><i class="fa fa-star mr-2"></i>SCA 점수 (0~10점, 0.25단위)</h3>
+            <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                <div>
+                    <label class="block text-sm mb-1">프래그런스</label>
+                    <input type="number" step="0.25" min="0" max="10" id="scoreFragrance" class="coffee-input w-full p-1.5 text-center border rounded" value="7">
+                </div>
+                <div>
+                    <label class="block text-sm mb-1">아로마</label>
+                    <input type="number" step="0.25" min="0" max="10" id="scoreAroma" class="coffee-input w-full p-1.5 text-center border rounded" value="7">
+                </div>
+                <div>
+                    <label class="block text-sm mb-1">플레이버</label>
+                    <input type="number" step="0.25" min="0" max="10" id="scoreFlavor" class="coffee-input w-full p-1.5 text-center border rounded" value="7">
+                </div>
+                <div>
+                    <label class="block text-sm mb-1">에프터테이스트</label>
+                    <input type="number" step="0.25" min="0" max="10" id="scoreAftertaste" class="coffee-input w-full p-1.5 text-center border rounded" value="7">
+                </div>
+                <div>
+                    <label class="block text-sm mb-1">액시디티</label>
+                    <input type="number" step="0.25" min="0" max="10" id="scoreAcidity" class="coffee-input w-full p-1.5 text-center border rounded" value="7">
+                </div>
+                <div>
+                    <label class="block text-sm mb-1">바디</label>
+                    <input type="number" step="0.25" min="0" max="10" id="scoreBody" class="coffee-input w-full p-1.5 text-center border rounded" value="7">
+                </div>
+                <div>
+                    <label class="block text-sm mb-1">밸런스</label>
+                    <input type="number" step="0.25" min="0" max="10" id="scoreBalance" class="coffee-input w-full p-1.5 text-center border rounded" value="7">
+                </div>
+                <div>
+                    <label class="block text-sm mb-1">오버럴</label>
+                    <input type="number" step="0.25" min="0" max="10" id="scoreOverall" class="coffee-input w-full p-1.5 text-center border rounded" value="7">
+                </div>
+            </div>
+            <div class="mt-4 flex flex-wrap items-end gap-3">
+                <div>
+                    <label class="text-sm block mb-1">총점 (기본 30점+합계)</label>
+                    <span id="totalScore" class="font-bold inline-block text-lg bg-gray-100 px-4 py-2 rounded border">86.00</span>
+                </div>
+                <button type="button" id="calcScoreBtn" class="ml-1 mt-2 px-4 py-2 rounded export-btn flex items-center text-sm"><i class="fas fa-equals mr-2"></i>점수 계산</button>
+            </div>
+        </section>
+
+        <!-- TASTING NOTES -->
+        <section class="mb-6">
+            <h3 class="text-xl font-bold mb-2 border-b-2 pb-1 border-tan-200 flex items-center"><i class="fas fa-pen-nib mr-2"></i>테이스팅 노트/기타</h3>
+            <textarea id="tastingNotes" class="coffee-input w-full min-h-[80px] p-2 border rounded" placeholder="특이사항, 시간, 온도, 커핑 총평 등 메모"></textarea>
+        </section>
+
+        <!-- VISUALIZATION -->
+        <section class="">
+            <h3 class="text-xl font-bold mb-2 border-b-2 pb-1 border-tan-200 flex items-center"><i class="fas fa-chart-radar mr-2"></i>결과 시각화 및 내보내기</h3>
+            <div class="grid md:grid-cols-2 gap-4">
+                <div class="bg-white rounded-lg p-4 shadow-md">
+                    <h4 class="font-semibold mb-2">향미 특성/훈련용 워드 클라우드</h4>
+                    <div id="selectedFlavorsArea"></div>
+                </div>
+                <div class="bg-white rounded-lg p-4 shadow-md">
+                    <h4 class="font-semibold mb-2">SCA 평가 레이더 차트</h4>
+                    <canvas id="cuppingRadar" class="" height="200"></canvas>
+                </div>
+            </div>
+            <div class="flex flex-wrap space-x-2 mt-6 gap-2">
+                <button id="exportImgBtn" type="button" class="export-btn px-6 py-2 rounded flex items-center"><i class="fas fa-image mr-2"></i>이미지로 내보내기</button>
+                <button id="exportCsvBtn" type="button" class="bg-green-600 hover:bg-green-700 text-white px-6 py-2 rounded flex items-center"><i class="fas fa-file-csv mr-2"></i>CSV로 내보내기</button>
+                <button id="exportXlsxBtn" type="button" class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded flex items-center"><i class="fas fa-file-excel mr-2"></i>엑셀로 내보내기</button>
+            </div>
+        </section>
+    </form>
+</div>
+
+<!-- COMPARE MODAL -->
+<div id="compareModal" class="hidden fixed top-0 left-0 w-full h-full flex justify-center items-center z-50 modal-bg">
+  <div class="bg-white rounded-lg shadow-xl p-4 md:p-6 w-full max-w-5xl max-h-[92vh] overflow-y-auto relative border">
+    <button type="button" id="closeCompareBtn" class="absolute top-2 right-4 text-lg text-gray-500 hover:text-red-500"><i class="fas fa-times"></i></button>
+    <h3 class="text-2xl font-bold mb-4 flex items-center"><i class="fas fa-balance-scale mr-2"></i>샘플 비교</h3>
+    <div class="flex flex-col md:flex-row gap-2">
+        <div class="md:w-1/2">
+            <canvas id="compareRadar"></canvas>
+            <div class="text-sm text-gray-400 mt-1">SCA Score Radar: 2~5개까지 선택 가능</div>
+        </div>
+        <div class="md:w-1/2 overflow-x-auto">
+            <table class="min-w-full bg-white border text-sm mt-2">
+                <thead><tr id="compareTableHeader" class="bg-gray-50"></tr></thead>
+                <tbody id="compareTableBody"></tbody>
+            </table>
         </div>
     </div>
+  </div>
+</div>
 
-    <script>
-        // 플레이버 데이터 구조
-        const flavorCategories = {
-            fruity: {
-                name: "과일향 (Fruity)",
-                korName: "과일",
-                color: "#E57373",
-                subcategories: {
-                    berry: {
-                        name: "베리류 (Berry)",
-                        korName: "베리",
-                        color: "#F06292",
-                        flavors: {
-                            blackberry: "블랙베리 (Blackberry)",
-                            raspberry: "라즈베리 (Raspberry)",
-                            blueberry: "블루베리 (Blueberry)",
-                            strawberry: "딸기 (Strawberry)",
-                            cranberry: "크랜베리 (Cranberry)"
-                        }
-                    },
-                    citrus: {
-                        name: "시트러스 (Citrus)",
-                        korName: "감귤류",
-                        color: "#FF9800",
-                        flavors: {
-                            lemon: "레몬 (Lemon)",
-                            orange: "오렌지 (Orange)",
-                            grapefruit: "자몽 (Grapefruit)",
-                            lime: "라임 (Lime)",
-                            mandarin: "귤 (Mandarin)"
-                        }
-                    },
-                    "stone-fruit": {
-                        name: "핵과류 (Stone Fruit)",
-                        korName: "과일류",
-                        color: "#FFB74D",
-                        flavors: {
-                            peach: "복숭아 (Peach)",
-                            apricot: "살구 (Apricot)",
-                            cherry: "체리 (Cherry)",
-                            plum: "자두 (Plum)",
-                            nectarine: "넥타린 (Nectarine)"
-                        }
-                    },
-                    tropical: {
-                        name: "열대과일 (Tropical)",
-                        korName: "트로피컬",
-                        color: "#FFEB3B",
-                        flavors: {
-                            pineapple: "파인애플 (Pineapple)",
-                            mango: "망고 (Mango)",
-                            banana: "바나나 (Banana)",
-                            "passion-fruit": "패션프루트 (Passion Fruit)",
-                            kiwi: "키위 (Kiwi)"
-                        }
-                    },
-                    dried: {
-                        name: "건조 과일 (Dried)",
-                        korName: "건과일",
-                        color: "#EED8AE",
-                        flavors: {
-                            raisin: "건포도 (Raisin)",
-                            prune: "프룬 (Prune)",
-                            fig: "무화과 (Fig)",
-                            date: "대추야자 (Date)"
-                        }
-                    }
-                }
-            },
-            floral: {
-                name: "꽃향 (Floral)",
-                korName: "플로럴",
-                color: "#9575CD",
-                subcategories: {
-                    floral: {
-                        name: "꽃향 (Floral)",
-                        korName: "플로럴",
-                        color: "#9575CD",
-                        flavors: {
-                            jasmine: "자스민 (Jasmine)",
-                            rose: "장미 (Rose)",
-                            elderflower: "엘더플라워 (Elderflower)",
-                            lavender: "라벤더 (Lavender)",
-                            chamomile: "캐모마일 (Chamomile)",
-                            honeysuckle: "인동덩굴 (Honeysuckle)",
-                            orchid: "난초 (Orchid)"
-                        }
-                    }
-                }
-            },
-            herbal: {
-                name: "허브향 (Herbal)",
-                korName: "허브",
-                color: "#81C784",
-                subcategories: {
-                    herbal: {
-                        name: "허브향 (Herbal)",
-                        korName: "허브",
-                        color: "#81C784",
-                        flavors: {
-                            mint: "민트 (Mint)",
-                            sage: "세이지 (Sage)",
-                            basil: "바질 (Basil)",
-                            thyme: "타임 (Thyme)",
-                            tea: "차 (Tea)",
-                            lemongrass: "레몬그라스 (Lemongrass)",
-                            eucalyptus: "유칼립투스 (Eucalyptus)"
-                        }
-                    }
-                }
-            },
-            spice: {
-                name: "향신료 (Spice)",
-                korName: "스파이스",
-                color: "#A1887F",
-                subcategories: {
-                    spice: {
-                        name: "향신료 (Spice)",
-                        korName: "스파이스",
-                        color: "#A1887F",
-                        flavors: {
-                            cinnamon: "시나몬 (Cinnamon)",
-                            clove: "클로브 (Clove)",
-                            pepper: "후추 (Pepper)",
-                            anise: "아니스 (Anise)",
-                            cardamom: "카다몸 (Cardamom)",
-                            ginger: "생강 (Ginger)",
-                            nutmeg: "넛맥 (Nutmeg)"
-                        }
-                    }
-                }
-            },
-            sweet: {
-                name: "달콤함 (Sweet)",
-                korName: "달콤함",
-                color: "#FFCC80",
-                subcategories: {
-                    sweet: {
-                        name: "달콤함 (Sweet)",
-                        korName: "달콤함",
-                        color: "#FFCC80",
-                        flavors: {
-                            caramel: "카라멜 (Caramel)",
-                            honey: "꿀 (Honey)",
-                            vanilla: "바닐라 (Vanilla)",
-                            molasses: "당밀 (Molasses)",
-                            "maple-syrup": "메이플 시럽 (Maple Syrup)",
-                            "brown-sugar": "흑설탕 (Brown Sugar)"
-                        }
-                    }
-                }
-            },
-            nutty: {
-                name: "견과류 (Nutty)",
-                korName: "견과류",
-                color: "#8D6E63",
-                subcategories: {
-                    nutty: {
-                        name: "견과류 (Nutty)",
-                        korName: "견과류",
-                        color: "#8D6E63",
-                        flavors: {
-                            almond: "아몬드 (Almond)",
-                            hazelnut: "헤이즐넛 (Hazelnut)",
-                            peanut: "땅콩 (Peanut)",
-                            walnut: "호두 (Walnut)",
-                            cashew: "캐슈넛 (Cashew)"
-                        }
-                    }
-                }
-            },
-            cocoa: {
-                name: "코코아 (Cocoa)",
-                korName: "초콜릿",
-                color: "#795548",
-                subcategories: {
-                    cocoa: {
-                        name: "코코아 (Cocoa)",
-                        korName: "초콜릿",
-                        color: "#795548",
-                        flavors: {
-                            "dark-chocolate": "다크 초콜릿 (Dark Chocolate)",
-                            "milk-chocolate": "밀크 초콜릿 (Milk Chocolate)",
-                            "cocoa-powder": "코코아 파우더 (Cocoa Powder)",
-                            "baker-chocolate": "베이커 초콜릿 (Baker's Chocolate)",
-                            "chocolate-liquor": "초콜릿 리큐어 (Chocolate Liquor)"
-                        }
-                    }
-                }
-            }
+<script>
+// SCAA FLAVOR DATA (MainCategory/Sub/Descriptors)
+const FLAVOR_DATA = [
+    // Each array here: [MainCategory,SubCategory (optional),Descriptor, Color]
+    // (this is not a complete wheel but covers main SCAA flavor types; you may expand if desired)
+    ["Fruity", "Citrus Fruit", "Lemon", "#FFD966"], ["Fruity", "Citrus Fruit", "Orange", "#FFC300"],
+    ["Fruity", "Citrus Fruit", "Grapefruit", "#FF7F50"], ["Fruity", "Other Fruit", "Apple", "#ABE188"],
+    ["Fruity", "Other Fruit", "Pear", "#B6E4A3"], ["Fruity", "Berry", "Raspberry", "#DD5772"],
+    ["Fruity", "Berry", "Strawberry", "#FF6F91"], ["Fruity", "Berry", "Blackberry", "#D7263D"],
+    ["Fruity", "Dried Fruit", "Raisin", "#BB9055"], ["Fruity", "Dried Fruit", "Prune", "#925E3A"],
+    ["Sweet", "", "Brown Sugar", "#B38B57"], ["Sweet", "", "Caramel", "#FFB15E"],
+    ["Sweet", "", "Honey", "#FDE994"], ["Sweet", "", "Vanilla", "#F0D7BC"],
+    ["Floral", "", "Jasmine", "#DEC2CB"], ["Floral", "", "Rose", "#FD5D8B"],
+    ["Floral", "", "Chamomile", "#F5E5C0"], ["Nutty/Cocoa", "Nutty", "Hazelnut", "#D7C2A8"],
+    ["Nutty/Cocoa", "Nutty", "Almond", "#DBD3C9"], ["Nutty/Cocoa", "Cocoa", "Dark Chocolate", "#6C4F3D"],
+    ["Nutty/Cocoa", "Cocoa", "Cocoa", "#926F34"], ["Spices", "", "Cinnamon", "#E5B39B"],
+    ["Spices", "", "Clove", "#C17855"], ["Spices", "", "Pepper", "#818286"], ["Spices", "", "Nutmeg", "#BD9C7F"],
+    ["Brown Sugar", "", "Molasses", "#946A3B"], ["Brown Sugar", "", "Maple Syrup", "#C97C5D"],
+    ["Roasted", "", "Brown Roast", "#5C4033"], ["Roasted", "", "Smoky", "#2D231C"],
+    ["Green/Vegetative", "", "Under-ripe", "#A4C09C"], ["Green/Vegetative", "", "Peapod", "#B2DAC0"],
+    ["Green/Vegetative", "", "Fresh", "#C2E99E"],
+    // Sour/Fermented
+    ["Sour/Fermented", "Sour", "Citric Acid", "#CEE6CB"],
+    ["Sour/Fermented", "Sour", "Malic Acid", "#C9E265"],
+    ["Sour/Fermented", "Sour", "Acetic Acid", "#D9C1B4"],
+    ["Sour/Fermented", "Fermented", "Winey", "#AC436E"],
+    ["Sour/Fermented", "Fermented", "Overripe", "#625958"],
+    ["Other", "", "Chemical", "#FCF6B1"],
+    ["Other", "", "Medicinal", "#E2D784"],
+];
+
+// PHASES (for fragrance/aroma/flavor/aftertaste)
+const FLAVOR_PHASES = [
+    {id: "fragrance", label:"프래그런스"},
+    {id: "aroma", label:"아로마"},
+    {id: "flavor", label:"플레이버"},
+    {id: "aftertaste", label:"에프터테이스트"}
+];
+
+// RAM: SAMPLE DATA STORE
+let samples = []; // [{}, ...] up to 20
+let currentSampleIdx = 0;
+
+/* -------- Sample Initialization Helper -------- */
+function makeEmptySample(){
+    let flavorSelections = {};
+    FLAVOR_PHASES.forEach(phase=>{
+        flavorSelections[phase.id] = [];
+    });
+    return {
+        name: "샘플" + (samples.length+1),
+        coffeeName: "", origin: "", variety: "", process: "",
+        roastDate: "", roastLevel: "",
+        flavorSelections,
+        acidityLevel: "", sweetnessLevel: "", bodyLevel: "",
+        scoreFragrance: 7, scoreAroma: 7, scoreFlavor: 7, scoreAftertaste: 7,
+        scoreAcidity: 7, scoreBody:7, scoreBalance:7, scoreOverall:7,
+        tastingNotes: ""
+    }
+}
+
+/* -------- UI Rendering Functions -------- */
+function updateSampleTabs(){
+    let tabArea = document.getElementById('sampleTabs');
+    tabArea.innerHTML = '';
+    samples.forEach((sample, idx)=>{
+        let btn = document.createElement('button');
+        btn.type='button';
+        btn.className = 'rounded px-3 py-1 mx-1 mb-1 border text-sm '+(idx===currentSampleIdx?'tab-btn-active':'tab-btn-inactive');
+        btn.textContent = sample.name || (`샘플${idx+1}`);
+        btn.setAttribute('data-idx',idx);
+        btn.onclick = ()=>{
+            saveUiToSample();
+            currentSampleIdx=idx;
+            renderSample();
+            updateSampleTabs();
         };
+        tabArea.appendChild(btn);
+    });
+}
 
-        // DOM 로드 완료 후 실행
-        document.addEventListener('DOMContentLoaded', function() {
-            // 초기화
-            initCheckboxes();
-            initCharts();
-            updateResultTitle();
-            
-            // 이벤트 리스너
-            document.querySelectorAll('input[type="checkbox"]').forEach(checkbox => {
-                checkbox.addEventListener('change', function() {
-                    const level = this.getAttribute('data-level');
-                    const category = this.getAttribute('data-category');
-                    
-                    // 대분류 체크박스가 선택/해제될 때
-                    if (level === 'main') {
-                        const subcategoryCheckboxes = document.querySelectorAll(`input[data-category="${category}"][data-level="sub"]`);
-                        const flavorCheckboxes = document.querySelectorAll(`input[data-category="${category}"][data-level="flavor"]`);
-                        
-                        // 모든 하위 체크박스 상태 변경
-                        subcategoryCheckboxes.forEach(subCheckbox => {
-                            subCheckbox.checked = this.checked;
-                        });
-                        
-                        flavorCheckboxes.forEach(flavorCheckbox => {
-                            flavorCheckbox.checked = this.checked;
-                        });
-                    }
-                    
-                    // 중분류 체크박스가 선택/해제될 때
-                    if (level === 'sub') {
-                        const subcategory = this.getAttribute('data-subcategory');
-                        const flavorCheckboxes = document.querySelectorAll(`input[data-category="${category}"][data-subcategory="${subcategory}"][data-level="flavor"]`);
-                        
-                        // 해당 중분류의 모든 세부 향미 체크박스 상태 변경
-                        flavorCheckboxes.forEach(flavorCheckbox => {
-                            flavorCheckbox.checked = this.checked;
-                        });
-                        
-                        // 중분류 체크박스 상태에 따라 대분류 체크박스 상태 업데이트
-                        updateCategoryCheckboxState(category);
-                    }
-                    
-                    // 세부 향미 체크박스가 선택/해제될 때
-                    if (level === 'flavor') {
-                        const subcategory = this.getAttribute('data-subcategory');
-                        updateSubcategoryCheckboxState(category, subcategory);
-                        updateCategoryCheckboxState(category);
-                    }
-                    
-                    updateSelectedFlavorsList();
-                });
-            });
-            
-            document.getElementById('flavorIntensity').addEventListener('input', function() {
-                updateSelectedFlavorsList();
-            });
-            
-            document.getElementById('calculateBtn').addEventListener('click', function() {
-                calculateTotalScore();
-                updateScoringRadar();
-            });
-            
-            document.getElementById('coffeeName').addEventListener('input', updateResultTitle);
-            document.getElementById('origin').addEventListener('input', updateResultTitle);
-            
-            document.getElementById('exportBtn').addEventListener('click', exportAsImage);
-            
-            // 초기 데이터로 차트 업데이트
-            updateScoringRadar();
-            updateSelectedFlavorsList();
+/* -------- Form <-> Sample Binding -------- */
+function renderSample(){
+    let data = samples[currentSampleIdx]||{};
+    document.getElementById('coffeeName').value = data.coffeeName||'';
+    document.getElementById('origin').value = data.origin||'';
+    document.getElementById('variety').value = data.variety||'';
+    document.getElementById('process').value = data.process||'';
+    document.getElementById('roastDate').value = data.roastDate||'';
+    document.getElementById('roastLevel').value = data.roastLevel||'';
+
+    // Attribute radios
+    for(let group of ["acidity","sweetness","body"]){
+      let v = data[group+"Level"]||"";
+      if(v){
+        let radio = document.querySelector('input[name="'+group+'Level"][value="'+v+'"]');
+        if(radio) radio.checked = true;
+      }else{
+        let radios = document.querySelectorAll('input[name="'+group+'Level"]');
+        radios.forEach(r=>r.checked=false);
+      }
+    }
+    // Score
+    [
+      ["scoreFragrance","scoreFragrance"],
+      ["scoreAroma","scoreAroma"],
+      ["scoreFlavor","scoreFlavor"],
+      ["scoreAftertaste","scoreAftertaste"],
+      ["scoreAcidity","scoreAcidity"],
+      ["scoreBody","scoreBody"],
+      ["scoreBalance","scoreBalance"],
+      ["scoreOverall","scoreOverall"]
+    ].forEach(([key,id])=>{
+      document.getElementById(id).value = data[key]||7;
+    });
+    document.getElementById('tastingNotes').value = data.tastingNotes||'';
+    renderFlavorPhase();
+    updateFlavorsArea();
+    updateRadar();
+    updateTotalScore();
+}
+
+function saveUiToSample(){
+    let s=samples[currentSampleIdx];
+    s.coffeeName = document.getElementById('coffeeName').value;
+    s.origin = document.getElementById('origin').value;
+    s.variety = document.getElementById('variety').value;
+    s.process = document.getElementById('process').value;
+    s.roastDate = document.getElementById('roastDate').value;
+    s.roastLevel = document.getElementById('roastLevel').value;
+    s.acidityLevel = getCheckedRadio('acidityLevel');
+    s.sweetnessLevel = getCheckedRadio('sweetnessLevel');
+    s.bodyLevel = getCheckedRadio('bodyLevel');
+    s.scoreFragrance = parseFloat(document.getElementById('scoreFragrance').value)||0;
+    s.scoreAroma = parseFloat(document.getElementById('scoreAroma').value)||0;
+    s.scoreFlavor = parseFloat(document.getElementById('scoreFlavor').value)||0;
+    s.scoreAftertaste = parseFloat(document.getElementById('scoreAftertaste').value)||0;
+    s.scoreAcidity = parseFloat(document.getElementById('scoreAcidity').value)||0;
+    s.scoreBody = parseFloat(document.getElementById('scoreBody').value)||0;
+    s.scoreBalance = parseFloat(document.getElementById('scoreBalance').value)||0;
+    s.scoreOverall = parseFloat(document.getElementById('scoreOverall').value)||0;
+    s.tastingNotes = document.getElementById('tastingNotes').value;
+    // save phase flavors et al. in respective handlers
+}
+
+/* -------- Flavor Phase UI -------- */
+let currentFlavorPhase = "fragrance";
+function renderFlavorPhase(){
+    let curSel = samples[currentSampleIdx].flavorSelections[currentFlavorPhase]||[];
+    let outer = document.getElementById('flavorWheelMultiSelectArea');
+    // Group data by MainCategory
+    let catMap = {};
+    FLAVOR_DATA.forEach(([cat, sub, desc, color])=>{
+        if(!catMap[cat])catMap[cat] = [];
+        catMap[cat].push({sub,desc,color});
+    });
+    // Build HTML
+    let html = '';
+    for(let cat in catMap){
+        html += `<div class="mb-1 mt-2"><div class="font-bold mb-0.5">${cat}</div>`;
+        // SubCat group
+        let subMap = {};
+        catMap[cat].forEach(f=>{
+            let k = f.sub||'특징없음';
+            if(!subMap[k])subMap[k]=[];
+            subMap[k].push(f);
         });
-        
-        // 중분류 체크박스 상태 업데이트
-        function updateSubcategoryCheckboxState(category, subcategory) {
-            const flavorCheckboxes = document.querySelectorAll(`input[data-category="${category}"][data-subcategory="${subcategory}"][data-level="flavor"]`);
-            const subcategoryCheckbox = document.querySelector(`input[data-category="${category}"][data-subcategory="${subcategory}"][data-level="sub"]`);
-            
-            if (subcategoryCheckbox) {
-                // 해당 중분류 내 모든 세부 향미 체크박스가 선택되었는지 확인
-                const allChecked = Array.from(flavorCheckboxes).every(checkbox => checkbox.checked);
-                
-                // 해당 중분류 내 하나 이상의 세부 향미 체크박스가 선택되었는지 확인
-                const anyChecked = Array.from(flavorCheckboxes).some(checkbox => checkbox.checked);
-                
-                // 모두 선택되었으면 중분류 체크박스도 선택
-                subcategoryCheckbox.checked = anyChecked;
-                
-                // 선택된 향미 개수 표시
-                const checkedCount = Array.from(flavorCheckboxes).filter(checkbox => checkbox.checked).length;
-                const statusElement = document.getElementById(`${subcategory}-status`);
-                if (statusElement) {
-                    statusElement.textContent = anyChecked ? `${checkedCount}/${flavorCheckboxes.length}` : '';
-                }
-            }
-        }
-        
-        // 대분류 체크박스 상태 업데이트
-        function updateCategoryCheckboxState(category) {
-            const subcategoryCheckboxes = document.querySelectorAll(`input[data-category="${category}"][data-level="sub"]`);
-            const categoryCheckbox = document.querySelector(`input[data-category="${category}"][data-level="main"]`);
-            
-            if (categoryCheckbox && subcategoryCheckboxes.length > 0) {
-                // 해당 대분류 내 모든 중분류 체크박스가 선택되었는지 확인
-                const allChecked = Array.from(subcategoryCheckboxes).every(checkbox => checkbox.checked);
-                
-                // 해당 대분류 내 하나 이상의 중분류 체크박스가 선택되었는지 확인
-                const anyChecked = Array.from(subcategoryCheckboxes).some(checkbox => checkbox.checked);
-                
-                // 모두 선택되었으면 대분류 체크박스도 선택
-                categoryCheckbox.checked = anyChecked;
-            }
-        }
-
-        // 체크박스 선택 관계 초기화
-        function initCheckboxes() {
-            // 모든 카테고리에 대해 처리
-            for (const category in flavorCategories) {
-                // 각 서브카테고리에 대해 처리
-                for (const subcategory in flavorCategories[category].subcategories) {
-                    updateSubcategoryCheckboxState(category, subcategory);
-                }
-                updateCategoryCheckboxState(category);
-            }
-        }
-
-        // 차트 초기화
-        function initCharts() {
-            // 점수 레이더 차트 초기화
-            const scoringRadarCtx = document.getElementById('scoringRadar').getContext('2d');
-            window.scoringRadarChart = new Chart(scoringRadarCtx, {
-                type: 'radar',
-                data: {
-                    labels: ['아로마', '플레이버', '후미', '산미', '바디', '균형감', '단맛', '클린컵'],
-                    datasets: [{
-                        label: 'SCA 점수',
-                        data: [7.5, 7.5, 7.5, 7.5, 7.5, 7.5, 7.5, 7.5],
-                        backgroundColor: 'rgba(139, 90, 43, 0.3)',
-                        borderColor: 'rgba(139, 90, 43, 1)',
-                        borderWidth: 2,
-                        pointBackgroundColor: 'rgba(139, 90, 43, 1)',
-                        pointBorderColor: '#fff',
-                        pointHoverBackgroundColor: '#fff',
-                        pointHoverBorderColor: 'rgba(139, 90, 43, 1)'
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: true,
-                    scales: {
-                        r: {
-                            beginAtZero: false,
-                            min: 5,
-                            max: 10,
-                            ticks: {
-                                stepSize: 1,
-                                font: {
-                                    size: 14,
-                                    weight: 'bold'
-                                }
-                            },
-                            pointLabels: {
-                                font: {
-                                    family: 'Noto Sans KR',
-                                    size: 16,
-                                    weight: 'bold'
-                                }
-                            }
-                        }
-                    },
-                    plugins: {
-                        legend: {
-                            display: false
-                        }
-                    }
-                }
+        for(let sub in subMap){
+            html += `<div class="mb-1 ml-2"><span class="font-semibold text-sm">${sub!=='특징없음'?sub:""}</span>&nbsp;`;
+            subMap[sub].forEach(f=>{
+                // unique key for this desc
+                let id = cat+'|'+sub+'|'+f.desc;
+                let checked = curSel.includes(id) ? ' checked ':'';
+                html+=`<label class="inline-block align-middle mr-2 mb-1 flavor-badge" style="background:${f.color};"><input type="checkbox" class="flavorSelectBox" data-key="${id}" ${checked}><span>${f.desc}</span></label>`;
             });
+            html += '</div>';
         }
-
-        // 현재 선택된 향미 가져오기
-        function getSelectedFlavors() {
-            const selected = {};
-            
-            // 선택된 체크박스 찾기
-            document.querySelectorAll('input[data-flavor]:checked').forEach(checkbox => {
-                const category = checkbox.getAttribute('data-category');
-                const subcategory = checkbox.getAttribute('data-subcategory');
-                const flavor = checkbox.getAttribute('data-flavor');
-                
-                // 선택된 향미 목록에 추가
-                if (!selected[category]) {
-                    selected[category] = {};
-                }
-                if (!selected[category][subcategory]) {
-                    selected[category][subcategory] = {};
-                }
-                
-                selected[category][subcategory][flavor] = true;
-            });
-            
-            return selected;
-        }
-
-        // 선택된 향미 목록 텍스트 업데이트
-        function updateSelectedFlavorsList() {
-            const selectedFlavors = getSelectedFlavors();
-            const listElement = document.getElementById('selectedFlavors');
-            const intensity = parseInt(document.getElementById('flavorIntensity').value);
-            
-            if (Object.keys(selectedFlavors).length === 0) {
-                listElement.textContent = "선택된 향미가 없습니다.";
-                return;
+        html+='</div>';
+    }
+    outer.innerHTML = html;
+    // Checkbox handler
+    outer.querySelectorAll('.flavorSelectBox').forEach(cb=>{
+        cb.onchange = function(){
+            let sel = samples[currentSampleIdx].flavorSelections[currentFlavorPhase];
+            let key = this.getAttribute('data-key');
+            if(this.checked){
+                if(sel.length<10) sel.push(key);
+            }else{
+                let idx = sel.indexOf(key);
+                if(idx>-1) sel.splice(idx,1);
             }
-            
-            let flavorHtml = '';
-            
-            // 강도 레벨 표시
-            flavorHtml += `<div class="mb-4">
-                <strong>향미 강도:</strong> ${intensity}/10 (${intensity <= 3 ? '약함' : intensity <= 7 ? '중간' : '강함'})
-            </div>`;
-            
-            // 카테고리 별 그룹핑
-            for (const [category, subcategories] of Object.entries(selectedFlavors)) {
-                const categoryInfo = flavorCategories[category];
-                
-                // 카테고리에 선택된 항목이 있는지 확인
-                let hasSelectedFlavors = false;
-                for (const subcategory in subcategories) {
-                    if (Object.keys(subcategories[subcategory]).length > 0) {
-                        hasSelectedFlavors = true;
-                        break;
-                    }
-                }
-                
-                if (hasSelectedFlavors) {
-                    flavorHtml += `<div class="flavor-group">
-                        <div class="flavor-group-title">
-                            <span class="flavor-indicator" style="background-color:${categoryInfo.color}"></span>
-                            ${categoryInfo.name}
-                        </div>`;
-                    
-                    // 서브카테고리 그룹핑
-                    for (const [subcategory, flavors] of Object.entries(subcategories)) {
-                        if (Object.keys(flavors).length > 0) {
-                            const subcategoryInfo = categoryInfo.subcategories[subcategory];
-                            flavorHtml += `<div class="ml-4 mb-2">
-                                <div class="font-medium mb-1">${subcategoryInfo.name}</div>
-                                <div class="flex flex-wrap">`;
-                            
-                            // 개별 향미 배지
-                            for (const flavor in flavors) {
-                                flavorHtml += `<span class="flavor-badge" style="background-color:${subcategoryInfo.color}">
-                                    ${subcategoryInfo.flavors[flavor].split(' (')[0]}
-                                </span>`;
-                            }
-                            
-                            flavorHtml += `</div></div>`;
-                        }
-                    }
-                    
-                    flavorHtml += `</div>`;
-                }
+            samples[currentSampleIdx].flavorSelections[currentFlavorPhase] = sel;
+            updateFlavorsArea();
+        }
+    });
+}
+/* nav phase */
+document.querySelectorAll('.flavor-phase-btn').forEach(btn=>{
+    btn.onclick = function(){
+        document.querySelectorAll('.flavor-phase-btn').forEach(b=>b.classList.remove('tab-btn-active'));
+        this.classList.add('tab-btn-active');
+        currentFlavorPhase = this.getAttribute('data-flavorphase');
+        renderFlavorPhase();
+    };
+});
+
+/* ------- Update Flavors Word Cloud/Selection ------ */
+function updateFlavorsArea(){
+    let s = samples[currentSampleIdx];
+    let html = '';
+    FLAVOR_PHASES.forEach(phase=>{
+        let phaseSel = (s.flavorSelections[phase.id]||[]).map(key=>{
+            let [cat,sub,desc] = key.split('|');
+            let rec = FLAVOR_DATA.find(f=>f[0]===cat&&f[1]===sub&&f[2]===desc);
+            let color = rec?rec[3]:'#B8B2A5';
+            return `<span class="flavor-badge" style="background:${color};">${desc}</span>`;
+        });
+        html+=`<div class="mb-1"><span class="font-bold">${phase.label}:</span> ${phaseSel.join(' ')||'<span class="text-xs text-gray-400">없음</span>'}</div>`;
+    });
+    document.getElementById('selectedFlavorsArea').innerHTML = html;
+}
+
+/* ---- Score, Attribute, Radar Chart  ---- */
+function updateTotalScore(){
+    let s = samples[currentSampleIdx];
+    let sum = 30 + s.scoreFragrance + s.scoreAroma + s.scoreFlavor + s.scoreAftertaste + s.scoreAcidity + s.scoreBody + s.scoreBalance + s.scoreOverall;
+    document.getElementById('totalScore').textContent = sum.toFixed(2);
+}
+function updateRadar(){
+    if(!window.cuppingRadarChart){
+        window.cuppingRadarChart = new Chart(document.getElementById('cuppingRadar').getContext('2d'), {
+          type: "radar",
+          data: {
+            labels:["프래그런스","아로마","플레이버","에프터테이스트","액시디티","바디","밸런스","오버럴"],
+            datasets:[{label:"점수",data:[7,7,7,7,7,7,7,7], backgroundColor:"rgba(139,90,43,0.2)",borderColor:"#8B5A2B",pointBgColor:"#8B5A2B"}]
+          },
+          options: {
+            responsive:true,
+            plugins:{legend:{display:false}},
+            scales:{r:{
+              min:0,max:10,ticks:{stepSize:2,
+                font:{family:"Noto Sans KR", size:13}},
+             pointLabels:{font:{family:"Noto Sans KR", weight:"bold", size:14}}
+            }}
+          }
+        });
+    }
+    let s = samples[currentSampleIdx];
+    let chart = window.cuppingRadarChart;
+    chart.data.datasets[0].data = [
+      s.scoreFragrance, s.scoreAroma, s.scoreFlavor, s.scoreAftertaste,
+      s.scoreAcidity, s.scoreBody, s.scoreBalance, s.scoreOverall
+    ];
+    chart.update();
+}
+
+// -- CSV/XLSX Helper --
+function samplesToRows(fields){
+    // fields = ["샘플이름",'coffeeName' ...]
+    return samples.map(s=>{
+        return fields.map(f=>{
+            if(f.startsWith('flavorSelections.')){
+                let phase = f.split('.')[1];
+                return (s.flavorSelections[phase]||[]).map(key=>key.split('|')[2]).join('; ');
             }
-            
-            // 선택된 질감 항목 가져오기
-            const selectedTextures = {
-                weight: Array.from(document.querySelectorAll('input[name="texture-weight"]:checked')).map(cb => cb.value),
-                feel: Array.from(document.querySelectorAll('input[name="texture-feel"]:checked')).map(cb => cb.value),
-                mouthfeel: Array.from(document.querySelectorAll('input[name="texture-mouthfeel"]:checked')).map(cb => cb.value),
-                other: Array.from(document.querySelectorAll('input[name="texture-other"]:checked')).map(cb => cb.value)
-            };
-            
-            // 선택된 질감 표현이 있는지 확인
-            const hasSelectedTextures = selectedTextures.weight.length > 0 || 
-                                       selectedTextures.feel.length > 0 || 
-                                       selectedTextures.mouthfeel.length > 0 || 
-                                       selectedTextures.other.length > 0;
-            
-            // 질감 표현 추가
-            if (hasSelectedTextures) {
-                flavorHtml += `<div class="flavor-group mt-4">
-                    <div class="flavor-group-title">
-                        <span class="flavor-indicator" style="background-color:#A1887F"></span>
-                        질감 표현 (Body Descriptors)
-                    </div>`;
-                
-                const textureLabels = {
-                    weight: {
-                        light: "가벼운 (Light)",
-                        medium: "중간 (Medium)",
-                        heavy: "무거운 (Heavy)"
-                    },
-                    feel: {
-                        smooth: "부드러운 (Smooth)",
-                        grainy: "까끌까끌한 (Grainy)",
-                        creamy: "크리미한 (Creamy)"
-                    },
-                    mouthfeel: {
-                        silky: "실키한 (Silky)",
-                        velvety: "벨벳같은 (Velvety)",
-                        dry: "텁텁한 (Dry)"
-                    },
-                    other: {
-                        dense: "밀도감 (Dense)",
-                        rich: "풍부한 (Rich)",
-                        thin: "얇은 (Thin)"
-                    }
-                };
-                
-                if (selectedTextures.weight.length > 0) {
-                    flavorHtml += `<div class="ml-4 mb-2">
-                        <div class="font-medium">무게감 (Weight)</div>
-                        <div class="flex flex-wrap">`;
-                    
-                    selectedTextures.weight.forEach(texture => {
-                        flavorHtml += `<span class="flavor-badge" style="background-color:#8B5A2B">
-                            ${textureLabels.weight[texture].split(' (')[0]}
-                        </span>`;
-                    });
-                    
-                    flavorHtml += `</div></div>`;
-                }
-                
-                if (selectedTextures.feel.length > 0) {
-                    flavorHtml += `<div class="ml-4 mb-2">
-                        <div class="font-medium">질감 (Texture)</div>
-                        <div class="flex flex-wrap">`;
-                    
-                    selectedTextures.feel.forEach(texture => {
-                        flavorHtml += `<span class="flavor-badge" style="background-color:#8B5A2B">
-                            ${textureLabels.feel[texture].split(' (')[0]}
-                        </span>`;
-                    });
-                    
-                    flavorHtml += `</div></div>`;
-                }
-                
-                if (selectedTextures.mouthfeel.length > 0) {
-                    flavorHtml += `<div class="ml-4 mb-2">
-                        <div class="font-medium">입안 감촉 (Mouthfeel)</div>
-                        <div class="flex flex-wrap">`;
-                    
-                    selectedTextures.mouthfeel.forEach(texture => {
-                        flavorHtml += `<span class="flavor-badge" style="background-color:#8B5A2B">
-                            ${textureLabels.mouthfeel[texture].split(' (')[0]}
-                        </span>`;
-                    });
-                    
-                    flavorHtml += `</div></div>`;
-                }
-                
-                if (selectedTextures.other.length > 0) {
-                    flavorHtml += `<div class="ml-4 mb-2">
-                        <div class="font-medium">기타 (Other)</div>
-                        <div class="flex flex-wrap">`;
-                    
-                    selectedTextures.other.forEach(texture => {
-                        flavorHtml += `<span class="flavor-badge" style="background-color:#8B5A2B">
-                            ${textureLabels.other[texture].split(' (')[0]}
-                        </span>`;
-                    });
-                    
-                    flavorHtml += `</div></div>`;
-                }
-                
-                flavorHtml += `</div>`;
-            }
-            
-            listElement.innerHTML = flavorHtml;
-        }
+            return s[f]!==undefined?s[f]:"";
+        });
+    });
+}
 
-        // SCA 점수 레이더 차트 업데이트
-        function updateScoringRadar() {
-            const scores = [
-                parseFloat(document.getElementById('scoreAroma').value) || 7.5,
-                parseFloat(document.getElementById('scoreFlavor').value) || 7.5,
-                parseFloat(document.getElementById('scoreAftertaste').value) || 7.5,
-                parseFloat(document.getElementById('scoreAcidity').value) || 7.5,
-                parseFloat(document.getElementById('scoreBody').value) || 7.5,
-                parseFloat(document.getElementById('scoreBalance').value) || 7.5,
-                parseFloat(document.getElementById('scoreSweetness').value) || 7.5,
-                parseFloat(document.getElementById('scoreCleanCup').value) || 7.5
-            ];
-            
-            window.scoringRadarChart.data.datasets[0].data = scores;
-            window.scoringRadarChart.update();
-        }
+/* ---- COMPARISON ---------- */
+function openCompareModal(){
+    // By default: select all samples, up to 5
+    let selectedIdx = samples.map((s,idx)=>idx).slice(0,Math.min(5,samples.length));
+    let tableHeader = document.getElementById('compareTableHeader');
+    let tableBody = document.getElementById('compareTableBody');
 
-        // 총점 계산
-        function calculateTotalScore() {
-            const scoreFields = [
-                'scoreAroma', 'scoreFlavor', 'scoreAftertaste', 'scoreAcidity',
-                'scoreBody', 'scoreBalance', 'scoreSweetness', 'scoreCleanCup'
-            ];
-            
-            let total = 0;
-            
-            scoreFields.forEach(field => {
-                const value = parseFloat(document.getElementById(field).value) || 0;
-                total += value;
-            });
-            
-            // SCA 커핑 폼에 따라 총점 계산 (36 + 합계)
-            const finalScore = 36 + total;
-            document.getElementById('totalScore').textContent = finalScore.toFixed(2);
-        }
+    // Header
+    tableHeader.innerHTML = '<th class="px-1 py-0.5"></th>'+selectedIdx.map(idx=>`<th class="text-sm text-tan-800 px-1 py-0.5">${samples[idx].name||"샘플"+(idx+1)}</th>`).join("");
+    // Body/fields
+    let rows = [
+        ['커피명','coffeeName'],
+        ['원산지','origin'],
+        ['품종','variety'],
+        ['가공','process'],
+        ['로스팅','roastLevel'],
+        ['프래그런스','scoreFragrance'],
+        ['아로마','scoreAroma'],
+        ['플레이버','scoreFlavor'],
+        ['에프터테이스트','scoreAftertaste'],
+        ['액시디티','scoreAcidity'],
+        ['바디','scoreBody'],
+        ['밸런스','scoreBalance'],
+        ['오버럴','scoreOverall'],
+        ['총점',null],
+        ['Acidity Level','acidityLevel'],
+        ['Sweetness Level','sweetnessLevel'],
+        ['Body Level','bodyLevel'],
+    ];
+    tableBody.innerHTML = '';
+    rows.forEach(([label,key])=>{
+        tableBody.innerHTML += `<tr>
+          <td class="border p-1 font-semibold">${label}</td>
+          ${selectedIdx.map(idx=>{
+              if(key){
+                return `<td class="border p-1">${samples[idx][key]??""}</td>`;
+              }else if(label==="총점"){
+                let s = samples[idx];
+                let sum = 30+s.scoreFragrance+s.scoreAroma+s.scoreFlavor+s.scoreAftertaste+s.scoreAcidity+s.scoreBody+s.scoreBalance+s.scoreOverall;
+                return `<td class="border p-1 font-bold bg-gray-50">${sum.toFixed(2)}</td>`;
+              }else return `<td class="border"></td>`
+          }).join('')}
+        </tr>`;
+    });
+    // Radar
+    let radar = document.getElementById('compareRadar').getContext('2d');
+    if(window.compareRadarChart) window.compareRadarChart.destroy();
+    let datasets = selectedIdx.map((idx,j)=>({
+        label: samples[idx].name||`샘플${idx+1}`,
+        data:[
+            samples[idx].scoreFragrance,
+            samples[idx].scoreAroma,
+            samples[idx].scoreFlavor,
+            samples[idx].scoreAftertaste,
+            samples[idx].scoreAcidity,
+            samples[idx].scoreBody,
+            samples[idx].scoreBalance,
+            samples[idx].scoreOverall
+        ],
+        backgroundColor: `rgba(${60+j*35},${130+j*21},${170-j*15},0.13)`,
+        borderColor: `rgba(${60+j*35},${120+j*20},${170-j*15},1)`,
+        pointBackgroundColor: `rgba(${60+j*35},${120+j*20},${170-j*15},1)`
+    }));
+    window.compareRadarChart = new Chart(radar, {
+      type:'radar',
+      data: {
+        labels:["프래그런스","아로마","플레이버","에프터테이스트","액시디티","바디","밸런스","오버럴"],
+        datasets
+      },
+      options: {
+        responsive:true, plugins:{legend:{position:'top',labels:{font:{family:"Noto Sans KR"}}}},
+        scales:{r:{min:0,max:10,ticks:{stepSize:2}}}
+      }
+    });
 
-        // 결과 타이틀 업데이트
-        function updateResultTitle() {
-            const coffeeName = document.getElementById('coffeeName').value;
-            const origin = document.getElementById('origin').value;
-            
-            let title = "커피 향미 프로필";
-            
-            if (coffeeName) {
-                title = coffeeName;
-                if (origin) {
-                    title += ` (${origin})`;
-                }
-            }
-            
-            document.getElementById('result-title').textContent = title;
-        }
+    document.getElementById('compareModal').classList.remove('hidden');
+}
+document.getElementById('compareViewBtn').onclick = openCompareModal;
+document.getElementById('closeCompareBtn').onclick = ()=>{
+    document.getElementById('compareModal').classList.add('hidden');
+};
 
-        // 이미지로 내보내기
-        function exportAsImage() {
-            const resultContainer = document.querySelector('.result-container');
-            
-            html2canvas(resultContainer, {
-                backgroundColor: "#FFF8E7",
-                scale: 2,
-                logging: false,
-                onclone: function(clonedDoc) {
-                    // 클론된 DOM에서 필요 없는 버튼 등 숨기기
-                    Array.from(clonedDoc.querySelectorAll('.no-print')).forEach(el => {
-                        el.style.display = 'none';
-                    });
-                }
-            }).then(canvas => {
-                // 캔버스를 이미지로 변환
-                const image = canvas.toDataURL('image/png');
-                
-                // 다운로드 링크 생성
-                const downloadLink = document.createElement('a');
-                const coffeeName = document.getElementById('coffeeName').value || 'coffee';
-                downloadLink.href = image;
-                downloadLink.download = `${coffeeName}_profile.png`;
-                
-                // 링크 클릭하여 다운로드
-                document.body.appendChild(downloadLink);
-                downloadLink.click();
-                document.body.removeChild(downloadLink);
-            });
-        }
-    </script>
+
+function getCheckedRadio(name){
+    let r = document.querySelector('input[name="'+name+'"]:checked');
+    return r?r.value:"";
+}
+
+/* ------ Event Handlers ------ */
+// score input handler
+["scoreFragrance","scoreAroma","scoreFlavor","scoreAftertaste",
+ "scoreAcidity","scoreBody","scoreBalance","scoreOverall"].forEach(id=>{
+    document.getElementById(id).onchange = ()=>{
+        saveUiToSample(); updateTotalScore(); updateRadar();
+    };
+ });
+["acidityLevel","sweetnessLevel","bodyLevel"].forEach(gr=>{
+    document.querySelectorAll('input[name="'+gr+'"]').forEach(r=>{
+        r.onchange = ()=>{ saveUiToSample();}
+    });
+});
+["coffeeName","origin","variety","process","roastDate","roastLevel","tastingNotes"].forEach(id=>{
+    document.getElementById(id).onblur = ()=>{saveUiToSample();}
+});
+document.getElementById('calcScoreBtn').onclick = ()=>{
+    saveUiToSample();
+    updateTotalScore();
+    updateRadar();
+};
+
+/* ------- init sample + buttons---------- */
+function addSample(copy=null){
+    if(samples.length>=20){alert("최대 20개까지 추가 가능합니다.");return;}
+    if(copy){
+        samples.push(JSON.parse(JSON.stringify(copy)));
+    }else{
+        samples.push(makeEmptySample());
+    }
+    currentSampleIdx = samples.length-1;
+    renderSample();
+    updateSampleTabs();
+}
+function removeSample(){
+    if(samples.length<=1){alert("최소 하나는 필요합니다.");return;}
+    samples.splice(currentSampleIdx,1);
+    if(currentSampleIdx>0)currentSampleIdx--;
+    renderSample();
+    updateSampleTabs();
+}
+function duplicateSample(){
+    let copy = JSON.parse(JSON.stringify(samples[currentSampleIdx]));
+    addSample(copy);
+}
+document.getElementById('addSampleBtn').onclick = ()=>{saveUiToSample();addSample();};
+document.getElementById('removeSampleBtn').onclick = ()=>{removeSample();};
+document.getElementById('duplicateSampleBtn').onclick = ()=>{duplicateSample();};
+
+/* ---- EXPORT: IMAGE, CSV, XLSX ---- */
+document.getElementById('exportImgBtn').onclick = ()=>{
+    // Only export current visualization(not full page);
+    html2canvas(document.querySelector("#cuppingForm"),{
+      backgroundColor:"#fcfaf7",scale:2,logging:false,
+      onclone:(doc)=>{
+        doc.getElementById('cuppingForm').style.boxShadow="none";
+      }
+    }).then(canvas=>{
+        let a = document.createElement('a');
+        a.href = canvas.toDataURL("image/png");
+        let fname = (samples[currentSampleIdx].coffeeName||samples[currentSampleIdx].name||'sample')+'_cupping.png';
+        a.download = fname;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+    });
+};
+document.getElementById('exportCsvBtn').onclick = ()=>{
+    saveUiToSample();
+    // CSV fields: 샘플명, 주요 정보, 각 phase flavor, 점수, 속성 등
+    let fields = [
+        "name","coffeeName","origin","variety","process","roastDate","roastLevel",
+        "acidityLevel","sweetnessLevel","bodyLevel",
+        "flavorSelections.fragrance","flavorSelections.aroma","flavorSelections.flavor","flavorSelections.aftertaste",
+        "scoreFragrance","scoreAroma","scoreFlavor","scoreAftertaste","scoreAcidity","scoreBody","scoreBalance","scoreOverall",
+        "tastingNotes"
+    ];
+    let rows = samplesToRows(fields);
+    let header = ["샘플구분","커피명","원산지","품종","가공법","로스팅일","로스팅레벨","산미단계","단맛단계","바디단계","프래그런스","아로마","플레이버","에프터테이스트","Fragrance점수","Aroma점수","Flavor점수","Aftertaste점수","Acidity점수","Body점수","Balance점수","Overall점수","비고/노트"];
+    let csv = header.join(',')+'\n'+rows.map(row=>row.map(v=>'"'+String(v).replace(/"/g,'""')+'"').join(',')).join('\n');
+    let blob = new Blob([csv],{type:"text/csv"});
+    let a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = "cupping_data.csv";
+    document.body.appendChild(a);
+    a.click(); document.body.removeChild(a);
+};
+document.getElementById('exportXlsxBtn').onclick = ()=>{
+    saveUiToSample();
+    let fields = [
+        "name","coffeeName","origin","variety","process","roastDate","roastLevel",
+        "acidityLevel","sweetnessLevel","bodyLevel",
+        "flavorSelections.fragrance","flavorSelections.aroma","flavorSelections.flavor","flavorSelections.aftertaste",
+        "scoreFragrance","scoreAroma","scoreFlavor","scoreAftertaste","scoreAcidity","scoreBody","scoreBalance","scoreOverall",
+        "tastingNotes"
+    ];
+    let rows = samplesToRows(fields);
+    let header = ["샘플구분","커피명","원산지","품종","가공법","로스팅일","로스팅레벨","산미단계","단맛단계","바디단계","프래그런스","아로마","플레이버","에프터테이스트","Fragrance점수","Aroma점수","Flavor점수","Aftertaste점수","Acidity점수","Body점수","Balance점수","Overall점수","비고/노트"];
+    let ws = XLSX.utils.aoa_to_sheet([header,...rows]);
+    let wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, "cupping");
+    XLSX.writeFile(wb,"cupping_data.xlsx");
+};
+
+/* ---- INIT ----- */
+addSample(); // make one sample
+renderSample();
+updateSampleTabs();
+</script>
 </body>
 </html>
+
