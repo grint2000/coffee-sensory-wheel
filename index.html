@@ -730,22 +730,206 @@ document.getElementById('duplicateSampleBtn').onclick = ()=>{duplicateSample();}
 
 /* ---- EXPORT: IMAGE, CSV, XLSX ---- */
 document.getElementById('exportImgBtn').onclick = ()=>{
-    // Only export current visualization(not full page);
-    html2canvas(document.querySelector("#cuppingForm"),{
-      backgroundColor:"#fcfaf7",scale:2,logging:false,
-      onclone:(doc)=>{
-        doc.getElementById('cuppingForm').style.boxShadow="none";
-      }
-    }).then(canvas=>{
-        let a = document.createElement('a');
+    // 생성할 임시 컨테이너
+    const tempContainer = document.createElement('div');
+    tempContainer.style.backgroundColor = "#fcfaf7";
+    tempContainer.style.padding = "20px";
+    tempContainer.style.fontFamily = "'Noto Sans KR', sans-serif";
+    tempContainer.style.maxWidth = "900px";
+    tempContainer.style.margin = "0 auto";
+    
+    // 제목 추가
+    const title = document.createElement('h2');
+    title.textContent = "커피 관능 평가 결과";
+    title.style.textAlign = "center";
+    title.style.marginBottom = "15px";
+    title.style.fontSize = "24px";
+    title.style.fontWeight = "bold";
+    title.style.color = "#8B5A2B";
+    title.style.borderBottom = "2px solid #8B5A2B";
+    title.style.paddingBottom = "8px";
+    tempContainer.appendChild(title);
+    
+    // 커피 정보 섹션 복제
+    const coffeeInfoSection = document.querySelector('#cuppingForm > section:first-child').cloneNode(true);
+    // 불필요한 입력 필드 대신 값만 보이게 변경
+    const coffeeInputs = coffeeInfoSection.querySelectorAll('input, select');
+    coffeeInputs.forEach(input => {
+        const value = input.value;
+        const parentDiv = input.parentElement;
+        const label = parentDiv.querySelector('label').textContent;
+        
+        // 입력 필드 제거하고 텍스트로 대체
+        input.remove();
+        const valueText = document.createElement('div');
+        valueText.textContent = value || "미입력";
+        valueText.style.padding = "6px 0";
+        valueText.style.fontWeight = value ? "normal" : "light";
+        valueText.style.color = value ? "#333" : "#999";
+        parentDiv.appendChild(valueText);
+    });
+    tempContainer.appendChild(coffeeInfoSection);
+    
+    // 선택된 향미 워드 클라우드 복제
+    const flavorCloud = document.getElementById('selectedFlavorsArea').cloneNode(true);
+    
+    // 레이더 차트 캔버스 복제
+    const radarChart = document.getElementById('cuppingRadar');
+    const radarClone = document.createElement('canvas');
+    radarClone.width = radarChart.width;
+    radarClone.height = radarChart.height;
+    const radarContext = radarClone.getContext('2d');
+    radarContext.drawImage(radarChart, 0, 0);
+    
+    // 결과 시각화 컨테이너 생성
+    const visualSection = document.createElement('section');
+    visualSection.style.display = "flex";
+    visualSection.style.flexDirection = "column";
+    visualSection.style.gap = "20px";
+    visualSection.style.marginTop = "25px";
+    
+    // 시각화 섹션 제목
+    const visTitle = document.createElement('h3');
+    visTitle.textContent = "향미 특성 및 평가 점수";
+    visTitle.style.fontSize = "18px";
+    visTitle.style.fontWeight = "bold";
+    visTitle.style.borderBottom = "2px solid #DDD";
+    visTitle.style.paddingBottom = "8px";
+    visTitle.style.marginBottom = "10px";
+    visualSection.appendChild(visTitle);
+    
+    // 두 칼럼으로 구성된 컨테이너
+    const visualColumns = document.createElement('div');
+    visualColumns.style.display = "flex";
+    visualColumns.style.gap = "20px";
+    
+    // 향미 워드 클라우드 컨테이너
+    const flavorContainer = document.createElement('div');
+    flavorContainer.style.flex = "1";
+    flavorContainer.style.backgroundColor = "white";
+    flavorContainer.style.padding = "15px";
+    flavorContainer.style.borderRadius = "8px";
+    flavorContainer.style.boxShadow = "0 1px 3px rgba(0, 0, 0, 0.1)";
+    
+    const flavorTitle = document.createElement('h4');
+    flavorTitle.textContent = "향미 특성";
+    flavorTitle.style.fontSize = "16px";
+    flavorTitle.style.fontWeight = "600";
+    flavorTitle.style.marginBottom = "10px";
+    flavorContainer.appendChild(flavorTitle);
+    flavorContainer.appendChild(flavorCloud);
+    
+    // 레이더 차트 컨테이너
+    const radarContainer = document.createElement('div');
+    radarContainer.style.flex = "1";
+    radarContainer.style.backgroundColor = "white";
+    radarContainer.style.padding = "15px";
+    radarContainer.style.borderRadius = "8px";
+    radarContainer.style.boxShadow = "0 1px 3px rgba(0, 0, 0, 0.1)";
+    
+    const radarTitle = document.createElement('h4');
+    radarTitle.textContent = "SCA 평가 점수 차트";
+    radarTitle.style.fontSize = "16px";
+    radarTitle.style.fontWeight = "600";
+    radarTitle.style.marginBottom = "10px";
+    radarContainer.appendChild(radarTitle);
+    
+    // 총점 정보 추가
+    const scoreInfo = document.createElement('div');
+    scoreInfo.style.textAlign = "center";
+    scoreInfo.style.marginTop = "10px";
+    const totalScoreValue = document.getElementById('totalScore').textContent;
+    scoreInfo.innerHTML = `<strong>총점:</strong> <span style="font-size:18px;font-weight:bold;color:#8B5A2B;">${totalScoreValue}</span>`;
+    radarContainer.appendChild(radarClone);
+    radarContainer.appendChild(scoreInfo);
+    
+    // 칼럼 추가
+    visualColumns.appendChild(flavorContainer);
+    visualColumns.appendChild(radarContainer);
+    visualSection.appendChild(visualColumns);
+    
+    // 테이스팅 노트 추가 (있을 경우)
+    const tastingNotes = document.getElementById('tastingNotes').value;
+    if (tastingNotes) {
+        const notesSection = document.createElement('div');
+        notesSection.style.marginTop = "20px";
+        notesSection.style.backgroundColor = "white";
+        notesSection.style.padding = "15px";
+        notesSection.style.borderRadius = "8px";
+        notesSection.style.boxShadow = "0 1px 3px rgba(0, 0, 0, 0.1)";
+        
+        const notesTitle = document.createElement('h4');
+        notesTitle.textContent = "테이스팅 노트";
+        notesTitle.style.fontSize = "16px";
+        notesTitle.style.fontWeight = "600";
+        notesTitle.style.marginBottom = "10px";
+        
+        const notesContent = document.createElement('div');
+        notesContent.textContent = tastingNotes;
+        notesContent.style.fontSize = "14px";
+        notesContent.style.lineHeight = "1.5";
+        
+        notesSection.appendChild(notesTitle);
+        notesSection.appendChild(notesContent);
+        visualSection.appendChild(notesSection);
+    }
+    
+    tempContainer.appendChild(visualSection);
+    
+    // 푸터 정보 추가
+    const footer = document.createElement('footer');
+    footer.style.marginTop = "30px";
+    footer.style.fontSize = "12px";
+    footer.style.color = "#999";
+    footer.style.textAlign = "center";
+    footer.style.borderTop = "1px solid #EEE";
+    footer.style.paddingTop = "10px";
+    
+    const date = new Date();
+    footer.textContent = `평가일: ${date.getFullYear()}-${String(date.getMonth()+1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')} | mollis SCAA 커피 관능 평가`;
+    tempContainer.appendChild(footer);
+    
+    // 임시 컨테이너를 문서에 추가 (안보이게)
+    tempContainer.style.position = "absolute";
+    tempContainer.style.left = "-9999px";
+    document.body.appendChild(tempContainer);
+    
+    // 이미지 캡처 및 다운로드
+    html2canvas(tempContainer, {
+        backgroundColor: "#fcfaf7",
+        scale: 2,
+        logging: false,
+        onclone: (doc) => {
+            // 레이더 차트 다시 그리기 (캔버스 복제 이슈)
+            const newRadar = doc.querySelector('canvas');
+            if (newRadar) {
+                const ctx = newRadar.getContext('2d');
+                // 원본 차트 데이터 가져오기
+                if (window.cuppingRadarChart) {
+                    const originalChart = window.cuppingRadarChart;
+                    // 새 차트 인스턴스 생성 (임시)
+                    new Chart(ctx, {
+                        type: originalChart.config.type,
+                        data: JSON.parse(JSON.stringify(originalChart.data)),
+                        options: JSON.parse(JSON.stringify(originalChart.config.options))
+                    });
+                }
+            }
+        }
+    }).then(canvas => {
+        const a = document.createElement('a');
         a.href = canvas.toDataURL("image/png");
-        let fname = (samples[currentSampleIdx].coffeeName||samples[currentSampleIdx].name||'sample')+'_cupping.png';
+        const fname = (samples[currentSampleIdx].coffeeName || samples[currentSampleIdx].name || 'sample') + '_cupping.png';
         a.download = fname;
         document.body.appendChild(a);
         a.click();
         document.body.removeChild(a);
+        
+        // 임시 컨테이너 제거
+        document.body.removeChild(tempContainer);
     });
 };
+
 document.getElementById('exportCsvBtn').onclick = ()=>{
     saveUiToSample();
     // CSV fields: 샘플명, 주요 정보, 각 phase flavor, 점수, 속성 등
