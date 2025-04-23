@@ -243,8 +243,7 @@
 <script>
 // SCAA FLAVOR DATA (MainCategory/Sub/Descriptors)
 const FLAVOR_DATA = [
-    // Each array here: [MainCategory,SubCategory (optional),Descriptor, Color]
-    // (this is not a complete wheel but covers main SCAA flavor types; you may expand if desired)
+    // 기존 데이터 유지
     ["Fruity", "Citrus Fruit", "Lemon", "#FFD966"], ["Fruity", "Citrus Fruit", "Orange", "#FFC300"],
     ["Fruity", "Citrus Fruit", "Grapefruit", "#FF7F50"], ["Fruity", "Other Fruit", "Apple", "#ABE188"],
     ["Fruity", "Other Fruit", "Pear", "#B6E4A3"], ["Fruity", "Berry", "Raspberry", "#DD5772"],
@@ -261,7 +260,6 @@ const FLAVOR_DATA = [
     ["Roasted", "", "Brown Roast", "#5C4033"], ["Roasted", "", "Smoky", "#2D231C"],
     ["Green/Vegetative", "", "Under-ripe", "#A4C09C"], ["Green/Vegetative", "", "Peapod", "#B2DAC0"],
     ["Green/Vegetative", "", "Fresh", "#C2E99E"],
-    // Sour/Fermented
     ["Sour/Fermented", "Sour", "Citric Acid", "#CEE6CB"],
     ["Sour/Fermented", "Sour", "Malic Acid", "#C9E265"],
     ["Sour/Fermented", "Sour", "Acetic Acid", "#D9C1B4"],
@@ -269,7 +267,90 @@ const FLAVOR_DATA = [
     ["Sour/Fermented", "Fermented", "Overripe", "#625958"],
     ["Other", "", "Chemical", "#FCF6B1"],
     ["Other", "", "Medicinal", "#E2D784"],
+    
+    // 1. 프래그런스(원두 향기) 추가 항목
+    ["Fruity", "Citrus Fruit", "Lime", "#C0E57B"],
+    ["Fruity", "Citrus Fruit", "Tangerine", "#FFA54F"],
+    ["Fruity", "Berry", "Blueberry", "#4F86F7"],
+    ["Fruity", "Berry", "Cranberry", "#E30B5C"],
+    ["Fruity", "Stone Fruit", "Peach", "#FFCBA4"],
+    ["Fruity", "Stone Fruit", "Apricot", "#FBCEB1"],
+    ["Fruity", "Stone Fruit", "Cherry", "#DE3163"],
+    ["Fruity", "Stone Fruit", "Plum", "#8E4585"],
+    ["Fruity", "Tropical Fruit", "Pineapple", "#FEDF00"],
+    ["Fruity", "Tropical Fruit", "Mango", "#FFB300"],
+    ["Fruity", "Tropical Fruit", "Coconut", "#F2E8D7"],
+    ["Fruity", "Tropical Fruit", "Passion Fruit", "#DDA0DD"],
+    ["Fruity", "Dried Fruit", "Fig", "#8A4117"],
+    ["Fruity", "Dried Fruit", "Date", "#A57164"],
+    
+    // 2. 아로마(음료 향기) 추가 항목
+    ["Floral", "", "Hibiscus", "#F53E6A"],
+    ["Floral", "", "Lavender", "#B57EDC"],
+    ["Floral", "", "Orange Blossom", "#FFCC99"],
+    ["Spices", "Warming Spices", "Cardamom", "#BDA55D"],
+    ["Spices", "Warming Spices", "Allspice", "#9C5903"],
+    ["Spices", "Pungent Spices", "Licorice", "#2A2926"],
+    ["Spices", "Pungent Spices", "Anise", "#50404D"],
+    ["Sweet", "Caramelized", "Toffee", "#D2691E"],
+    ["Sweet", "Caramelized", "Butterscotch", "#E09540"],
+    ["Sweet", "Vanilla", "Custard", "#F0E68C"],
+    ["Sweet", "Vanilla", "Cream", "#FFFDD0"],
+    
+    // 3. 플레이버(맛) 추가 항목
+    ["Nutty/Cocoa", "Nutty", "Peanut", "#D28C78"],
+    ["Nutty/Cocoa", "Nutty", "Walnut", "#C19A6B"],
+    ["Nutty/Cocoa", "Nutty", "Cashew", "#F5DEB3"],
+    ["Nutty/Cocoa", "Cocoa", "Milk Chocolate", "#7B3F00"],
+    ["Nutty/Cocoa", "Cocoa", "Bittersweet Chocolate", "#332421"],
+    ["Nutty/Cocoa", "Cocoa", "Mocha", "#785135"],
+    ["Cereal/Grain", "Cereal", "Malt", "#F0E68C"],
+    ["Cereal/Grain", "Cereal", "Toast", "#D2B48C"],
+    ["Cereal/Grain", "Cereal", "Barley", "#DBD0AE"],
+    ["Cereal/Grain", "Grain-like", "Granola", "#C8A951"],
+    ["Cereal/Grain", "Grain-like", "Oats", "#E4CBB1"],
+    ["Cereal/Grain", "Grain-like", "Rice", "#F9FBE7"],
+    
+    // 4. 에프터테이스트(뒷맛) 추가 항목
+    ["Sour/Fermented", "Clean Acidity", "Tartaric Acid", "#D7E8CB"],
+    ["Sour/Fermented", "Clean Acidity", "Phosphoric Acid", "#E8F3D9"],
+    ["Sour/Fermented", "Fermented", "Yogurt", "#F5F5F5"],
+    ["Sour/Fermented", "Fermented", "Sourdough", "#E8D0A7"],
+    ["Sour/Fermented", "Fermented", "Vinegar", "#ECEDE6"],
+    ["Sour/Fermented", "Fermented", "Kombucha", "#DEC19B"],
+    ["Sour/Fermented", "Aged/Funky", "Musty", "#8B7D6B"],
+    ["Sour/Fermented", "Aged/Funky", "Earthy", "#79553D"],
+    ["Roasted", "Light Roast", "Tea-like", "#967969"],
+    ["Roasted", "Light Roast", "Herbal", "#BDCB96"],
+    ["Roasted", "Medium Roast", "Toasty", "#C19A6B"],
+    ["Roasted", "Medium Roast", "Caramelized", "#C68E17"],
+    ["Roasted", "Dark Roast", "Burnt", "#373536"],
+    ["Roasted", "Dark Roast", "Charred", "#2C1608"],
+    ["Roasted", "Dark Roast", "Ashy", "#5D5D5D"],
+    
+    // 공통 특성 추가 항목
+    ["Green/Vegetative", "Fresh Green", "Grass", "#7EC850"],
+    ["Green/Vegetative", "Fresh Green", "Cucumber", "#8FBC8F"],
+    ["Green/Vegetative", "Fresh Green", "Green Bell Pepper", "#4F7942"],
+    ["Green/Vegetative", "Herbaceous", "Mint", "#98FB98"],
+    ["Green/Vegetative", "Herbaceous", "Sage", "#BCB88A"],
+    ["Green/Vegetative", "Herbaceous", "Basil", "#579229"],
+    ["Green/Vegetative", "Vegetal", "Olive", "#708238"],
+    ["Green/Vegetative", "Vegetal", "Spinach", "#175732"],
+    ["Other", "Chemical", "Rubber", "#454545"],
+    ["Other", "Chemical", "Petroleum", "#2E2E2E"],
+    ["Other", "Chemical", "Plastic", "#BEBEBE"],
+    ["Other", "Chemical", "Tar", "#1C1C1C"],
+    ["Other", "Earthy", "Soil", "#6F4E37"],
+    ["Other", "Earthy", "Mushroom", "#D7CEC7"],
+    ["Other", "Earthy", "Forest Floor", "#5E4B3B"],
+    ["Other", "Earthy", "Wet Earth", "#622F22"],
+    ["Other", "Woody", "Oak", "#A46B2B"],
+    ["Other", "Woody", "Cedar", "#A67B5B"],
+    ["Other", "Woody", "Pine", "#8A9A5B"],
+    ["Other", "Woody", "Sandalwood", "#B87333"]
 ];
+
 
 // PHASES (for fragrance/aroma/flavor/aftertaste)
 const FLAVOR_PHASES = [
