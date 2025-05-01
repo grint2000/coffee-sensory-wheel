@@ -10,6 +10,8 @@
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/hammerjs@2.0.8/hammer.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
   <style>
     html,body { font-family: 'Noto Sans KR', sans-serif; background: #fcfaf7;}
     .flavor-badge { font-size: 13px; border-radius: 9999px; padding: 2px 10px; margin: 2px; display:inline-block;}
@@ -49,6 +51,266 @@
       .defect-badge { font-size:11px!important;padding:1px 6px;}
       .defect-headline { font-size:12.5px;}
     }
+    
+    /* 향미 선택 개선 */
+    .flavor-checkbox-label {
+      position: relative;
+      display: inline-block;
+      padding: 4px 12px;
+      border-radius: 20px;
+      margin: 3px;
+      font-size: 13px;
+      cursor: pointer;
+      line-height: 1.2;
+      transition: all 0.2s;
+    }
+    .flavor-checkbox-label:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+    .flavor-checkbox-label input {
+      position: absolute;
+      opacity: 0;
+    }
+    
+    /* 샘플 슬라이드 네비게이션 */
+    .sample-nav {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 8px;
+    }
+    .sample-nav-btn {
+      background: #f3efe8;
+      color: #8B5A2B;
+      border: none;
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.2s;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    }
+    .sample-nav-btn:hover {
+      background: #e6dfd3;
+    }
+    .sample-nav-btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+    .sample-nav-title {
+      font-size: 15px;
+      font-weight: 600;
+      padding: 6px 12px;
+      background: #f9f5f0;
+      border-radius: 8px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      max-width: 200px;
+      text-align: center;
+    }
+    .sample-info {
+      transition: transform 0.3s;
+    }
+    .sample-info.slide-left {
+      transform: translateX(-100%);
+      opacity: 0;
+    }
+    .sample-info.slide-right {
+      transform: translateX(100%);
+      opacity: 0;
+    }
+    
+    /* 샘플 리스트 드래그 앤 드롭 */
+    .sample-item {
+      cursor: grab;
+      transition: background-color 0.2s;
+      user-select: none;
+      touch-action: none; /* 모바일에서 드래그 사용 가능 */
+    }
+    .sample-item:active {
+      cursor: grabbing;
+    }
+    .sample-item.sortable-ghost {
+      opacity: 0.4;
+      background-color: #f0ebdd !important;
+    }
+    .sample-item.sortable-chosen {
+      background-color: #fef9c3 !important;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+    .sample-drag-handle {
+      cursor: grab;
+      color: #9ca3af;
+      padding: 0 6px;
+    }
+    
+    /* 향미 프로필 레이더 차트 */
+    .flavor-profile-chart-container {
+      width: 100%;
+      height: 300px;
+      margin-top: 20px;
+    }
+    
+    /* 분할 화면 비교 */
+    .split-view {
+      display: flex;
+      flex-direction: row;
+      width: 100%;
+      gap: 10px;
+      margin-top: 20px;
+      overflow: auto;
+    }
+    .split-view-container {
+      flex: 1;
+      min-width: 200px;
+      border: 1px solid #e5e7eb;
+      border-radius: 8px;
+      padding: 15px;
+      background: white;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    }
+    @media (max-width: 768px) {
+      .split-view {
+        flex-direction: column;
+      }
+    }
+    
+    /* 터치 최적화 - 모바일 */
+    @media (max-width: 768px) {
+      .flavor-checkbox-label {
+        padding: 8px 14px; /* 더 큰 터치 영역 */
+        margin: 4px;
+        font-size: 14px;
+      }
+      .mobile-touch-friendly {
+        min-height: 44px; /* 최소 터치 영역 크기 */
+      }
+      .tab-btn-inactive, .tab-btn-active {
+        padding: 8px 16px;
+        margin-bottom: 8px;
+      }
+      input[type="radio"] + span {
+        padding: 4px 0;
+        margin-left: 4px;
+        display: inline-block;
+      }
+      .score-slider {
+        height: 20px; /* 슬라이더 높이 증가 */
+      }
+      .flavor-badge {
+        padding: 4px 12px;
+        margin: 3px;
+      }
+    }
+    
+    /* 고급 비교 테이블 */
+    .advanced-compare-table {
+      width: 100%;
+      border-collapse: separate;
+      border-spacing: 0;
+      margin-top: 15px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+      border-radius: 8px;
+      overflow: hidden;
+    }
+    .advanced-compare-table th {
+      background: #8B5A2B;
+      color: white;
+      font-weight: 600;
+      text-align: left;
+      padding: 10px 12px;
+      font-size: 13px;
+    }
+    .advanced-compare-table td {
+      padding: 10px 12px;
+      border-bottom: 1px solid #f0f0f0;
+      font-size: 13px;
+    }
+    .advanced-compare-table tr:nth-child(even) {
+      background-color: #f9f7f5;
+    }
+    .advanced-compare-table tr:last-child td {
+      border-bottom: none;
+    }
+    .advanced-compare-table .category-row {
+      background-color: #f4eee6;
+      font-weight: bold;
+    }
+    .advanced-compare-category {
+      margin-top: 10px;
+      margin-bottom: 6px;
+      font-weight: bold;
+      padding: 6px 8px;
+      background-color: #f4eee6;
+      border-radius: 4px;
+    }
+    
+    /* 모달 스타일 */
+    .modal {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-color: rgba(0, 0, 0, 0.5);
+      z-index: 50;
+      display: none; /* 모달은 처음에 보이지 않음 */
+      align-items: center;
+      justify-content: center;
+      padding: 1rem;
+    }
+    .modal.show {
+      display: flex; /* 모달이 보이도록 함 */
+    }
+    .modal-content {
+      background-color: white;
+      border-radius: 0.5rem;
+      max-width: 90%;
+      max-height: 90vh;
+      overflow: auto;
+      width: 1200px;
+    }
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 1rem;
+      border-bottom: 1px solid #e5e7eb;
+    }
+    .modal-body {
+      padding: 1rem;
+    }
+    
+    /* 검색 기능 추가 */
+    .search-box {
+      position: sticky;
+      top: 0;
+      background: #f8f8f8;
+      padding: 8px;
+      margin-bottom: 10px;
+      border-radius: 8px;
+      z-index: 5;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    }
+    .search-input {
+      width: 100%;
+      padding: 8px 12px;
+      border: 1px solid #ddd;
+      border-radius: 6px;
+      font-size: 14px;
+    }
+    
+    /* 차트 컨테이너 높이 지정 - 수정된 부분 */
+    .chart-container {
+      position: relative;
+      height: 300px;
+      width: 100%;
+    }
   </style>
 </head>
 <body class="min-h-screen bg-[#fcfaf7]">
@@ -80,15 +342,21 @@
       </div>
       <h3 class="text-base font-bold mb-2 border-b pb-1 border-tan-200 flex items-center"><i class="fa fa-database mr-2"></i>샘플 관리/불러오기</h3>
       <div class="flex items-center gap-1 mb-2 flex-wrap">
-        <button class="px-2 py-1 export-btn rounded text-xs flex items-center" id="addSampleBtn"><i class="fa fa-plus mr-2"></i>샘플 추가</button>
-        <button class="px-2 py-1 bg-gray-200 hover:bg-gray-300 rounded text-xs flex items-center" id="removeSampleBtn"><i class="fa fa-trash mr-2"></i>샘플 삭제</button>
+        <button class="px-2 py-1 export-btn rounded text-xs flex items-center mobile-touch-friendly" id="addSampleBtn"><i class="fa fa-plus mr-2"></i>샘플 추가</button>
+        <button class="px-2 py-1 bg-gray-200 hover:bg-gray-300 rounded text-xs flex items-center mobile-touch-friendly" id="removeSampleBtn"><i class="fa fa-trash mr-2"></i>샘플 삭제</button>
+        <button class="px-2 py-1 bg-blue-100 hover:bg-blue-200 text-blue-700 rounded text-xs flex items-center mobile-touch-friendly" id="cloneSampleBtn"><i class="fa fa-copy mr-2"></i>복제</button>
       </div>
-      <div class="sample-list-scroll bg-gray-50 rounded-lg border p-1.5 no-scrollbar"><div id="sampleList"></div></div>
+      <div class="sample-list-scroll bg-gray-50 rounded-lg border p-1.5 no-scrollbar">
+        <div id="sampleList" class="sample-sortable-list"></div>
+        <div class="text-xs text-gray-500 mt-2 px-2">
+          <i class="fas fa-arrows-alt"></i> 샘플 순서를 드래그하여 변경할 수 있습니다.
+        </div>
+      </div>
       <div class="flex flex-wrap gap-1 mt-2">
-        <button class="px-3 py-1 bg-blue-100 hover:bg-blue-200 text-blue-800 rounded text-xs flex items-center" id="saveSamplesBtn"><i class="fa fa-save mr-1"></i>웹에 전체 저장</button>
-        <button class="px-3 py-1 bg-blue-200 hover:bg-blue-300 text-blue-900 rounded text-xs flex items-center" id="loadSamplesWebBtn"><i class="fa fa-cloud-download-alt mr-1"></i>웹에서 불러오기</button>
-        <button class="px-3 py-1 bg-green-100 hover:bg-green-200 text-green-800 rounded text-xs flex items-center" id="exportSamplesBtn"><i class="fa fa-download mr-1"></i>JSON 내보내기</button>
-        <label class="px-3 py-1 bg-yellow-100 hover:bg-yellow-200 text-yellow-800 rounded text-xs flex items-center cursor-pointer mb-0"><i class="fa fa-upload mr-1"></i>불러오기<input type="file" id="importSamplesInput" accept=".json" class="hidden"></label>
+        <button class="px-3 py-1 bg-blue-100 hover:bg-blue-200 text-blue-800 rounded text-xs flex items-center mobile-touch-friendly" id="saveSamplesBtn"><i class="fa fa-save mr-1"></i>웹에 전체 저장</button>
+        <button class="px-3 py-1 bg-blue-200 hover:bg-blue-300 text-blue-900 rounded text-xs flex items-center mobile-touch-friendly" id="loadSamplesWebBtn"><i class="fa fa-cloud-download-alt mr-1"></i>웹에서 불러오기</button>
+        <button class="px-3 py-1 bg-green-100 hover:bg-green-200 text-green-800 rounded text-xs flex items-center mobile-touch-friendly" id="exportSamplesBtn"><i class="fa fa-download mr-1"></i>JSON 내보내기</button>
+        <label class="px-3 py-1 bg-yellow-100 hover:bg-yellow-200 text-yellow-800 rounded text-xs flex items-center cursor-pointer mb-0 mobile-touch-friendly"><i class="fa fa-upload mr-1"></i>불러오기<input type="file" id="importSamplesInput" accept=".json" class="hidden"></label>
       </div>
     </div>
     <!-- 커핑 비교 -->
@@ -105,12 +373,29 @@
       </div>
       <h3 class="text-base font-bold mb-2 border-b pb-1 border-tan-200 flex items-center"><i class="fas fa-code-compare mr-2"></i>커핑 기록 비교</h3>
       <div id="compareListBox" class="mb-2"></div>
-      <button class="export-btn text-xs px-3 py-1 rounded flex items-center mb-2" id="compareBtn"><i class="fa fa-chart-radar mr-1"></i>비교차트 표시</button>
-      <div id="compareArea"><div class="text-xs text-gray-400 my-2">2개 이상 샘플을 선택 후 "비교차트 표시" 버튼을 눌러주세요.</div></div>
+      <div class="flex gap-2 flex-wrap">
+        <button class="export-btn text-xs px-3 py-1 rounded flex items-center mb-2 mobile-touch-friendly" id="compareBtn">
+          <i class="fa fa-chart-radar mr-1"></i>기본 비교
+        </button>
+        <button class="bg-indigo-600 hover:bg-indigo-700 text-white text-xs px-3 py-1 rounded flex items-center mb-2 mobile-touch-friendly" id="advancedCompareBtn">
+          <i class="fa fa-chart-line mr-1"></i>고급 비교
+        </button>
+        <button class="bg-purple-600 hover:bg-purple-700 text-white text-xs px-3 py-1 rounded flex items-center mb-2 mobile-touch-friendly" id="splitViewBtn">
+          <i class="fa fa-columns mr-1"></i>분할 화면
+        </button>
+      </div>
+      <div id="compareArea"><div class="text-xs text-gray-400 my-2">2개 이상 샘플을 선택 후 비교 버튼을 눌러주세요.</div></div>
     </div>
   </section>
+  <!-- 샘플 슬라이드 네비게이션 버튼 -->
+  <div class="sample-nav mb-3">
+    <button id="prevSampleBtn" class="sample-nav-btn mobile-touch-friendly" title="이전 샘플"><i class="fas fa-chevron-left"></i></button>
+    <div id="currentSampleTitle" class="sample-nav-title">현재 샘플</div>
+    <button id="nextSampleBtn" class="sample-nav-btn mobile-touch-friendly" title="다음 샘플"><i class="fas fa-chevron-right"></i></button>
+  </div>
+  
   <!-- 평가 폼 -->
-  <form id="cuppingForm" class="bg-white shadow rounded-lg p-3 md:p-6 mb-4">
+  <form id="cuppingForm" class="bg-white shadow rounded-lg p-3 md:p-6 mb-4 sample-info">
     <div class="flex flex-wrap items-center gap-2 mb-2">
       <div class="font-bold text-lg mr-2 mb-1">현재 샘플명:</div>
       <input id="sampleTitleInput" type="text" maxlength="60" class="p-1.5 border rounded min-w-[140px] text-base font-semibold" placeholder="샘플명">
@@ -157,7 +442,7 @@
     <section class="mt-8">
       <h3 class="text-base font-bold mb-1 border-b pb-1 border-tan-200 flex items-center"><i class="fa fa-circle-half-stroke mr-2"></i>SCA 향미 선택</h3>
       <div class="text-xs mb-3 text-gray-600">[프래그런스] [아로마] [플레이버] [에프터테이스트] 각 그룹별로 10개까지 선택</div>
-      <button type="button" class="mb-4 px-2 py-1 rounded bg-gray-100 text-xs" onclick="window.open('https://sca.coffee/research/coffee-tasters-flavor-wheel', '_blank');"> 플레이버 휠 공식자료 <i class="fas fa-external-link-alt ml-1 text-xs"></i> </button>
+      <button type="button" class="mb-4 px-2 py-1 rounded bg-gray-100 text-xs mobile-touch-friendly" onclick="window.open('https://sca.coffee/research/coffee-tasters-flavor-wheel', '_blank');"> 플레이버 휠 공식자료 <i class="fas fa-external-link-alt ml-1 text-xs"></i> </button>
       <div id="flavorTabs" class="flex flex-wrap gap-2 mb-2"></div>
       <div id="flavorWheelMultiSelectArea" class="flavor-scroll border border-gray-50 rounded-lg p-2 bg-gray-50 no-scrollbar mb-1"></div>
     </section>
@@ -170,11 +455,11 @@
             <span class="tooltip-text">커피의 밝고 상쾌한 특성으로 입에서 느껴지는 신맛의 정도</span>
           </label>
           <div class="flex gap-2 flex-wrap" id="acidity_level">
-            <label><input type="radio" name="acidityLevel" value="Low"><span class="ml-1">Low</span></label>
-            <label><input type="radio" name="acidityLevel" value="Med-Low"><span class="ml-1">Med-Low</span></label>
-            <label><input type="radio" name="acidityLevel" value="Medium"><span class="ml-1">Medium</span></label>
-            <label><input type="radio" name="acidityLevel" value="Med-High"><span class="ml-1">Med-High</span></label>
-            <label><input type="radio" name="acidityLevel" value="High"><span class="ml-1">High</span></label>
+            <label class="mobile-touch-friendly"><input type="radio" name="acidityLevel" value="Low"><span class="ml-1">Low</span></label>
+            <label class="mobile-touch-friendly"><input type="radio" name="acidityLevel" value="Med-Low"><span class="ml-1">Med-Low</span></label>
+            <label class="mobile-touch-friendly"><input type="radio" name="acidityLevel" value="Medium"><span class="ml-1">Medium</span></label>
+            <label class="mobile-touch-friendly"><input type="radio" name="acidityLevel" value="Med-High"><span class="ml-1">Med-High</span></label>
+            <label class="mobile-touch-friendly"><input type="radio" name="acidityLevel" value="High"><span class="ml-1">High</span></label>
           </div>
         </div>
         <div>
@@ -183,11 +468,11 @@
             <span class="tooltip-text">커피에서 느껴지는 달콤함의 정도와 깊이</span>
           </label>
           <div class="flex gap-2 flex-wrap" id="sweetness_level">
-            <label><input type="radio" name="sweetnessLevel" value="Low"><span class="ml-1">Low</span></label>
-            <label><input type="radio" name="sweetnessLevel" value="Med-Low"><span class="ml-1">Med-Low</span></label>
-            <label><input type="radio" name="sweetnessLevel" value="Medium"><span class="ml-1">Medium</span></label>
-            <label><input type="radio" name="sweetnessLevel" value="Med-High"><span class="ml-1">Med-High</span></label>
-            <label><input type="radio" name="sweetnessLevel" value="High"><span class="ml-1">High</span></label>
+            <label class="mobile-touch-friendly"><input type="radio" name="sweetnessLevel" value="Low"><span class="ml-1">Low</span></label>
+            <label class="mobile-touch-friendly"><input type="radio" name="sweetnessLevel" value="Med-Low"><span class="ml-1">Med-Low</span></label>
+            <label class="mobile-touch-friendly"><input type="radio" name="sweetnessLevel" value="Medium"><span class="ml-1">Medium</span></label>
+            <label class="mobile-touch-friendly"><input type="radio" name="sweetnessLevel" value="Med-High"><span class="ml-1">Med-High</span></label>
+            <label class="mobile-touch-friendly"><input type="radio" name="sweetnessLevel" value="High"><span class="ml-1">High</span></label>
           </div>
         </div>
         <div>
@@ -196,11 +481,11 @@
             <span class="tooltip-text">커피의 질감과 무게감, 입안에서 느껴지는 밀도</span>
           </label>
           <div class="flex gap-2 flex-wrap" id="body_level">
-            <label><input type="radio" name="bodyLevel" value="Low"><span class="ml-1">Low</span></label>
-            <label><input type="radio" name="bodyLevel" value="Med-Low"><span class="ml-1">Med-Low</span></label>
-            <label><input type="radio" name="bodyLevel" value="Medium"><span class="ml-1">Medium</span></label>
-            <label><input type="radio" name="bodyLevel" value="Med-High"><span class="ml-1">Med-High</span></label>
-            <label><input type="radio" name="bodyLevel" value="High"><span class="ml-1">High</span></label>
+            <label class="mobile-touch-friendly"><input type="radio" name="bodyLevel" value="Low"><span class="ml-1">Low</span></label>
+            <label class="mobile-touch-friendly"><input type="radio" name="bodyLevel" value="Med-Low"><span class="ml-1">Med-Low</span></label>
+            <label class="mobile-touch-friendly"><input type="radio" name="bodyLevel" value="Medium"><span class="ml-1">Medium</span></label>
+            <label class="mobile-touch-friendly"><input type="radio" name="bodyLevel" value="Med-High"><span class="ml-1">Med-High</span></label>
+            <label class="mobile-touch-friendly"><input type="radio" name="bodyLevel" value="High"><span class="ml-1">High</span></label>
           </div>
         </div>
       </div>
@@ -222,12 +507,12 @@
             </span>
           </label>
           <div class="flex gap-2 flex-wrap mt-1" id="defect_underdevelopment">
-            <label><input type="radio" name="defectUnderdevelopment" value="none"><span class="ml-1">미선택</span></label>
-            <label><input type="radio" name="defectUnderdevelopment" value="very_weak"><span class="ml-1">매우 약함</span></label>
-            <label><input type="radio" name="defectUnderdevelopment" value="weak"><span class="ml-1">약함</span></label>
-            <label><input type="radio" name="defectUnderdevelopment" value="moderate"><span class="ml-1">보통</span></label>
-            <label><input type="radio" name="defectUnderdevelopment" value="strong"><span class="ml-1">강함</span></label>
-            <label><input type="radio" name="defectUnderdevelopment" value="very_strong"><span class="ml-1">매우 강함</span></label>
+            <label class="mobile-touch-friendly"><input type="radio" name="defectUnderdevelopment" value="none"><span class="ml-1">미선택</span></label>
+            <label class="mobile-touch-friendly"><input type="radio" name="defectUnderdevelopment" value="very_weak"><span class="ml-1">매우 약함</span></label>
+            <label class="mobile-touch-friendly"><input type="radio" name="defectUnderdevelopment" value="weak"><span class="ml-1">약함</span></label>
+            <label class="mobile-touch-friendly"><input type="radio" name="defectUnderdevelopment" value="moderate"><span class="ml-1">보통</span></label>
+            <label class="mobile-touch-friendly"><input type="radio" name="defectUnderdevelopment" value="strong"><span class="ml-1">강함</span></label>
+            <label class="mobile-touch-friendly"><input type="radio" name="defectUnderdevelopment" value="very_strong"><span class="ml-1">매우 강함</span></label>
           </div>
         </div>
         <div>
@@ -240,12 +525,12 @@
             </span>
           </label>
           <div class="flex gap-2 flex-wrap mt-1" id="defect_overdevelopment">
-            <label><input type="radio" name="defectOverdevelopment" value="none"><span class="ml-1">미선택</span></label>
-            <label><input type="radio" name="defectOverdevelopment" value="very_weak"><span class="ml-1">매우 약함</span></label>
-            <label><input type="radio" name="defectOverdevelopment" value="weak"><span class="ml-1">약함</span></label>
-            <label><input type="radio" name="defectOverdevelopment" value="moderate"><span class="ml-1">보통</span></label>
-            <label><input type="radio" name="defectOverdevelopment" value="strong"><span class="ml-1">강함</span></label>
-            <label><input type="radio" name="defectOverdevelopment" value="very_strong"><span class="ml-1">매우 강함</span></label>
+            <label class="mobile-touch-friendly"><input type="radio" name="defectOverdevelopment" value="none"><span class="ml-1">미선택</span></label>
+            <label class="mobile-touch-friendly"><input type="radio" name="defectOverdevelopment" value="very_weak"><span class="ml-1">매우 약함</span></label>
+            <label class="mobile-touch-friendly"><input type="radio" name="defectOverdevelopment" value="weak"><span class="ml-1">약함</span></label>
+            <label class="mobile-touch-friendly"><input type="radio" name="defectOverdevelopment" value="moderate"><span class="ml-1">보통</span></label>
+            <label class="mobile-touch-friendly"><input type="radio" name="defectOverdevelopment" value="strong"><span class="ml-1">강함</span></label>
+            <label class="mobile-touch-friendly"><input type="radio" name="defectOverdevelopment" value="very_strong"><span class="ml-1">매우 강함</span></label>
           </div>
         </div>
         <div>
@@ -258,12 +543,12 @@
             </span>
           </label>
           <div class="flex gap-2 flex-wrap mt-1" id="defect_baked">
-            <label><input type="radio" name="defectBaked" value="none"><span class="ml-1">미선택</span></label>
-            <label><input type="radio" name="defectBaked" value="very_weak"><span class="ml-1">매우 약함</span></label>
-            <label><input type="radio" name="defectBaked" value="weak"><span class="ml-1">약함</span></label>
-            <label><input type="radio" name="defectBaked" value="moderate"><span class="ml-1">보통</span></label>
-            <label><input type="radio" name="defectBaked" value="strong"><span class="ml-1">강함</span></label>
-            <label><input type="radio" name="defectBaked" value="very_strong"><span class="ml-1">매우 강함</span></label>
+            <label class="mobile-touch-friendly"><input type="radio" name="defectBaked" value="none"><span class="ml-1">미선택</span></label>
+            <label class="mobile-touch-friendly"><input type="radio" name="defectBaked" value="very_weak"><span class="ml-1">매우 약함</span></label>
+            <label class="mobile-touch-friendly"><input type="radio" name="defectBaked" value="weak"><span class="ml-1">약함</span></label>
+            <label class="mobile-touch-friendly"><input type="radio" name="defectBaked" value="moderate"><span class="ml-1">보통</span></label>
+            <label class="mobile-touch-friendly"><input type="radio" name="defectBaked" value="strong"><span class="ml-1">강함</span></label>
+            <label class="mobile-touch-friendly"><input type="radio" name="defectBaked" value="very_strong"><span class="ml-1">매우 강함</span></label>
           </div>
         </div>
         <div>
@@ -275,12 +560,12 @@
             </span>
           </label>
           <div class="flex gap-2 flex-wrap mt-1" id="defect_scorching">
-            <label><input type="radio" name="defectScorching" value="none"><span class="ml-1">미선택</span></label>
-            <label><input type="radio" name="defectScorching" value="very_weak"><span class="ml-1">매우 약함</span></label>
-            <label><input type="radio" name="defectScorching" value="weak"><span class="ml-1">약함</span></label>
-            <label><input type="radio" name="defectScorching" value="moderate"><span class="ml-1">보통</span></label>
-            <label><input type="radio" name="defectScorching" value="strong"><span class="ml-1">강함</span></label>
-            <label><input type="radio" name="defectScorching" value="very_strong"><span class="ml-1">매우 강함</span></label>
+            <label class="mobile-touch-friendly"><input type="radio" name="defectScorching" value="none"><span class="ml-1">미선택</span></label>
+            <label class="mobile-touch-friendly"><input type="radio" name="defectScorching" value="very_weak"><span class="ml-1">매우 약함</span></label>
+            <label class="mobile-touch-friendly"><input type="radio" name="defectScorching" value="weak"><span class="ml-1">약함</span></label>
+            <label class="mobile-touch-friendly"><input type="radio" name="defectScorching" value="moderate"><span class="ml-1">보통</span></label>
+            <label class="mobile-touch-friendly"><input type="radio" name="defectScorching" value="strong"><span class="ml-1">강함</span></label>
+            <label class="mobile-touch-friendly"><input type="radio" name="defectScorching" value="very_strong"><span class="ml-1">매우 강함</span></label>
           </div>
         </div>
       </div>
@@ -335,7 +620,7 @@
           <label class="text-sm block mb-1">총점 (기본 30점+합계)</label>
           <span id="totalScore" class="font-bold inline-block text-lg bg-gray-100 px-4 py-2 rounded border">86.00</span>
         </div>
-        <button type="button" id="calcScoreBtn" class="ml-1 mt-2 px-4 py-2 rounded export-btn flex items-center"><i class="fas fa-equals mr-2"></i>점수 계산</button>
+        <button type="button" id="calcScoreBtn" class="ml-1 mt-2 px-4 py-2 rounded export-btn flex items-center mobile-touch-friendly"><i class="fas fa-equals mr-2"></i>점수 계산</button>
       </div>
     </section>
     <!-- 테이스팅 노트 -->
@@ -356,31 +641,253 @@
           <canvas id="cuppingRadar" class="w-full max-w-full" height="200"></canvas>
         </div>
       </div>
+      <!-- 향미 프로필 차트 (새로 추가) - 차트 컨테이너 클래스 적용 -->
+      <div class="bg-white rounded-lg p-4 shadow-md mt-4">
+        <h4 class="font-semibold mb-2 flex items-center">
+          <i class="fa fa-chart-pie mr-2"></i>향미 프로필 차트
+        </h4>
+        <div class="chart-container">
+          <canvas id="flavorProfileChart"></canvas>
+        </div>
+      </div>
       <div id="selectedDefectsArea" class="w-full mt-6"></div>
       <div class="flex flex-wrap mt-6 gap-2">
-        <button id="exportImgBtn" type="button" class="export-btn px-6 py-2 rounded flex items-center"><i class="fas fa-image mr-2"></i>이미지로 내보내기</button>
-        <button id="exportCsvBtn" type="button" class="bg-green-600 hover:bg-green-700 text-white px-6 py-2 rounded flex items-center"><i class="fas fa-file-csv mr-2"></i>CSV로 내보내기</button>
-        <button id="exportXlsxBtn" type="button" class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded flex items-center"><i class="fas fa-file-excel mr-2"></i>엑셀로 내보내기</button>
+        <button id="exportImgBtn" type="button" class="export-btn px-6 py-2 rounded flex items-center mobile-touch-friendly"><i class="fas fa-image mr-2"></i>이미지로 내보내기</button>
+        <button id="exportCsvBtn" type="button" class="bg-green-600 hover:bg-green-700 text-white px-6 py-2 rounded flex items-center mobile-touch-friendly"><i class="fas fa-file-csv mr-2"></i>CSV로 내보내기</button>
+        <button id="exportXlsxBtn" type="button" class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded flex items-center mobile-touch-friendly"><i class="fas fa-file-excel mr-2"></i>엑셀로 내보내기</button>
       </div>
       <div class="text-xs text-gray-400 mt-8 md:mt-12 text-center"> 평가일: <span id="evalDate"></span> | mollis SCA 커피 관능 평가</div>
     </section>
   </form>
 </div>
+
+<!-- 분할 화면 비교 모달 -->
+<div id="splitViewModal" class="modal">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h3 class="font-bold text-lg">분할 화면 비교</h3>
+      <button id="closeSplitViewBtn" class="text-gray-500 hover:text-gray-700 mobile-touch-friendly">
+        <i class="fas fa-times text-xl"></i>
+      </button>
+    </div>
+    <div class="modal-body">
+      <div class="flex gap-2 mb-4 flex-wrap">
+        <div class="flex-1 min-w-[200px]">
+          <label class="block text-sm font-medium mb-1">왼쪽 샘플</label>
+          <select id="leftSampleSelect" class="w-full border rounded p-2 mobile-touch-friendly"></select>
+        </div>
+        <div class="flex-1 min-w-[200px]">
+          <label class="block text-sm font-medium mb-1">오른쪽 샘플</label>
+          <select id="rightSampleSelect" class="w-full border rounded p-2 mobile-touch-friendly"></select>
+        </div>
+      </div>
+      <div class="split-view" id="splitViewContainer">
+        <div class="split-view-container" id="leftSampleView">
+          <div class="text-center text-gray-500">왼쪽 샘플을 선택하세요</div>
+        </div>
+        <div class="split-view-container" id="rightSampleView">
+          <div class="text-center text-gray-500">오른쪽 샘플을 선택하세요</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
 <div id="toast" class="toast"></div>
+
 <script>
 /* --- 원본 데이터 및 각종 전역변수 --- */
+// 향미 데이터 확장 및 조정
 const FLAVOR_DATA = [
-  ["Fruity","Citrus Fruit","Lemon","#FFD966"],["Fruity","Citrus Fruit","Orange","#FFC300"],["Fruity","Citrus Fruit","Grapefruit","#FF7F50"],["Fruity","Other Fruit","Apple","#ABE188"],["Fruity","Other Fruit","Pear","#B6E4A3"],["Fruity","Berry","Raspberry","#DD5772"],["Fruity","Berry","Strawberry","#FF6F91"],["Fruity","Berry","Blackberry","#D7263D"],["Fruity","Dried Fruit","Raisin","#BB9055"],["Fruity","Dried Fruit","Prune","#925E3A"],["Sweet","","Brown Sugar","#B38B57"],["Sweet","","Caramel","#FFB15E"],["Sweet","","Honey","#FDE994"],["Sweet","","Vanilla","#F0D7BC"],["Floral","","Jasmine","#DEC2CB"],["Floral","","Rose","#FD5D8B"],["Floral","","Chamomile","#F5E5C0"],["Nutty/Cocoa","Nutty","Hazelnut","#D7C2A8"],["Nutty/Cocoa","Nutty","Almond","#DBD3C9"],["Nutty/Cocoa","Cocoa","Dark Chocolate","#6C4F3D"],["Nutty/Cocoa","Cocoa","Cocoa","#926F34"],["Spices","","Cinnamon","#E5B39B"],["Spices","","Clove","#C17855"],["Spices","","Pepper","#818286"],["Spices","","Nutmeg","#BD9C7F"],["Brown Sugar","","Molasses","#946A3B"],["Brown Sugar","","Maple Syrup","#C97C5D"],["Roasted","","Brown Roast","#5C4033"],["Roasted","","Smoky","#2D231C"],["Green/Vegetative","","Under-ripe","#A4C09C"],["Green/Vegetative","","Peapod","#B2DAC0"],["Green/Vegetative","","Fresh","#C2E99E"],["Sour/Fermented","Sour","Citric Acid","#CEE6CB"],["Sour/Fermented","Sour","Malic Acid","#C9E265"],["Sour/Fermented","Sour","Acetic Acid","#D9C1B4"],["Sour/Fermented","Fermented","Winey","#AC436E"],["Sour/Fermented","Fermented","Overripe","#625958"],["Other","","Chemical","#FCF6B1"],["Other","","Medicinal","#E2D784"],["Fruity","Citrus Fruit","Lime","#C0E57B"],["Fruity","Citrus Fruit","Tangerine","#FFA54F"],["Fruity","Berry","Blueberry","#4F86F7"],["Fruity","Berry","Cranberry","#E30B5C"],["Fruity","Stone Fruit","Peach","#FFCBA4"],["Fruity","Stone Fruit","Apricot","#FBCEB1"],["Fruity","Stone Fruit","Cherry","#DE3163"],["Fruity","Stone Fruit","Plum","#8E4585"],["Fruity","Tropical Fruit","Pineapple","#FEDF00"],["Fruity","Tropical Fruit","Mango","#FFB300"],["Fruity","Tropical Fruit","Coconut","#F2E8D7"],["Fruity","Tropical Fruit","Passion Fruit","#DDA0DD"],["Fruity","Dried Fruit","Fig","#8A4117"],["Fruity","Dried Fruit","Date","#A57164"],["Floral","","Hibiscus","#F53E6A"],["Floral","","Lavender","#B57EDC"],["Floral","","Orange Blossom","#FFCC99"],["Spices","Warming Spices","Cardamom","#BDA55D"],["Spices","Warming Spices","Allspice","#9C5903"],["Spices","Pungent Spices","Licorice","#2A2926"],["Spices","Pungent Spices","Anise","#50404D"],["Sweet","Caramelized","Toffee","#D2691E"],["Sweet","Caramelized","Butterscotch","#E09540"],["Sweet","Vanilla","Custard","#F0E68C"],["Sweet","Vanilla","Cream","#FFFDD0"],["Nutty/Cocoa","Nutty","Peanut","#D28C78"],["Nutty/Cocoa","Nutty","Walnut","#C19A6B"],["Nutty/Cocoa","Nutty","Cashew","#F5DEB3"],["Nutty/Cocoa","Cocoa","Milk Chocolate","#7B3F00"],["Nutty/Cocoa","Cocoa","Bittersweet Chocolate","#332421"],["Nutty/Cocoa","Cocoa","Mocha","#785135"],["Cereal/Grain","Cereal","Malt","#F0E68C"],["Cereal/Grain","Cereal","Toast","#D2B48C"],["Cereal/Grain","Cereal","Barley","#DBD0AE"],["Cereal/Grain","Grain-like","Granola","#C8A951"],["Cereal/Grain","Grain-like","Oats","#E4CBB1"],["Cereal/Grain","Grain-like","Rice","#F9FBE7"],["Sour/Fermented","Clean Acidity","Tartaric Acid","#D7E8CB"],["Sour/Fermented","Clean Acidity","Phosphoric Acid","#E8F3D9"],["Sour/Fermented","Fermented","Yogurt","#F5F5F5"],["Sour/Fermented","Fermented","Sourdough","#E8D0A7"],["Sour/Fermented","Fermented","Vinegar","#ECEDE6"],["Sour/Fermented","Fermented","Kombucha","#DEC19B"],["Sour/Fermented","Aged/Funky","Musty","#8B7D6B"],["Sour/Fermented","Aged/Funky","Earthy","#79553D"],["Roasted","Light Roast","Tea-like","#967969"],["Roasted","Light Roast","Herbal","#BDCB96"],["Roasted","Medium Roast","Toasty","#C19A6B"],["Roasted","Medium Roast","Caramelized","#C68E17"],["Roasted","Dark Roast","Burnt","#373536"],["Roasted","Dark Roast","Charred","#2C1608"],["Roasted","Dark Roast","Ashy","#5D5D5D"],["Green/Vegetative","Fresh Green","Grass","#7EC850"],["Green/Vegetative","Fresh Green","Cucumber","#8FBC8F"],["Green/Vegetative","Fresh Green","Green Bell Pepper","#4F7942"],["Green/Vegetative","Herbaceous","Mint","#98FB98"],["Green/Vegetative","Herbaceous","Sage","#BCB88A"],["Green/Vegetative","Herbaceous","Basil","#579229"],["Green/Vegetative","Vegetal","Olive","#708238"],["Green/Vegetative","Vegetal","Spinach","#175732"],["Other","Chemical","Rubber","#454545"],["Other","Chemical","Petroleum","#2E2E2E"],["Other","Chemical","Plastic","#BEBEBE"],["Other","Chemical","Tar","#1C1C1C"],["Other","Earthy","Soil","#6F4E37"],["Other","Earthy","Mushroom","#D7CEC7"],["Other","Earthy","Forest Floor","#5E4B3B"],["Other","Earthy","Wet Earth","#622F22"],["Other","Woody","Oak","#A46B2B"],["Other","Woody","Cedar","#A67B5B"],["Other","Woody","Pine","#8A9A5B"],["Other","Woody","Sandalwood","#B87333"]
+  // Fruity - Citrus Fruit
+  ["Fruity","Citrus Fruit","Lemon","#FFEB88"],
+  ["Fruity","Citrus Fruit","Orange","#FFC300"],
+  ["Fruity","Citrus Fruit","Grapefruit","#FF9970"],
+  ["Fruity","Citrus Fruit","Lime","#C0E57B"],
+  ["Fruity","Citrus Fruit","Tangerine","#FFA54F"],
+  ["Fruity","Citrus Fruit","Bergamot","#F9D949"],
+  ["Fruity","Citrus Fruit","Yuzu","#EFDF48"],
+  
+  // Fruity - Other Fruit
+  ["Fruity","Other Fruit","Apple","#C4E8A2"],
+  ["Fruity","Other Fruit","Pear","#D6ECC2"],
+  ["Fruity","Other Fruit","Grape","#A288E3"],
+  ["Fruity","Other Fruit","Kiwi","#8FBC8F"],
+  ["Fruity","Other Fruit","Watermelon","#E8B4B8"],
+  
+  // Fruity - Berry
+  ["Fruity","Berry","Raspberry","#FF8BA0"],
+  ["Fruity","Berry","Strawberry","#FF97A1"],
+  ["Fruity","Berry","Blackberry","#D7263D"],
+  ["Fruity","Berry","Blueberry","#7099DA"],
+  ["Fruity","Berry","Cranberry","#E30B5C"],
+  ["Fruity","Berry","Acai","#71466F"],
+  
+  // Fruity - Stone Fruit
+  ["Fruity","Stone Fruit","Peach","#FFCBA4"],
+  ["Fruity","Stone Fruit","Apricot","#FBCEB1"],
+  ["Fruity","Stone Fruit","Cherry","#DE3163"],
+  ["Fruity","Stone Fruit","Plum","#B27AA4"],
+  ["Fruity","Stone Fruit","Nectarine","#FFB8A0"],
+  
+  // Fruity - Tropical Fruit  
+  ["Fruity","Tropical Fruit","Pineapple","#FEDF00"],
+  ["Fruity","Tropical Fruit","Mango","#FFB300"],
+  ["Fruity","Tropical Fruit","Coconut","#F2E8D7"],
+  ["Fruity","Tropical Fruit","Passion Fruit","#DDA0DD"],
+  ["Fruity","Tropical Fruit","Guava","#F88379"],
+  ["Fruity","Tropical Fruit","Banana","#FFEB99"],
+  ["Fruity","Tropical Fruit","Lychee","#FFE4E1"],
+  ["Fruity","Tropical Fruit","Star Fruit","#FADA5E"],
+  ["Fruity","Tropical Fruit","Papaya","#FFDAB9"],
+  
+  // Fruity - Dried Fruit
+  ["Fruity","Dried Fruit","Raisin","#BB9055"],
+  ["Fruity","Dried Fruit","Prune","#925E3A"],
+  ["Fruity","Dried Fruit","Fig","#8A4117"],
+  ["Fruity","Dried Fruit","Date","#A57164"],
+  ["Fruity","Dried Fruit","Dried Apple","#D5BA98"],
+  ["Fruity","Dried Fruit","Dried Cherry","#A85751"],
+  
+  // Sweet
+  ["Sweet","","Brown Sugar","#B38B57"],
+  ["Sweet","","Caramel","#FFB15E"],
+  ["Sweet","","Honey","#FDE994"],
+  ["Sweet","","Vanilla","#F0D7BC"],
+  ["Sweet","Caramelized","Toffee","#D2691E"],
+  ["Sweet","Caramelized","Butterscotch","#E09540"],
+  ["Sweet","Vanilla","Custard","#F0E68C"],
+  ["Sweet","Vanilla","Cream","#FFFDD0"],
+  ["Sweet","","Maple Syrup","#C97C5D"],
+  ["Sweet","","Molasses","#774936"],
+  
+  // Floral
+  ["Floral","","Jasmine","#DEC2CB"],
+  ["Floral","","Rose","#FD5D8B"],
+  ["Floral","","Chamomile","#F5E5C0"],
+  ["Floral","","Hibiscus","#F53E6A"],
+  ["Floral","","Lavender","#B57EDC"],
+  ["Floral","","Orange Blossom","#FFCC99"],
+  ["Floral","","Elderflower","#F0FFF0"],
+  ["Floral","","Honeysuckle","#FFF0DB"],
+  ["Floral","","Violet","#C9A0DC"],
+  
+  // Nutty/Cocoa
+  ["Nutty/Cocoa","Nutty","Hazelnut","#D7C2A8"],
+  ["Nutty/Cocoa","Nutty","Almond","#DBD3C9"],
+  ["Nutty/Cocoa","Nutty","Peanut","#D28C78"],
+  ["Nutty/Cocoa","Nutty","Walnut","#C19A6B"],
+  ["Nutty/Cocoa","Nutty","Cashew","#F5DEB3"],
+  ["Nutty/Cocoa","Cocoa","Dark Chocolate","#6C4F3D"],
+  ["Nutty/Cocoa","Cocoa","Cocoa","#926F34"],
+  ["Nutty/Cocoa","Cocoa","Milk Chocolate","#7B3F00"],
+  ["Nutty/Cocoa","Cocoa","Bittersweet Chocolate","#332421"],
+  ["Nutty/Cocoa","Cocoa","Mocha","#785135"],
+  
+  // Spices
+  ["Spices","","Cinnamon","#E5B39B"],
+  ["Spices","","Clove","#C17855"],
+  ["Spices","","Pepper","#818286"],
+  ["Spices","","Nutmeg","#BD9C7F"],
+  ["Spices","Warming Spices","Cardamom","#BDA55D"],
+  ["Spices","Warming Spices","Allspice","#9C5903"],
+  ["Spices","Pungent Spices","Licorice","#2A2926"],
+  ["Spices","Pungent Spices","Anise","#50404D"],
+  ["Spices","","Ginger","#EFCC9C"],
+  ["Spices","","Vanilla Bean","#F3E5AB"],
+  
+  // Cereal/Grain
+  ["Cereal/Grain","Cereal","Malt","#F0E68C"],
+  ["Cereal/Grain","Cereal","Toast","#D2B48C"],
+  ["Cereal/Grain","Cereal","Barley","#DBD0AE"],
+  ["Cereal/Grain","Grain-like","Granola","#C8A951"],
+  ["Cereal/Grain","Grain-like","Oats","#E4CBB1"],
+  ["Cereal/Grain","Grain-like","Rice","#F9FBE7"],
+  ["Cereal/Grain","Grain-like","Wheat","#EAD9A7"],
+  ["Cereal/Grain","Grain-like","Corn","#FFF380"],
+  
+  // Roasted
+  ["Roasted","","Brown Roast","#5C4033"],
+  ["Roasted","","Smoky","#463F3A"],
+  ["Roasted","Light Roast","Tea-like","#967969"],
+  ["Roasted","Light Roast","Herbal","#BDCB96"],
+  ["Roasted","Medium Roast","Toasty","#C19A6B"],
+  ["Roasted","Medium Roast","Caramelized","#C68E17"],
+  ["Roasted","Dark Roast","Burnt","#373536"],
+  ["Roasted","Dark Roast","Charred","#2C1608"],
+  ["Roasted","Dark Roast","Ashy","#5D5D5D"],
+  
+  // Green/Vegetative
+  ["Green/Vegetative","","Under-ripe","#A4C09C"],
+  ["Green/Vegetative","","Peapod","#B2DAC0"],
+  ["Green/Vegetative","","Fresh","#C2E99E"],
+  ["Green/Vegetative","Fresh Green","Grass","#7EC850"],
+  ["Green/Vegetative","Fresh Green","Cucumber","#8FBC8F"],
+  ["Green/Vegetative","Fresh Green","Green Bell Pepper","#4F7942"],  ["Green/Vegetative","Fresh Green","Green Bell Pepper","#4F7942"],
+  ["Green/Vegetative","Herbaceous","Mint","#98FB98"],
+  ["Green/Vegetative","Herbaceous","Sage","#BCB88A"],
+  ["Green/Vegetative","Herbaceous","Basil","#579229"],
+  ["Green/Vegetative","Vegetal","Olive","#708238"],
+  ["Green/Vegetative","Vegetal","Spinach","#175732"],
+  
+  // Sour/Fermented
+  ["Sour/Fermented","Sour","Citric Acid","#CEE6CB"],
+  ["Sour/Fermented","Sour","Malic Acid","#C9E265"],
+  ["Sour/Fermented","Sour","Acetic Acid","#D9C1B4"],
+  ["Sour/Fermented","Clean Acidity","Tartaric Acid","#D7E8CB"],
+  ["Sour/Fermented","Clean Acidity","Phosphoric Acid","#E8F3D9"],
+  ["Sour/Fermented","Fermented","Winey","#AC436E"],
+  ["Sour/Fermented","Fermented","Overripe","#625958"],
+  ["Sour/Fermented","Fermented","Yogurt","#F5F5F5"],
+  ["Sour/Fermented","Fermented","Sourdough","#E8D0A7"],
+  ["Sour/Fermented","Fermented","Vinegar","#ECEDE6"],
+  ["Sour/Fermented","Fermented","Kombucha","#DEC19B"],
+  ["Sour/Fermented","Aged/Funky","Musty","#8B7D6B"],
+  ["Sour/Fermented","Aged/Funky","Earthy","#79553D"],
+  
+  // Other
+  ["Other","","Chemical","#FCF6B1"],
+  ["Other","","Medicinal","#E2D784"],
+  ["Other","Chemical","Rubber","#454545"],
+  ["Other","Chemical","Petroleum","#2E2E2E"],
+  ["Other","Chemical","Plastic","#BEBEBE"],
+  ["Other","Chemical","Tar","#1C1C1C"],
+  ["Other","Earthy","Soil","#6F4E37"],
+  ["Other","Earthy","Mushroom","#D7CEC7"],
+  ["Other","Earthy","Forest Floor","#5E4B3B"],
+  ["Other","Earthy","Wet Earth","#622F22"],
+  ["Other","Woody","Oak","#A46B2B"],
+  ["Other","Woody","Cedar","#A67B5B"],
+  ["Other","Woody","Pine","#8A9A5B"],
+  ["Other","Woody","Sandalwood","#B87333"]
 ];
+
 const FLAVOR_PHASES=[{id:"fragrance",label:"프래그런스"},{id:"aroma",label:"아로마"},{id:"flavor",label:"플레이버"},{id:"aftertaste",label:"에프터테이스트"}];
 const ATTR_TO_BADGE={acidityLevel:{label:"산미",color:"#FF6B6B"},sweetnessLevel:{label:"단맛",color:"#51CF66"},bodyLevel:{label:"바디감",color:"#339AF0"}};
 const ATTR_VALUE_LABELS={"Low":"Low","Med-Low":"Med-Low","Medium":"Medium","Med-High":"Med-High","High":"High"};
 const DEFECT_LABELS={none:{label:"미선택",color:"#bbb" },very_weak:{label:"매우 약함",color:"#9ad0c2"},weak:{label:"약함",color:"#95a7f2"},moderate:{label:"보통",color:"#f6c177"},strong:{label:"강함",color:"#f59f4c"},very_strong:{label:"매우 강함",color:"#fc4747"} };
 const DEFECT_PROPS=[{key:"defectUnderdevelopment",label:"언더디벨롭먼트",desc:"로스팅 불충분, 강한 산미, 피니시/애프터 부족",wheel:"Green/Vegetative"},{key:"defectOverdevelopment",label:"오버디벨롭먼트",desc:"과도한 로스팅으로 산미, 플레이버 소멸",wheel:"Roasted"},{key:"defectBaked",label:"베이킹(베이크드)",desc:"팝콘/귀리/시리얼류 결점, 캐러멜화 과잉",wheel:"곡물(Cereal/Grain)"},{key:"defectScorching",label:"스코칭",desc:"탄맛, 과다열 노출, 재/탄 노트",wheel:"Roasted"}];
 
+// 향미 카테고리별 그룹핑
+const FLAVOR_CATEGORIES = [
+  { name: "과일류", categories: ["Fruity"], color: "#FFB8A0" },
+  { name: "달콤함", categories: ["Sweet"], color: "#FDE994" },
+  { name: "꽃향", categories: ["Floral"], color: "#F5E5C0" },
+  { name: "견과/초콜릿", categories: ["Nutty/Cocoa"], color: "#D7C2A8" },
+  { name: "향신료", categories: ["Spices"], color: "#BDA55D" },
+  { name: "곡물/시리얼", categories: ["Cereal/Grain"], color: "#E4CBB1" },
+  { name: "로스팅", categories: ["Roasted"], color: "#967969" },
+  { name: "풀/채소류", categories: ["Green/Vegetative"], color: "#A4C09C" },
+  { name: "산미/발효", categories: ["Sour/Fermented"], color: "#CEE6CB" },
+  { name: "기타", categories: ["Other"], color: "#D7CEC7" }
+];
+
 let samples = [];
 let currentSampleId = null;
 let sampleSaveTimeout = null;
+let slideDirection = ''; // 슬라이드 방향 추적
+let flavorProfileChart = null; // 향미 프로필 차트 객체
+
 function getEmptySampleData(){
   let flavorSelections = {}; FLAVOR_PHASES.forEach(phase=> flavorSelections[phase.id] = [] );
   return {
@@ -391,29 +898,189 @@ function getEmptySampleData(){
     tastingNotes: "", lastEdit: +(new Date())
   };
 }
+
 function createNewSampleObj(title){
   let id = "sample_"+Date.now()+"_"+Math.floor(Math.random()*10000);
   return {id, title:title||"새 샘플", sampleData: getEmptySampleData(), lastEdit: +(new Date())};
 }
+
 function renderSampleList(){
   let listDiv = document.getElementById('sampleList');
   if(!samples.length){
     listDiv.innerHTML = `<div class="text-gray-500 text-xs my-3 text-center">샘플 없음<br>새로 추가하세요.</div>`;
+    updateSampleNavigation();
     return;
   }
-  let html = samples.map(sm=>`<div class="flex justify-between items-center border rounded-lg px-2 py-1 mb-1 cursor-pointer ${sm.id === currentSampleId?"bg-yellow-100 border-yellow-700":"bg-white border-gray-200"}" data-id="${sm.id}">
-    <span class="truncate text-sm ${sm.id===currentSampleId?"font-bold":""}">${sm.title||"샘플"}</span>
-    <span class="text-xs ml-2 text-gray-400">${sm.sampleData && sm.sampleData.roastDate?sm.sampleData.roastDate:""}</span>
-  </div>`).join("");
-  listDiv.innerHTML = html;
-  Array.from(listDiv.querySelectorAll('div[data-id]')).forEach(el=>{
-    el.onclick = ()=>{
-      let id = el.getAttribute('data-id');
-      if(id !== currentSampleId){ loadSample(id); }
-    }
+  
+  // 드래그 앤 드롭 가능한 샘플 리스트로 변경
+  let html = '';
+  samples.forEach(sm => {
+    html += `
+      <div class="flex justify-between items-center border rounded-lg px-2 py-1 mb-1 sample-item ${sm.id === currentSampleId ? "bg-yellow-100 border-yellow-700" : "bg-white border-gray-200"}" data-id="${sm.id}">
+        <div class="sample-drag-handle"><i class="fas fa-grip-lines"></i></div>
+        <span class="truncate text-sm flex-1 ${sm.id === currentSampleId ? "font-bold" : ""}">${sm.title || "샘플"}</span>
+        <span class="text-xs ml-2 text-gray-400">${sm.sampleData && sm.sampleData.roastDate ? sm.sampleData.roastDate : ""}</span>
+      </div>
+    `;
   });
+  
+  listDiv.innerHTML = html;
+  
+  // 샘플 클릭 이벤트
+  Array.from(listDiv.querySelectorAll('.sample-item')).forEach(el => {
+    el.addEventListener('click', (e) => {
+      // 드래그 핸들을 클릭했을 때는 로드하지 않음
+      if (!e.target.closest('.sample-drag-handle')) {
+        let id = el.getAttribute('data-id');
+        if (id !== currentSampleId) {
+          loadSample(id);
+        }
+      }
+    });
+    
+    // 샘플 복제를 위한 컨텍스트 메뉴(우클릭) 이벤트
+    el.addEventListener('contextmenu', (e) => {
+      e.preventDefault();
+      const sampleId = el.getAttribute('data-id');
+      if (confirm("이 샘플을 복제하시겠습니까?")) {
+        cloneSample(sampleId);
+      }
+    });
+    
+    // 모바일에서 길게 누르기로 샘플 복제
+    el.addEventListener('touchstart', function(e) {
+      if (e.target.closest('.sample-drag-handle')) return; // 드래그 핸들 터치 시 무시
+      
+      const longPressTimer = setTimeout(() => {
+        const sampleId = el.getAttribute('data-id');
+        if (confirm("이 샘플을 복제하시겠습니까?")) {
+          cloneSample(sampleId);
+        }
+      }, 800); // 800ms 이상 누르면 복제 다이얼로그 표시
+      
+      // 터치 종료 시 타이머 제거
+      const clearTimer = () => clearTimeout(longPressTimer);
+      el.addEventListener('touchend', clearTimer, { once: true });
+      el.addEventListener('touchcancel', clearTimer, { once: true });
+    });
+  });
+  
+  // Sortable.js 초기화 - 드래그 앤 드롭
+  if (samples.length > 1) {
+    const sortable = new Sortable(listDiv, {
+      animation: 150,
+      handle: '.sample-drag-handle',
+      ghostClass: 'sortable-ghost',
+      chosenClass: 'sortable-chosen',
+      onEnd: function (evt) {
+        // 드래그 앤 드롭 후 배열 재정렬
+        const oldIndex = evt.oldIndex;
+        const newIndex = evt.newIndex;
+        
+        if (oldIndex !== newIndex) {
+          const item = samples[oldIndex];
+          samples.splice(oldIndex, 1);
+          samples.splice(newIndex, 0, item);
+          saveSamplesToStorage();
+        }
+      }
+    });
+  }
+  
+  updateSampleNavigation();
   renderCompareList(); // 샘플 변경시 항상 compare UI 새로 그리기
+  
+  // 분할 화면 비교 셀렉트박스 업데이트
+  updateSplitViewSelects();
 }
+
+// 샘플 복제 기능
+function cloneSample(sampleId) {
+  const originalSample = samples.find(s => s.id === sampleId);
+  if (!originalSample) return;
+  
+  // 깊은 복사를 통해 완전한 복제본 생성
+  const clonedData = JSON.parse(JSON.stringify(originalSample.sampleData));
+  const newId = "sample_" + Date.now() + "_" + Math.floor(Math.random() * 10000);
+  const clonedSample = {
+    id: newId,
+    title: originalSample.title + " (복사본)",
+    sampleData: clonedData,
+    lastEdit: +(new Date())
+  };
+  
+  samples.unshift(clonedSample); // 배열 맨 앞에 추가
+  currentSampleId = newId;
+  renderSampleList();
+  setUIFromSample(clonedSample.sampleData);
+  saveSamplesToStorage();
+  showToast("샘플을 복제했습니다.");
+}
+
+// 샘플 네비게이션 업데이트
+function updateSampleNavigation(){
+  const prevBtn = document.getElementById('prevSampleBtn');
+  const nextBtn = document.getElementById('nextSampleBtn');
+  const titleEl = document.getElementById('currentSampleTitle');
+  
+  if(!samples.length){
+    prevBtn.disabled = true;
+    nextBtn.disabled = true;
+    titleEl.textContent = "샘플 없음";
+    return;
+  }
+  
+  const currentIndex = samples.findIndex(s => s.id === currentSampleId);
+  const currentSample = samples[currentIndex];
+  
+  prevBtn.disabled = currentIndex <= 0;
+  nextBtn.disabled = currentIndex >= samples.length - 1;
+  
+  titleEl.textContent = currentSample ? currentSample.title : "샘플 선택";
+}
+
+// 이전 샘플로 이동
+function goToPrevSample(){
+  if(!samples.length) return;
+  
+  const currentIndex = samples.findIndex(s => s.id === currentSampleId);
+  if(currentIndex > 0){
+    slideDirection = 'right';
+    loadSample(samples[currentIndex - 1].id);
+  }
+}
+
+// 다음 샘플로 이동
+function goToNextSample(){
+  if(!samples.length) return;
+  
+  const currentIndex = samples.findIndex(s => s.id === currentSampleId);
+  if(currentIndex < samples.length - 1){
+    slideDirection = 'left';
+    loadSample(samples[currentIndex + 1].id);
+  }
+}
+
+// 샘플 로드 시 슬라이드 애니메이션 적용
+function applySlideAnimation() {
+  const form = document.getElementById('cuppingForm');
+  
+  // 이전 클래스 제거
+  form.classList.remove('slide-left', 'slide-right');
+  
+  // 슬라이드 방향에 따라 클래스 추가
+  if(slideDirection === 'left') {
+    form.classList.add('slide-left');
+  } else if(slideDirection === 'right') {
+    form.classList.add('slide-right');
+  }
+  
+  // 애니메이션 재설정
+  setTimeout(() => {
+    form.classList.remove('slide-left', 'slide-right');
+  }, 300);
+}
+
 function loadSamplesFromStorage(){
   try{
     let raw = localStorage.getItem("mollis_sca_samples2");
@@ -428,11 +1095,13 @@ function loadSamplesFromStorage(){
   if(!currentSampleId || !samples.find(s=>s.id===currentSampleId)){ currentSampleId = samples[0].id; }
   renderSampleList();
 }
+
 function saveSamplesToStorage(){
   localStorage.setItem("mollis_sca_samples2", JSON.stringify(samples));
   document.getElementById('sampleSavedState').classList.remove("hidden");
   setTimeout(()=>document.getElementById('sampleSavedState').classList.add("hidden"), 900);
 }
+
 function showToast(msg) {
   try {
     let toast = document.getElementById('toast');
@@ -441,6 +1110,7 @@ function showToast(msg) {
     setTimeout(()=>{toast.classList.remove('show');},1800);
   } catch(e) {}
 }
+
 function saveCurrentSample(applyInput=true){
   let sampleIdx = samples.findIndex(s=>s.id===currentSampleId);
   if(sampleIdx!==-1){
@@ -455,6 +1125,22 @@ function saveCurrentSample(applyInput=true){
     saveSamplesToStorage();
   }
 }
+
+function loadSample(sampleId){
+  // 현재 샘플 저장
+  if(currentSampleId) {
+    saveCurrentSample();
+  }
+  
+  let sampleObj = samples.find(s=>s.id===sampleId);
+  if(sampleObj){
+    currentSampleId = sampleId;
+    setUIFromSample(sampleObj.sampleData);
+    renderSampleList();
+    applySlideAnimation(); // 슬라이드 애니메이션 적용
+  }
+}
+
 function setUIFromSample(sampleData){
   document.getElementById('sampleTitleInput').value = sampleData.title||'';
   document.getElementById('coffeeName').value = sampleData.coffeeName||'';
@@ -490,9 +1176,11 @@ function setUIFromSample(sampleData){
   renderSelectedDefectsArea(sampleData);
   updateRadar(sampleData);
   updateTotalScore(sampleData);
+  updateFlavorProfileChart(sampleData);
   renderFlavorTabs();
   renderFlavorPhase();
 }
+
 function saveUIToSample(targetDataObj){
   let sampleData = targetDataObj||getCurrentSampleObj().sampleData;
   sampleData.title = document.getElementById('sampleTitleInput').value||"";
@@ -519,58 +1207,19 @@ function saveUIToSample(targetDataObj){
   sampleData.tastingNotes = document.getElementById('tastingNotes').value;
   sampleData.lastEdit = +(new Date());
 }
-function getCurrentSampleObj(){ return samples.find(s=>s.id===currentSampleId); }
-function loadSample(sampleId){
-  let sampleObj = samples.find(s=>s.id===sampleId);
-  if(sampleObj){
-    currentSampleId = sampleId;
-    setUIFromSample(sampleObj.sampleData);
-    renderSampleList();
-  }
-}
 
-// 샘플 추가/삭제
-document.getElementById('addSampleBtn').onclick = ()=>{
-  let title = prompt("새 샘플명(생략시 '샘플')", "");
-  let obj = createNewSampleObj(title);
-  samples.unshift(obj); //최신순
-  currentSampleId = obj.id;
-  renderSampleList();
-  setUIFromSample(obj.sampleData);
-  saveSamplesToStorage();
-};
-document.getElementById('removeSampleBtn').onclick = ()=>{
-  if(!samples.length) return;
-  if(!confirm("이 샘플을 삭제할까요?")){ return; }
-  let idx = samples.findIndex(s=>s.id===currentSampleId);
-  if(idx!==-1){
-    samples.splice(idx,1);
-    if(samples.length===0){
-      let def = createNewSampleObj("샘플 #1");
-      samples.push(def);
-      currentSampleId=def.id;
-    }else{
-      currentSampleId = samples[0].id;
-    }
-    renderSampleList();
-    setUIFromSample(getCurrentSampleObj().sampleData);
-    saveSamplesToStorage();
-  }
-};
-document.getElementById('sampleTitleInput').onblur = ()=>{ saveCurrentSample(); };
-function scheduleAutoSave(){
-  if(sampleSaveTimeout)clearTimeout(sampleSaveTimeout);
-  sampleSaveTimeout = setTimeout(()=>{saveCurrentSample();}, 5000);
-}
+function getCurrentSampleObj(){ return samples.find(s=>s.id===currentSampleId); }
+
 // FlavorTabs/Phase
 let currentFlavorPhase = "fragrance";
+
 function renderFlavorTabs(){
   const tabs = document.getElementById('flavorTabs');
   tabs.innerHTML = '';
   FLAVOR_PHASES.forEach(phase=>{
     const btn = document.createElement('button');
     btn.type = 'button';
-    btn.className = 'flavor-phase-btn font-bold rounded px-4 py-1 mr-1 mb-1 ' + (currentFlavorPhase === phase.id ? 'tab-btn-active' : 'tab-btn-inactive');
+    btn.className = 'flavor-phase-btn font-bold rounded px-4 py-1 mr-1 mb-1 mobile-touch-friendly ' + (currentFlavorPhase === phase.id ? 'tab-btn-active' : 'tab-btn-inactive');
     btn.textContent = phase.label;
     btn.dataset.flavorphase = phase.id;
     btn.onclick = () => {
@@ -581,6 +1230,7 @@ function renderFlavorTabs(){
     tabs.appendChild(btn);
   });
 }
+
 function renderFlavorPhase(){
   let curSel = getCurrentSampleObj().sampleData.flavorSelections[currentFlavorPhase]||[];
   let outer = document.getElementById('flavorWheelMultiSelectArea');
@@ -589,9 +1239,17 @@ function renderFlavorPhase(){
     if(!catMap[cat])catMap[cat] = [];
     catMap[cat].push({sub,desc,color});
   });
-  let html = '';
+  
+  // 검색 기능 추가
+  let html = `
+    <div class="search-box mb-3">
+      <input type="text" id="flavorSearchInput" class="search-input" 
+        placeholder="향미 검색 (예: berry, chocolate, floral...)">
+    </div>
+  `;
+  
   for(let cat in catMap){
-    html += `<div class="mb-1 mt-2"><div class="font-bold mb-0.5">${cat}</div>`;
+    html += `<div class="flavor-category mb-3 mt-2"><div class="font-bold mb-1">${cat}</div>`;
     let subMap = {};
     catMap[cat].forEach(f=>{
       let k = f.sub||'특징없음';
@@ -599,30 +1257,90 @@ function renderFlavorPhase(){
       subMap[k].push(f);
     });
     for(let sub in subMap){
-      html += `<div class="mb-1 ml-2"><span class="font-semibold text-sm">${sub!=='특징없음'?sub:""}</span>&nbsp;`;
+      html += `<div class="flavor-subcategory mb-2 ml-2"><span class="font-semibold text-sm">${sub!=='특징없음'?sub:""}</span>&nbsp;`;
       subMap[sub].forEach(f=>{
         let id = cat+'|'+sub+'|'+f.desc;
         let checked = curSel.includes(id) ? ' checked ':'';
-        html+=`<label class="inline-block align-middle mr-2 mb-1 flavor-badge" style="background:${f.color};"><input type="checkbox" class="flavorSelectBox" data-key="${id}" ${checked}> <span>${f.desc}</span></label>`;
+        let textColor = getContrastColor(f.color);
+        
+        html+=`<label class="flavor-checkbox-label" style="background:${f.color};color:${textColor};box-shadow:${checked?'0 0 0 1px #000, inset 0 0 0 1px rgba(255,255,255,0.4)':'none'}" data-category="${cat}" data-subcategory="${sub}" data-flavor="${f.desc.toLowerCase()}">
+          <input type="checkbox" class="flavorSelectBox" data-key="${id}" ${checked}> ${f.desc}
+        </label>`;
       });
       html += '</div>';
     } html+='</div>';
   }
   outer.innerHTML = html;
+  
+  // 검색 기능 추가
+  const searchInput = document.getElementById('flavorSearchInput');
+  if (searchInput) {
+    searchInput.addEventListener('input', function() {
+      const searchTerm = this.value.trim().toLowerCase();
+      if (searchTerm === '') {
+        // 모든 항목 표시
+        document.querySelectorAll('.flavor-checkbox-label').forEach(label => {
+          label.style.display = '';
+        });
+        document.querySelectorAll('.flavor-category, .flavor-subcategory').forEach(item => {
+          item.style.display = '';
+        });
+      } else {
+        // 검색어에 맞는 항목만 표시
+        document.querySelectorAll('.flavor-checkbox-label').forEach(label => {
+          const category = label.dataset.category.toLowerCase();
+          const subcategory = label.dataset.subcategory.toLowerCase();
+          const flavor = label.dataset.flavor;
+          
+          if (category.includes(searchTerm) || subcategory.includes(searchTerm) || flavor.includes(searchTerm)) {
+            label.style.display = '';
+          } else {
+            label.style.display = 'none';
+          }
+        });
+        
+        // 빈 서브카테고리 및 카테고리 숨기기
+        document.querySelectorAll('.flavor-subcategory').forEach(subcat => {
+          const hasVisibleItems = Array.from(subcat.querySelectorAll('.flavor-checkbox-label')).some(
+            label => label.style.display !== 'none'
+          );
+          subcat.style.display = hasVisibleItems ? '' : 'none';
+        });
+        
+        document.querySelectorAll('.flavor-category').forEach(cat => {
+          const hasVisibleItems = Array.from(cat.querySelectorAll('.flavor-subcategory')).some(
+            subcat => subcat.style.display !== 'none'
+          );
+          cat.style.display = hasVisibleItems ? '' : 'none';
+        });
+      }
+    });
+  }
+  
   outer.querySelectorAll('.flavorSelectBox').forEach(cb=>{
     cb.onchange = function(){
       let sel = getCurrentSampleObj().sampleData.flavorSelections[currentFlavorPhase];
       let key = this.getAttribute('data-key');
       if(this.checked){
         if(sel.length<10) sel.push(key);
+        else {
+          this.checked = false;
+          showToast("각 항목당 최대 10개까지만 선택 가능합니다.");
+          return;
+        }
+        this.parentNode.style.boxShadow = '0 0 0 1px #000, inset 0 0 0 1px rgba(255,255,255,0.4)';
       } else{
         let idx = sel.indexOf(key); if(idx>-1) sel.splice(idx,1);
+        this.parentNode.style.boxShadow = 'none';
       }
       renderSelectedFlavorsArea();
-      saveCurrentSample();
+      updateFlavorProfileChart();
+      scheduleAutoSave();
     }
   });
 }
+
+// 향미 특성/속성에 로스팅 디펙트 표시
 function renderSelectedFlavorsArea(_data){
   let sampleData = _data||getCurrentSampleObj().sampleData;
   let html = '';
@@ -631,10 +1349,14 @@ function renderSelectedFlavorsArea(_data){
       let [cat,sub,desc] = key.split('|');
       let rec = FLAVOR_DATA.find(f=>f[0]===cat&&f[1]===sub&&f[2]===desc);
       let color = rec?rec[3]:'#B8B2A5';
-      return `<span class="flavor-badge" style="background:${color};">${desc}</span>`;
+      // 색상 대비 계산하여 텍스트 색상 결정
+      let textColor = getContrastColor(color);
+      return `<span class="flavor-badge" style="background:${color};color:${textColor};">${desc}</span>`;
     });
     html+=`<div class="mb-1"><span class="font-bold">${phase.label}:</span> ${phaseSel.join(' ')||'<span class="text-xs text-gray-400">없음</span>'}</div>`;
   });
+  
+  // 속성 표시 (기존 코드)
   html += `<div class="mt-2 mb-1 flex flex-wrap items-center">`;
   Object.keys(ATTR_TO_BADGE).forEach(attrKey=>{
     let attrMeta = ATTR_TO_BADGE[attrKey];
@@ -646,30 +1368,75 @@ function renderSelectedFlavorsArea(_data){
     }
   });
   html += `</div>`;
-  document.getElementById('selectedFlavorsArea').innerHTML = html;
-}
-function renderSelectedDefectsArea(_data){
-  let sampleData = _data||getCurrentSampleObj().sampleData;
-  let html = '<div class="defect-headline flex items-center"><i class="fa fa-fire-alt mr-2"></i>로스팅 디펙트(결점) 현황</div>';
-  html += '<div style="display: flex; flex-wrap:wrap; align-items:stretch; gap:10px 12px;">';
+  
+  // 로스팅 디펙트 표시
+  html += `<div class="mt-2"><span class="font-bold">로스팅 디펙트:</span> <div class="flex flex-wrap gap-1 mt-1">`;
+  let hasDefect = false;
   DEFECT_PROPS.forEach(d=>{
     const val = sampleData[d.key]||"none";
-    const dLabel = DEFECT_LABELS[val] ? DEFECT_LABELS[val].label : "미선택";
-    const dColor = DEFECT_LABELS[val] ? DEFECT_LABELS[val].color : "#bbb";
-    html += `<div class="defect-block" style="font-size:12px;"><span class="font-semibold" style="font-size:12px;">${d.label}</span>
-      <span class="defect-desc">${d.desc}</span>
-      <span class="defect-badge" style="background:${dColor};color:${val==='none'?'#666':'#fff'};">${dLabel}</span>
-      </div>`;
+    if(val !== "none") {
+      const dColor = DEFECT_LABELS[val] ? DEFECT_LABELS[val].color : "#bbb";
+      html += `<span class="flavor-badge" style="background:${dColor};color:#fff;">${d.label}: ${DEFECT_LABELS[val].label}</span>`;
+      hasDefect = true;
+    }
   });
-  html += '</div>';
-  document.getElementById('selectedDefectsArea').innerHTML = html;
+  
+  // 선택된 디펙트가 없는 경우
+  if(!hasDefect) {
+    html += `<span class="text-xs text-gray-400">선택된 디펙트 없음</span>`;
+  }
+  
+  html += `</div></div>`;
+  document.getElementById('selectedFlavorsArea').innerHTML = html;
 }
+
+// 기존 renderSelectedDefectsArea 함수는 빈 내용으로 수정
+function renderSelectedDefectsArea(_data){
+  // 디펙트 영역은 비워둠
+  document.getElementById('selectedDefectsArea').innerHTML = '';
+}
+
+// 배경색에 따라 대비되는 텍스트 색상 반환 (가독성 향상)
+function getContrastColor(hexColor) {
+  // 색상이 어두운지 밝은지 판단
+  if (!hexColor) return '#000000';
+  
+  // 16진수 색상값 파싱
+  let r, g, b;
+  if (hexColor.startsWith('#')) {
+    hexColor = hexColor.substring(1);
+  }
+  
+  // 3자리 헥스코드 처리 (#RGB)
+  if (hexColor.length === 3) {
+    r = parseInt(hexColor.charAt(0) + hexColor.charAt(0), 16);
+    g = parseInt(hexColor.charAt(1) + hexColor.charAt(1), 16);
+    b = parseInt(hexColor.charAt(2) + hexColor.charAt(2), 16);
+  } 
+  // 6자리 헥스코드 처리 (#RRGGBB)
+  else if (hexColor.length === 6) {
+    r = parseInt(hexColor.substring(0, 2), 16);
+    g = parseInt(hexColor.substring(2, 4), 16);
+    b = parseInt(hexColor.substring(4, 6), 16);
+  } else {
+    return '#000000'; // 기본값
+  }
+  
+  // 밝기 계산 (YIQ 공식)
+  const brightness = (r * 299 + g * 587 + b * 114) / 1000;
+  
+  // 밝은 색상이면 검정, 어두운 색상이면 흰색 반환
+  return brightness > 128 ? '#000000' : '#FFFFFF';
+}
+
 function getCheckedRadio(name){ let r = document.querySelector('input[name="'+name+'"]:checked'); return r?r.value:""; }
+
 function updateTotalScore(_data){
   let s = _data||getCurrentSampleObj().sampleData;
   let sum = 30 + s.scoreFragrance + s.scoreAroma + s.scoreFlavor + s.scoreAftertaste + s.scoreAcidity + s.scoreBody + s.scoreBalance + s.scoreOverall;
   document.getElementById('totalScore').textContent = sum.toFixed(2);
 }
+
 // SCA Radar Chart
 let radarChartObj = null;
 function updateRadar(_data){
@@ -679,7 +1446,7 @@ function updateRadar(_data){
       type: "radar",
       data: {
         labels:["프래그런스","아로마","플레이버","에프터테이스트","액시디티","바디","밸런스","오버럴"],
-        datasets:[{label:"점수",data:[7,7,7,7,7,7,7,7], backgroundColor:"rgba(139,90,43,0.15)",borderColor:"#8B5A2B",pointBgColor:"#8B5A2B"}]
+        datasets:[{label:"점수",data:[7,7,7,7,7,7,7,7], backgroundColor:"rgba(139,90,43,0.15)",borderColor:"#8B5A2B",pointBackgroundColor:"#8B5A2B"}]
       },
       options: { responsive:true, plugins:{legend:{display:false}}, scales:{r:{ min:0,max:10,ticks:{stepSize:2, font:{family:"Noto Sans KR", size:13}}, pointLabels:{font:{family:"Noto Sans KR", weight:"bold", size:13}} }} }
     });
@@ -691,6 +1458,106 @@ function updateRadar(_data){
   ];
   chart.update();
 }
+
+// 향미 프로필 차트 - 고정 높이 적용
+function updateFlavorProfileChart(_data) {
+  let sampleData = _data || getCurrentSampleObj().sampleData;
+  const canvas = document.getElementById('flavorProfileChart');
+  
+  // 카테고리별 항목 수 계산
+  let categoryCount = {};
+  FLAVOR_CATEGORIES.forEach(cat => {
+    categoryCount[cat.name] = 0;
+  });
+  
+  // 모든 플레이버 페이즈의 선택된 향미를 합쳐서 카테고리별로 집계
+  FLAVOR_PHASES.forEach(phase => {
+    (sampleData.flavorSelections[phase.id] || []).forEach(key => {
+      const [cat, sub, desc] = key.split('|');
+      
+      // 해당 카테고리 찾기
+      const category = FLAVOR_CATEGORIES.find(c => c.categories.includes(cat));
+      if (category) {
+        categoryCount[category.name]++;
+      }
+    });
+  });
+  
+  // 데이터 배열 생성
+  const labels = FLAVOR_CATEGORIES.map(c => c.name);
+  const data = FLAVOR_CATEGORIES.map(c => categoryCount[c.name]);
+  const borderColors = FLAVOR_CATEGORIES.map(c => c.color);
+  
+  // 기존 차트 파괴 후 새로 생성
+  if (flavorProfileChart) {
+    flavorProfileChart.destroy();
+  }
+  
+  // 차트 부모 요소 높이를 명시적으로 설정 - 이미 CSS에서 .chart-container로 설정함
+  
+  // 새 차트 생성 - maintainAspectRatio: true로 설정
+  flavorProfileChart = new Chart(canvas.getContext('2d'), {
+    type: 'radar',
+    data: {
+      labels: labels,
+      datasets: [{
+        label: '향미 그룹 분포',
+        data: data,
+        backgroundColor: 'rgba(139, 90, 43, 0.2)',
+        borderColor: '#8B5A2B',
+        borderWidth: 2,
+        pointBackgroundColor: borderColors,
+        pointRadius: 4
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: true, // 비율 유지
+      plugins: {
+        legend: {
+          display: false
+        },
+        tooltip: {
+          callbacks: {
+            label: function(context) {
+              const value = context.raw;
+              return `${context.label}: ${value}개`;
+            }
+          }
+        }
+      },
+      scales: {
+        r: {
+          min: 0,
+          ticks: {
+            stepSize: 1,
+            callback: function(value) {
+              if (value % 1 === 0) {
+                return value;
+              }
+            }
+          },
+          pointLabels: {
+            font: {
+              family: 'Noto Sans KR',
+              size: 12,
+              weight: 'bold'
+            }
+          }
+        }
+      }
+    }
+  });
+}
+
+// 자동 저장 스케줄링
+function scheduleAutoSave() {
+  if (sampleSaveTimeout) clearTimeout(sampleSaveTimeout);
+  sampleSaveTimeout = setTimeout(() => {
+    saveCurrentSample();
+  }, 3000); // 3초 후 저장
+}
+
 // 수치입력, 슬라이더/인풋 동기화
 (()=>{
   let scoreFieldList = ["Fragrance","Aroma","Flavor","Aftertaste","Acidity","Body","Balance","Overall"];
@@ -700,131 +1567,294 @@ function updateRadar(_data){
     let sliderInput= document.getElementById(sliderId);
     numInput.oninput = numInput.onchange = ()=>{
       sliderInput.value = numInput.value;
-      saveCurrentSample();
       updateTotalScore();
       updateRadar();
       scheduleAutoSave();
     };
     sliderInput.oninput = sliderInput.onchange = ()=>{
       numInput.value = sliderInput.value;
-      saveCurrentSample();
       updateTotalScore();
       updateRadar();
       scheduleAutoSave();
     }
   });
 })();
+
 ["acidityLevel","sweetnessLevel","bodyLevel"].forEach(gr=>{
   document.querySelectorAll('input[name="'+gr+'"]').forEach(r=>{
     r.onchange = ()=>{
-      saveCurrentSample();
       renderSelectedFlavorsArea();
       scheduleAutoSave();
     }
   });
 });
+
 ["coffeeName","origin","variety","process","roastDate","roastLevel","tastingNotes"].forEach(id=>{
-  document.getElementById(id).onblur = ()=>{ saveCurrentSample(); scheduleAutoSave(); };
+  document.getElementById(id).onblur = ()=>{ scheduleAutoSave(); };
 });
+
 // 디펙트: radio 이벤트
 DEFECT_PROPS.forEach(d=>{
   document.querySelectorAll('input[name="'+d.key+'"]').forEach(radio=>{
     radio.onchange = ()=>{
-      saveCurrentSample();
-      renderSelectedDefectsArea();
+      renderSelectedFlavorsArea();
       scheduleAutoSave();
     }
   });
 });
+
 document.getElementById('calcScoreBtn').onclick = ()=>{
   saveCurrentSample();
   updateTotalScore();
   updateRadar();
 };
-// 이미지로 내보내기, 디펙트 글자 줄이기/스타일 개선
+
+// 이미지로 내보내기 - 개선된 스타일 적용
 document.getElementById('exportImgBtn').onclick = ()=>{
   saveCurrentSample();
   let s = getCurrentSampleObj().sampleData;
   const tempRoot = document.createElement('div');
   tempRoot.style.backgroundColor = "#fcfaf7";
-  tempRoot.style.padding = "32px 6vw";
+  tempRoot.style.padding = "32px 40px";
   tempRoot.style.maxWidth = "800px";
   tempRoot.style.fontFamily = "'Noto Sans KR', sans-serif";
   tempRoot.style.position = "absolute";
   tempRoot.style.left = "-9999px";
   tempRoot.style.top = "0";
+  
   tempRoot.innerHTML = `
-  <h2 style="text-align:center;margin-bottom:15px;font-size:23px;font-weight:bold;color:#8B5A2B;border-bottom:2px solid #8B5A2B;padding-bottom:7px;">커피 관능 평가 결과</h2>
-  <section style="margin-bottom:18px;">
-    <table style="width:100%;border-spacing:0px;">
-    <tr>
-      <td style="padding:2px 2px 8px 0;font-weight:bold;width:120px;">커피명</td>
-      <td style="padding:2px 2px 8px 2px;">${s.coffeeName||"<span style='color:#BBB;'>미입력</span>"}</td>
-      <td style="padding:2px 2px 8px 10px;font-weight:bold;width:85px;">원산지</td>
-      <td style="padding:2px 2px 8px 2px;">${s.origin||"<span style='color:#BBB;'>미입력</span>"}</td>
-    </tr>
-    <tr>
-      <td style="padding:2px 2px 8px 0;font-weight:bold;">품종(Variety)</td>
-      <td style="padding:2px 2px 8px 2px;">${s.variety||"<span style='color:#BBB;'>미입력</span>"}</td>
-      <td style="padding:2px 2px 8px 10px;font-weight:bold;">가공방식</td>
-      <td style="padding:2px 2px 8px 2px;">${s.process||"<span style='color:#BBB;'>미입력</span>"}</td>
-    </tr>
-    <tr>
-      <td style="padding:2px 2px 8px 0;font-weight:bold;">로스팅 날짜</td>
-      <td style="padding:2px 2px 8px 2px;">${s.roastDate||"<span style='color:#BBB;'>미입력</span>"}</td>
-      <td style="padding:2px 2px 8px 10px;font-weight:bold;">로스팅 레벨</td>
-      <td style="padding:2px 2px 8px 2px;">${s.roastLevel||"<span style='color:#BBB;'>미입력</span>"}</td>
-    </tr>
+  <h2 style="text-align:center;margin-bottom:22px;font-size:24px;font-weight:bold;color:#8B5A2B;border-bottom:2px solid #8B5A2B;padding-bottom:8px;">커피 관능 평가 결과</h2>
+  
+  <div style="margin-bottom:25px;">
+    <table style="width:100%;border-spacing:0;border-collapse:separate;font-size:14px;">
+      <tr>
+        <td style="padding:4px 5px 8px 0;font-weight:bold;width:120px;">커피명</td>
+        <td style="padding:4px 15px 8px 0;">${s.coffeeName||"<span style='color:#BBB;'>미입력</span>"}</td>
+        <td style="padding:4px 5px 8px 0;font-weight:bold;width:100px;">원산지</td>
+        <td style="padding:4px 0 8px 0;">${s.origin||"<span style='color:#BBB;'>미입력</span>"}</td>
+      </tr>
+      <tr>
+        <td style="padding:4px 5px 8px 0;font-weight:bold;">품종(Variety)</td>
+        <td style="padding:4px 15px 8px 0;">${s.variety||"<span style='color:#BBB;'>미입력</span>"}</td>
+        <td style="padding:4px 5px 8px 0;font-weight:bold;">가공방식</td>
+        <td style="padding:4px 0 8px 0;">${s.process||"<span style='color:#BBB;'>미입력</span>"}</td>
+      </tr>
+      <tr>
+        <td style="padding:4px 5px 8px 0;font-weight:bold;">로스팅 날짜</td>
+        <td style="padding:4px 15px 8px 0;">${s.roastDate||"<span style='color:#BBB;'>미입력</span>"}</td>
+        <td style="padding:4px 5px 8px 0;font-weight:bold;">로스팅 레벨</td>
+        <td style="padding:4px 0 8px 0;">${s.roastLevel||"<span style='color:#BBB;'>미입력</span>"}</td>
+      </tr>
     </table>
-  </section>
-  <section class="visual-section-flex" style="display:flex;flex-direction:row;gap:19px;flex-wrap:wrap;">
-    <div style="background:white;min-width:210px;flex:1;border-radius:9px;padding:14px 10px; box-shadow:0 1px 3px #DBDBDB;margin-bottom:12px;">
-      <h4 style="font-weight:600;font-size:14px;margin-bottom:8px;">향미 특성 및 속성</h4>
-      <div>${document.getElementById('selectedFlavorsArea').innerHTML}</div>
-    </div>
-    <div style="background:white;min-width:210px;flex:1;border-radius:9px;padding:14px 10px; box-shadow:0 1px 3px #DBDBDB;">
-      <h4 style="font-weight:600;font-size:14px;margin-bottom:8px;">SCA 평가 점수 차트</h4>
-      <canvas id="imgExportRadar" width="320" height="220"></canvas>
-      <div style="text-align:center;margin-top:8px;">
-        <strong>총점:</strong> <span style="font-size:18px;font-weight:bold;color:#8B5A2B;">${document.getElementById('totalScore').textContent}</span>
+  </div>
+  
+  <div style="display:flex;flex-direction:row;gap:20px;flex-wrap:wrap;margin-bottom:25px;">
+    <div style="background:white;flex:1;min-width:250px;border-radius:10px;padding:18px 15px;box-shadow:0 2px 4px rgba(0,0,0,0.1);">
+      <h4 style="font-weight:600;font-size:16px;margin:0 0 12px 0;color:#333;">향미 특성 및 속성</h4>
+      <div style="margin-bottom:15px;">
+        ${FLAVOR_PHASES.map(phase => {
+          const phaseSel = (s.flavorSelections[phase.id]||[]).map(key => {
+            const [cat, sub, desc] = key.split('|');
+            const rec = FLAVOR_DATA.find(f => f[0]===cat && f[1]===sub && f[2]===desc);
+            const color = rec ? rec[3] : '#B8B2A5';
+            const textColor = getContrastColor(color);
+            return `<span style="display:inline-block;padding:4px 12px;border-radius:20px;margin:3px;font-size:13px;color:${textColor};background:${color};">${desc}</span>`;
+          }).join('');
+          
+          return `<div style="margin-bottom:10px;">
+            <span style="font-weight:600;margin-right:5px;">${phase.label}:</span> 
+            ${phaseSel || '<span style="font-size:13px;color:#999;">없음</span>'}
+          </div>`;
+        }).join('')}
+      </div>
+      
+      <div style="margin-bottom:12px;">
+        ${Object.keys(ATTR_TO_BADGE).map(attrKey => {
+          const attrMeta = ATTR_TO_BADGE[attrKey];
+          const val = s[attrKey];
+          if(val) {
+            return `<span style="display:inline-block;padding:4px 12px;border-radius:20px;margin:3px 6px 3px 0;font-size:13px;color:#fff;background:${attrMeta.color};">${attrMeta.label}: ${ATTR_VALUE_LABELS[val]}</span>`;
+          } else {
+            return `<span style="display:inline-block;padding:4px 12px;border-radius:20px;margin:3px 6px 3px 0;font-size:13px;color:#fff;background:${attrMeta.color};opacity:0.5;">${attrMeta.label}: 미선택</span>`;
+          }
+        }).join('')}
+      </div>
+      
+      <div>
+        <span style="font-weight:600;margin-right:5px;">로스팅 디펙트:</span>
+        <div style="margin-top:4px;">
+          ${(() => {
+            let defectHtml = '';
+            let hasDefect = false;
+            
+            DEFECT_PROPS.forEach(d => {
+              const val = s[d.key] || "none";
+              if(val !== "none") {
+                const dColor = DEFECT_LABELS[val] ? DEFECT_LABELS[val].color : "#bbb";
+                defectHtml += `<span style="display:inline-block;padding:4px 12px;border-radius:20px;margin:3px 6px 3px 0;font-size:13px;color:#fff;background:${dColor};">${d.label}: ${DEFECT_LABELS[val].label}</span>`;
+                hasDefect = true;
+              }
+            });
+            
+            if(!hasDefect) {
+              return '<span style="font-size:13px;color:#999;">선택된 디펙트 없음</span>';
+            }
+            
+            return defectHtml;
+          })()}
+        </div>
       </div>
     </div>
-  </section>
-  <section style="margin-top:17px;background:#F6F1E9;border-radius:8px;padding:10px 4px 8px 14px;">
-    <div style="font-weight:600;font-size:13px;margin-bottom:5px;color:#8B5A2B;display:flex;align-items:center;">
-      <i class="fa fa-fire-alt" style="font-size:13px;margin-right:5px;"></i>로스팅 디펙트(결점) 현황 
+    
+    <div style="background:white;flex:1;min-width:250px;border-radius:10px;padding:18px 15px;box-shadow:0 2px 4px rgba(0,0,0,0.1);">
+      <h4 style="font-weight:600;font-size:16px;margin:0 0 12px 0;color:#333;">SCA 평가 점수 차트</h4>
+      <canvas id="imgExportRadar" width="320" height="250"></canvas>
+      <div style="text-align:center;margin-top:15px;">
+        <span style="font-weight:600;">총점:</span> <span style="font-size:20px;font-weight:bold;color:#8B5A2B;">${document.getElementById('totalScore').textContent}</span>
+      </div>
     </div>
-    <div style="display:flex;flex-wrap:wrap;gap:7px 10px;">
-      ${ DEFECT_PROPS.map(d=>{
-        let val = s[d.key]||"none";
-        let label = DEFECT_LABELS[val]?DEFECT_LABELS[val].label:"미선택";
-        let color = DEFECT_LABELS[val]?DEFECT_LABELS[val].color:"#bbb";
-        return `<div style="display:flex;flex-direction:column;min-width:95px;margin-right:6px;">
-          <span style="font-weight:600;font-size:11px;">${d.label}</span>
-          <span style="font-size:10px;color:#686868;">${d.desc}</span>
-          <span style="background:${color};border-radius:30px;font-size:11px;padding:2px 7px;display:inline-block;color:${val==='none'?'#666':'#fff'};max-width:100px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:2px;">${label}</span>
-        </div>`;
-      }).join('') }
-    </div>
-  </section>
+  </div>
+  
+  <div style="background:white;border-radius:10px;padding:18px 15px;box-shadow:0 2px 4px rgba(0,0,0,0.1);margin-bottom:25px;">
+    <h4 style="font-weight:600;font-size:16px;margin:0 0 12px 0;color:#333;">향미 프로필 분포</h4>
+    <canvas id="imgExportFlavorProfile" width="500" height="300"></canvas>
+  </div>
+  
   ${s.tastingNotes ? `
-  <section style="margin-top:17px;background:#F6F1E9;border-radius:8px;padding:11px 4px 9px 15px;">
-    <div style="font-weight:600;font-size:12.7px;margin-bottom:5px;color:#76582B;">테이스팅 노트</div>
-    <div style="white-space:pre-line;font-size:12.4px;line-height:1.7;">${s.tastingNotes.replace(/</g,"&lt;")}</div>
-  </section>
+  <div style="background:#F6F1E9;border-radius:10px;padding:15px 18px;margin-top:12px;">
+    <div style="font-weight:600;font-size:16px;margin-bottom:8px;color:#76582B;">테이스팅 노트</div>
+    <div style="white-space:pre-line;font-size:14px;line-height:1.7;color:#333;">${s.tastingNotes.replace(/</g,"&lt;")}</div>
+  </div>
   ` : ''}
-  <footer style="margin-top:22px;font-size:11.7px;color:#888;text-align:center;border-top:1px solid #ece1cf;padding:7px 0 0 0;"> 평가일: ${(new Date()).toISOString().slice(0,10)} | mollis SCA 커피 관능 평가 </footer>
+  
+  <div style="margin-top:30px;font-size:12px;color:#888;text-align:center;border-top:1px solid #ece1cf;padding:8px 0 0 0;"> 
+    평가일: ${(new Date()).toISOString().slice(0,10)} | mollis SCA 커피 관능 평가 
+  </div>
   `;
+  
   document.body.appendChild(tempRoot);
+  
   // Draw radar chart for export
   const exportRadar = tempRoot.querySelector('#imgExportRadar');
   if(exportRadar){
     new Chart(exportRadar.getContext('2d'), {
       type: "radar",
-      data: { labels:["프래그런스","아로마","플레이버","에프터테이스트","액시디티","바디","밸런스","오버럴"], datasets:[{ label:"점수", data:[ s.scoreFragrance, s.scoreAroma, s.scoreFlavor, s.scoreAftertaste, s.scoreAcidity, s.scoreBody, s.scoreBalance, s.scoreOverall ], backgroundColor:"rgba(139,90,43,0.13)", borderColor:"#8B5A2B", pointBackgroundColor:"#8B5A2B" }] },
-      options: { plugins:{legend:{display:false}}, scales:{r:{min:0,max:10,ticks:{stepSize:2}, pointLabels:{font:{size:11.4}}} } }
+      data: { 
+        labels:["프래그런스","아로마","플레이버","에프터테이스트","액시디티","바디","밸런스","오버럴"], 
+        datasets:[{ 
+          label:"점수", 
+          data:[ s.scoreFragrance, s.scoreAroma, s.scoreFlavor, s.scoreAftertaste, s.scoreAcidity, s.scoreBody, s.scoreBalance, s.scoreOverall ], 
+          backgroundColor:"rgba(139,90,43,0.13)", 
+          borderColor:"#8B5A2B", 
+          pointBackgroundColor:"#8B5A2B",
+          borderWidth: 2,
+          pointRadius: 4
+        }] 
+      },
+      options: { 
+        plugins:{legend:{display:false}}, 
+        scales:{r:{
+          min:0,
+          max:10,
+          ticks:{
+            stepSize:2,
+            font:{size:12}
+          },
+          pointLabels:{
+            font:{size:13,weight:'bold'}
+          },
+          grid: {
+            color: 'rgba(0,0,0,0.1)'
+          },
+          angleLines: {
+            color: 'rgba(0,0,0,0.1)'
+          }
+        }}
+      }
     });
   }
+  
+  // Draw flavor profile chart for export
+  const exportFlavorProfile = tempRoot.querySelector('#imgExportFlavorProfile');
+  if(exportFlavorProfile){
+    // 카테고리별 항목 수 계산
+    let categoryCount = {};
+    FLAVOR_CATEGORIES.forEach(cat => {
+      categoryCount[cat.name] = 0;
+    });
+  
+    // 모든 플레이버 페이즈의 선택된 향미를 합쳐서 카테고리별로 집계
+    FLAVOR_PHASES.forEach(phase => {
+      (s.flavorSelections[phase.id] || []).forEach(key => {
+        const [cat, sub, desc] = key.split('|');
+        
+        // 해당 카테고리 찾기
+        const category = FLAVOR_CATEGORIES.find(c => c.categories.includes(cat));
+        if (category) {
+          categoryCount[category.name]++;
+        }
+      });
+    });
+  
+    // 데이터 배열 생성
+    const labels = FLAVOR_CATEGORIES.map(c => c.name);
+    const data = FLAVOR_CATEGORIES.map(c => categoryCount[c.name]);
+    const borderColors = FLAVOR_CATEGORIES.map(c => c.color);
+    
+    new Chart(exportFlavorProfile.getContext('2d'), {
+      type: 'radar',
+      data: {
+        labels: labels,
+        datasets: [{
+          label: '향미 그룹 분포',
+          data: data,
+          backgroundColor: 'rgba(139, 90, 43, 0.2)',
+          borderColor: '#8B5A2B',
+          borderWidth: 2,
+          pointBackgroundColor: borderColors,
+          pointRadius: 4
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: true,
+        plugins: {
+          legend: {
+            display: false
+          },
+          tooltip: {
+            callbacks: {
+              label: function(context) {
+                const value = context.raw;
+                return `${context.label}: ${value}개`;
+              }
+            }
+          }
+        },
+        scales: {
+          r: {
+            min: 0,
+            ticks: {
+              stepSize: 1,
+              callback: function(value) {
+                if (value % 1 === 0) {
+                  return value;
+                }
+              }
+            },
+            pointLabels: {
+              font: {
+                family: 'Noto Sans KR',
+                size: 12,
+                weight: 'bold'
+              }
+            }
+          }
+        }
+      }
+    });
+  }
+  
   setTimeout(()=>{
     html2canvas(tempRoot, {backgroundColor:"#fcfaf7", scale: 2, logging:false})
     .then(canvas=>{
@@ -837,9 +1867,10 @@ document.getElementById('exportImgBtn').onclick = ()=>{
       document.body.removeChild(a);
       document.body.removeChild(tempRoot);
     });
-  }, 420);
+  }, 800); // 차트 렌더링 시간을 위해 시간 증가
 };
-// export csv/xlsx 등 기타 기능 원본 동일...
+
+// export csv/xlsx 등 기타 기능
 document.getElementById('exportCsvBtn').onclick = ()=>{
   saveCurrentSample();
   let s = getCurrentSampleObj().sampleData;
@@ -869,6 +1900,7 @@ document.getElementById('exportCsvBtn').onclick = ()=>{
   a.download = (s.title?s.title+"_":"cupping_")+"data.csv";
   a.click();
 };
+
 document.getElementById('exportXlsxBtn').onclick = ()=>{
   saveCurrentSample();
   let s = getCurrentSampleObj().sampleData;
@@ -896,11 +1928,13 @@ document.getElementById('exportXlsxBtn').onclick = ()=>{
   XLSX.utils.book_append_sheet(wb, ws, "cupping");
   XLSX.writeFile(wb,(s.title?s.title+"_":"cupping_")+"data.xlsx");
 };
+
 document.getElementById('saveSamplesBtn').onclick = ()=>{
   saveCurrentSample();
   saveSamplesToStorage();
   showToast("모든 샘플을 웹 브라우저(LocalStorage)에 저장했습니다.");
 };
+
 document.getElementById('exportSamplesBtn').onclick = ()=>{
   saveCurrentSample();
   let blob = new Blob([JSON.stringify(samples,null,2)],{type:'application/json'});
@@ -909,6 +1943,7 @@ document.getElementById('exportSamplesBtn').onclick = ()=>{
   a.download = 'sca_cupping_samples.json';
   a.click();
 };
+
 document.getElementById('importSamplesInput').onchange = function(e){
   let file = e.target.files[0];
   if(!file)return;
@@ -930,6 +1965,7 @@ document.getElementById('importSamplesInput').onchange = function(e){
   };
   reader.readAsText(file,"utf-8");
 };
+
 // 웹에서 불러오기 버튼(내부 localStorage → 앱에 적용)
 document.getElementById('loadSamplesWebBtn').onclick = ()=>{
   let raw = localStorage.getItem("mollis_sca_samples2");
@@ -948,6 +1984,7 @@ document.getElementById('loadSamplesWebBtn').onclick = ()=>{
     }catch(e){ alert("불러올 수 없습니다."); }
   }else{ showToast("저장된 기록이 없습니다."); }
 };
+
 // --- 커핑 비교 기능 개선
 function renderCompareList(){
   let cmpBox = document.getElementById('compareListBox');
@@ -955,13 +1992,15 @@ function renderCompareList(){
     cmpBox.innerHTML =`<div class="text-xs text-gray-400">기록 없음</div>`;return;
   }
   let html = samples.map(sm=>
-    `<label class="inline-flex items-center mr-2 mb-1 text-xs">
+    `<label class="inline-flex items-center mr-2 mb-1 text-xs mobile-touch-friendly">
       <input type="checkbox" class="compareCheck" value="${sm.id}">
       <span class="ml-1">${sm.title}</span>
     </label>`
   ).join("");
   cmpBox.innerHTML = html;
 }
+
+// 기본 비교 차트 생성
 document.getElementById('compareBtn').onclick = function(){
   let checked = Array.from(document.querySelectorAll('.compareCheck:checked')).map(cb=>cb.value);
   if(checked.length<2){
@@ -973,7 +2012,7 @@ document.getElementById('compareBtn').onclick = function(){
   let scaNames = ["프래그런스","아로마","플레이버","에프터테이스트","액시디티","바디","밸런스","오버럴"];
   let colorList=["#7f5539","#9c6644","#e5989b","#a7c957","#2196f3","#f9c846","#c70039","#607466"];
   let cmpDiv = document.getElementById('compareArea');
-  cmpDiv.innerHTML = '<canvas id="compareRadarChart" width="400" height="280"></canvas>';
+  cmpDiv.innerHTML = '<div class="chart-container"><canvas id="compareRadarChart"></canvas></div>';
   setTimeout(()=>{
     let ctx = document.getElementById('compareRadarChart').getContext('2d');
     let cmpChart = new Chart(ctx, {
@@ -989,6 +2028,8 @@ document.getElementById('compareBtn').onclick = function(){
         }))
       },
       options: {
+        responsive: true,
+        maintainAspectRatio: true,
         plugins: {legend:{position:"top"}},
         scales: { r:{min:0,max:10,ticks:{stepSize:2}} }
       }
@@ -1023,18 +2064,506 @@ document.getElementById('compareBtn').onclick = function(){
         </tbody>
       </table>
     </div>`;
+};
+
+// 고급 비교 테이블 및 차트 생성
+document.getElementById('advancedCompareBtn').onclick = function() {
+  let checked = Array.from(document.querySelectorAll('.compareCheck:checked')).map(cb=>cb.value);
+  if(checked.length<2){
+    document.getElementById('compareArea').innerHTML = '<div class="text-red-600 text-xs my-2">2개 이상 샘플을 반드시 선택해야 비교가 가능합니다.</div>';
+    return;
+  }
+  
+  let cmpSamples = samples.filter(s=>checked.includes(s.id));
+  let cmpDiv = document.getElementById('compareArea');
+  
+  // SCA 점수 관련 상수
+  const scaFields = ["scoreFragrance","scoreAroma","scoreFlavor","scoreAftertaste","scoreAcidity","scoreBody","scoreBalance","scoreOverall"];
+  const scaNames = ["프래그런스","아로마","플레이버","에프터테이스트","액시디티","바디","밸런스","오버럴"];
+  const colorList = ["#7f5539","#9c6644","#e5989b","#a7c957","#2196f3","#f9c846","#c70039","#607466"];
+  
+  // 카테고리별로 데이터 구성
+  const categories = [
+    { name: "SCA 점수", fields: scaFields, labels: scaNames },
+    { name: "맛 속성", fields: ["acidityLevel", "sweetnessLevel", "bodyLevel"], 
+      labels: ["산미", "단맛", "바디감"],
+      valueMap: { 
+        "acidityLevel": ATTR_VALUE_LABELS, 
+        "sweetnessLevel": ATTR_VALUE_LABELS,
+        "bodyLevel": ATTR_VALUE_LABELS
+      }
+    },
+    { name: "로스팅 결점", fields: DEFECT_PROPS.map(d => d.key), 
+      labels: DEFECT_PROPS.map(d => d.label),
+      valueMap: DEFECT_PROPS.reduce((obj, d) => {
+        obj[d.key] = DEFECT_LABELS;
+        return obj;
+      }, {})
+    }
+  ];
+  
+  // SCA 점수 레이더 차트 생성
+  cmpDiv.innerHTML = '<div class="chart-container"><canvas id="advancedCompareRadarChart"></canvas></div>';
+  
+  // 카테고리별 HTML 생성
+  let html = '';
+  categories.forEach(category => {
+    html += `<div class="advanced-compare-category">${category.name}</div>`;
+    html += `
+      <div class="overflow-x-auto">
+        <table class="advanced-compare-table min-w-[360px] w-full">
+          <thead>
+            <tr>
+              <th>항목</th>
+              ${cmpSamples.map(s => `<th>${s.title}</th>`).join("")}
+            </tr>
+          </thead>
+          <tbody>
+    `;
+    
+    category.fields.forEach((field, idx) => {
+      html += `<tr>
+        <td>${category.labels[idx]}</td>
+        ${cmpSamples.map(s => {
+          let val = s.sampleData[field];
+          
+          // 숫자값(점수)인 경우 그대로 표시
+          if (typeof val === 'number') {
+            return `<td>${val}</td>`;
+          }
+          
+          // 레벨이나 결점의 경우 레이블로 표시
+          if (category.valueMap && category.valueMap[field]) {
+            const valueObj = category.valueMap[field][val || 'none'];
+            return `<td>${valueObj ? valueObj.label : '미선택'}</td>`;
+          }
+          
+          return `<td>${val || '-'}</td>`;
+        }).join("")}
+      </tr>`;
+    });
+    
+    html += `</tbody></table></div>`;
+  });
+  
+  // 향미 프로필 비교를 위한 향미 카테고리별 집계 테이블
+  html += `<div class="advanced-compare-category">향미 프로필 비교</div>`;
+  html += `<div class="overflow-x-auto"><table class="advanced-compare-table min-w-[360px] w-full">
+    <thead><tr><th>향미 카테고리</th>${cmpSamples.map(s => `<th>${s.title}</th>`).join("")}</tr></thead>
+    <tbody>`;
+  
+  // 각 샘플별 카테고리 집계
+  FLAVOR_CATEGORIES.forEach(category => {
+    html += `<tr><td>${category.name}</td>`;
+    
+    cmpSamples.forEach(s => {
+      let count = 0;
+      FLAVOR_PHASES.forEach(phase => {
+        (s.sampleData.flavorSelections[phase.id] || []).forEach(key => {
+          const [cat, sub, desc] = key.split('|');
+          if (category.categories.includes(cat)) {
+            count++;
+          }
+        });
+      });
+      
+      html += `<td>${count}</td>`;
+    });
+    
+    html += `</tr>`;
+  });
+  
+  html += `</tbody></table></div>`;
+  
+  // 향미 특성 상세 비교
+  html += `<div class="advanced-compare-category">향미 특성 상세 비교</div>`;
+  
+  FLAVOR_PHASES.forEach(phase => {
+    html += `<div class="mb-4">
+      <h4 class="font-semibold mb-2">${phase.label}</h4>
+      <div class="overflow-x-auto">
+        <table class="advanced-compare-table min-w-[360px] w-full">
+          <thead><tr><th>샘플</th><th>선택된 향미</th></tr></thead>
+          <tbody>`;
+          
+    cmpSamples.forEach(s => {
+      const flavors = (s.sampleData.flavorSelections[phase.id] || [])
+        .map(key => {
+          const [cat, sub, desc] = key.split('|');
+          const rec = FLAVOR_DATA.find(f => f[0] === cat && f[1] === sub && f[2] === desc);
+          const color = rec ? rec[3] : '#B8B2A5';
+          const textColor = getContrastColor(color);
+          
+          return `<span style="display:inline-block;padding:2px 8px;border-radius:15px;margin:2px;font-size:12px;color:${textColor};background:${color};">${desc}</span>`;
+        })
+        .join(' ');
+        
+      html += `<tr><td>${s.title}</td><td>${flavors || '-'}</td></tr>`;
+    });
+    
+    html += `</tbody></table></div></div>`;
+  });
+  
+  // 향미 프로필 레이더 차트
+  html += `<div class="mt-5 mb-3 chart-container"><canvas id="flavorProfileCompareChart"></canvas></div>`;
+  
+  cmpDiv.innerHTML += html;
+  
+  // SCA 점수 레이더 차트 생성
+  setTimeout(() => {
+    const ctx = document.getElementById('advancedCompareRadarChart').getContext('2d');
+    new Chart(ctx, {
+      type: "radar",
+      data: {
+        labels: scaNames,
+        datasets: cmpSamples.map((smp, i) => ({
+          label: smp.title,
+          data: scaFields.map(f => smp.sampleData[f] || 0),
+          borderColor: colorList[i % colorList.length],
+          backgroundColor: colorList[i % colorList.length] + '25',
+          pointBackgroundColor: colorList[i % colorList.length],
+          borderWidth: 2
+        }))
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: true,
+        plugins: { legend: { position: "top" } },
+        scales: { r: { min: 0, max: 10, ticks: { stepSize: 2 } } }
+      }
+    });
+    
+    // 향미 프로필 레이더 차트 생성
+    const flavCtx = document.getElementById('flavorProfileCompareChart').getContext('2d');
+    
+    // 각 샘플별 향미 카테고리 집계
+    const flavorProfileDatasets = cmpSamples.map((smp, i) => {
+      const categoryData = FLAVOR_CATEGORIES.map(category => {
+        let count = 0;
+        FLAVOR_PHASES.forEach(phase => {
+          (smp.sampleData.flavorSelections[phase.id] || []).forEach(key => {
+            const [cat, sub, desc] = key.split('|');
+            if (category.categories.includes(cat)) {
+              count++;
+            }
+          });
+        });
+        return count;
+      });
+      
+      return {
+        label: smp.title,
+        data: categoryData,
+        borderColor: colorList[i % colorList.length],
+        backgroundColor: colorList[i % colorList.length] + '25',
+        borderWidth: 2
+      };
+    });
+    
+    new Chart(flavCtx, {
+      type: "radar",
+      data: {
+        labels: FLAVOR_CATEGORIES.map(c => c.name),
+        datasets: flavorProfileDatasets
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: true,
+        plugins: { legend: { position: "top" } },
+        scales: { 
+          r: { 
+            min: 0,
+            ticks: {
+              stepSize: 1,
+              callback: function(value) {
+                if (value % 1 === 0) return value;
+              }
+            }
+          } 
+        }
+      }
+    });
+  }, 150);
+};
+
+// 분할 화면 비교 관련 함수
+function updateSplitViewSelects() {
+  const leftSelect = document.getElementById('leftSampleSelect');
+  const rightSelect = document.getElementById('rightSampleSelect');
+  
+  if (!leftSelect || !rightSelect) return;
+  
+  leftSelect.innerHTML = '';
+  rightSelect.innerHTML = '';
+  
+  // 기본 옵션 추가
+  leftSelect.innerHTML = '<option value="">샘플 선택...</option>';
+  rightSelect.innerHTML = '<option value="">샘플 선택...</option>';
+  
+  // 샘플 목록 옵션 추가
+  samples.forEach(sample => {
+    const leftOption = document.createElement('option');
+    leftOption.value = sample.id;
+    leftOption.textContent = sample.title;
+    
+    const rightOption = document.createElement('option');
+    rightOption.value = sample.id;
+    rightOption.textContent = sample.title;
+    
+    leftSelect.appendChild(leftOption);
+    rightSelect.appendChild(rightOption);
+  });
+  
+  // 기본값 선택 (첫 번째, 두 번째 샘플)
+  if (samples.length >= 2) {
+    leftSelect.value = samples[0].id;
+    rightSelect.value = samples[1].id;
+    updateSplitView();
+  } else if (samples.length === 1) {
+    leftSelect.value = samples[0].id;
+    updateSplitView();
+  }
 }
 
-document.addEventListener('DOMContentLoaded', function() {
-  loadSamplesFromStorage();
-  setUIFromSample(getCurrentSampleObj().sampleData);
-  renderCompareList();
-  document.getElementById('evalDate').textContent = (new Date()).toISOString().slice(0,10);
+// 분할 화면에 샘플 정보 표시
+function updateSplitView() {
+  const leftSelect = document.getElementById('leftSampleSelect');
+  const rightSelect = document.getElementById('rightSampleSelect');
+  const leftView = document.getElementById('leftSampleView');
+  const rightView = document.getElementById('rightSampleView');
+  
+  if (!leftSelect || !rightSelect || !leftView || !rightView) return;
+  
+  // 왼쪽 샘플 정보 표시
+  const leftSampleId = leftSelect.value;
+  const leftSample = leftSampleId ? samples.find(s => s.id === leftSampleId) : null;
+  
+  if (leftSample) {
+    leftView.innerHTML = renderSampleSummaryForSplitView(leftSample);
+  } else {
+    leftView.innerHTML = '<div class="text-center text-gray-500">왼쪽 샘플을 선택하세요</div>';
+  }
+  
+  // 오른쪽 샘플 정보 표시
+  const rightSampleId = rightSelect.value;
+  const rightSample = rightSampleId ? samples.find(s => s.id === rightSampleId) : null;
+  
+  if (rightSample) {
+    rightView.innerHTML = renderSampleSummaryForSplitView(rightSample);
+  } else {
+    rightView.innerHTML = '<div class="text-center text-gray-500">오른쪽 샘플을 선택하세요</div>';
+  }
+}
+
+// 분할 화면용 샘플 요약 HTML 생성
+function renderSampleSummaryForSplitView(sample) {
+  const s = sample.sampleData;
+  let html = `
+    <div class="mb-3 border-b pb-2">
+      <h3 class="font-bold text-lg">${sample.title}</h3>
+    </div>
+    
+    <div class="mb-4">
+      <table class="w-full text-sm">
+        <tr>
+          <td class="font-semibold pr-2">커피명:</td>
+          <td>${s.coffeeName || "<span class='text-gray-400'>미입력</span>"}</td>
+        </tr>
+        <tr>
+          <td class="font-semibold pr-2">원산지:</td>
+          <td>${s.origin || "<span class='text-gray-400'>미입력</span>"}</td>
+        </tr>
+        <tr>
+          <td class="font-semibold pr-2">품종:</td>
+          <td>${s.variety || "<span class='text-gray-400'>미입력</span>"}</td>
+        </tr>
+        <tr>
+          <td class="font-semibold pr-2">가공법:</td>
+          <td>${s.process || "<span class='text-gray-400'>미입력</span>"}</td>
+        </tr>
+        <tr>
+          <td class="font-semibold pr-2">로스팅날짜:</td>
+          <td>${s.roastDate || "<span class='text-gray-400'>미입력</span>"}</td>
+        </tr>
+        <tr>
+          <td class="font-semibold pr-2">로스팅레벨:</td>
+          <td>${s.roastLevel || "<span class='text-gray-400'>미입력</span>"}</td>
+        </tr>
+      </table>
+    </div>
+    
+    <div class="mb-4">
+      <h4 class="font-semibold border-b pb-1 mb-2">SCA 점수</h4>
+      <div class="grid grid-cols-2 gap-1 text-sm">
+        <div>프래그런스: <span class="font-medium">${s.scoreFragrance}</span></div>
+        <div>아로마: <span class="font-medium">${s.scoreAroma}</span></div>
+        <div>플레이버: <span class="font-medium">${s.scoreFlavor}</span></div>
+        <div>에프터테이스트: <span class="font-medium">${s.scoreAftertaste}</span></div>
+        <div>액시디티: <span class="font-medium">${s.scoreAcidity}</span></div>
+        <div>바디: <span class="font-medium">${s.scoreBody}</span></div>
+        <div>밸런스: <span class="font-medium">${s.scoreBalance}</span></div>
+        <div>오버럴: <span class="font-medium">${s.scoreOverall}</span></div>
+      </div>
+      <div class="text-right font-bold mt-2">총점: ${(30 + s.scoreFragrance + s.scoreAroma + s.scoreFlavor + s.scoreAftertaste + s.scoreAcidity + s.scoreBody + s.scoreBalance + s.scoreOverall).toFixed(2)}</div>
+    </div>
+    
+    <div class="mb-4">
+      <h4 class="font-semibold border-b pb-1 mb-2">속성</h4>
+      <div class="grid grid-cols-3 gap-2 text-sm">
+        <div>산미: <span class="font-medium">${s.acidityLevel || "미선택"}</span></div>
+        <div>단맛: <span class="font-medium">${s.sweetnessLevel || "미선택"}</span></div>
+        <div>바디감: <span class="font-medium">${s.bodyLevel || "미선택"}</span></div>
+      </div>
+    </div>
+    
+    <div class="mb-4">
+      <h4 class="font-semibold border-b pb-1 mb-2">향미</h4>
+  `;
+  
+  FLAVOR_PHASES.forEach(phase => {
+    const flavors = (s.flavorSelections[phase.id] || []).map(key => {
+      const [cat, sub, desc] = key.split('|');
+      const rec = FLAVOR_DATA.find(f => f[0] === cat && f[1] === sub && f[2] === desc);
+      const color = rec ? rec[3] : '#B8B2A5';
+      const textColor = getContrastColor(color);
+      
+      return `<span class="inline-block rounded-full px-2 py-0.5 text-xs mr-1 mb-1" style="background:${color};color:${textColor};">${desc}</span>`;
+    }).join('');
+    
+    html += `
+      <div class="mb-2">
+        <div class="text-sm font-medium">${phase.label}:</div>
+        <div class="flex flex-wrap mt-1">${flavors || "<span class='text-gray-400 text-xs'>없음</span>"}</div>
+      </div>
+    `;
+  });
+  
+  html += `
+    </div>
+    
+    <div class="mb-4">
+      <h4 class="font-semibold border-b pb-1 mb-2">로스팅 디펙트</h4>
+      <div class="text-sm">
+  `;
+  
+  let hasDefect = false;
+  DEFECT_PROPS.forEach(d => {
+    const val = s[d.key] || "none";
+    if (val !== "none") {
+      const defectLabel = DEFECT_LABELS[val] ? DEFECT_LABELS[val].label : "미선택";
+      html += `<div>${d.label}: <span class="font-medium">${defectLabel}</span></div>`;
+      hasDefect = true;
+    }
+  });
+  
+  if (!hasDefect) {
+    html += `<span class="text-gray-400 text-xs">선택된 디펙트 없음</span>`;
+  }
+  
+  html += `
+      </div>
+    </div>
+    
+    ${s.tastingNotes ? `
+    <div>
+      <h4 class="font-semibold border-b pb-1 mb-2">테이스팅 노트</h4>
+      <div class="text-sm whitespace-pre-line">${s.tastingNotes}</div>
+    </div>
+    ` : ''}
+  `;
+  
+  return html;
+}
+
+// 분할 화면 비교 모달 컨트롤 - 수정된 부분 (모달 토글 로직)
+document.getElementById('splitViewBtn').onclick = function() {
+  const modal = document.getElementById('splitViewModal');
+  modal.classList.add('show'); // 클래스를 추가하여 표시
+  
+  updateSplitViewSelects();
+  updateSplitView();
+};
+
+document.getElementById('closeSplitViewBtn').onclick = function() {
+  const modal = document.getElementById('splitViewModal');
+  modal.classList.remove('show'); // 클래스를 제거하여 숨김
+};
+
+// 분할 화면 셀렉트박스 변경 이벤트
+document.getElementById('leftSampleSelect').onchange = updateSplitView;
+document.getElementById('rightSampleSelect').onchange = updateSplitView;
+
+// 샘플 슬라이드 내비게이션 이벤트 리스너
+document.getElementById('prevSampleBtn').onclick = goToPrevSample;
+document.getElementById('nextSampleBtn').onclick = goToNextSample;
+
+// 샘플 복제 버튼 클릭 이벤트
+document.getElementById('cloneSampleBtn').onclick = function() {
+  if (!currentSampleId) {
+    showToast("복제할 샘플이 선택되지 않았습니다.");
+    return;
+  }
+  
+  cloneSample(currentSampleId);
+};
+
+// 모달 외부 클릭 시 닫기 기능
+document.addEventListener('click', function(e) {
+  const modal = document.getElementById('splitViewModal');
+  
+  // 모달이 표시 중이고, 모달 외부를 클릭했을 때만 닫기
+  if (modal.classList.contains('show') && !e.target.closest('.modal-content') && e.target === modal) {
+    modal.classList.remove('show');
+  }
 });
 
+// 초기화 함수
+document.addEventListener('DOMContentLoaded', function() {
+  // 기본 초기화
+  loadSamplesFromStorage();
+  
+  if (samples.length > 0) {
+    // 샘플이 있을 경우 첫 번째 샘플 로드
+    const sampleObj = samples.find(s => s.id === currentSampleId);
+    if (sampleObj) {
+      setUIFromSample(sampleObj.sampleData);
+    }
+  }
+  
+  renderCompareList();
+  document.getElementById('evalDate').textContent = (new Date()).toISOString().slice(0,10);
+  
+  // 스와이프 제스처 지원 (모바일)
+  const formEl = document.getElementById('cuppingForm');
+  const hammer = new Hammer(formEl);
+  
+  hammer.on('swipeleft', function() {
+    goToNextSample();
+  });
+  
+  hammer.on('swiperight', function() {
+    goToPrevSample();
+  });
+  
+  // 키보드 좌우 화살표 키 지원 (PC)
+  document.addEventListener('keydown', function(e) {
+    // 포커스가 input/textarea에 있으면 무시
+    if (document.activeElement.tagName === 'INPUT' || document.activeElement.tagName === 'TEXTAREA') {
+      return;
+    }
+    
+    if (e.key === 'ArrowLeft') {
+      goToPrevSample();
+    } else if (e.key === 'ArrowRight') {
+      goToNextSample();
+    }
+  });
+});
+
+// 모바일에서 폰트 사이즈 조정
 window.addEventListener('resize', function(){
   // 모바일일 때 손가락 확대 버그 방지 (tailwind가 커버 대부분 함)
-  document.body.style.fontSize= window.innerWidth<760 ? '14.5px':'16px';
+  document.body.style.fontSize = window.innerWidth < 760 ? '14.5px' : '16px';
 }, false);
 </script>
 </body>
