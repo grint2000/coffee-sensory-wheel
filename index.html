@@ -259,6 +259,23 @@
       height: 300px;
       width: 100%;
     }
+    
+    /* 네비게이션 버튼 스타일 */
+    .nav-btn {
+      padding: 6px 12px;
+      background-color: #f3f4f6;
+      border-radius: 6px;
+      font-size: 14px;
+      font-weight: 500;
+      transition: all 0.2s;
+    }
+    .nav-btn:hover:not(:disabled) {
+      background-color: #e5e7eb;
+    }
+    .nav-btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
   </style>
 </head>
 <body class="min-h-screen bg-[#fcfaf7]">
@@ -335,6 +352,17 @@
       <div id="compareArea"><div class="text-xs text-gray-400 my-2">2개 이상 샘플을 선택 후 비교 버튼을 눌러주세요.</div></div>
     </div>
   </section>
+  
+  <!-- 샘플 네비게이션 (추가된 부분) -->
+  <div class="mb-3 bg-white shadow rounded-lg p-3 flex items-center justify-between">
+    <button id="prevSampleBtn" class="nav-btn mobile-touch-friendly">
+      <i class="fas fa-chevron-left mr-1"></i>이전
+    </button>
+    <div id="currentSampleIndicator" class="font-bold text-center flex-1 truncate mx-2">현재 샘플: <span class="text-amber-700"></span></div>
+    <button id="nextSampleBtn" class="nav-btn mobile-touch-friendly">
+      다음<i class="fas fa-chevron-right ml-1"></i>
+    </button>
+  </div>
   
   <!-- 평가 폼 -->
   <form id="cuppingForm" class="bg-white shadow rounded-lg p-3 md:p-6 mb-4 sample-info">
@@ -424,7 +452,8 @@
           </label>
           <div class="flex gap-2 flex-wrap" id="body_level">
             <label class="mobile-touch-friendly"><input type="radio" name="bodyLevel" value="Low"><span class="ml-1">Low</span></label>
-            <label class="mobile-touch-friendly"><input type="radio" name="bodyLevel" value="Med-Low"><span class="ml-1">Med-Low</span></label>            <label class="mobile-touch-friendly"><input type="radio" name="bodyLevel" value="Medium"><span class="ml-1">Medium</span></label>
+            <label class="mobile-touch-friendly"><input type="radio" name="bodyLevel" value="Med-Low"><span class="ml-1">Med-Low</span></label>
+            <label class="mobile-touch-friendly"><input type="radio" name="bodyLevel" value="Medium"><span class="ml-1">Medium</span></label>
             <label class="mobile-touch-friendly"><input type="radio" name="bodyLevel" value="Med-High"><span class="ml-1">Med-High</span></label>
             <label class="mobile-touch-friendly"><input type="radio" name="bodyLevel" value="High"><span class="ml-1">High</span></label>
           </div>
@@ -765,8 +794,7 @@ const FLAVOR_DATA = [
   // Sour/Fermented
   ["Sour/Fermented","Sour","Citric Acid","#CEE6CB"],
   ["Sour/Fermented","Sour","Malic Acid","#C9E265"],
-  ["Sour/Fermented","Sour","Acetic Acid","#D9C1B4"],
-  ["Sour/Fermented","Clean Acidity","Tartaric Acid","#D7E8CB"],
+  ["Sour/Fermented","Sour","Acetic Acid","#D9C1B4"],  ["Sour/Fermented","Clean Acidity","Tartaric Acid","#D7E8CB"],
   ["Sour/Fermented","Clean Acidity","Phosphoric Acid","#E8F3D9"],
   ["Sour/Fermented","Fermented","Winey","#AC436E"],
   ["Sour/Fermented","Fermented","Overripe","#625958"],
@@ -784,7 +812,8 @@ const FLAVOR_DATA = [
   ["Other","Chemical","Petroleum","#2E2E2E"],
   ["Other","Chemical","Plastic","#BEBEBE"],
   ["Other","Chemical","Tar","#1C1C1C"],
-  ["Other","Earthy","Soil","#6F4E37"],  ["Other","Earthy","Mushroom","#D7CEC7"],
+  ["Other","Earthy","Soil","#6F4E37"],
+  ["Other","Earthy","Mushroom","#D7CEC7"],
   ["Other","Earthy","Forest Floor","#5E4B3B"],
   ["Other","Earthy","Wet Earth","#622F22"],
   ["Other","Woody","Oak","#A46B2B"],
@@ -835,10 +864,69 @@ function createNewSampleObj(title){
   return {id, title:title||"새 샘플", sampleData: getEmptySampleData(), lastEdit: +(new Date())};
 }
 
+// 현재 샘플 표시 업데이트 함수
+function updateCurrentSampleIndicator() {
+  const indicator = document.getElementById('currentSampleIndicator');
+  if (!indicator) return;
+  
+  const currentSample = getCurrentSampleObj();
+  if (currentSample) {
+    indicator.querySelector('span').textContent = currentSample.title || "샘플";
+    
+    // 현재 위치 표시 (예: 2/5)
+    const currentIndex = samples.findIndex(s => s.id === currentSampleId);
+    if (currentIndex > -1) {
+      indicator.querySelector('span').textContent += ` (${currentIndex + 1}/${samples.length})`;
+    }
+  } else {
+    indicator.querySelector('span').textContent = "샘플 없음";
+  }
+}
+
+// 네비게이션 버튼 상태 업데이트
+function updateNavigationButtons() {
+  const prevBtn = document.getElementById('prevSampleBtn');
+  const nextBtn = document.getElementById('nextSampleBtn');
+  
+  if (!prevBtn || !nextBtn || !samples.length) return;
+  
+  const currentIndex = samples.findIndex(s => s.id === currentSampleId);
+  
+  prevBtn.disabled = currentIndex <= 0;
+  prevBtn.classList.toggle('opacity-50', currentIndex <= 0);
+  prevBtn.classList.toggle('cursor-not-allowed', currentIndex <= 0);
+  
+  nextBtn.disabled = currentIndex >= samples.length - 1;
+  nextBtn.classList.toggle('opacity-50', currentIndex >= samples.length - 1);
+  nextBtn.classList.toggle('cursor-not-allowed', currentIndex >= samples.length - 1);
+}
+
+// 이전 샘플로 이동
+function goToPrevSample() {
+  if (!samples.length) return;
+  
+  const currentIndex = samples.findIndex(s => s.id === currentSampleId);
+  if (currentIndex > 0) {
+    loadSample(samples[currentIndex - 1].id);
+  }
+}
+
+// 다음 샘플로 이동
+function goToNextSample() {
+  if (!samples.length) return;
+  
+  const currentIndex = samples.findIndex(s => s.id === currentSampleId);
+  if (currentIndex < samples.length - 1) {
+    loadSample(samples[currentIndex + 1].id);
+  }
+}
+
 function renderSampleList(){
   let listDiv = document.getElementById('sampleList');
   if(!samples.length){
     listDiv.innerHTML = `<div class="text-gray-500 text-xs my-3 text-center">샘플 없음<br>새로 추가하세요.</div>`;
+    updateNavigationButtons();
+    updateCurrentSampleIndicator();
     return;
   }
   
@@ -917,11 +1005,15 @@ function renderSampleList(){
           samples.splice(oldIndex, 1);
           samples.splice(newIndex, 0, item);
           saveSamplesToStorage();
+          updateNavigationButtons();
+          updateCurrentSampleIndicator();
         }
       }
     });
   }
   
+  updateNavigationButtons();
+  updateCurrentSampleIndicator();
   renderCompareList(); // 샘플 변경시 항상 compare UI 새로 그리기
   
   // 분할 화면 비교 셀렉트박스 업데이트
@@ -1042,6 +1134,7 @@ function setUIFromSample(sampleData){
   });
   document.getElementById('tastingNotes').value = sampleData.tastingNotes||'';
   renderSelectedFlavorsArea(sampleData);
+  renderSelectedDefectsArea(sampleData);
   updateRadar(sampleData);
   updateTotalScore(sampleData);
   renderFlavorTabs();
@@ -2267,22 +2360,24 @@ document.addEventListener('DOMContentLoaded', function() {
   renderCompareList();
   document.getElementById('evalDate').textContent = (new Date()).toISOString().slice(0,10);
   
+  // 샘플 네비게이션 초기화
+  updateCurrentSampleIndicator();
+  updateNavigationButtons();
+  
+  // 이전/다음 버튼 이벤트 설정
+  document.getElementById('prevSampleBtn').addEventListener('click', goToPrevSample);
+  document.getElementById('nextSampleBtn').addEventListener('click', goToNextSample);
+  
   // 스와이프 제스처 지원 (모바일)
   const formEl = document.getElementById('cuppingForm');
   const hammer = new Hammer(formEl);
   
   hammer.on('swipeleft', function() {
-    const currentIndex = samples.findIndex(s => s.id === currentSampleId);
-    if (currentIndex < samples.length - 1) {
-      loadSample(samples[currentIndex + 1].id);
-    }
+    goToNextSample();
   });
   
   hammer.on('swiperight', function() {
-    const currentIndex = samples.findIndex(s => s.id === currentSampleId);
-    if (currentIndex > 0) {
-      loadSample(samples[currentIndex - 1].id);
-    }
+    goToPrevSample();
   });
   
   // 키보드 좌우 화살표 키 지원 (PC)
@@ -2292,11 +2387,10 @@ document.addEventListener('DOMContentLoaded', function() {
       return;
     }
     
-    const currentIndex = samples.findIndex(s => s.id === currentSampleId);
-    if (e.key === 'ArrowLeft' && currentIndex > 0) {
-      loadSample(samples[currentIndex - 1].id);
-    } else if (e.key === 'ArrowRight' && currentIndex < samples.length - 1) {
-      loadSample(samples[currentIndex + 1].id);
+    if (e.key === 'ArrowLeft') {
+      goToPrevSample();
+    } else if (e.key === 'ArrowRight') {
+      goToNextSample();
     }
   });
 });
