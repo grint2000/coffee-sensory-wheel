@@ -3312,40 +3312,214 @@ function setupEventHandlers() {
     scheduleAutoSave();
   });
   
-  // 이미지로 내보내기 버튼 (수정된 버전)
-  document.getElementById('exportImgBtn').addEventListener('click', function() {
-    try {
-      // 결과 시각화 영역만 캡처하도록 수정
-      const visualSection = document.querySelector('.visual-section-flex');
-      
-      if (!visualSection) {
-        showToast("이미지 생성을 위한 영역을 찾을 수 없습니다.");
-        return;
-      }
-      
-      html2canvas(visualSection, {
-        backgroundColor: '#ffffff',
-        scale: 1.5,
-        useCORS: true,
-        allowTaint: true,
-        className: 'html2canvas-container'
-      }).then(canvas => {
-        const imgData = canvas.toDataURL('image/png');
-        
-        // 다운로드 링크 생성
-        const link = document.createElement('a');
-        link.download = `${document.getElementById('sampleTitleInput').value || 'coffee'}_평가_${new Date().toISOString().slice(0, 10)}.png`;
-        link.href = imgData;
-        link.click();
-        
-        showToast("이미지가 저장되었습니다.");
-      });
-    } catch (e) {
-      console.error("이미지 내보내기 중 오류:", e);
-      showToast("이미지 생성 중 오류가 발생했습니다.");
-    }
-  });
+// 이미지로 내보내기 - 향미 프로필 차트 개선
+document.getElementById('exportImgBtn').onclick = () => {
+  saveCurrentSample();
   
+  const currentSample = getCurrentSampleObj();
+  if (!currentSample) {
+    showToast("내보낼 샘플이 없습니다.");
+    return;
+  }
+  
+  const s = currentSample.sampleData;
+  
+  // 임시 DOM 요소 생성
+  const tempRoot = document.createElement('div');
+  tempRoot.style.backgroundColor = "#fcfaf7";
+  tempRoot.style.padding = "32px 40px";
+  tempRoot.style.maxWidth = "800px";
+  tempRoot.style.fontFamily = "'Noto Sans KR', sans-serif";
+  tempRoot.style.position = "absolute";
+  tempRoot.style.left = "-9999px";
+  tempRoot.style.top = "0";
+  
+  // HTML 구성
+  tempRoot.innerHTML = `
+  <h2 style="text-align:center;margin-bottom:22px;font-size:24px;font-weight:bold;color:#8B5A2B;border-bottom:2px solid #8B5A2B;padding-bottom:8px;">커피 관능 평가 결과</h2>
+  
+  <div style="margin-bottom:25px;">
+    <table style="width:100%;border-spacing:0;border-collapse:separate;font-size:14px;">
+      <tr>
+        <td style="padding:4px 5px 8px 0;font-weight:bold;width:120px;">커피명</td>
+        <td style="padding:4px 15px 8px 0;">${s.coffeeName||"<span style='color:#BBB;'>미입력</span>"}</td>
+        <td style="padding:4px 5px 8px 0;font-weight:bold;width:100px;">원산지</td>
+        <td style="padding:4px 0 8px 0;">${s.origin||"<span style='color:#BBB;'>미입력</span>"}</td>
+      </tr>
+      <tr>
+        <td style="padding:4px 5px 8px 0;font-weight:bold;">품종(Variety)</td>
+        <td style="padding:4px 15px 8px 0;">${s.variety||"<span style='color:#BBB;'>미입력</span>"}</td>
+        <td style="padding:4px 5px 8px 0;font-weight:bold;">가공방식</td>
+        <td style="padding:4px 0 8px 0;">${s.process||"<span style='color:#BBB;'>미입력</span>"}</td>
+      </tr>
+      <tr>
+        <td style="padding:4px 5px 8px 0;font-weight:bold;">로스팅 날짜</td>
+        <td style="padding:4px 15px 8px 0;">${s.roastDate||"<span style='color:#BBB;'>미입력</span>"}</td>
+        <td style="padding:4px 5px 8px 0;font-weight:bold;">로스팅 레벨</td>
+        <td style="padding:4px 0 8px 0;">${s.roastLevel||"<span style='color:#BBB;'>미입력</span>"}</td>
+      </tr>
+    </table>
+  </div>
+  
+  <div style="display:flex;flex-direction:row;gap:20px;flex-wrap:wrap;margin-bottom:25px;">
+    <div style="background:white;flex:1;min-width:250px;border-radius:10px;padding:18px 15px;box-shadow:0 2px 4px rgba(0,0,0,0.1);">
+      <h4 style="font-weight:600;font-size:16px;margin:0 0 12px 0;color:#333;">향미 특성 및 속성</h4>
+      <div style="margin-bottom:15px;">
+        ${FLAVOR_PHASES.map(phase => {
+          const phaseSel = (s.flavorSelections[phase.id]||[]).map(key => {
+            const [cat, sub, desc] = key.split('|');
+            const rec = FLAVOR_DATA.find(f => f[0]===cat && f[1]===sub && f[2]===desc);
+            const color = rec ? rec[3] : '#B8B2A5';
+            const koreanName = rec && rec.length > 6 ? rec[6] : desc;
+            const textColor = getContrastColor(color);
+            return `<span style="display:inline-block;padding:4px 12px;border-radius:20px;margin:3px;font-size:13px;color:${textColor};background:${color};">${currentLanguage === 'en' ? desc : koreanName}</span>`;
+          }).join('');
+          
+          return `<div style="margin-bottom:10px;">
+            <span style="font-weight:600;margin-right:5px;">${phase.label}:</span> 
+            ${phaseSel || '<span style="font-size:13px;color:#999;">없음</span>'}
+          </div>`;
+        }).join('')}
+      </div>
+      
+      <div style="margin-bottom:12px;">
+        ${Object.keys(ATTR_TO_BADGE).map(attrKey => {
+          const attrMeta = ATTR_TO_BADGE[attrKey];
+          const val = s[attrKey];
+          if(val) {
+            return `<span style="display:inline-block;padding:4px 12px;border-radius:20px;margin:3px 6px 3px 0;font-size:13px;color:#fff;background:${attrMeta.color};">${attrMeta.label}: ${ATTR_VALUE_LABELS[val]}</span>`;
+          } else {
+            return `<span style="display:inline-block;padding:4px 12px;border-radius:20px;margin:3px 6px 3px 0;font-size:13px;color:#fff;background:${attrMeta.color};opacity:0.5;">${attrMeta.label}: 미선택</span>`;
+          }
+        }).join('')}
+      </div>
+      
+      <div>
+        <span style="font-weight:600;margin-right:5px;">로스팅 디펙트:</span>
+        <div style="margin-top:4px;">
+          ${(() => {
+            let defectHtml = '';
+            let hasDefect = false;
+            
+            DEFECT_PROPS.forEach(d => {
+              const val = s[d.key] || "none";
+              if(val !== "none") {
+                const dColor = DEFECT_LABELS[val] ? DEFECT_LABELS[val].color : "#bbb";
+                defectHtml += `<span style="display:inline-block;padding:4px 12px;border-radius:20px;margin:3px 6px 3px 0;font-size:13px;color:#fff;background:${dColor};">${d.label}: ${DEFECT_LABELS[val].label}</span>`;
+                hasDefect = true;
+              }
+            });
+            
+            if(!hasDefect) {
+              return '<span style="font-size:13px;color:#999;">선택된 디펙트 없음</span>';
+            }
+            
+            return defectHtml;
+          })()}
+        </div>
+      </div>
+    </div>
+    
+    <div style="background:white;flex:1;min-width:250px;border-radius:10px;padding:18px 15px;box-shadow:0 2px 4px rgba(0,0,0,0.1);">
+      <h4 style="font-weight:600;font-size:16px;margin:0 0 12px 0;color:#333;">SCA 평가 점수 차트</h4>
+      <canvas id="imgExportRadar" width="320" height="250"></canvas>
+      <div style="text-align:center;margin-top:15px;">
+        <span style="font-weight:600;">총점:</span> <span style="font-size:20px;font-weight:bold;color:#8B5A2B;">${document.getElementById('totalScore').textContent}</span>
+      </div>
+    </div>
+  </div>
+  
+  ${s.tastingNotes ? `
+  <div style="background:#F6F1E9;border-radius:10px;padding:15px 18px;margin-top:12px;">
+    <div style="font-weight:600;font-size:16px;margin-bottom:8px;color:#76582B;">테이스팅 노트</div>
+    <div style="white-space:pre-line;font-size:14px;line-height:1.7;color:#333;">${s.tastingNotes.replace(/</g,"&lt;")}</div>
+  </div>
+  ` : ''}
+  
+  <div style="margin-top:30px;font-size:12px;color:#888;text-align:center;border-top:1px solid #ece1cf;padding:8px 0 0 0;"> 
+    평가일: ${(new Date()).toISOString().slice(0,10)} | mollis SCA 커피 관능 평가 
+  </div>
+  `;
+  
+  document.body.appendChild(tempRoot);
+  
+  // 차트 렌더링
+  const exportRadar = tempRoot.querySelector('#imgExportRadar');
+  if(exportRadar){
+    // 차트 객체를 저장하여 메모리 누수 방지
+    const exportChart = new Chart(exportRadar.getContext('2d'), {
+      type: "radar",
+      data: { 
+        labels:["프래그런스","아로마","플레이버","에프터테이스트","액시디티","바디","밸런스","오버럴"], 
+        datasets:[{ 
+          label:"점수", 
+          data:[ s.scoreFragrance, s.scoreAroma, s.scoreFlavor, s.scoreAftertaste, s.scoreAcidity, s.scoreBody, s.scoreBalance, s.scoreOverall ], 
+          backgroundColor:"rgba(139,90,43,0.13)", 
+          borderColor:"#8B5A2B", 
+          pointBackgroundColor:"#8B5A2B",
+          borderWidth: 2,
+          pointRadius: 4
+        }] 
+      },
+      options: { 
+        plugins:{legend:{display:false}}, 
+        scales:{r:{
+          min:0,
+          max:10,
+          ticks:{
+            stepSize:2,
+            font:{size:12}
+          },
+          pointLabels:{
+            font:{size:13,weight:'bold'}
+          },
+          grid: {
+            color: 'rgba(0,0,0,0.1)'
+          },
+          angleLines: {
+            color: 'rgba(0,0,0,0.1)'
+          }
+        }}
+      }
+    });
+
+    // 이미지 생성 전에 차트가 완전히 렌더링되도록 시간 부여
+    setTimeout(() => {
+      html2canvas(tempRoot, {
+        backgroundColor: "#fcfaf7",
+        scale: 2,
+        logging: false,
+        useCORS: true // 외부 이미지 허용
+      }).then(canvas => {
+        try {
+          // 이미지 다운로드
+          const a = document.createElement('a');
+          a.href = canvas.toDataURL("image/png");
+          const fname = (s.title || s.coffeeName || 'coffee_sample') + '_cupping.png';
+          a.download = fname;
+          document.body.appendChild(a);
+          a.click();
+          
+          // 정리
+          document.body.removeChild(a);
+          document.body.removeChild(tempRoot);
+          exportChart.destroy(); // 차트 객체 제거
+        } catch (e) {
+          console.error("이미지 생성 중 오류:", e);
+          showToast("이미지 생성 중 오류가 발생했습니다.");
+        }
+      }).catch(e => {
+        console.error("Canvas 생성 중 오류:", e);
+        showToast("이미지 변환 중 오류가 발생했습니다.");
+      }).finally(() => {
+        // 항상 실행되는 정리 코드
+        if (document.body.contains(tempRoot)) {
+          document.body.removeChild(tempRoot);
+        }
+      });
+    }, 1000); // 차트 렌더링 시간을 위해 시간 증가
+  }
+};
   // CSV로 내보내기 버튼
   document.getElementById('exportCsvBtn').addEventListener('click', function() {
     try {
