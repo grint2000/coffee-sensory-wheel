@@ -930,7 +930,6 @@ const FLAVOR_DATA = [
   ["Fruity","Citrus Fruit","Grapefruit","#FF9970","과일류","감귤류","자몽"],
   ["Fruity","Citrus Fruit","Lime","#C0E57B","과일류","감귤류","라임"],  
   ["Fruity","Citrus Fruit","Tangerine","#FFA54F","과일류","감귤류","귤"],
-  ["Fruity","Citrus Fruit","Bergamot","#F9D949","과일류","감귤류","베르가못"],
   ["Fruity","Citrus Fruit","Yuzu","#EFDF48","과일류","감귤류","유자"],
   ["Fruity","Citrus Fruit","Kumquat","#FFA07A","과일류","감귤류","금귤"],
   ["Fruity","Citrus Fruit","Citron","#F0E68C","과일류","감귤류","시트론"],
@@ -970,8 +969,8 @@ const FLAVOR_DATA = [
   ["Fruity","Berry","Cloudberry","#FFB347","과일류","베리류","클라우드베리"],
   
   // Fruity - Stone Fruit
-  ["Fruity","Stone Fruit","Peach","#FFCBA4","과일류","핵과류","복숭아"],
-  ["Fruity","Stone Fruit","Apricot","#FBCEB1","과일류","핵과류","살구"],
+["Fruity","Stone Fruit","Hard Peach","#FFA07A","과일류","핵과류","딱딱한 복숭아"],
+["Fruity","Stone Fruit","Water Peach","#FFDAB9","과일류","핵과류","물복숭아"],  ["Fruity","Stone Fruit","Apricot","#FBCEB1","과일류","핵과류","살구"],
   ["Fruity","Stone Fruit","Cherry","#DE3163","과일류","핵과류","체리"],  
   ["Fruity","Stone Fruit","Plum","#B27AA4","과일류","핵과류","자두"],
   ["Fruity","Stone Fruit","Nectarine","#FFB8A0","과일류","핵과류","넥타린"],
@@ -1014,6 +1013,10 @@ const FLAVOR_DATA = [
   ["Fruity","Dried Fruit","Dried Pineapple","#FFCC33","과일류","건조과일","말린파인애플"],
   
   // Sweet
+  ["Sweet","General","Sweet Aroma","#FFD700","단맛","일반","단향"],
+  ["Sweet","General","Confectionery","#FFDF8C","단맛","일반","과자류"],
+  ["Sweet","General","Bakery Sweet","#F7E7CE","단맛","일반","베이커리 단맛"],
+  ["Sweet","General","Candy-like","#FFDEAD","단맛","일반","사탕 같은"],
   ["Sweet","","Brown Sugar","#B38B57","단맛","","흑설탕"],
   ["Sweet","","Caramel","#FFB15E","단맛","","캐러멜"],
   ["Sweet","","Honey","#FDE994","단맛","","꿀"],
@@ -1034,6 +1037,8 @@ const FLAVOR_DATA = [
   ["Sweet","","White Chocolate","#FFFFF0","단맛","","화이트초콜릿"],
   
   // Floral
+  ["Floral","","White Flower","#FFFFFF","꽃향","","흰꽃"],
+["Floral","","Yellow Flower","#FFFF00","꽃향","","노란꽃"],
   ["Floral","","Jasmine","#DEC2CB","꽃향","","자스민"],
   ["Floral","","Rose","#FD5D8B","꽃향","","장미"],
   ["Floral","","Chamomile","#F5E5C0","꽃향","","카모마일"],
@@ -1056,8 +1061,13 @@ const FLAVOR_DATA = [
   ["Floral","","Lilac","#C8A2C8","꽃향","","라일락"],
   ["Floral","","Iris","#5A4FCF","꽃향","","아이리스"],
   ["Floral","","Wisteria","#C9A0DC","꽃향","","등나무꽃"],
+  ["Floral","","Coffee Blossom","#F5F5F5","꽃향","","커피꽃"],
   
   // Nutty/Cocoa
+  ["Nutty/Cocoa","Nutty General","Nutty Aroma","#D2B48C","견과/코코아","일반 견과류","견과향"],
+["Nutty/Cocoa","Nutty General","Roasted Nuts","#CD853F","견과/코코아","일반 견과류","볶은 견과류"],
+["Nutty/Cocoa","Nutty General","Mixed Nuts","#DEB887","견과/코코아","일반 견과류","혼합 견과류"],
+["Nutty/Cocoa","Nutty General","Nut Butter","#D2B48C","견과/코코아","일반 견과류","견과 버터"],
   ["Nutty/Cocoa","Nutty","Hazelnut","#D7C2A8","견과/코코아","견과류","헤이즐넛"],
   ["Nutty/Cocoa","Nutty","Almond","#DBD3C9","견과/코코아","견과류","아몬드"],
   ["Nutty/Cocoa","Nutty","Peanut","#D28C78","견과/코코아","견과류","땅콩"],
@@ -1108,6 +1118,7 @@ const FLAVOR_DATA = [
   
   // Tea
   ["Tea","Black Tea","Earl Grey","#3A2E39","차","홍차","얼그레이"],
+  ["Tea","Black Tea","Bergamot","#F9D949","차","홍차","베르가못"],
   ["Tea","Black Tea","English Breakfast","#654321","차","홍차","잉글리시 브렉퍼스트"],
   ["Tea","Black Tea","Darjeeling","#856D4D","차","홍차","다즐링"],
   ["Tea","Green Tea","Matcha","#D0F0C0","차","녹차","말차"],
@@ -1176,7 +1187,7 @@ const FLAVOR_DATA = [
   ["Green/Vegetative","Fresh Green","Cucumber","#8FBC8F","풀/채소류","신선한 풀","오이"],
   ["Green/Vegetative","Fresh Green","Green Bell Pepper","#4F7942","풀/채소류","신선한 풀","피망"],
   ["Green/Vegetative","Herbaceous","Mint","#98FB98","풀/채소류","허브류","민트"],
-  ["Green/Vegetative","Herbaceous","Sage","#BCB88A","풀/채소류","허브류","세이지"],  ["Green/Vegetative","Herbaceous","Sage","#BCB88A","풀/채소류","허브류","세이지"],
+  ["Green/Vegetative","Herbaceous","Sage","#BCB88A","풀/채소류","허브류","세이지"],
   ["Green/Vegetative","Herbaceous","Basil","#579229","풀/채소류","허브류","바질"],
   ["Green/Vegetative","Vegetal","Olive","#708238","풀/채소류","채소류","올리브"],
   ["Green/Vegetative","Vegetal","Spinach","#175732","풀/채소류","채소류","시금치"],
@@ -1218,6 +1229,10 @@ const FLAVOR_DATA = [
   ["Sour/Fermented","Aged/Funky","Mildew","#7D7D65","산미/발효","숙성/펑키","곰팡이"],
   
   // Other
+  ["Other","Defect","Baggy","#C8B094","기타","결함","포대냄새"],
+["Other","Defect","Ferment","#614E1A","기타","결함","과발효"],
+["Other","Defect","Phenol","#3B0000","기타","결함","페놀릭"],
+["Other","Defect","Quaker","#D1BEA8","기타","결함","퀘이커"],
   ["Other","","Chemical","#FCF6B1","기타","","화학적"],
   ["Other","","Medicinal","#E2D784","기타","","약품향"],
   ["Other","Chemical","Rubber","#454545","기타","화학적","고무"],
@@ -1268,15 +1283,39 @@ const FLAVOR_CATEGORIES = [
 
 // 자주 사용하는 향미 리스트 추가
 const FREQUENT_FLAVORS = [
+  // 베리류
+  "Fruity|Berry|Strawberry",
+  "Fruity|Berry|Blueberry",
+  "Fruity|Berry|Raspberry",
+  "Fruity|Berry|Cranberry",
+  
+  // 감귤류
   "Fruity|Citrus Fruit|Lemon",
-  "Fruity|Berry|Blueberry", 
-  "Sweet||Caramel",
-  "Sweet||Honey",
+  "Fruity|Citrus Fruit|Orange",
+  
+  // 핵과류 - 복숭아를 딱딱한 복숭아와 물복숭아로 대체
+  "Fruity|Stone Fruit|Hard Peach",
+  "Fruity|Stone Fruit|Water Peach",
+  "Fruity|Stone Fruit|Apricot",
+  "Fruity|Stone Fruit|Plum",
+  
+  // 꽃향
+  "Floral||Coffee Blossom",
   "Floral||Jasmine",
-  "Nutty/Cocoa|Cocoa|Dark Chocolate",
-  "Spices||Cinnamon",
-  "Cereal/Grain|Cereal|Toast",
-  "Green/Vegetative|Fresh Green|Grass"
+  "Floral||White Flower",
+  "Floral||Yellow Flower",
+  
+  // 열대과일
+  "Fruity|Tropical Fruit|Passion Fruit",
+  "Fruity|Tropical Fruit|Mango",
+  "Fruity|Tropical Fruit|Papaya",
+  "Fruity|Tropical Fruit|Guava",
+  
+  // 견과류
+  "Nutty/Cocoa|Nutty|Almond",
+  "Nutty/Cocoa|Nutty|Walnut",
+  "Nutty/Cocoa|Nutty|Macadamia",
+  "Nutty/Cocoa|Nutty|Peanut"
 ];
 
 let samples = [];
@@ -3520,194 +3559,229 @@ document.getElementById('exportImgBtn').onclick = () => {
     }, 1000); // 차트 렌더링 시간을 위해 시간 증가
   }
 };
-  // CSV로 내보내기 버튼
-  document.getElementById('exportCsvBtn').addEventListener('click', function() {
-    try {
-      const currentSample = getCurrentSampleObj();
-      if (!currentSample) return;
-      
-      const sampleData = currentSample.sampleData;
-      
-      // CSV 헤더
-      let csvContent = "항목,값\n";
-      
-      // 기본 정보
-      csvContent += `샘플명,${sampleData.title || ""}\n`;
-      csvContent += `커피명,${sampleData.coffeeName || ""}\n`;
-      csvContent += `원산지,${sampleData.origin || ""}\n`;
-      csvContent += `품종,${sampleData.variety || ""}\n`;
-      csvContent += `가공방식,${sampleData.process || ""}\n`;
-      csvContent += `로스팅날짜,${sampleData.roastDate || ""}\n`;
-      csvContent += `로스팅레벨,${sampleData.roastLevel || ""}\n\n`;
-      
-      // 속성
-      csvContent += `산미,${sampleData.acidityLevel || "미선택"}\n`;
-      csvContent += `단맛,${sampleData.sweetnessLevel || "미선택"}\n`;
-      csvContent += `바디감,${sampleData.bodyLevel || "미선택"}\n\n`;
-      
-      // 로스팅 디펙트
-      DEFECT_PROPS.forEach(d => {
-        const val = sampleData[d.key] || "none";
-        csvContent += `${d.label},${val === "none" ? "미선택" : DEFECT_LABELS[val].label}\n`;
-      });
-      csvContent += "\n";
-      
-      // SCA 점수
-      csvContent += `프래그런스,${sampleData.scoreFragrance || 0}\n`;
-      csvContent += `아로마,${sampleData.scoreAroma || 0}\n`;
-      csvContent += `플레이버,${sampleData.scoreFlavor || 0}\n`;
-      csvContent += `에프터테이스트,${sampleData.scoreAftertaste || 0}\n`;
-      csvContent += `액시디티,${sampleData.scoreAcidity || 0}\n`;
-      csvContent += `바디,${sampleData.scoreBody || 0}\n`;
-      csvContent += `밸런스,${sampleData.scoreBalance || 0}\n`;
-      csvContent += `오버럴,${sampleData.scoreOverall || 0}\n`;
+// CSV로 모든 샘플 내보내기 버튼 함수 수정
+document.getElementById('exportCsvBtn').addEventListener('click', function() {
+  try {
+    // 현재 샘플 저장
+    if (currentSampleId) {
+      saveCurrentSample();
+    }
+    
+    // 파일 이름 설정
+    const fileName = `coffee_samples_${new Date().toISOString().slice(0, 10)}.csv`;
+    
+    // CSV 헤더 생성
+    let headers = [
+      "샘플ID", "샘플명", "커피명", "원산지", "품종", "가공방식", "로스팅날짜", "로스팅레벨",
+      "산미레벨", "단맛레벨", "바디감레벨",
+      "언더디벨롭먼트", "오버디벨롭먼트", "베이킹", "스코칭",
+      "프래그런스", "아로마", "플레이버", "에프터테이스트", "액시디티", "바디", "밸런스", "오버럴", "총점",
+      "프래그런스향미", "아로마향미", "플레이버향미", "에프터테이스트향미",
+      "테이스팅노트", "마지막수정일"
+    ];
+    
+    let csvContent = headers.join(",") + "\n";
+    
+    // 각 샘플 데이터를 CSV 행으로 변환
+    samples.forEach(sample => {
+      const s = sample.sampleData;
       
       // 총점 계산
       let totalScore = 30;
-      totalScore += parseFloat(sampleData.scoreFragrance || 0);
-      totalScore += parseFloat(sampleData.scoreAroma || 0);
-      totalScore += parseFloat(sampleData.scoreFlavor || 0);
-      totalScore += parseFloat(sampleData.scoreAftertaste || 0);
-      totalScore += parseFloat(sampleData.scoreAcidity || 0);
-      totalScore += parseFloat(sampleData.scoreBody || 0);
-      totalScore += parseFloat(sampleData.scoreBalance || 0);
-      totalScore += parseFloat(sampleData.scoreOverall || 0);
+      totalScore += parseFloat(s.scoreFragrance || 0);
+      totalScore += parseFloat(s.scoreAroma || 0);
+      totalScore += parseFloat(s.scoreFlavor || 0);
+      totalScore += parseFloat(s.scoreAftertaste || 0);
+      totalScore += parseFloat(s.scoreAcidity || 0);
+      totalScore += parseFloat(s.scoreBody || 0);
+      totalScore += parseFloat(s.scoreBalance || 0);
+      totalScore += parseFloat(s.scoreOverall || 0);
       
-      csvContent += `총점,${totalScore.toFixed(2)}\n\n`;
+      // 향미 문자열 생성 함수
+      const getFlavorString = (phaseId) => {
+        const flavors = s.flavorSelections[phaseId] || [];
+        if (flavors.length === 0) return "";
+        
+        return flavors.map(key => {
+          const [cat, sub, desc] = key.split('|');
+          const flavor = FLAVOR_DATA.find(f => f[0] === cat && f[1] === sub && f[2] === desc);
+          return flavor ? flavor[2] : '';
+        }).filter(name => name).join('; ');
+      };
       
-      // 향미 선택
-      FLAVOR_PHASES.forEach(phase => {
-        csvContent += `${phase.label},`;
-        const flavors = sampleData.flavorSelections[phase.id] || [];
-        if (flavors.length > 0) {
-          const flavorNames = flavors.map(key => {
-            const [cat, sub, desc] = key.split('|');
-            const flavor = FLAVOR_DATA.find(f => f[0] === cat && f[1] === sub && f[2] === desc);
-            return flavor ? flavor[2] : '';
-          }).filter(name => name);
-          csvContent += flavorNames.join('; ');
-        }
-        csvContent += '\n';
-      });
-      csvContent += "\n";
+      // CSV 행 데이터 생성
+      let rowData = [
+        sample.id,
+        (s.title || "").replace(/,/g, " "),
+        (s.coffeeName || "").replace(/,/g, " "),
+        (s.origin || "").replace(/,/g, " "),
+        (s.variety || "").replace(/,/g, " "),
+        (s.process || "").replace(/,/g, " "),
+        s.roastDate || "",
+        s.roastLevel || "",
+        s.acidityLevel || "",
+        s.sweetnessLevel || "",
+        s.bodyLevel || "",
+        s.defectUnderdevelopment || "none",
+        s.defectOverdevelopment || "none",
+        s.defectBaked || "none",
+        s.defectScorching || "none",
+        s.scoreFragrance || 0,
+        s.scoreAroma || 0,
+        s.scoreFlavor || 0,
+        s.scoreAftertaste || 0,
+        s.scoreAcidity || 0,
+        s.scoreBody || 0,
+        s.scoreBalance || 0,
+        s.scoreOverall || 0,
+        totalScore.toFixed(2),
+        getFlavorString("fragrance"),
+        getFlavorString("aroma"),
+        getFlavorString("flavor"),
+        getFlavorString("aftertaste"),
+        (s.tastingNotes || "").replace(/[\r\n,]/g, " "),
+        new Date(s.lastEdit || Date.now()).toISOString()
+      ];
       
-      // 테이스팅 노트
-      csvContent += `테이스팅노트,${(sampleData.tastingNotes || "").replace(/[\r\n]+/g, ' ')}\n`;
-      
-      // 다운로드
-      const blob = new Blob(["\uFEFF" + csvContent], { type: 'text/csv;charset=utf-8;' });
-      const url = URL.createObjectURL(blob);
-      const link = document.createElement('a');
-      link.setAttribute('href', url);
-      link.setAttribute('download', `${sampleData.title || 'coffee'}_평가_${new Date().toISOString().slice(0, 10)}.csv`);
-      link.click();
-      
-      showToast("CSV 파일이 다운로드되었습니다.");
-    } catch (e) {
-      console.error("CSV 내보내기 중 오류:", e);
-      showToast("CSV 파일 생성 중 오류가 발생했습니다.");
+      // 행 데이터를 CSV 문자열로 변환
+      csvContent += rowData.join(",") + "\n";
+    });
+    
+    // 다운로드 처리
+    const blob = new Blob(["\uFEFF" + csvContent], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.setAttribute('href', url);
+    link.setAttribute('download', fileName);
+    link.click();
+    
+    showToast("모든 샘플이 CSV 파일로 내보내졌습니다.");
+  } catch (e) {
+    console.error("CSV 내보내기 중 오류:", e);
+    showToast("CSV 파일 생성 중 오류가 발생했습니다.");
+  }
+});  
+// 엑셀로 모든 샘플 내보내기 버튼 함수 수정
+document.getElementById('exportXlsxBtn').addEventListener('click', function() {
+  try {
+    // 현재 샘플 저장
+    if (currentSampleId) {
+      saveCurrentSample();
     }
-  });
-  
-  // 엑셀로 내보내기 버튼
-  document.getElementById('exportXlsxBtn').addEventListener('click', function() {
-    try {
-      const currentSample = getCurrentSampleObj();
-      if (!currentSample) return;
-      
-      const sampleData = currentSample.sampleData;
-      
-      // 워크시트 데이터 준비
-      const ws_data = [
-        ["mollis SCA 커피 관능 평가", "", "평가일:", new Date().toLocaleDateString()],
-        [""],
-        ["기본 정보", ""],
-        ["샘플명", sampleData.title || ""],
-        ["커피명", sampleData.coffeeName || ""],
-        ["원산지", sampleData.origin || ""],
-        ["품종", sampleData.variety || ""],
-        ["가공방식", sampleData.process || ""],
-        ["로스팅날짜", sampleData.roastDate || ""],
-        ["로스팅레벨", sampleData.roastLevel || ""],
-        [""],
-        ["속성", ""],
-        ["산미", sampleData.acidityLevel || "미선택"],
-        ["단맛", sampleData.sweetnessLevel || "미선택"],
-        ["바디감", sampleData.bodyLevel || "미선택"],
-        [""],
-        ["로스팅 디펙트", ""]
-      ];
-      
-      // 디펙트 추가
-      DEFECT_PROPS.forEach(d => {
-        const val = sampleData[d.key] || "none";
-        ws_data.push([d.label, val === "none" ? "미선택" : DEFECT_LABELS[val].label]);
-      });
-      
-      ws_data.push([""]);
-      ws_data.push(["SCA 점수", ""]);
-      
-      // SCA 점수
-      const scoreData = [
-        ["프래그런스", sampleData.scoreFragrance || 0],
-        ["아로마", sampleData.scoreAroma || 0],
-        ["플레이버", sampleData.scoreFlavor || 0],
-        ["에프터테이스트", sampleData.scoreAftertaste || 0],
-        ["액시디티", sampleData.scoreAcidity || 0],
-        ["바디", sampleData.scoreBody || 0],
-        ["밸런스", sampleData.scoreBalance || 0],
-        ["오버럴", sampleData.scoreOverall || 0]
-      ];
-      
-      // 점수 추가
-      ws_data.push(...scoreData);
+    
+    // 헤더 행 정의
+    const headers = [
+      "샘플ID", "샘플명", "커피명", "원산지", "품종", "가공방식", "로스팅날짜", "로스팅레벨",
+      "산미레벨", "단맛레벨", "바디감레벨",
+      "언더디벨롭먼트", "오버디벨롭먼트", "베이킹", "스코칭",
+      "프래그런스", "아로마", "플레이버", "에프터테이스트", "액시디티", "바디", "밸런스", "오버럴", "총점",
+      "프래그런스향미", "아로마향미", "플레이버향미", "에프터테이스트향미", 
+      "테이스팅노트", "마지막수정일"
+    ];
+    
+    // 데이터 행 준비
+    const data = [headers];
+    
+    // 각 샘플의 데이터 행 추가
+    samples.forEach(sample => {
+      const s = sample.sampleData;
       
       // 총점 계산
       let totalScore = 30;
-      scoreData.forEach(item => totalScore += parseFloat(item[1]));
+      totalScore += parseFloat(s.scoreFragrance || 0);
+      totalScore += parseFloat(s.scoreAroma || 0);
+      totalScore += parseFloat(s.scoreFlavor || 0);
+      totalScore += parseFloat(s.scoreAftertaste || 0);
+      totalScore += parseFloat(s.scoreAcidity || 0);
+      totalScore += parseFloat(s.scoreBody || 0);
+      totalScore += parseFloat(s.scoreBalance || 0);
+      totalScore += parseFloat(s.scoreOverall || 0);
       
-      ws_data.push(["총점", totalScore.toFixed(2)]);
-      ws_data.push([""]);
-      
-      // 향미 선택
-      ws_data.push(["향미 선택", ""]);
-      
-      FLAVOR_PHASES.forEach(phase => {
-        const flavors = sampleData.flavorSelections[phase.id] || [];
-        let flavorStr = "";
+      // 향미 문자열 생성 함수
+      const getFlavorString = (phaseId) => {
+        const flavors = s.flavorSelections[phaseId] || [];
+        if (flavors.length === 0) return "";
         
-        if (flavors.length > 0) {
-          const flavorNames = flavors.map(key => {
-            const [cat, sub, desc] = key.split('|');
-            const flavor = FLAVOR_DATA.find(f => f[0] === cat && f[1] === sub && f[2] === desc);
-            return flavor ? flavor[2] : '';
-          }).filter(name => name);
-          flavorStr = flavorNames.join('; ');
-        }
-        
-        ws_data.push([phase.label, flavorStr]);
-      });
+        return flavors.map(key => {
+          const [cat, sub, desc] = key.split('|');
+          const flavor = FLAVOR_DATA.find(f => f[0] === cat && f[1] === sub && f[2] === desc);
+          return flavor ? flavor[2] : '';
+        }).filter(name => name).join('; ');
+      };
       
-      ws_data.push([""]);
-      ws_data.push(["테이스팅 노트", ""]);
-      ws_data.push(["", sampleData.tastingNotes || ""]);
-      
-      // 워크북 생성
-      const wb = XLSX.utils.book_new();
-      const ws = XLSX.utils.aoa_to_sheet(ws_data);
-      
-      // 워크시트를 워크북에 추가
-      XLSX.utils.book_append_sheet(wb, ws, "커피 평가");
-      
-      // 엑셀 파일로 내보내기
-      XLSX.writeFile(wb, `${sampleData.title || 'coffee'}_평가_${new Date().toISOString().slice(0, 10)}.xlsx`);
-      
-      showToast("엑셀 파일이 다운로드되었습니다.");
-    } catch (e) {
-      console.error("엑셀 내보내기 중 오류:", e);
-      showToast("엑셀 파일 생성 중 오류가 발생했습니다.");
-    }
-  });
+      // 데이터 행 추가
+      data.push([
+        sample.id,
+        s.title || "",
+        s.coffeeName || "",
+        s.origin || "",
+        s.variety || "",
+        s.process || "",
+        s.roastDate || "",
+        s.roastLevel || "",
+        s.acidityLevel || "",
+        s.sweetnessLevel || "",
+        s.bodyLevel || "",
+        s.defectUnderdevelopment || "none",
+        s.defectOverdevelopment || "none",
+        s.defectBaked || "none",
+        s.defectScorching || "none",
+        s.scoreFragrance || 0,
+        s.scoreAroma || 0,
+        s.scoreFlavor || 0,
+        s.scoreAftertaste || 0,
+        s.scoreAcidity || 0,
+        s.scoreBody || 0,
+        s.scoreBalance || 0,
+        s.scoreOverall || 0,
+        totalScore.toFixed(2),
+        getFlavorString("fragrance"),
+        getFlavorString("aroma"),
+        getFlavorString("flavor"),
+        getFlavorString("aftertaste"),
+        s.tastingNotes || "",
+        new Date(s.lastEdit || Date.now()).toLocaleDateString()
+      ]);
+    });
+    
+    // 두 번째 시트: 향미 데이터 사전
+    const flavorDict = [["대분류", "중분류", "세부명칭", "색상코드", "한글대분류", "한글중분류", "한글세부명칭"]];
+    FLAVOR_DATA.forEach(flavor => {
+      flavorDict.push(flavor);
+    });
+    
+    // 워크북 생성
+    const wb = XLSX.utils.book_new();
+    
+    // 샘플 데이터 시트 생성
+    const ws = XLSX.utils.aoa_to_sheet(data);
+    XLSX.utils.book_append_sheet(wb, ws, "커피 샘플 데이터");
+    
+    // 향미 데이터 사전 시트 생성
+    const wsDict = XLSX.utils.aoa_to_sheet(flavorDict);
+    XLSX.utils.book_append_sheet(wb, wsDict, "향미 데이터 사전");
+    
+    // 워크시트 열 너비 조정 (자동 조정은 복잡해서 기본값만 설정)
+    ws['!cols'] = [
+      {wch: 10}, // 샘플ID
+      {wch: 15}, // 샘플명
+      {wch: 15}, // 커피명
+      {wch: 15}, // 원산지
+      {wch: 15}, // 품종
+      {wch: 15}  // 가공방식
+      // 나머지 열은 기본 너비 사용
+    ];
+    
+    // 엑셀 파일로 내보내기
+    const fileName = `coffee_samples_${new Date().toISOString().slice(0, 10)}.xlsx`;
+    XLSX.writeFile(wb, fileName);
+    
+    showToast("모든 샘플이 엑셀 파일로 내보내졌습니다.");
+  } catch (e) {
+    console.error("엑셀 내보내기 중 오류:", e);
+    showToast("엑셀 파일 생성 중 오류가 발생했습니다.");
+  }
+});
   
   // 네비게이션 버튼
   document.getElementById('prevSampleBtn').addEventListener('click', goToPrevSample);
