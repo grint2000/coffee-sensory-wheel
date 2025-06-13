@@ -1774,6 +1774,36 @@ function toggleAccordion(header) {
   }
 }
 
+// 한국어 초성 추출 함수
+function getKoreanInitials(text) {
+  if (!text) return '';
+  
+  const initials = ['ㄱ','ㄲ','ㄴ','ㄷ','ㄸ','ㄹ','ㅁ','ㅂ','ㅃ','ㅅ','ㅆ','ㅇ','ㅈ','ㅉ','ㅊ','ㅋ','ㅌ','ㅍ','ㅎ'];
+  
+  return text.split('').map(char => {
+    const code = char.charCodeAt(0);
+    if (code >= 0xAC00 && code <= 0xD7A3) {
+      // 한글 유니코드 범위
+      const index = Math.floor((code - 0xAC00) / 588);
+      return initials[index];
+    }
+    return char;
+  }).join('');
+}
+
+// 한국어 초성 매칭 함수
+function matchKoreanInitials(text, searchTerm) {
+  if (!text || !searchTerm) return false;
+  
+  const textInitials = getKoreanInitials(text.toLowerCase());
+  const searchInitials = getKoreanInitials(searchTerm.toLowerCase());
+  
+  // 일반 텍스트 매칭도 함께 확인
+  return text.toLowerCase().includes(searchTerm.toLowerCase()) || 
+         textInitials.includes(searchInitials) ||
+         textInitials.includes(searchTerm.toLowerCase());
+}
+
 // 배경색에 따른 텍스트 색상 최적화 함수
 function getContrastColor(hexColor) {
   if (!hexColor || typeof hexColor !== 'string') return '#000000';
@@ -2161,8 +2191,11 @@ function renderFlavorPhase() {
   let html = `
     <div class="search-box mb-3">
       <input type="text" id="flavorSearchInput" class="search-input" 
-        placeholder="${currentLanguage === 'ko' ? '향미 검색 (베리, 초콜릿, 꽃향 등...)' : 'Search flavors (berry, chocolate, floral, etc...)'}">
-    </div>
+        placeholder="${currentLanguage === 'ko' ? '향미 검색 (베리, 초콜릿, 꽃향, 초성: ㅂㄹ, ㅊㅋㄹ 등...)' : 'Search flavors (berry, chocolate, floral, etc...)'}">
+      <div class="text-xs text-gray-500 mt-1 px-2">
+        ${currentLanguage === 'ko' ? '💡 팁: 한국어 초성으로도 검색 가능 (예: "ㅂㄹ" → 베리류, "ㅊㅋㄹ" → 초콜릿)' : '💡 Tip: Search with Korean initials (e.g., "ㅂㄹ" → Berry)'}
+      </div>
+   </div>
     
     <div class="flavor-category-tabs">
   `;
@@ -2348,12 +2381,18 @@ function renderFlavorPhase() {
           const category = label.dataset.category?.toLowerCase() || '';
           const subcategory = label.dataset.subcategory?.toLowerCase() || '';
           
-          if (
-            flavorEn.includes(searchTerm) || 
-            flavorKr.includes(searchTerm) || 
-            category.includes(searchTerm) || 
-            subcategory.includes(searchTerm)
-          ) {
+// 기본 텍스트 매칭
+const basicMatch = flavorEn.includes(searchTerm) || 
+                 flavorKr.includes(searchTerm) || 
+                 category.includes(searchTerm) || 
+                 subcategory.includes(searchTerm);
+
+// 한국어 초성 매칭
+const initialMatch = matchKoreanInitials(flavorKr, searchTerm) ||
+                    matchKoreanInitials(category, searchTerm) ||
+                    matchKoreanInitials(subcategory, searchTerm);
+
+if (basicMatch || initialMatch) {
             label.style.display = '';
             label.classList.add('search-highlight');
             
