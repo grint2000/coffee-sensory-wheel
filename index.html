@@ -164,7 +164,31 @@
     .no-scrollbar {-ms-overflow-style: none; scrollbar-width: none;}
     .html2canvas-container { box-shadow: 0 0 0 3px #eee; }
     .score-slider { width: 100%; }
-    .sample-list-scroll {max-height: 190px; overflow-y: auto;}
+    .sample-list-scroll {
+  max-height: 190px; 
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch; /* iOS 부드러운 스크롤 */
+  scrollbar-width: thin; /* Firefox */
+  scrollbar-color: #8B5A2B transparent; /* Firefox */
+}
+
+/* 스크롤바 스타일링 - 웹킷 기반 브라우저 */
+.sample-list-scroll::-webkit-scrollbar {
+  width: 4px;
+}
+
+.sample-list-scroll::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.sample-list-scroll::-webkit-scrollbar-thumb {
+  background: #8B5A2B;
+  border-radius: 2px;
+}
+
+.sample-list-scroll::-webkit-scrollbar-thumb:hover {
+  background: #654321;
+}
     .compare-table th, .compare-table td {border:1px solid #e2e2e2; padding:6px 8px; font-size:14px;}
     .compare-table th {background: #f9f3ea;}
     .compare-table tr:nth-child(even) td {background: #f8f6f4;}
@@ -313,7 +337,47 @@
         flex-direction: column;
       }
     }
-    
+  
+/* 모바일 터치 최적화 - 샘플 목록 스크롤 개선 */
+@media (max-width: 768px) {
+  .sample-list-scroll {
+    max-height: 200px; /* 모바일에서 약간 더 높게 */
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    /* 모바일에서 스크롤 영역 명확하게 */
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    padding: 8px;
+  }
+  
+  /* 모바일에서 스크롤바 더 굵게 */
+  .sample-list-scroll::-webkit-scrollbar {
+    width: 6px;
+  }
+  
+  .sample-list-scroll::-webkit-scrollbar-thumb {
+    background: #8B5A2B;
+    border-radius: 3px;
+  }
+  
+  /* 샘플 아이템 터치 영역 확대 */
+  .sample-item {
+    min-height: 50px;
+    padding: 8px;
+    margin-bottom: 4px;
+    touch-action: manipulation;
+  }
+  
+  /* 드래그 핸들 터치 영역 확대 */
+  .sample-drag-handle {
+    padding: 8px 6px;
+    min-width: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+}
+  
     /* 터치 최적화 - 모바일 */
     @media (max-width: 768px) {
       .flavor-checkbox-label {
@@ -739,8 +803,11 @@
       <div class="sample-list-scroll bg-gray-50 rounded-lg border p-1.5 no-scrollbar">
         <div id="sampleList" class="sample-sortable-list"></div>
         <div class="text-xs text-gray-500 mt-2 px-2">
-          <i class="fas fa-arrows-alt"></i> 샘플 순서를 드래그하여 변경할 수 있습니다.
-        </div>
+  <i class="fas fa-arrows-alt"></i> 샘플 순서를 드래그하여 변경할 수 있습니다.
+  <div class="text-xs text-gray-400 mt-1">
+    📱 모바일: 위아래로 스크롤하여 더 많은 샘플을 확인하세요.
+  </div>
+</div>
       </div>
       <div class="flex flex-wrap gap-1 mt-2">
         <button class="px-3 py-1 bg-blue-100 hover:bg-blue-200 text-blue-800 rounded text-xs flex items-center mobile-touch-friendly" id="saveSamplesBtn"><i class="fa fa-save mr-1"></i>웹에 전체 저장</button>
@@ -2804,7 +2871,7 @@ function saveUIToSample(targetDataObj) {
   sampleData.lastEdit = +(new Date());
 }
 
-// 샘플 목록 렌더링 (드래그 앤 드롭 지원)
+// 샘플 목록 렌더링 (드래그 앤 드롭 지원) - 모바일 스크롤 개선
 function renderSampleList() {
   let listDiv = document.getElementById('sampleList');
   if (!samples.length) {
@@ -2827,6 +2894,9 @@ function renderSampleList() {
   
   listDiv.innerHTML = html;
   
+  // 모바일에서 스크롤 가능하도록 터치 이벤트 최적화
+  const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+  
   // 샘플 클릭 이벤트
   Array.from(listDiv.querySelectorAll('.sample-item')).forEach(el => {
     el.addEventListener('click', (e) => {
@@ -2842,24 +2912,48 @@ function renderSampleList() {
       }
     });
     
-    // 모바일 길게 누르기로 복제
-    el.addEventListener('touchstart', function(e) {
-      if (e.target.closest('.sample-drag-handle')) return;
+    // 모바일 길게 누르기로 복제 (드래그와 구분)
+    if (isMobile) {
+      let longPressTimer;
+      let isDragging = false;
       
-      const longPressTimer = setTimeout(() => {
-        const sampleId = el.getAttribute('data-id');
-        if (confirm("이 샘플을 복제하시겠습니까?")) {
-          cloneSample(sampleId);
+      el.addEventListener('touchstart', function(e) {
+        if (e.target.closest('.sample-drag-handle')) {
+          isDragging = true;
+          return;
         }
-      }, 800);
+        
+        isDragging = false;
+        longPressTimer = setTimeout(() => {
+          if (!isDragging) {
+            const sampleId = el.getAttribute('data-id');
+            if (confirm("이 샘플을 복제하시겠습니까?")) {
+              cloneSample(sampleId);
+            }
+          }
+        }, 800);
+      });
       
-      const clearTimer = () => clearTimeout(longPressTimer);
-      el.addEventListener('touchend', clearTimer, { once: true });
-      el.addEventListener('touchcancel', clearTimer, { once: true });
-    });
+      el.addEventListener('touchmove', function(e) {
+        if (!e.target.closest('.sample-drag-handle')) {
+          clearTimeout(longPressTimer);
+          isDragging = true;
+        }
+      });
+      
+      el.addEventListener('touchend', function(e) {
+        clearTimeout(longPressTimer);
+        isDragging = false;
+      });
+      
+      el.addEventListener('touchcancel', function(e) {
+        clearTimeout(longPressTimer);
+        isDragging = false;
+      });
+    }
   });
   
-  // Sortable.js 초기화
+  // Sortable.js 초기화 (모바일 최적화)
   if (sortableInstance) {
     sortableInstance.destroy();
   }
@@ -2870,6 +2964,13 @@ function renderSampleList() {
       handle: '.sample-drag-handle',
       ghostClass: 'sortable-ghost',
       chosenClass: 'sortable-chosen',
+      // 모바일에서 스크롤과 드래그 구분
+      scroll: true,
+      scrollSensitivity: 30,
+      scrollSpeed: 10,
+      // 터치 지연 추가 (모바일에서 스크롤과 드래그 구분)
+      delay: isMobile ? 100 : 0,
+      delayOnTouchOnly: true,
       onEnd: function (evt) {
         const oldIndex = evt.oldIndex;
         const newIndex = evt.newIndex;
@@ -3456,7 +3557,7 @@ function createSampleSummary(sample) {
   return html;
 }
 
-// SNS형 이미지 내보내기 함수
+// SNS형 이미지 내보내기 함수 (수정됨)
 function exportSnsImage() {
   saveCurrentSample();
   
@@ -3467,6 +3568,36 @@ function exportSnsImage() {
   }
   
   const s = currentSample.sampleData;
+  
+  // 바디감 디스크립터 HTML 생성 함수
+  function generateBodyDescriptorsHtml() {
+    if (!s.bodyDescriptors || s.bodyDescriptors.length === 0) {
+      return '';
+    }
+    
+    const bodyDescriptorElements = s.bodyDescriptors.map(descriptorId => {
+      const descriptor = BODY_DESCRIPTORS.find(d => d.id === descriptorId);
+      if (descriptor) {
+        const displayText = currentLanguage === 'ko' ? descriptor.korean : descriptor.label;
+        const textColor = getContrastColor(descriptor.color);
+        return `<span style="display: inline-block; padding: 4px 10px; border-radius: 12px; font-size: 12px; color: ${textColor}; background: ${descriptor.color}; font-weight: 500; margin: 2px;">${displayText}</span>`;
+      }
+      return '';
+    }).filter(html => html !== '').join('');
+    
+    if (bodyDescriptorElements) {
+      return `
+        <div style="margin-top: 15px; padding-top: 15px; border-top: 1px solid #e5e5e5;">
+          <div style="font-weight: 600; margin-bottom: 8px; font-size: 14px; color: #555;">바디감 디스크립터</div>
+          <div style="display: flex; flex-wrap: wrap; gap: 4px; line-height: 1.4;">
+            ${bodyDescriptorElements}
+          </div>
+        </div>
+      `;
+    }
+    
+    return '';
+  }
   
   // SNS용 임시 DOM 요소 생성 (심플한 흰색 배경)
   const tempRoot = document.createElement('div');
@@ -3484,7 +3615,9 @@ function exportSnsImage() {
     border: 2px solid #f0f0f0;
   `;
   
-  // SNS용 간결한 HTML 구성 (커피명 + 향미특성/속성만)
+  // SNS용 간결한 HTML 구성
+  const bodyDescriptorsHtml = generateBodyDescriptorsHtml();
+  
   tempRoot.innerHTML = `
   <div style="text-align: center; margin-bottom: 30px;">
     <h2 style="margin: 0; font-size: 24px; font-weight: bold; color: #8B5A2B;">${s.title || s.coffeeName || '커피 테이스팅'}</h2>
@@ -3535,22 +3668,7 @@ function exportSnsImage() {
       </div>
     </div>
     
-    ${(s.bodyDescriptors && s.bodyDescriptors.length > 0) ? `
-    <div style="margin-top: 15px; padding-top: 15px; border-top: 1px solid #e5e5e5;">
-      <div style="font-weight: 600; margin-bottom: 8px; font-size: 14px; color: #555;">바디감</div>
-      <div style="display: flex; flex-wrap: wrap; gap: 6px;">
-        ${s.bodyDescriptors.map(descriptorId => {
-          const descriptor = BODY_DESCRIPTORS.find(d => d.id === descriptorId);
-          if (descriptor) {
-            const displayText = currentLanguage === 'ko' ? descriptor.korean : descriptor.label;
-            const textColor = getContrastColor(descriptor.color);
-            return `<span style="display: inline-block; padding: 4px 10px; border-radius: 12px; font-size: 12px; color: ${textColor}; background: ${descriptor.color}; font-weight: 500;">${displayText}</span>`;
-          }
-          return '';
-        }).join('')}
-      </div>
-    </div>
-    ` : ''}
+    ${bodyDescriptorsHtml}
     
     <div style="margin-top: 20px; padding-top: 15px; border-top: 1px solid #e5e5e5; text-align: center;">
       <div style="font-size: 12px; color: #888;">
@@ -3582,9 +3700,20 @@ function exportSnsImage() {
       document.body.removeChild(a);
       document.body.removeChild(tempRoot);
       showToast("SNS용 이미지가 저장되었습니다!");
+      
+      // 성공 로그
+      console.log("SNS 이미지 내보내기 성공:", {
+        title: s.title,
+        bodyDescriptors: s.bodyDescriptors ? s.bodyDescriptors.length : 0,
+        flavorSelections: Object.keys(s.flavorSelections).length
+      });
+      
     } catch (e) {
       console.error("SNS 이미지 생성 중 오류:", e);
       showToast("SNS 이미지 생성 중 오류가 발생했습니다.");
+      if (document.body.contains(tempRoot)) {
+        document.body.removeChild(tempRoot);
+      }
     }
   }).catch(e => {
     console.error("Canvas 생성 중 오류:", e);
