@@ -42,11 +42,36 @@ if ('serviceWorker' in navigator) {
   });
 }
 
+window.addEventListener('beforeinstallprompt', (e) => {
+  e.preventDefault();
+  deferredPrompt = e;
+  const installBtn = document.getElementById('installBtn');
+  if (installBtn) installBtn.classList.remove('hidden');
+});
+
+
 document.addEventListener('DOMContentLoaded', () => {
   const loginBtn = document.getElementById('loginBtn');
+  const logoutBtn = document.getElementById('logoutBtn');
+  const installBtn = document.getElementById('installBtn');
   const display = document.getElementById('currentUserDisplay');
-  if (display) display.textContent = currentUser;
+  if (display) display.textContent = window.currentUser;
   if (loginBtn) loginBtn.addEventListener('click', loginUser);
+  if (logoutBtn) logoutBtn.addEventListener('click', logoutUser);
+  if (logoutBtn && window.currentUser !== 'default') {
+    logoutBtn.classList.remove('hidden');
+  }
+  if (installBtn) {
+    installBtn.addEventListener('click', () => {
+      if (deferredPrompt) {
+        deferredPrompt.prompt();
+        deferredPrompt.userChoice.then(() => {
+          deferredPrompt = null;
+          installBtn.classList.add('hidden');
+        });
+      }
+    });
+  }
   const undoBtn = document.getElementById('undoBtn');
   if (undoBtn) undoBtn.addEventListener('click', undoLastAction);
   const addBtn = document.getElementById('addSampleBtn');
