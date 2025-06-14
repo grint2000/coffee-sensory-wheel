@@ -5,9 +5,7 @@
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <title>Mollis SCA 커피 관능 평가 (개선버전)</title>
   <link rel="manifest" href="manifest.json">
- <link rel="매니페스트" href="manifest.json">
   <meta name="theme-color" content="#8B5A2B">
- <meta name = "테마 색상"콘텐츠 = "#8B5A2B">
   <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
   <link href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.5.2/css/all.min.css" rel="stylesheet">
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&display=swap" rel="stylesheet">
@@ -3972,9 +3970,7 @@ function setupEventHandlers() {
   });
   
   const cloneSampleBtn = document.getElementById('cloneSampleBtn');
-          <button class="px-2 py-1 bg-purple-100 hover:bg-purple-200 text-purple-700 rounded text-xs flex items-center mobile-touch-friendly" id="undoBtn"><i class="fa fa-undo mr-2"></i>실행취소</button>
   if (cloneSampleBtn) cloneSampleBtn.addEventListener('click', function() {
-          <button class="px-2 py-1 bg-purple-100 hover:bg-purple-200 text-purple-700 rounded text-xs flex items-center mobile-touch-friendly" id="undoBtn"><i class="fa fa-undo mr-2"></i>실행취소</button>
     if (!currentSampleId) return;
     cloneSample(currentSampleId);
   });
@@ -4197,7 +4193,7 @@ if (document.readyState !== 'loading') {
   runInit();
 } else {
   document.addEventListener('DOMContentLoaded', runInit);
-    if ('serviceWorker' in navigator) {
+  if ('serviceWorker' in navigator) {
     window.addEventListener('load', function() {
       navigator.serviceWorker.register('service-worker.js').catch(e => console.error('SW registration failed:', e));
     });
@@ -4215,6 +4211,6 @@ window.addEventListener('beforeunload', function(e) {
 });
 
 </script>
-  <script src="extras.js"></script>
+<script src="extras.js"></script>
 </body>
 </html>
