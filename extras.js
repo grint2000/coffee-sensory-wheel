@@ -1,6 +1,7 @@
 // Extra features: undo, login, service worker registration
 let undoStack = [];
-let currentUser = localStorage.getItem('mollis_sca_current_user') || 'default';
+window.currentUser = localStorage.getItem('mollis_sca_current_user') || 'default';
+let deferredPrompt;
 
 function pushUndoState() {
   if (window.samples) {
@@ -15,16 +16,24 @@ function undoLastAction() {
     return;
   }
   const state = undoStack.pop();
-  localStorage.setItem(`mollis_sca_samples2_${currentUser}`, state.samples);
+  localStorage.setItem(`mollis_sca_samples2_${window.currentUser}`, state.samples);
   location.reload();
 }
 
 function loginUser() {
-  const name = prompt('사용자 이름을 입력하세요', currentUser);
+  const name = prompt('사용자 이름을 입력하세요', window.currentUser);
   if (!name) return;
-  currentUser = name.trim();
-  localStorage.setItem('mollis_sca_current_user', currentUser);
+  window.currentUser = name.trim();
+  localStorage.setItem('mollis_sca_current_user', window.currentUser);
   location.reload();
+}
+
+function logoutUser() {
+  if (confirm('로그아웃하시겠습니까?')) {
+    window.currentUser = 'default';
+    localStorage.setItem('mollis_sca_current_user', window.currentUser);
+    location.reload();
+  }
 }
 
 if ('serviceWorker' in navigator) {
