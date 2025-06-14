@@ -20,3 +20,10 @@ The application runs entirely in the browser, so you can simply double-click `in
 ## Browser Compatibility
 
 The page is designed with responsive layouts and touch-friendly controls. It works in modern browsers on Windows, macOS, Android, and iOS. For the best experience, keep your browser up to date.
+
+## Customizing the Header Logo
+
+1. Replace the file `icons/header-logo.png` with your own image (recommended size around 192×192 pixels).
+2. Open `index.html` and reload the page. Your image will appear next to the **mollis** text at the top.
+
+This update applies both on desktop and mobile views and is cached for offline use by the PWA service worker.
