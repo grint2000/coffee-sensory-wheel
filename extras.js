@@ -56,18 +56,29 @@ document.addEventListener('DOMContentLoaded', () => {
   const installBtn = document.getElementById('installBtn');
   const display = document.getElementById('currentUserDisplay');
   if (display) display.textContent = window.currentUser;
-  if (loginBtn) loginBtn.addEventListener('click', loginUser);
-  if (logoutBtn) logoutBtn.addEventListener('click', logoutUser);
-  if (logoutBtn && window.currentUser !== 'default') {
-    logoutBtn.classList.remove('hidden');
+  if (loginBtn) {
+    loginBtn.addEventListener('click', loginUser);
+    if (window.currentUser !== 'default') {
+      loginBtn.classList.add('hidden');
+    }
+  }
+  if (logoutBtn) {
+    logoutBtn.addEventListener('click', logoutUser);
+    if (window.currentUser !== 'default') {
+      logoutBtn.classList.remove('hidden');
+    }
   }
   if (installBtn) {
+    const hideInstall = () => installBtn.classList.add('hidden');
+    if (window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone) {
+      hideInstall();
+    }
     installBtn.addEventListener('click', () => {
       if (deferredPrompt) {
         deferredPrompt.prompt();
         deferredPrompt.userChoice.then(() => {
           deferredPrompt = null;
-          installBtn.classList.add('hidden');
+          hideInstall();
         });
       }
     });
