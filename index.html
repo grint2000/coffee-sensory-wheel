@@ -2579,9 +2579,9 @@ function renderSelectedFlavorsArea(_data) {
     let attrMeta = ATTR_TO_BADGE[attrKey];
     let val = sampleData[attrKey];
     const attrLabel = currentLanguage === 'ko' ? attrMeta.label : attrMeta.labelEn;
-    const valLabel = val && ATTR_VALUE_LABELS[val] ? 
-      (currentLanguage === 'ko' ? ATTR_VALUE_LABELS[val].kr : ATTR_VALUE_LABELS[val].en) : 
-      '미선택';
+    const valLabel = val && ATTR_VALUE_LABELS[val] ?
+      (currentLanguage === 'ko' ? ATTR_VALUE_LABELS[val].kr : ATTR_VALUE_LABELS[val].en) :
+      (currentLanguage === 'ko' ? '미선택' : 'None');
     
     if (val) {
       html += `<span class="flavor-badge" style="background:${attrMeta.color};color:#fff;">
@@ -3655,9 +3655,9 @@ function exportSnsImage() {
           const attrMeta = ATTR_TO_BADGE[attrKey];
           const val = s[attrKey];
           const attrLabel = currentLanguage === 'ko' ? attrMeta.label : attrMeta.labelEn;
-          const valLabel = val && ATTR_VALUE_LABELS[val] ? 
-            (currentLanguage === 'ko' ? ATTR_VALUE_LABELS[val].kr : ATTR_VALUE_LABELS[val].en) : 
-            '미선택';
+          const valLabel = val && ATTR_VALUE_LABELS[val] ?
+            (currentLanguage === 'ko' ? ATTR_VALUE_LABELS[val].kr : ATTR_VALUE_LABELS[val].en) :
+            (currentLanguage === 'ko' ? '미선택' : 'None');
           
           if (val) {
             return `<span style="display: inline-block; padding: 4px 10px; border-radius: 12px; font-size: 12px; color: white; background: ${attrMeta.color}; font-weight: 500;">${attrLabel}: ${valLabel}</span>`;
