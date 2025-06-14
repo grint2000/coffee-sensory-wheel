@@ -3551,7 +3551,18 @@ function exportResultImage() {
   wrapper.innerHTML = `<h2 style="text-align:center;font-weight:bold;color:#8B5A2B;margin-bottom:16px;">${currentSample.title || currentSample.sampleData.coffeeName || '커핑 샘플'}</h2>`;
   const visual = document.querySelector('.visual-section-flex');
   if (visual) {
-    wrapper.appendChild(visual.cloneNode(true));
+    const clone = visual.cloneNode(true);
+    const origCanvas = visual.querySelector('#cuppingRadar');
+    const cloneCanvas = clone.querySelector('#cuppingRadar');
+    if (origCanvas && cloneCanvas) {
+      const img = document.createElement('img');
+      img.src = origCanvas.toDataURL('image/png');
+      img.style.maxWidth = '100%';
+      img.width = origCanvas.width;
+      img.height = origCanvas.height;
+      cloneCanvas.parentNode.replaceChild(img, cloneCanvas);
+    }
+    wrapper.appendChild(clone);
   }
 
   document.body.appendChild(wrapper);
