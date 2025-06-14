@@ -1,0 +1,11 @@
+{
+  "name": "Mollis Coffee Cupping",
+"name":"몰리스 커피 커핑",
+  "short_name": "Cupping",
+"short_name":"컵핑",
+  "start_url": "./index.html",
+  "display": "standalone",
+"display":"독립형",
+  "icons": []
+"아이콘":[]
+}
