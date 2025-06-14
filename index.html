@@ -3910,7 +3910,8 @@ function initApp() {
 // 이벤트 핸들러 설정
 function setupEventHandlers() {
   // 샘플 관리 버튼들
-  document.getElementById('addSampleBtn').addEventListener('click', function() {
+  const addSampleBtn = document.getElementById('addSampleBtn');
+  if (addSampleBtn) addSampleBtn.addEventListener('click', function() {
     if (currentSampleId) {
       saveCurrentSample();
     }
@@ -3922,9 +3923,10 @@ function setupEventHandlers() {
     setUIFromSample(newSample.sampleData);
     saveSamplesToStorage();
     showToast("새 샘플이 추가되었습니다.");
-  });
+  });␊
   
-  document.getElementById('removeSampleBtn').addEventListener('click', function() {
+  const removeSampleBtn = document.getElementById('removeSampleBtn');
+  if (removeSampleBtn) removeSampleBtn.addEventListener('click', function() {
     if (!currentSampleId) return;
     
     if (confirm("현재 샘플을 삭제하시겠습니까?")) {
@@ -3949,13 +3951,15 @@ function setupEventHandlers() {
     }
   });
   
-  document.getElementById('cloneSampleBtn').addEventListener('click', function() {
+  const cloneSampleBtn = document.getElementById('cloneSampleBtn');
+  if (cloneSampleBtn) cloneSampleBtn.addEventListener('click', function() {
     if (!currentSampleId) return;
     cloneSample(currentSampleId);
   });
   
   // 데이터 관리 버튼들
-  document.getElementById('saveSamplesBtn').addEventListener('click', function() {
+  const saveSamplesBtn = document.getElementById('saveSamplesBtn');
+  if (saveSamplesBtn) saveSamplesBtn.addEventListener('click', function() {
     if (currentSampleId) {
       saveCurrentSample();
     }
@@ -3963,7 +3967,8 @@ function setupEventHandlers() {
     showToast("모든 샘플이 웹 스토리지에 저장되었습니다.");
   });
   
-  document.getElementById('loadSamplesWebBtn').addEventListener('click', function() {
+  const loadSamplesWebBtn = document.getElementById('loadSamplesWebBtn');
+  if (loadSamplesWebBtn) loadSamplesWebBtn.addEventListener('click', function() {
     if (confirm("웹 스토리지에서 샘플을 불러오시겠습니까? 저장되지 않은 변경사항은 사라집니다.")) {
       loadSamplesFromStorage();
       if (samples.length > 0) {
@@ -3974,12 +3979,14 @@ function setupEventHandlers() {
     }
   });
   
-  document.getElementById('backupManageBtn').addEventListener('click', function() {
+  const backupManageBtn = document.getElementById('backupManageBtn');
+  if (backupManageBtn) backupManageBtn.addEventListener('click', function() {
     showBackupList();
   });
   
   // JSON 내보내기
-  document.getElementById('exportSamplesBtn').addEventListener('click', function() {
+  const exportSamplesBtn = document.getElementById('exportSamplesBtn');
+  if (exportSamplesBtn) exportSamplesBtn.addEventListener('click', function() {
     if (currentSampleId) {
       saveCurrentSample();
     }
@@ -4006,7 +4013,8 @@ function setupEventHandlers() {
   });
   
   // JSON 불러오기
-  document.getElementById('importSamplesInput').addEventListener('change', function(e) {
+  const importSamplesInput = document.getElementById('importSamplesInput');
+  if (importSamplesInput) importSamplesInput.addEventListener('change', function(e) {
     const file = e.target.files[0];
     if (!file) return;
     
@@ -4061,12 +4069,14 @@ function setupEventHandlers() {
   });
   
   // 계산 버튼
-  document.getElementById('calcScoreBtn').addEventListener('click', function() {
+  const calcScoreBtn = document.getElementById('calcScoreBtn');
+  if (calcScoreBtn) calcScoreBtn.addEventListener('click', function() {
     updateTotalScore();
   });
   
   // 변경 감지 이벤트들
-  document.getElementById('sampleTitleInput').addEventListener('input', scheduleAutoSave);
+  const sampleTitleInput = document.getElementById('sampleTitleInput');
+  if (sampleTitleInput) sampleTitleInput.addEventListener('input', scheduleAutoSave);
   
   document.querySelectorAll('.coffee-input').forEach(input => {
     input.addEventListener('input', scheduleAutoSave);
@@ -4080,18 +4090,24 @@ function setupEventHandlers() {
     });
   });
   
-  document.getElementById('tastingNotes').addEventListener('input', scheduleAutoSave);
+  const tastingNotes = document.getElementById('tastingNotes');
+  if (tastingNotes) tastingNotes.addEventListener('input', scheduleAutoSave);
   
   // 네비게이션 버튼
-  document.getElementById('prevSampleBtn').addEventListener('click', goToPrevSample);
-  document.getElementById('nextSampleBtn').addEventListener('click', goToNextSample);
+  const prevSampleBtn = document.getElementById('prevSampleBtn');
+  if (prevSampleBtn) prevSampleBtn.addEventListener('click', goToPrevSample);
+  const nextSampleBtn = document.getElementById('nextSampleBtn');
+  if (nextSampleBtn) nextSampleBtn.addEventListener('click', goToNextSample);
   
   // 언어 전환 버튼 개선
-  document.getElementById('langEn').addEventListener('click', () => switchLanguage('en'));
-  document.getElementById('langKo').addEventListener('click', () => switchLanguage('ko'));
+  const langEn = document.getElementById('langEn');
+  if (langEn) langEn.addEventListener('click', () => switchLanguage('en'));
+  const langKo = document.getElementById('langKo');
+  if (langKo) langKo.addEventListener('click', () => switchLanguage('ko'));
   
   // 비교 버튼들
-  document.getElementById('compareBtn').addEventListener('click', function() {
+  const compareBtn = document.getElementById('compareBtn');
+  if (compareBtn) compareBtn.addEventListener('click', function() {
     const selectedIds = Array.from(document.querySelectorAll('.compare-checkbox:checked'))
       .map(cb => cb.value);
     
@@ -4104,7 +4120,8 @@ function setupEventHandlers() {
     createComparisonChart(selectedSamples);
   });
     
-  document.getElementById('splitViewBtn').addEventListener('click', function() {
+  const splitViewBtn = document.getElementById('splitViewBtn');
+  if (splitViewBtn) splitViewBtn.addEventListener('click', function() {
     if (samples.length < 2) {
       showToast("비교를 위해 샘플이 2개 이상 필요합니다.");
       return;
@@ -4116,12 +4133,15 @@ function setupEventHandlers() {
   });
   
   // 모달 관련
-  document.getElementById('closeSplitViewBtn').addEventListener('click', function() {
+  const closeSplitViewBtn = document.getElementById('closeSplitViewBtn');
+  if (closeSplitViewBtn) closeSplitViewBtn.addEventListener('click', function() {
     document.getElementById('splitViewModal').classList.remove('show');
   });
-  
-  document.getElementById('leftSampleSelect').addEventListener('change', updateSplitView);
-  document.getElementById('rightSampleSelect').addEventListener('change', updateSplitView);
+
+  const leftSampleSelect = document.getElementById('leftSampleSelect');
+  if (leftSampleSelect) leftSampleSelect.addEventListener('change', updateSplitView);
+  const rightSampleSelect = document.getElementById('rightSampleSelect');
+  if (rightSampleSelect) rightSampleSelect.addEventListener('change', updateSplitView);
   
   // 모달 배경 클릭으로 닫기
   document.addEventListener('click', function(e) {
@@ -4131,22 +4151,31 @@ function setupEventHandlers() {
   });
   
   // 내보내기 버튼들 (기존 코드 유지 - 생략하여 길이 단축)
-  document.getElementById('exportImgBtn').addEventListener('click', exportResultImage);
-  
-  document.getElementById('exportSnsImgBtn').addEventListener('click', exportSnsImage);
-  
-  document.getElementById('exportXlsxBtn').addEventListener('click', exportToExcel);
+  const exportImgBtn = document.getElementById('exportImgBtn');
+  if (exportImgBtn) exportImgBtn.addEventListener('click', exportResultImage);
+
+  const exportSnsImgBtn = document.getElementById('exportSnsImgBtn');
+  if (exportSnsImgBtn) exportSnsImgBtn.addEventListener('click', exportSnsImage);
+
+  const exportXlsxBtn = document.getElementById('exportXlsxBtn');
+  if (exportXlsxBtn) exportXlsxBtn.addEventListener('click', exportToExcel);
   
   console.log("모든 이벤트 핸들러 설정 완료");
 }
 
-// DOM이 준비되면 앱 초기화
-document.addEventListener('DOMContentLoaded', function() {
+// DOM 준비 상태 확인 후 앱 초기화
+function runInit() {
   initApp();
   setupEventHandlers();
   setupAutoBackup();
   optimizePerformance();
-});
+}
+
+if (document.readyState !== 'loading') {
+  runInit();
+} else {
+  document.addEventListener('DOMContentLoaded', runInit);
+}
 
 // 페이지 종료 시 정리 작업 
 window.addEventListener('beforeunload', function(e) {
