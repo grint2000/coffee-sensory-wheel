@@ -12,18 +12,12 @@ const urlsToCache = [
   'https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js'
 ];
 self.addEventListener('install', event => {
-자기addEventListener('설치', 이벤트 => {
   event.waitUntil(
- 이벤트.waitUntil(
     caches.open(CACHE_NAME).then(cache => cache.addAll(urlsToCache))
- 캐시.open(CACHE_NAME)입니다.then(cache => 캐시.addAll(urlsToCache))를 사용합니다.
   );
 });
 self.addEventListener('fetch', event => {
-자기addEventListener('가져오기', 이벤트 => {
   event.respondWith(
- 이벤트.응답With(
     caches.match(event.request).then(resp => resp || fetch(event.request))
- 캐시.match(이벤트.요청).then(resp => resp || fetch(이벤트.요청))
   );
 });
