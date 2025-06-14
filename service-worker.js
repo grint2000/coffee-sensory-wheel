@@ -1,7 +1,8 @@
-const CACHE_NAME = 'mollis-sca-v1';
+const CACHE_NAME = 'mollis-sca-v2';
 const urlsToCache = [
   './',
   './index.html',
+  './offline.html',
   './manifest.json',
   './extras.js',
   './icons/icon-192.png',
@@ -31,6 +32,8 @@ self.addEventListener('activate', event => {
 });
 self.addEventListener('fetch', event => {
   event.respondWith(
-    caches.match(event.request).then(resp => resp || fetch(event.request))
+        caches.match(event.request).then(resp => {
+      return resp || fetch(event.request).catch(() => caches.match('./offline.html'));
+    })
   );
 });
