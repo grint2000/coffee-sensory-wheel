@@ -2178,7 +2178,7 @@ function renderFlavorPhase() {
     });
   });
   
-  let html = `␊
+  let html = `
     <div class="search-box mb-3">
       <input type="text" id="flavorSearchInput" class="search-input" 
         placeholder="${currentLanguage === 'ko' ? '향미 검색 (베리, 초콜릿, 꽃향, 초성: ㅂㄹ, ㅊㅋㄹ 등...)' : 'Search flavors (berry, chocolate, floral, etc...)'}">
@@ -3923,7 +3923,7 @@ function setupEventHandlers() {
     setUIFromSample(newSample.sampleData);
     saveSamplesToStorage();
     showToast("새 샘플이 추가되었습니다.");
-  });␊
+  });
   
   const removeSampleBtn = document.getElementById('removeSampleBtn');
   if (removeSampleBtn) removeSampleBtn.addEventListener('click', function() {
