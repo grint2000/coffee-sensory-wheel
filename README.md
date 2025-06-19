@@ -15,7 +15,7 @@ The application runs entirely in the browser, so you can simply double-click `in
 
 - **Sample Management** – Add, clone, and remove cupping samples. Data is automatically saved locally and can be exported or restored using JSON files.
 - **Comparison Tools** – Select two or more samples to generate charts comparing SCA scores, flavor notes, and defects.
-- **Export Options** – Save your results as images, SNS-ready images, Excel spreadsheets, or JSON files for backup and sharing.
+- **Export Options** – Save your results as images, SNS-ready images, Excel spreadsheets, or JSON files for backup and sharing. The exported images now include the coffee's origin, processing method, roast date, and roast level so you have full context when sharing.
 
 ## Browser Compatibility
 
