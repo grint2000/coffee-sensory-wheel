@@ -35,3 +35,10 @@ Click the **로그인** button at the top of the page to set a user name. Data i
 2. Open `index.html` and reload the page. Your image will appear next to the **mollis** text at the top.
 
 This update applies both on desktop and mobile views and is cached for offline use by the PWA service worker.
+
+### Exporting Images
+
+1. Fill in the sample details including **원산지**, **가공 방식**, **로스팅 날짜**, and **로스팅 정도**.
+2. Click **이미지로 내보내기** to download a full report with the radar chart and tasting notes.
+3. Click **SNS형 이미지** for a compact version that is easy to share on social networks.
+4. Both image types will display the coffee's origin and roasting information in the header.
