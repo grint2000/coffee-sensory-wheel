@@ -660,6 +660,29 @@
       border-radius: 4px;
       font-size: 14px;
     }
+
+    /* Dark mode styles */
+    body.dark {
+      background-color: #1f2937;
+      color: #f3f4f6;
+    }
+    body.dark header {
+      background-color: #374151;
+    }
+    body.dark .bg-white {
+      background-color: #4b5563 !important;
+    }
+    body.dark .text-gray-500,
+    body.dark .text-gray-600 {
+      color: #d1d5db !important;
+    }
+    body.dark input,
+    body.dark textarea,
+    body.dark select {
+      background-color: #1f2937;
+      color: #f3f4f6;
+      border-color: #4b5563;
+    }
   </style>
 </head>
 <body class="min-h-screen bg-[#fcfaf7]">
@@ -678,6 +701,7 @@
       <button id="loginBtn" class="px-2 py-1 bg-gray-200 hover:bg-gray-300 rounded text-xs">로그인</button>
       <button id="logoutBtn" class="ml-2 px-2 py-1 bg-gray-200 hover:bg-gray-300 rounded text-xs hidden">로그아웃</button>
       <button id="installBtn" class="ml-2 px-2 py-1 bg-gray-200 hover:bg-gray-300 rounded text-xs hidden">앱설치</button>
+      <button id="themeToggle" class="ml-2 px-2 py-1 bg-gray-200 hover:bg-gray-300 rounded text-xs" aria-label="테마 전환"><i id="themeToggleIcon" class="fa fa-moon"></i></button>
       <span id="currentUserDisplay" class="ml-2 text-sm text-gray-600"></span>
     </div>
   </header>
@@ -4232,5 +4256,6 @@ window.addEventListener('beforeunload', function(e) {
 
 </script>
 <script src="extras.js"></script>
+<script src="theme.js"></script>
 </body>
 </html>
