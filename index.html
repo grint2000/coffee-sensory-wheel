@@ -166,7 +166,7 @@
     .no-scrollbar {-ms-overflow-style: none; scrollbar-width: none;}
     .html2canvas-container { box-shadow: 0 0 0 3px #eee; }
     .score-slider { width: 100%; }
-    .sample-list-scroll {max-height: 190px; overflow-y: auto;}
+    .sample-list-scroll {max-height: 190px; overflow-y: auto; -webkit-overflow-scrolling: touch;}
     .compare-table th, .compare-table td {border:1px solid #e2e2e2; padding:6px 8px; font-size:14px;}
     .compare-table th {background: #f9f3ea;}
     .compare-table tr:nth-child(even) td {background: #f8f6f4;}
@@ -262,7 +262,7 @@
       cursor: grab;
       transition: background-color 0.2s;
       user-select: none;
-      touch-action: none;
+      touch-action: manipulation;
     }
     .sample-item:active {
       cursor: grabbing;
@@ -1121,6 +1121,7 @@
 // 확장된 향미 데이터 - 첨부된 커피 플레이버 휠 참고하여 대폭 확장
 const FLAVOR_DATA = [
   // Fruity - Citrus Fruit (감귤류 확장)
+  ["Fruity","Citrus Fruit","Citrus","#FFEBCD","과일류","감귤류","시트러스"],
   ["Fruity","Citrus Fruit","Lemon","#FFEB88","과일류","감귤류","레몬"],
   ["Fruity","Citrus Fruit","Orange","#FFC300","과일류","감귤류","오렌지"],
   ["Fruity","Citrus Fruit","Grapefruit","#FF9970","과일류","감귤류","자몽"],
@@ -1174,6 +1175,7 @@ const FLAVOR_DATA = [
   ["Fruity","Berry","Gooseberry","#9ACD32","과일류","베리류","구스베리"],
   
   // Fruity - Stone Fruit (핵과류 확장)
+  ["Fruity","Stone Fruit","Stone Fruit","#FFC0A0","과일류","핵과류","스톤프룻"],
   ["Fruity","Stone Fruit","Peach","#FFA07A","과일류","핵과류","복숭아"],
   ["Fruity","Stone Fruit","White Peach","#FFDAB9","과일류","핵과류","백도"],
   ["Fruity","Stone Fruit","Yellow Peach","#FFCC5C","과일류","핵과류","황도"],
@@ -1193,6 +1195,7 @@ const FLAVOR_DATA = [
   ["Fruity","Stone Fruit","Loquat","#F6AD49","과일류","핵과류","비파"],
   
   // Fruity - Tropical Fruit (열대과일 확장)
+  ["Fruity","Tropical Fruit","Tropical Fruit","#FBD784","과일류","열대과일","트로피프룻"],
   ["Fruity","Tropical Fruit","Pineapple","#FEDF00","과일류","열대과일","파인애플"],
   ["Fruity","Tropical Fruit","Fresh Pineapple","#FFD700","과일류","열대과일","신선한 파인애플"],
   ["Fruity","Tropical Fruit","Grilled Pineapple","#DAA520","과일류","열대과일","구운 파인애플"],
@@ -1267,6 +1270,7 @@ const FLAVOR_DATA = [
   ["Sweet","Confectionery","Cotton Candy","#FFB6C1","단맛","과자류","솜사탕"],
   
   // Floral (꽃향 확장)
+  ["Floral","General Flowers","Flower","#FFF0F0","꽃향","꽃","꽃"],
   ["Floral","White Flowers","White Flower","#FFFFFF","꽃향","흰꽃","흰꽃"],
   ["Floral","White Flowers","Jasmine","#DEC2CB","꽃향","흰꽃","자스민"],
   ["Floral","White Flowers","Orange Blossom","#FFCC99","꽃향","흰꽃","오렌지꽃"],
@@ -1379,6 +1383,7 @@ const FLAVOR_DATA = [
   ["Tea","Herbal Tea","Rooibos","#D2691E","차","허브차","루이보스"],
   ["Tea","Herbal Tea","Hibiscus Tea","#CA3433","차","허브차","히비스커스차"],
   ["Tea","Herbal Tea","Lemongrass","#9DC183","차","허브차","레몬그라스"],
+  ["Tea","Herbal Tea","Lemon Verbena","#E3FFB5","차","허브차","레몬버베지"],
   ["Tea","Herbal Tea","Chrysanthemum","#FFD700","차","허브차","국화차"],
   ["Tea","Herbal Tea","Mint Tea","#98FB98","차","허브차","민트차"],
   ["Tea","Puer","Aged Puer","#70593E","차","푸얼차","숙성 보이차"],
@@ -1956,30 +1961,35 @@ function getCheckedRadio(name) {
 // 향미 카테고리 필터링
 function filterByCategory(category) {
   currentFlavorCategory = currentFlavorCategory === category ? null : category;
-  
+
   document.querySelectorAll('.flavor-category-tab').forEach(tab => {
     tab.classList.toggle('active', tab.dataset.category === currentFlavorCategory);
   });
-  
+
   const allCategories = document.querySelectorAll('.flavor-category-accordion');
-  
+
   if (currentFlavorCategory) {
     allCategories.forEach(cat => {
+      const content = cat.querySelector('.flavor-category-content');
+      const icon = cat.querySelector('.accordion-icon');
+
       if (cat.dataset.category === currentFlavorCategory) {
         cat.classList.remove('flavor-fix-hidden');
-        const content = cat.querySelector('.flavor-category-content');
-        if (content) {
-          content.classList.add('show');
-          const icon = content.previousElementSibling.querySelector('.accordion-icon');
-          if (icon) icon.innerHTML = '<i class="fas fa-chevron-up"></i>';
-        }
+        if (content) content.classList.add('show');
+        if (icon) icon.innerHTML = '<i class="fas fa-chevron-up"></i>';
       } else {
         cat.classList.add('flavor-fix-hidden');
+        if (content) content.classList.remove('show');
+        if (icon) icon.innerHTML = '<i class="fas fa-chevron-down"></i>';
       }
     });
   } else {
     allCategories.forEach(cat => {
       cat.classList.remove('flavor-fix-hidden');
+      const content = cat.querySelector('.flavor-category-content');
+      const icon = cat.querySelector('.accordion-icon');
+      if (content) content.classList.remove('show');
+      if (icon) icon.innerHTML = '<i class="fas fa-chevron-down"></i>';
     });
   }
 }
@@ -2263,16 +2273,17 @@ function renderFlavorPhase() {
   Object.keys(flavorsByCategory).forEach(categoryName => {
     const flavors = flavorsByCategory[categoryName];
     if (!flavors || flavors.length === 0) return;
-    
-    const isHidden = currentFlavorCategory && currentFlavorCategory !== categoryName;
-    
+
+    const isFilteredOut = currentFlavorCategory && currentFlavorCategory !== categoryName;
+    const isOpen = currentFlavorCategory ? currentFlavorCategory === categoryName : false;
+
     html += `
-      <div class="flavor-category-accordion mb-3 ${isHidden ? 'flavor-fix-hidden' : ''}" data-category="${categoryName}">
+      <div class="flavor-category-accordion mb-3 ${isFilteredOut ? 'flavor-fix-hidden' : ''}" data-category="${categoryName}">
         <div class="flavor-category-header" onclick="toggleAccordion(this)">
           <h4>${categoryName}</h4>
-          <span class="accordion-icon"><i class="fas fa-chevron-${isHidden ? 'down' : 'up'}"></i></span>
+          <span class="accordion-icon"><i class="fas fa-chevron-${isOpen ? 'up' : 'down'}"></i></span>
         </div>
-        <div class="flavor-category-content ${isHidden ? '' : 'show'}">
+        <div class="flavor-category-content ${isOpen ? 'show' : ''}">
     `;
     
     // 서브카테고리별로 그룹화
