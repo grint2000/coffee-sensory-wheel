@@ -23,7 +23,7 @@ The page is designed with responsive layouts and touch-friendly controls. It wor
 
 ## Dark Mode
 
-Click the moon icon in the header to switch between light and dark themes. Your choice is saved in the browser so the page remembers your preference the next time you open it. Both themes work on desktop and mobile screens.
+Click the moon icon in the header to switch between light and dark themes. Your choice is saved in the browser so the page remembers your preference the next time you open it. The dark theme now automatically adjusts text colors for better readability on any screen. Both themes work on desktop and mobile devices.
 
 ## Offline and PWA Installation
 
