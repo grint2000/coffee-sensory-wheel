@@ -3455,6 +3455,11 @@ function exportSnsImage() {
   <div style="text-align: center; margin-bottom: 30px;">
     <h2 style="margin: 0; font-size: 24px; font-weight: bold; color: #8B5A2B;">${s.title || s.coffeeName || '커피 테이스팅'}</h2>
     ${s.coffeeName && s.title !== s.coffeeName ? `<div style="font-size: 16px; color: #666; margin-top: 5px;">${s.coffeeName}</div>` : ''}
+    <div style="font-size: 14px; color: #555; margin-top: 10px; line-height: 1.4;">
+      <div>원산지: ${s.origin || '-'}</div>
+      <div>가공법: ${s.process || '-'}</div>
+      <div>로스팅: ${s.roastDate || '-'} / ${s.roastLevel || '-'}</div>
+    </div>
   </div>
   
   <div style="border: 1px solid #e5e5e5; border-radius: 8px; padding: 25px;">
@@ -3570,7 +3575,12 @@ function exportResultImage() {
 
   const wrapper = document.createElement('div');
   wrapper.style.cssText = 'background:white;padding:20px;position:absolute;left:-9999px;top:0;font-family:\'Noto Sans KR\',sans-serif;';
-  wrapper.innerHTML = `<h2 style="text-align:center;font-weight:bold;color:#8B5A2B;margin-bottom:16px;">${currentSample.title || currentSample.sampleData.coffeeName || '커핑 샘플'}</h2>`;
+  wrapper.innerHTML = `<h2 style="text-align:center;font-weight:bold;color:#8B5A2B;margin-bottom:8px;">${currentSample.title || currentSample.sampleData.coffeeName || '커핑 샘플'}</h2>
+  <div style="text-align:center;font-size:14px;color:#555;margin-bottom:16px;line-height:1.4;">
+    <div>원산지: ${currentSample.sampleData.origin || '-'}</div>
+    <div>가공법: ${currentSample.sampleData.process || '-'}</div>
+    <div>로스팅: ${currentSample.sampleData.roastDate || '-'} / ${currentSample.sampleData.roastLevel || '-'}</div>
+  </div>`;
   const visual = document.querySelector('.visual-section-flex');
   if (visual) {
     const clone = visual.cloneNode(true);
