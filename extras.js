@@ -41,6 +41,7 @@ function logoutUser() {
   if (confirm('로그아웃하시겠습니까?')) {
     window.currentUser = 'default';
     localStorage.setItem('mollis_sca_current_user', window.currentUser);
+    localStorage.removeItem('mollis_sca_current_team');
     location.reload();
   }
 }
