@@ -1178,6 +1178,7 @@
       <div id="currentTeamInfo" class="mb-2 text-sm">
         <p>현재 팀: <span id="currentTeamDisplay" class="font-semibold"></span></p>
         <ul id="teamMembersList" class="list-disc pl-5 mt-1 text-xs text-gray-700"></ul>
+        <button id="teamReportBtn" class="mt-2 bg-purple-600 hover:bg-purple-700 text-white px-3 py-1 rounded mobile-touch-friendly">팀 결과 보기</button>
       </div>
       <p class="text-xs text-gray-500">Google 계정으로 로그인 후 사용하세요.</p>
     </div>
@@ -1186,6 +1187,18 @@
 
 <div id="toast" class="toast"></div>
 <div id="sampleToast" class="sample-toast"></div>
+<!-- 팀 결과 모달 -->
+<div id="teamReportModal" class="modal">
+  <div class="modal-content max-w-2xl">
+    <div class="modal-header">
+      <h3 class="font-bold text-lg">팀 평가 결과</h3>
+      <button id="closeTeamReportModal" class="text-gray-500 hover:text-gray-700 mobile-touch-friendly">
+        <i class="fas fa-times text-xl"></i>
+      </button>
+    </div>
+    <div id="teamReportBody" class="modal-body overflow-y-auto" style="max-height:60vh;"></div>
+  </div>
+</div>
 
 <script>
 /* === 1단계: 기본 데이터 구조 및 상수 정의 === */
@@ -4309,6 +4322,14 @@ function setupEventHandlers() {
   if (joinTeamBtn) joinTeamBtn.addEventListener('click', function() {
     const name = document.getElementById('teamNameInput').value.trim();
     if (name) joinTeam(name);
+  });
+  const teamReportBtn = document.getElementById('teamReportBtn');
+  if (teamReportBtn) teamReportBtn.addEventListener('click', function() {
+    if (typeof showTeamReport === 'function') showTeamReport();
+  });
+  const closeTeamReportModal = document.getElementById('closeTeamReportModal');
+  if (closeTeamReportModal) closeTeamReportModal.addEventListener('click', function() {
+    document.getElementById('teamReportModal').classList.remove('show');
   });
 
   const leftSampleSelect = document.getElementById('leftSampleSelect');
