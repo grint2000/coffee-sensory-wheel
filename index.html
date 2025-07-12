@@ -1051,15 +1051,10 @@
     <section class="mt-10">
       <h3 class="text-base font-bold mb-2 border-b pb-1 border-tan-200 flex items-center"><i class="fa fa-star mr-2"></i>SCA 점수 (0~10점, 0.25단위)</h3>
       <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-2 score-input-wrap">
-        <div>
-          <label class="block text-sm mb-1 tooltip">프래그런스<span class="tooltip-text">분쇄한 분말 시 느껴지는 향</span></label>
-          <input type="range" min="0" max="10" step="0.25" value="7" id="scoreFragrance_slider" class="score-slider mb-1">
-          <input type="number" step="0.25" min="0" max="10" id="scoreFragrance" class="coffee-input w-full p-1.5 text-center border rounded" value="7">
-        </div>
-        <div>
-          <label class="block text-sm mb-1 tooltip">아로마<span class="tooltip-text">물 부은 후 느껴지는 향</span></label>
-          <input type="range" min="0" max="10" step="0.25" value="7" id="scoreAroma_slider" class="score-slider mb-1">
-          <input type="number" step="0.25" min="0" max="10" id="scoreAroma" class="coffee-input w-full p-1.5 text-center border rounded" value="7">
+       <div>
+          <label class="block text-sm mb-1 tooltip">프래그런스/아로마<span class="tooltip-text">분쇄한 분말과 물을 부은 후 느껴지는 향</span></label>
+          <input type="range" min="0" max="10" step="0.25" value="7" id="scoreFragranceAroma_slider" class="score-slider mb-1">
+          <input type="number" step="0.25" min="0" max="10" id="scoreFragranceAroma" class="coffee-input w-full p-1.5 text-center border rounded" value="7">
         </div>
         <div>
           <label class="block text-sm mb-1 tooltip">플레이버<span class="tooltip-text">혀로 느껴지는 커피의 전반적 맛 특성</span></label>
@@ -1907,7 +1902,7 @@ function getEmptySampleData() {
     flavorSelections, acidityLevel: "", sweetnessLevel: "", bodyLevel: "",
     bodyDescriptors: [], // 바디감 디스크립터 추가
     defectUnderdevelopment: "none", defectOverdevelopment: "none", defectBaked: "none", defectScorching: "none",
-    scoreFragrance: 7, scoreAroma: 7, scoreFlavor: 7, scoreAftertaste: 7, scoreAcidity: 7, scoreBody: 7, scoreBalance: 7, scoreOverall: 7,
+    scoreFragranceAroma: 7, scoreFlavor: 7, scoreAftertaste: 7, scoreAcidity: 7, scoreBody: 7, scoreBalance: 7, scoreOverall: 7,
     tastingNotes: "", lastEdit: +(new Date())
   };
 }
@@ -2669,12 +2664,11 @@ function updateRadar(data) {
   if (!sampleData) return;
 
   const chartData = {
-    labels: ['프래그런스', '아로마', '플레이버', '에프터테이스트', '액시디티', '바디', '밸런스', '오버럴'],
+    labels: ['프래그런스/아로마', '플레이버', '에프터테이스트', '액시디티', '바디', '밸런스', '오버럴'],
     datasets: [{
       label: '점수',
       data: [
-        sampleData.scoreFragrance || 0,
-        sampleData.scoreAroma || 0,
+        sampleData.scoreFragranceAroma || 0,
         sampleData.scoreFlavor || 0,
         sampleData.scoreAftertaste || 0,
         sampleData.scoreAcidity || 0,
@@ -2738,7 +2732,7 @@ function updateTotalScore(data) {
   }
   
   const scoreFields = [
-    'scoreFragrance', 'scoreAroma', 'scoreFlavor', 'scoreAftertaste', 
+    'scoreFragranceAroma', 'scoreFlavor', 'scoreAftertaste',
     'scoreAcidity', 'scoreBody', 'scoreBalance', 'scoreOverall'
   ];
   
@@ -2815,9 +2809,9 @@ function setUIFromSample(sampleData) {
   
   // SCA 점수 설정
   [
-    ["scoreFragrance", "scoreFragrance"], ["scoreAroma", "scoreAroma"], 
+    ["scoreFragranceAroma", "scoreFragranceAroma"],
     ["scoreFlavor", "scoreFlavor"], ["scoreAftertaste", "scoreAftertaste"],
-    ["scoreAcidity", "scoreAcidity"], ["scoreBody", "scoreBody"], 
+    ["scoreAcidity", "scoreAcidity"], ["scoreBody", "scoreBody"],
     ["scoreBalance", "scoreBalance"], ["scoreOverall", "scoreOverall"]
   ].forEach(([key, id]) => {
     document.getElementById(id).value = sampleData[key] || 7;
@@ -2856,8 +2850,7 @@ function saveUIToSample(targetDataObj) {
     sampleData[d.key] = getCheckedRadio(d.key) || "none";
   });
   
-  sampleData.scoreFragrance = parseFloat(document.getElementById('scoreFragrance').value) || 0;
-  sampleData.scoreAroma = parseFloat(document.getElementById('scoreAroma').value) || 0;
+  sampleData.scoreFragranceAroma = parseFloat(document.getElementById('scoreFragranceAroma').value) || 0;
   sampleData.scoreFlavor = parseFloat(document.getElementById('scoreFlavor').value) || 0;
   sampleData.scoreAftertaste = parseFloat(document.getElementById('scoreAftertaste').value) || 0;
   sampleData.scoreAcidity = parseFloat(document.getElementById('scoreAcidity').value) || 0;
@@ -3248,8 +3241,7 @@ function createComparisonChart(selectedSamples) {
   html += `</tr></thead><tbody>`;
   
   const scoreFields = [
-    { key: 'scoreFragrance', label: '프래그런스' },
-    { key: 'scoreAroma', label: '아로마' },
+    { key: 'scoreFragranceAroma', label: '프래그런스/아로마' },
     { key: 'scoreFlavor', label: '플레이버' },
     { key: 'scoreAftertaste', label: '에프터테이스트' },
     { key: 'scoreAcidity', label: '액시디티' },
@@ -3296,7 +3288,7 @@ function createComparisonChart(selectedSamples) {
   if (!ctx) return;
   
   const chartData = {
-    labels: ['프래그런스', '아로마', '플레이버', '에프터테이스트', '액시디티', '바디', '밸런스', '오버럴'],
+    labels: ['프래그런스/아로마', '플레이버', '에프터테이스트', '액시디티', '바디', '밸런스', '오버럴'],
     datasets: []
   };
   
@@ -3315,8 +3307,7 @@ function createComparisonChart(selectedSamples) {
     chartData.datasets.push({
       label: sample.title || '샘플',
       data: [
-        parseFloat(sample.sampleData.scoreFragrance || 0),
-        parseFloat(sample.sampleData.scoreAroma || 0),
+        parseFloat(sample.sampleData.scoreFragranceAroma || 0),
         parseFloat(sample.sampleData.scoreFlavor || 0),
         parseFloat(sample.sampleData.scoreAftertaste || 0),
         parseFloat(sample.sampleData.scoreAcidity || 0),
@@ -3423,8 +3414,7 @@ function createSampleSummary(sample) {
     
     <h4 class="font-bold mt-4 mb-2">SCA 점수</h4>
     <div class="grid grid-cols-2 gap-2">
-      <div><span class="font-semibold">프래그런스:</span> ${parseFloat(sampleData.scoreFragrance || 0).toFixed(2)}</div>
-      <div><span class="font-semibold">아로마:</span> ${parseFloat(sampleData.scoreAroma || 0).toFixed(2)}</div>
+      <div><span class="font-semibold">프래그런스/아로마:</span> ${parseFloat(sampleData.scoreFragranceAroma || 0).toFixed(2)}</div>
       <div><span class="font-semibold">플레이버:</span> ${parseFloat(sampleData.scoreFlavor || 0).toFixed(2)}</div>
       <div><span class="font-semibold">에프터테이스트:</span> ${parseFloat(sampleData.scoreAftertaste || 0).toFixed(2)}</div>
       <div><span class="font-semibold">액시디티:</span> ${parseFloat(sampleData.scoreAcidity || 0).toFixed(2)}</div>
@@ -3435,13 +3425,12 @@ function createSampleSummary(sample) {
     
   <div class="mt-2">
       <span class="font-bold">총점: </span>
-      ${(30 + parseFloat(sampleData.scoreFragrance || 0) + 
-          parseFloat(sampleData.scoreAroma || 0) + 
-          parseFloat(sampleData.scoreFlavor || 0) + 
-          parseFloat(sampleData.scoreAftertaste || 0) + 
-          parseFloat(sampleData.scoreAcidity || 0) + 
-          parseFloat(sampleData.scoreBody || 0) + 
-          parseFloat(sampleData.scoreBalance || 0) + 
+      ${(30 + parseFloat(sampleData.scoreFragranceAroma || 0) +
+          parseFloat(sampleData.scoreFlavor || 0) +
+          parseFloat(sampleData.scoreAftertaste || 0) +
+          parseFloat(sampleData.scoreAcidity || 0) +
+          parseFloat(sampleData.scoreBody || 0) +
+          parseFloat(sampleData.scoreBalance || 0) +
           parseFloat(sampleData.scoreOverall || 0)).toFixed(2)}
     </div>
   `;
@@ -3730,7 +3719,7 @@ function validateSampleData(sampleData) {
     }
     
     // 점수 필드 검증
-    const scoreFields = ['scoreFragrance', 'scoreAroma', 'scoreFlavor', 'scoreAftertaste', 
+    const scoreFields = ['scoreFragranceAroma', 'scoreFlavor', 'scoreAftertaste',
                         'scoreAcidity', 'scoreBody', 'scoreBalance', 'scoreOverall'];
     scoreFields.forEach(field => {
       if (typeof sampleData[field] !== 'number' || isNaN(sampleData[field])) {
