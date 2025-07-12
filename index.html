@@ -730,6 +730,7 @@
       <button id="installBtn" class="ml-2 px-2 py-1 bg-gray-200 hover:bg-gray-300 rounded text-xs hidden">앱설치</button>
       <button id="themeToggle" class="ml-2 px-2 py-1 bg-gray-200 hover:bg-gray-300 rounded text-xs" aria-label="테마 전환"><i id="themeToggleIcon" class="fa fa-moon"></i></button>
       <span id="currentUserDisplay" class="ml-2 text-sm text-gray-600"></span>
+      <span id="currentTeamHeader" class="ml-2 text-sm text-blue-600"></span>
     </div>
   </header>
   
@@ -1173,6 +1174,10 @@
       <div class="flex gap-2 mb-2">
         <button id="createTeamBtn" class="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 rounded mobile-touch-friendly">팀 만들기</button>
         <button id="joinTeamBtn" class="bg-green-600 hover:bg-green-700 text-white px-3 py-1 rounded mobile-touch-friendly">팀 참가</button>
+      </div>
+      <div id="currentTeamInfo" class="mb-2 text-sm">
+        <p>현재 팀: <span id="currentTeamDisplay" class="font-semibold"></span></p>
+        <ul id="teamMembersList" class="list-disc pl-5 mt-1 text-xs text-gray-700"></ul>
       </div>
       <p class="text-xs text-gray-500">Google 계정으로 로그인 후 사용하세요.</p>
     </div>
@@ -3973,13 +3978,13 @@ function optimizePerformance() {
   window.addEventListener('resize', function() {
     clearTimeout(resizeTimeout);
     resizeTimeout = setTimeout(() => {
-      // 차트 리사이즈
-      if (flavorProfileChart) {
+      // 차트 리사이즈 - DOM에 연결된 경우에만 수행
+      if (flavorProfileChart && flavorProfileChart.canvas && flavorProfileChart.canvas.ownerDocument) {
         flavorProfileChart.resize();
       }
-      
+
       Object.values(chartObjects).forEach(chart => {
-        if (chart && typeof chart.resize === 'function') {
+        if (chart && typeof chart.resize === 'function' && chart.canvas && chart.canvas.ownerDocument) {
           chart.resize();
         }
       });
@@ -4282,6 +4287,9 @@ function setupEventHandlers() {
 
   const teamBtn = document.getElementById('teamBtn');
   if (teamBtn) teamBtn.addEventListener('click', function() {
+    if (typeof loadTeamInfoToModal === 'function') {
+      loadTeamInfoToModal();
+    }
     document.getElementById('teamModal').classList.add('show');
   });
   const closeTeamModal = document.getElementById('closeTeamModal');
