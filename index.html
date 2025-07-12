@@ -3104,6 +3104,9 @@ function saveSamplesToStorage() {
   try {
     let key = `mollis_sca_samples2_${window.currentUser || 'default'}`;
     localStorage.setItem(key, JSON.stringify(samples));
+    if (typeof syncSamplesToTeam === 'function') {
+      try { syncSamplesToTeam(samples); } catch(e) { console.error(e); }
+    }
     const saveState = document.getElementById('sampleSavedState');
     if (saveState) {
       saveState.classList.remove("hidden");
