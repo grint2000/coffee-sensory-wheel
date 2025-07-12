@@ -35,7 +35,9 @@ Click the **로그인** button at the top of the page to set a user name. Data i
 
 ## Team Features
 
-To collaborate with others, click **팀관리** and sign in with a Google account. You can create a new team or join an existing one. The team owner can manage members and shared cupping samples in Firestore. Offline mode remains available, so you can still use the app without logging in.
+To collaborate with others, click **팀관리** and sign in with a Google account. You can create a new team or join an existing one. Once a team is selected the name appears in the header so you always know which team you belong to.
+
+When the team owner (or any member) adds or edits samples, the changes are saved to Firestore and automatically synced to everyone in the team. If you are online you will see new samples appear instantly. Offline mode still works, and any changes will sync the next time you connect.
 
 ## Customizing the Header Logo
 
