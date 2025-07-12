@@ -956,6 +956,7 @@
         <span data-i18n="body-descriptor-desc">커피의 질감, 밀도, 무게감을 표현하는 세부 특성을 선택하세요 (복수 선택 가능)</span>
       </div>
       <div class="body-descriptor-section">
+        <div id="bodyCategoryTabs" class="flex flex-wrap gap-2 mb-2"></div>
         <div id="bodyDescriptorArea" class="body-descriptor-grid">
           <!-- 바디감 디스크립터들이 JavaScript로 동적 생성됩니다 -->
         </div>
@@ -1805,8 +1806,9 @@ let currentLanguage = 'ko'; // 언어 기본값을 한국어로 설정
 let chartObjects = {};
 let currentFlavorCategory = null;
 let currentFlavorPhase = "fragrance";
+let currentBodyCategory = BODY_DESCRIPTOR_CATEGORIES[0].key;
 let lastErrorCount = 0;
-
+  
 // 향미 휠 아코디언 토글 함수
 function toggleAccordion(header) {
   if (!header) return;
@@ -2070,8 +2072,9 @@ function switchLanguage(lang) {
     // 향미 관련 UI 업데이트
     renderFlavorTabs();
     renderFlavorPhase();
-    
+
     // 바디감 디스크립터 UI 업데이트
+    renderBodyCategoryTabs();
     renderBodyDescriptors();
     
     // 선택된 향미 영역 업데이트
@@ -2106,43 +2109,63 @@ function updateI18nTexts() {
   });
 }
 
+// 바디감 카테고리 탭 렌더링
+function renderBodyCategoryTabs() {
+  const tabs = document.getElementById('bodyCategoryTabs');
+  if (!tabs) return;
+
+  tabs.innerHTML = '';
+  BODY_DESCRIPTOR_CATEGORIES.forEach(cat => {
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'font-bold rounded px-4 py-1 mr-1 mb-1 mobile-touch-friendly ' +
+      (currentBodyCategory === cat.key ? 'tab-btn-active' : 'tab-btn-inactive');
+    btn.textContent = currentLanguage === 'ko' ? cat.name : cat.nameEn;
+    btn.onclick = () => {
+      currentBodyCategory = cat.key;
+      renderBodyCategoryTabs();
+      renderBodyDescriptors();
+    };
+    tabs.appendChild(btn);
+  });
+
+  console.log(`바디감 카테고리 탭 렌더링 완료 (언어: ${currentLanguage})`);
+}
+
 // 바디감 디스크립터 렌더링 개선
 function renderBodyDescriptors() {
   const container = document.getElementById('bodyDescriptorArea');
   if (!container) return;
-  
+
   const currentSample = getCurrentSampleObj();
   const selectedDescriptors = currentSample ? (currentSample.sampleData.bodyDescriptors || []) : [];
-  
+
   let html = '';
-  
-  // 카테고리별로 그룹화하여 렌더링
-  BODY_DESCRIPTOR_CATEGORIES.forEach(category => {
+
+  const category = BODY_DESCRIPTOR_CATEGORIES.find(c => c.key === currentBodyCategory);
+  if (category) {
     const categoryDescriptors = BODY_DESCRIPTORS.filter(d => d.category === category.key);
-    
-    if (categoryDescriptors.length > 0) {
-      const categoryName = currentLanguage === 'ko' ? category.name : category.nameEn;
-      html += `<div class="col-span-full body-category-header">${categoryName}</div>`;
-      
-      categoryDescriptors.forEach(descriptor => {
-        const isSelected = selectedDescriptors.includes(descriptor.id);
-        const displayText = currentLanguage === 'ko' ? descriptor.korean : descriptor.label;
-        const selectedClass = isSelected ? 'selected' : '';
-        
-        html += `
-          <div class="body-descriptor-item ${selectedClass}" 
-               data-descriptor="${descriptor.id}"
-               style="border-color: ${descriptor.color};"
-               onclick="toggleBodyDescriptor('${descriptor.id}')">
-            <input type="checkbox" ${isSelected ? 'checked' : ''}>
-            <span class="checkbox-custom"></span>
-            <span>${displayText}</span>
-          </div>
-        `;
-      });
-    }
-  });
-  
+    const categoryName = currentLanguage === 'ko' ? category.name : category.nameEn;
+    html += `<div class="col-span-full body-category-header">${categoryName}</div>`;
+
+    categoryDescriptors.forEach(descriptor => {
+      const isSelected = selectedDescriptors.includes(descriptor.id);
+      const displayText = currentLanguage === 'ko' ? descriptor.korean : descriptor.label;
+      const selectedClass = isSelected ? 'selected' : '';
+
+      html += `
+        <div class="body-descriptor-item ${selectedClass}"
+             data-descriptor="${descriptor.id}"
+             style="border-color: ${descriptor.color};"
+             onclick="toggleBodyDescriptor('${descriptor.id}')">
+          <input type="checkbox" ${isSelected ? 'checked' : ''}>
+          <span class="checkbox-custom"></span>
+          <span>${displayText}</span>
+        </div>
+      `;
+    });
+  }
+
   container.innerHTML = html;
   
   console.log(`바디감 디스크립터 렌더링 완료 (언어: ${currentLanguage})`);
@@ -2827,6 +2850,7 @@ function setUIFromSample(sampleData) {
   updateRadar(sampleData);
   updateTotalScore(sampleData);
   renderFlavorTabs();
+  renderBodyCategoryTabs();
   renderFlavorPhase();
 }
 
@@ -3945,6 +3969,7 @@ function initApp() {
     console.log("🚀 Mollis SCA 커피 관능 평가 도구 (개선버전) 시작");
     
     renderFlavorTabs();
+    renderBodyCategoryTabs();
     loadSamplesFromStorage();
     
     // 모든 샘플 데이터 검증 및 수정
