@@ -21,6 +21,10 @@ function undoLastAction() {
 }
 
 function loginUser() {
+  if (typeof firebaseLogin === 'function') {
+    firebaseLogin();
+    return;
+  }
   const name = prompt('사용자 이름을 입력하세요', window.currentUser);
   if (!name) return;
   window.currentUser = name.trim();
@@ -28,6 +32,12 @@ function loginUser() {
   location.reload();
 }
 
+function logoutUser() {
+  if (typeof logoutFirebase === 'function') {
+    logoutFirebase();
+    return;
+  }
+  
 function logoutUser() {
   if (confirm('로그아웃하시겠습니까?')) {
     window.currentUser = 'default';
