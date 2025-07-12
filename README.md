@@ -33,6 +33,10 @@ This app is a Progressive Web App. When you visit on a mobile device or supporte
 
 Click the **로그인** button at the top of the page to set a user name. Data is saved separately for each name, so multiple people can use the same device without mixing their cupping records. Use the **로그아웃** button to switch back to the default profile. Each profile maintains its own samples.
 
+## Team Features
+
+To collaborate with others, click **팀관리** and sign in with a Google account. You can create a new team or join an existing one. The team owner can manage members and shared cupping samples in Firestore. Offline mode remains available, so you can still use the app without logging in.
+
 ## Customizing the Header Logo
 
 1. Replace the file `icons/header-logo.png` with your own image (recommended size around 192×192 pixels).
