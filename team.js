@@ -1,6 +1,6 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-app.js";
 import { getAuth, signInWithPopup, GoogleAuthProvider, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-auth.js";
-import { getFirestore, doc, setDoc, updateDoc, arrayUnion, getDoc } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore.js";
+import { getFirestore, doc, setDoc, updateDoc, arrayUnion, getDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyD-rwtilsBrdQ9JDJYFwXb57ebD6DsSqGg",
@@ -35,6 +35,7 @@ window.logoutFirebase = async function() {
   window.currentUser = 'default';
   localStorage.setItem('mollis_sca_current_user', window.currentUser);
   localStorage.removeItem('mollis_sca_current_team');
+  if (window._teamSamplesUnsub) window._teamSamplesUnsub();
   location.reload();
 };
 
@@ -47,6 +48,7 @@ onAuthStateChanged(auth, user => {
     const logoutBtn = document.getElementById('logoutBtn');
     if (loginBtn) loginBtn.classList.add('hidden');
     if (logoutBtn) logoutBtn.classList.remove('hidden');
+    fetchTeamSamples().then(startTeamSamplesListener);
   }
 });
 
@@ -62,6 +64,8 @@ window.createTeam = async function(teamName) {
   }, { merge: true });
   localStorage.setItem('mollis_sca_current_team', teamName);
   updateTeamHeader();
+  await syncSamplesToTeam(window.samples || []);
+  fetchTeamSamples().then(startTeamSamplesListener);
   alert('팀이 생성되었습니다');
 };
 
@@ -79,6 +83,8 @@ window.joinTeam = async function(teamName) {
   await updateDoc(teamRef, { members: arrayUnion({ uid: auth.currentUser.uid, name: window.currentUser }) });
   localStorage.setItem('mollis_sca_current_team', teamName);
   updateTeamHeader();
+  await fetchTeamSamples();
+  startTeamSamplesListener();
   alert('팀에 가입했습니다');
 };
 
@@ -108,4 +114,67 @@ function updateTeamHeader() {
   }
 }
 
-document.addEventListener('DOMContentLoaded', updateTeamHeader);
+// === Team sample sync functions ===
+
+async function fetchTeamSamples() {
+  const teamName = localStorage.getItem('mollis_sca_current_team');
+  if (!teamName) return;
+  try {
+    const snap = await getDoc(doc(db, 'teams', teamName));
+    if (snap.exists()) {
+      const data = snap.data();
+      if (data.samples) {
+        const key = `mollis_sca_samples2_${window.currentUser || 'default'}`;
+        const localStr = JSON.stringify(data.samples);
+        localStorage.setItem(key, localStr);
+        if (typeof loadSamplesFromStorage === 'function') {
+          loadSamplesFromStorage();
+          if (typeof renderSampleList === 'function') renderSampleList();
+        }
+      }
+    }
+  } catch (err) {
+    console.error('팀 샘플 불러오기 실패', err);
+  }
+}
+
+window.syncSamplesToTeam = async function(samples) {
+  const teamName = localStorage.getItem('mollis_sca_current_team');
+  if (!teamName) return;
+  try {
+    const teamRef = doc(db, 'teams', teamName);
+    await updateDoc(teamRef, { samples, updatedAt: Date.now() });
+  } catch (err) {
+    console.error('팀 샘플 동기화 실패', err);
+  }
+};
+
+window.startTeamSamplesListener = function() {
+  const teamName = localStorage.getItem('mollis_sca_current_team');
+  if (!teamName) return;
+  const teamRef = doc(db, 'teams', teamName);
+  if (window._teamSamplesUnsub) window._teamSamplesUnsub();
+  window._teamSamplesUnsub = onSnapshot(teamRef, snap => {
+    if (snap.exists()) {
+      const data = snap.data();
+      if (data.samples) {
+        const key = `mollis_sca_samples2_${window.currentUser || 'default'}`;
+        const newStr = JSON.stringify(data.samples);
+        if (localStorage.getItem(key) !== newStr) {
+          localStorage.setItem(key, newStr);
+          if (typeof loadSamplesFromStorage === 'function') {
+            loadSamplesFromStorage();
+            if (typeof renderSampleList === 'function') renderSampleList();
+          } else {
+            location.reload();
+          }
+        }
+      }
+    }
+  });
+};
+
+document.addEventListener('DOMContentLoaded', () => {
+  updateTeamHeader();
+  fetchTeamSamples().then(startTeamSamplesListener);
+});
