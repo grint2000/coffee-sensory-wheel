@@ -1,6 +1,6 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-app.js";
 import { getAuth, signInWithPopup, GoogleAuthProvider, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-auth.js";
-import { getFirestore, doc, setDoc, updateDoc, arrayUnion, getDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore.js";
+import { getFirestore, doc, setDoc, updateDoc, arrayUnion, getDoc, onSnapshot, deleteField } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyD-rwtilsBrdQ9JDJYFwXb57ebD6DsSqGg",
@@ -26,15 +26,7 @@ window.firebaseLogin = async function() {
     document.getElementById('loginBtn').classList.add('hidden');
   } catch (err) {
     console.error(err);
-    alert('로그인에 실패했습니다');
-  }
-};
-
-window.logoutFirebase = async function() {
-  await signOut(auth);
-  window.currentUser = 'default';
-  localStorage.setItem('mollis_sca_current_user', window.currentUser);
-  localStorage.removeItem('mollis_sca_current_team');
+@@ -38,143 +38,226 @@ window.logoutFirebase = async function() {
   if (window._teamSamplesUnsub) window._teamSamplesUnsub();
   location.reload();
 };
@@ -60,7 +52,8 @@ window.createTeam = async function(teamName) {
   const teamRef = doc(db, 'teams', teamName);
   await setDoc(teamRef, {
     owner: auth.currentUser.uid,
-    members: [{ uid: auth.currentUser.uid, name: window.currentUser }]
+    members: [{ uid: auth.currentUser.uid, name: window.currentUser }],
+    memberSamples: { [auth.currentUser.uid]: window.samples || [] }
   }, { merge: true });
   localStorage.setItem('mollis_sca_current_team', teamName);
   updateTeamHeader();
@@ -80,7 +73,10 @@ window.joinTeam = async function(teamName) {
     alert('팀이 존재하지 않습니다');
     return;
   }
-  await updateDoc(teamRef, { members: arrayUnion({ uid: auth.currentUser.uid, name: window.currentUser }) });
+  await updateDoc(teamRef, {
+    members: arrayUnion({ uid: auth.currentUser.uid, name: window.currentUser }),
+    [`memberSamples.${auth.currentUser.uid}`]: window.samples || []
+  });
   localStorage.setItem('mollis_sca_current_team', teamName);
   updateTeamHeader();
   await fetchTeamSamples();
@@ -100,10 +96,39 @@ window.loadTeamInfoToModal = async function() {
     const data = snap.data();
     (data.members || []).forEach(m => {
       const li = document.createElement('li');
-      li.textContent = m.name || m.uid;
+      li.className = 'flex justify-between items-center';
+      const span = document.createElement('span');
+      span.textContent = m.name || m.uid;
+      li.appendChild(span);
+      if (data.owner === auth.currentUser.uid && m.uid !== data.owner) {
+        const btn = document.createElement('button');
+        btn.textContent = '탈퇴';
+        btn.className = 'text-red-600 text-xs border px-1 rounded';
+        btn.addEventListener('click', () => removeMemberFromTeam(m.uid));
+        li.appendChild(btn);
+      }
       listEl.appendChild(li);
     });
   }
+};
+
+window.removeMemberFromTeam = async function(memberUid) {
+  const teamName = localStorage.getItem('mollis_sca_current_team');
+  if (!teamName) return;
+  const teamRef = doc(db, 'teams', teamName);
+  const snap = await getDoc(teamRef);
+  if (!snap.exists()) return;
+  const data = snap.data();
+  if (data.owner !== auth.currentUser.uid) {
+    alert('팀장만 팀원을 탈퇴시킬 수 있습니다');
+    return;
+  }
+  const newMembers = (data.members || []).filter(m => m.uid !== memberUid);
+  const updateObj = { members: newMembers };
+  updateObj[`memberSamples.${memberUid}`] = deleteField();
+  await updateDoc(teamRef, updateObj);
+  loadTeamInfoToModal();
+  alert('팀원이 탈퇴되었습니다');
 };
 
 function updateTeamHeader() {
@@ -123,9 +148,16 @@ async function fetchTeamSamples() {
     const snap = await getDoc(doc(db, 'teams', teamName));
     if (snap.exists()) {
       const data = snap.data();
-      if (data.samples) {
+      const uid = auth.currentUser ? auth.currentUser.uid : null;
+      let samplesData = null;
+      if (uid && data.memberSamples && data.memberSamples[uid]) {
+        samplesData = data.memberSamples[uid];
+      } else if (data.samples) {
+        samplesData = data.samples; // backward compatibility
+      }
+      if (samplesData) {
         const key = `mollis_sca_samples2_${window.currentUser || 'default'}`;
-        const localStr = JSON.stringify(data.samples);
+        const localStr = JSON.stringify(samplesData);
         localStorage.setItem(key, localStr);
         if (typeof loadSamplesFromStorage === 'function') {
           loadSamplesFromStorage();
@@ -140,10 +172,13 @@ async function fetchTeamSamples() {
 
 window.syncSamplesToTeam = async function(samples) {
   const teamName = localStorage.getItem('mollis_sca_current_team');
-  if (!teamName) return;
+  if (!teamName || !auth.currentUser) return;
   try {
     const teamRef = doc(db, 'teams', teamName);
-    await updateDoc(teamRef, { samples, updatedAt: Date.now() });
+    const updateObj = {};
+    updateObj[`memberSamples.${auth.currentUser.uid}`] = samples;
+    updateObj.updatedAt = Date.now();
+    await updateDoc(teamRef, updateObj);
   } catch (err) {
     console.error('팀 샘플 동기화 실패', err);
   }
@@ -157,9 +192,16 @@ window.startTeamSamplesListener = function() {
   window._teamSamplesUnsub = onSnapshot(teamRef, snap => {
     if (snap.exists()) {
       const data = snap.data();
-      if (data.samples) {
+      const uid = auth.currentUser ? auth.currentUser.uid : null;
+      let samplesData = null;
+      if (uid && data.memberSamples && data.memberSamples[uid]) {
+        samplesData = data.memberSamples[uid];
+      } else if (data.samples) {
+        samplesData = data.samples; // backward compatibility
+      }
+      if (samplesData) {
         const key = `mollis_sca_samples2_${window.currentUser || 'default'}`;
-        const newStr = JSON.stringify(data.samples);
+        const newStr = JSON.stringify(samplesData);
         if (localStorage.getItem(key) !== newStr) {
           localStorage.setItem(key, newStr);
           if (typeof loadSamplesFromStorage === 'function') {
@@ -172,6 +214,39 @@ window.startTeamSamplesListener = function() {
       }
     }
   });
+};
+
+window.showTeamReport = async function() {
+  const teamName = localStorage.getItem('mollis_sca_current_team');
+  if (!teamName) return;
+  const snap = await getDoc(doc(db, 'teams', teamName));
+  if (!snap.exists()) return;
+  const data = snap.data();
+  const bodyEl = document.getElementById('teamReportBody');
+  if (!bodyEl) return;
+  bodyEl.innerHTML = '';
+  (data.members || []).forEach(m => {
+    const memberSamples = (data.memberSamples && data.memberSamples[m.uid]) || [];
+    const wrapper = document.createElement('div');
+    wrapper.className = 'mb-4';
+    const nameEl = document.createElement('h4');
+    nameEl.className = 'font-semibold';
+    nameEl.textContent = m.name || m.uid;
+    wrapper.appendChild(nameEl);
+    memberSamples.forEach(sample => {
+      const div = document.createElement('div');
+      div.className = 'border rounded p-2 my-2';
+      const title = document.createElement('div');
+      title.className = 'font-medium mb-1';
+      title.textContent = sample.title;
+      div.appendChild(title);
+      const summary = buildFlavorSummaryHtml(sample.sampleData);
+      div.insertAdjacentHTML('beforeend', summary);
+      wrapper.appendChild(div);
+    });
+    bodyEl.appendChild(wrapper);
+  });
+  document.getElementById('teamReportModal').classList.add('show');
 };
 
 document.addEventListener('DOMContentLoaded', () => {
