@@ -26,7 +26,14 @@ window.firebaseLogin = async function() {
     document.getElementById('loginBtn').classList.add('hidden');
   } catch (err) {
     console.error(err);
-@@ -38,143 +38,226 @@ window.logoutFirebase = async function() {
+  }
+};
+
+window.logoutFirebase = async function() {
+  await signOut(auth);
+  window.currentUser = 'default';
+  localStorage.setItem('mollis_sca_current_user', window.currentUser);
+  localStorage.removeItem('mollis_sca_current_team');
   if (window._teamSamplesUnsub) window._teamSamplesUnsub();
   location.reload();
 };
