@@ -726,6 +726,7 @@
     <div class="mt-3 md:mt-0 flex items-center">
       <button id="loginBtn" class="px-2 py-1 bg-gray-200 hover:bg-gray-300 rounded text-xs">로그인</button>
       <button id="logoutBtn" class="ml-2 px-2 py-1 bg-gray-200 hover:bg-gray-300 rounded text-xs hidden">로그아웃</button>
+      <button id="teamBtn" class="ml-2 px-2 py-1 bg-gray-200 hover:bg-gray-300 rounded text-xs">팀관리</button>
       <button id="installBtn" class="ml-2 px-2 py-1 bg-gray-200 hover:bg-gray-300 rounded text-xs hidden">앱설치</button>
       <button id="themeToggle" class="ml-2 px-2 py-1 bg-gray-200 hover:bg-gray-300 rounded text-xs" aria-label="테마 전환"><i id="themeToggleIcon" class="fa fa-moon"></i></button>
       <span id="currentUserDisplay" class="ml-2 text-sm text-gray-600"></span>
@@ -1158,6 +1159,26 @@
   </div>
 </div>
 
+<!-- 팀 관리 모달 -->
+<div id="teamModal" class="modal">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h3 class="font-bold text-lg">팀 관리</h3>
+      <button id="closeTeamModal" class="text-gray-500 hover:text-gray-700 mobile-touch-friendly">
+        <i class="fas fa-times text-xl"></i>
+      </button>
+    </div>
+    <div class="modal-body">
+      <input id="teamNameInput" type="text" class="border rounded p-2 w-full mb-2" placeholder="팀 이름">
+      <div class="flex gap-2 mb-2">
+        <button id="createTeamBtn" class="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 rounded mobile-touch-friendly">팀 만들기</button>
+        <button id="joinTeamBtn" class="bg-green-600 hover:bg-green-700 text-white px-3 py-1 rounded mobile-touch-friendly">팀 참가</button>
+      </div>
+      <p class="text-xs text-gray-500">Google 계정으로 로그인 후 사용하세요.</p>
+    </div>
+  </div>
+</div>
+
 <div id="toast" class="toast"></div>
 <div id="sampleToast" class="sample-toast"></div>
 
@@ -1269,7 +1290,9 @@ const FLAVOR_DATA = [
   ["Fruity","Tropical Fruit","Rambutan","#EC2D01","과일류","열대과일","람부탄"],
   ["Fruity","Tropical Fruit","Soursop","#C3E88D","과일류","열대과일","사워삽"],
   ["Fruity","Tropical Fruit","Breadfruit","#E8D499","과일류","열대과일","브레드프룻"],
-  
+  ["Fruity","Tropical Fruit","Feijoa","#9ACD32","과일류","열대과일","페이조아"],
+  ["Fruity","Tropical Fruit","Cherimoya","#FFE4C4","과일류","열대과일","체리모야"],
+
   // Fruity - Dried Fruit (건조과일 확장)
   ["Fruity","Dried Fruit","Raisin","#BB9055","과일류","건조과일","건포도"],
   ["Fruity","Dried Fruit","Golden Raisin","#DAA520","과일류","건조과일","골든 건포도"],
@@ -1314,7 +1337,9 @@ const FLAVOR_DATA = [
   ["Sweet","Confectionery","White Chocolate","#FFFFF0","단맛","과자류","화이트초콜릿"],
   ["Sweet","Confectionery","Marshmallow","#F8F8FF","단맛","과자류","마시멜로"],
   ["Sweet","Confectionery","Cotton Candy","#FFB6C1","단맛","과자류","솜사탕"],
-  
+  ["Sweet","Confectionery","Maple Candy","#D4A017","단맛","과자류","메이플캔디"],
+  ["Sweet","Confectionery","Caramel Fudge","#C87A32","단맛","과자류","캐러멜 퍼지"],
+
   // Floral (꽃향 확장)
   ["Floral","General Flowers","Flower","#FFF0F0","꽃향","꽃","꽃"],
   ["Floral","White Flowers","White Flower","#FFFFFF","꽃향","흰꽃","흰꽃"],
@@ -1340,6 +1365,7 @@ const FLAVOR_DATA = [
   ["Floral","Colored Flowers","Lilac","#C8A2C8","꽃향","유색꽃","라일락"],
   ["Floral","Colored Flowers","Iris","#5A4FCF","꽃향","유색꽃","아이리스"],
   ["Floral","Colored Flowers","Wisteria","#C9A0DC","꽃향","유색꽃","등나무꽃"],
+  ["Floral","Colored Flowers","Daffodil","#FFFF31","꽃향","유색꽃","수선화"],
   ["Floral","Herbal Flowers","Chamomile","#F5E5C0","꽃향","허브꽃","카모마일"],
   ["Floral","Herbal Flowers","Honeysuckle","#FFF0DB","꽃향","허브꽃","인동덩굴"],
   ["Floral","Herbal Flowers","Osmanthus","#FFDB58","꽃향","허브꽃","계수나무"],
@@ -1359,6 +1385,7 @@ const FLAVOR_DATA = [
   ["Nutty/Cocoa","Tree Nuts","Brazilian Nut","#8D6E63","견과/코코아","견과류","브라질너트"],
   ["Nutty/Cocoa","Tree Nuts","Chestnut","#954535","견과/코코아","견과류","밤"],
   ["Nutty/Cocoa","Tree Nuts","Pine Nut","#D6C9A0","견과/코코아","견과류","잣"],
+  ["Nutty/Cocoa","Tree Nuts","Pili Nut","#F5E6CC","견과/코코아","견과류","필리넛"],
   ["Nutty/Cocoa","Other Nuts","Peanut","#D28C78","견과/코코아","기타견과류","땅콩"],
   ["Nutty/Cocoa","Other Nuts","Roasted Peanut","#A0522D","견과/코코아","기타견과류","구운땅콩"],
   ["Nutty/Cocoa","Other Nuts","Coconut","#F2EFE9","견과/코코아","기타견과류","코코넛"],
@@ -1405,7 +1432,9 @@ const FLAVOR_DATA = [
   ["Spices","Aromatic Spices","Saffron","#F4C430","향신료","방향성향신료","사프란"],
   ["Spices","Aromatic Spices","Juniper Berries","#6D80AB","향신료","방향성향신료","주니퍼베리"],
   ["Spices","Aromatic Spices","Fenugreek","#C19A6B","향신료","방향성향신료","페뉴그릭"],
-  
+  ["Spices","Aromatic Spices","Galangal","#D8B4A6","향신료","방향성향신료","갈랑갈"],
+  ["Spices","Hot Spices","Sichuan Pepper","#FF6F61","향신료","매운향신료","화자오"],
+
   // Tea (차 확장)
   ["Tea","Black Tea","Earl Grey","#3A2E39","차","홍차","얼그레이"],
   ["Tea","Black Tea","English Breakfast","#654321","차","홍차","잉글리시 브렉퍼스트"],
@@ -1414,6 +1443,7 @@ const FLAVOR_DATA = [
   ["Tea","Black Tea","Ceylon","#5F4842","차","홍차","실론"],
   ["Tea","Black Tea","Keemun","#6B4226","차","홍차","기문"],
   ["Tea","Black Tea","Lapsang Souchong","#2F1B14","차","홍차","라프상 소우총"],
+  ["Tea","Black Tea","Masala Chai","#C57035","차","홍차","마살라차이"],
   ["Tea","Green Tea","Matcha","#D0F0C0","차","녹차","말차"],
   ["Tea","Green Tea","Sencha","#90EE90","차","녹차","센차"],
   ["Tea","Green Tea","Gyokuro","#799E65","차","녹차","교쿠로"],
@@ -1422,6 +1452,7 @@ const FLAVOR_DATA = [
   ["Tea","Oolong","Oolong","#A0522D","차","우롱차","우롱"],
   ["Tea","Oolong","Ti Kuan Yin","#8B4513","차","우롱차","철관음"],
   ["Tea","Oolong","Da Hong Pao","#654321","차","우롱차","대홍포"],
+  ["Tea","Oolong","Milk Oolong","#F5E1A4","차","우롱차","밀크우롱"],
   ["Tea","White Tea","Silver Needle","#E6E8FA","차","백차","은침차"],
   ["Tea","White Tea","White Peony","#F5F5F5","차","백차","백모단"],
   ["Tea","Herbal Tea","Chamomile","#FADA5E","차","허브차","카모마일"],
@@ -1461,11 +1492,13 @@ const FLAVOR_DATA = [
   ["Cereal/Grain","Processed","Granola","#C8A951","곡물류","가공품","그래놀라"],
   ["Cereal/Grain","Processed","Cheerios","#E8C99B","곡물류","가공품","시리오스"],
   ["Cereal/Grain","Processed","Cornflakes","#FFBF00","곡물류","가공품","콘플레이크"],
-  
+  ["Cereal/Grain","Processed","Amaranth","#DFC98A","곡물류","가공품","아마란스"],
+
   // Roasted (로스팅 향 확장)
   ["Roasted","Light Roast","Cinnamon Roast","#AD8150","로스팅","라이트 로스트","시나몬 로스트"],
   ["Roasted","Light Roast","New England Roast","#967969","로스팅","라이트 로스트","뉴잉글랜드 로스트"],
   ["Roasted","Light Roast","Tea-like","#967969","로스팅","라이트 로스트","차와 유사한"],
+  ["Roasted","Light Roast","Scandinavian Roast","#8B6C42","로스팅","라이트 로스트","스칸디나비아 로스트"],
   ["Roasted","Light Roast","Herbal","#BDCB96","로스팅","라이트 로스트","허브향"],
   ["Roasted","Medium Roast","American Roast","#8B4513","로스팅","미디엄 로스트","아메리칸 로스트"],
   ["Roasted","Medium Roast","City Roast","#7B3F00","로스팅","미디엄 로스트","시티 로스트"],
@@ -1546,6 +1579,7 @@ const FLAVOR_DATA = [
   ["Sour/Fermented","Fermented","Kombucha","#DEC19B","산미/발효","발효","콤부차"],
   ["Sour/Fermented","Fermented","Kimchi","#E80000","산미/발효","발효","김치"],
   ["Sour/Fermented","Fermented","Sauerkraut","#E8E4C9","산미/발효","발효","사우어크라우트"],
+  ["Sour/Fermented","Fermented","Pickles","#CDFFB6","산미/발효","발효","피클"],
   ["Sour/Fermented","Fermented","Miso","#E9CEAA","산미/발효","발효","미소"],
   ["Sour/Fermented","Fermented","Sake","#EDEADE","산미/발효","발효","사케"],
   ["Sour/Fermented","Fermented","Beer","#F5DEB3","산미/발효","발효","맥주"],
@@ -1601,7 +1635,8 @@ const FLAVOR_DATA = [
   ["Other","Mineral","Chalk","#F5F5F5","기타","미네랄","분필"],
   ["Other","Mineral","Limestone","#E5E4E2","기타","미네랄","석회암"],
   ["Other","Mineral","Salt","#FFFFFF","기타","미네랄","소금"],
-  ["Other","Mineral","Sea Salt","#F0F8FF","기타","미네랄","바다소금"]
+  ["Other","Mineral","Sea Salt","#F0F8FF","기타","미네랄","바다소금"],
+  ["Other","Mineral","Sulfur","#C0C0C0","기타","미네랄","황"]
 ];
 
 // 바디감 디스크립터 데이터 개선 - 더 많은 항목과 한글/영문 지원 강화
@@ -4245,6 +4280,25 @@ function setupEventHandlers() {
     document.getElementById('splitViewModal').classList.remove('show');
   });
 
+  const teamBtn = document.getElementById('teamBtn');
+  if (teamBtn) teamBtn.addEventListener('click', function() {
+    document.getElementById('teamModal').classList.add('show');
+  });
+  const closeTeamModal = document.getElementById('closeTeamModal');
+  if (closeTeamModal) closeTeamModal.addEventListener('click', function() {
+    document.getElementById('teamModal').classList.remove('show');
+  });
+  const createTeamBtn = document.getElementById('createTeamBtn');
+  if (createTeamBtn) createTeamBtn.addEventListener('click', function() {
+    const name = document.getElementById('teamNameInput').value.trim();
+    if (name) createTeam(name);
+  });
+  const joinTeamBtn = document.getElementById('joinTeamBtn');
+  if (joinTeamBtn) joinTeamBtn.addEventListener('click', function() {
+    const name = document.getElementById('teamNameInput').value.trim();
+    if (name) joinTeam(name);
+  });
+
   const leftSampleSelect = document.getElementById('leftSampleSelect');
   if (leftSampleSelect) leftSampleSelect.addEventListener('change', updateSplitView);
   const rightSampleSelect = document.getElementById('rightSampleSelect');
@@ -4295,6 +4349,7 @@ window.addEventListener('beforeunload', function(e) {
 });
 
 </script>
+<script type="module" src="team.js"></script>
 <script src="extras.js"></script>
 <script src="theme.js"></script>
 </body>
