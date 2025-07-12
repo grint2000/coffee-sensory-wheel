@@ -34,6 +34,7 @@ window.logoutFirebase = async function() {
   await signOut(auth);
   window.currentUser = 'default';
   localStorage.setItem('mollis_sca_current_user', window.currentUser);
+  localStorage.removeItem('mollis_sca_current_team');
   location.reload();
 };
 
@@ -55,7 +56,12 @@ window.createTeam = async function(teamName) {
     return;
   }
   const teamRef = doc(db, 'teams', teamName);
-  await setDoc(teamRef, { owner: auth.currentUser.uid, members: [auth.currentUser.uid] }, { merge: true });
+  await setDoc(teamRef, {
+    owner: auth.currentUser.uid,
+    members: [{ uid: auth.currentUser.uid, name: window.currentUser }]
+  }, { merge: true });
+  localStorage.setItem('mollis_sca_current_team', teamName);
+  updateTeamHeader();
   alert('팀이 생성되었습니다');
 };
 
@@ -70,6 +76,36 @@ window.joinTeam = async function(teamName) {
     alert('팀이 존재하지 않습니다');
     return;
   }
-  await updateDoc(teamRef, { members: arrayUnion(auth.currentUser.uid) });
+  await updateDoc(teamRef, { members: arrayUnion({ uid: auth.currentUser.uid, name: window.currentUser }) });
+  localStorage.setItem('mollis_sca_current_team', teamName);
+  updateTeamHeader();
   alert('팀에 가입했습니다');
 };
+
+window.loadTeamInfoToModal = async function() {
+  const teamName = localStorage.getItem('mollis_sca_current_team');
+  const nameEl = document.getElementById('currentTeamDisplay');
+  const listEl = document.getElementById('teamMembersList');
+  if (nameEl) nameEl.textContent = teamName || '없음';
+  if (!teamName || !listEl) return;
+  listEl.innerHTML = '';
+  const snap = await getDoc(doc(db, 'teams', teamName));
+  if (snap.exists()) {
+    const data = snap.data();
+    (data.members || []).forEach(m => {
+      const li = document.createElement('li');
+      li.textContent = m.name || m.uid;
+      listEl.appendChild(li);
+    });
+  }
+};
+
+function updateTeamHeader() {
+  const headerEl = document.getElementById('currentTeamHeader');
+  if (headerEl) {
+    const name = localStorage.getItem('mollis_sca_current_team');
+    headerEl.textContent = name ? `팀: ${name}` : '';
+  }
+}
+
+document.addEventListener('DOMContentLoaded', updateTeamHeader);
