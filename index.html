@@ -733,7 +733,19 @@
       <span id="currentTeamHeader" class="ml-2 text-sm text-blue-600"></span>
     </div>
   </header>
-  
+
+  <div id="priceWidget" class="bg-white shadow rounded-lg p-2 md:p-3 mb-3 text-sm flex flex-wrap items-center justify-between">
+    <div class="flex flex-wrap items-center gap-4">
+      <span><span class="font-semibold">C-Price:</span> <span id="cPrice">-</span></span>
+      <span><span class="font-semibold">London:</span> <span id="londonPrice">-</span></span>
+      <span><span class="font-semibold">1kg 가격:</span> <span id="krwPerKg">-</span></span>
+    </div>
+    <div class="flex items-center gap-2 mt-2 md:mt-0">
+      <button id="refreshPricesBtn" class="px-2 py-1 bg-gray-200 hover:bg-gray-300 rounded text-xs">가격 새로고침</button>
+      <span id="priceMessage" class="text-xs text-red-600"></span>
+    </div>
+  </div>
+
   <!-- Sample/Data/Compare Section -->
   <section class="bg-white shadow rounded-lg p-3 md:p-6 mb-3 flex flex-col md:flex-row gap-3">
     <!-- 샘플 관리 -->
@@ -4383,6 +4395,7 @@ window.addEventListener('beforeunload', function(e) {
 
 </script>
 <script type="module" src="team.js"></script>
+<script src="price-widget.js"></script>
 <script src="extras.js"></script>
 <script src="theme.js"></script>
 </body>
