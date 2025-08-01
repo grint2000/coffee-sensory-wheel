@@ -42,7 +42,8 @@ When the team owner (or any member) adds or edits samples, the changes are saved
 
 ## Market Prices
 
-Below the header you can view real-time coffee prices. The widget displays the ICE C‑Price and the London Coffee Exchange index. Click **가격 새로고침** to fetch the latest data. Prices are converted to KRW per kilogram using the current USD exchange rate. The most recent values are cached locally so they remain visible even when offline.
+Below the header you can view coffee prices and even enter them yourself. Click **가격 새로고침** to try fetching the latest C‑Price, London Coffee Exchange index, and the current exchange rate. When the network is unreliable you can manually type the index values (C‑Price in US¢/lb, London index in USD/ton) along with the exchange rate, then press **값 적용** to see the KRW per kilogram. The most recent numbers are saved locally so they appear again when you return to the page.
+The conversion uses `지수 × 환율 × 2.2046 / 100` for the C‑Price and `지수 / 1000 × 환율` for the London index.
 
 ## Customizing the Header Logo
 
