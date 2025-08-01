@@ -22,7 +22,7 @@ function displayPrices(data) {
   const kEl = document.getElementById('krwPerKg');
   const tEl = document.getElementById('priceTime');
   if (cEl) cEl.textContent = data.cPriceUsdPerLb != null ? `${(data.cPriceUsdPerLb * 100).toFixed(2)}¢/lb` : '-';
-  if (lEl) lEl.textContent = data.londonPriceUsdPerLb != null ? `${(data.londonPriceUsdPerLb * 100).toFixed(2)}¢/lb` : '-';
+  if (lEl) lEl.textContent = data.londonPriceUsdPerTon != null ? `${data.londonPriceUsdPerTon.toFixed(2)} USD/ton` : '-';
   if (kEl) kEl.textContent = data.krwPerKg ? `${Math.round(data.krwPerKg).toLocaleString()}원/kg` : '-';
   if (lkEl) lkEl.textContent = data.londonKrwPerKg ? `${Math.round(data.londonKrwPerKg).toLocaleString()}원/kg` : '-';
   if (tEl) tEl.textContent = data.timestamp ? new Date(data.timestamp).toLocaleString() : '';
@@ -34,7 +34,7 @@ function setInputValues(data) {
   const lIn = document.getElementById('inputLondon');
   const fxIn = document.getElementById('inputFx');
   if (cIn && data.cPriceUsdPerLb != null) cIn.value = (data.cPriceUsdPerLb * 100).toFixed(2);
-  if (lIn && data.londonPriceUsdPerLb != null) lIn.value = (data.londonPriceUsdPerLb * 100).toFixed(2);
+  if (lIn && data.londonPriceUsdPerTon != null) lIn.value = data.londonPriceUsdPerTon.toFixed(2);
   if (fxIn && data.usdToKrw != null) fxIn.value = data.usdToKrw;
 }
 
@@ -77,14 +77,13 @@ async function fetchPrices() {
   const usdKrw = fxJson.rates?.KRW;
 
   const cUsdLb = cCents ? cCents / 100 : null;
-  const lUsdLb = lUsdTon ? lUsdTon / (LBS_PER_KG * 1000) : null;
 
   const krwPerKg = cCents && usdKrw ? cCents * usdKrw * LBS_PER_KG / 100 : null;
   const londonKrwKg = lUsdTon && usdKrw ? lUsdTon * usdKrw / 1000 : null;
 
   const data = {
     cPriceUsdPerLb: cUsdLb,
-    londonPriceUsdPerLb: lUsdLb,
+    londonPriceUsdPerTon: lUsdTon ?? null,
     usdToKrw: usdKrw,
     krwPerKg,
     londonKrwPerKg: londonKrwKg,
@@ -117,10 +116,10 @@ function applyManualPrices() {
   }
   const data = {
     cPriceUsdPerLb: isNaN(c) ? null : c / 100,
-    londonPriceUsdPerLb: isNaN(l) ? null : l / 100,
+    londonPriceUsdPerTon: isNaN(l) ? null : l,
     usdToKrw: fx,
     krwPerKg: isNaN(c) ? null : c * fx * LBS_PER_KG / 100,
-    londonKrwPerKg: isNaN(l) ? null : l * fx * LBS_PER_KG / 100,
+    londonKrwPerKg: isNaN(l) ? null : l * fx / 1000,
     timestamp: Date.now()
   };
   cachePrices(data);
