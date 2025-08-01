@@ -28,6 +28,16 @@ function displayPrices(data) {
   if (tEl) tEl.textContent = data.timestamp ? new Date(data.timestamp).toLocaleString() : '';
 }
 
+function setInputValues(data) {
+  if (!data) return;
+  const cIn = document.getElementById('inputCPrice');
+  const lIn = document.getElementById('inputLondon');
+  const fxIn = document.getElementById('inputFx');
+  if (cIn && data.cPriceUsdPerLb != null) cIn.value = data.cPriceUsdPerLb;
+  if (lIn && data.londonPriceUsdPerLb != null) lIn.value = data.londonPriceUsdPerLb;
+  if (fxIn && data.usdToKrw != null) fxIn.value = data.usdToKrw;
+}
+
 function setMessage(msg) {
   const el = document.getElementById('priceMessage');
   if (el) el.textContent = msg || '';
@@ -86,6 +96,7 @@ async function refreshPrices() {
   try {
     const data = await fetchPrices();
     displayPrices(data);
+    setInputValues(data);
     setMessage('');
   } catch (e) {
     console.error('Failed to fetch prices', e);
@@ -94,10 +105,37 @@ async function refreshPrices() {
   }
 }
 
+function applyManualPrices() {
+  const c = parseFloat(document.getElementById('inputCPrice').value);
+  const l = parseFloat(document.getElementById('inputLondon').value);
+  const fx = parseFloat(document.getElementById('inputFx').value);
+  if (isNaN(c) || isNaN(l) || isNaN(fx)) {
+    setMessage('입력값을 확인하세요');
+    return;
+  }
+  const data = {
+    cPriceUsdPerLb: c,
+    londonPriceUsdPerLb: l,
+    usdToKrw: fx,
+    krwPerKg: c * fx / LB_TO_KG,
+    londonKrwPerKg: l * fx / LB_TO_KG,
+    timestamp: Date.now()
+  };
+  cachePrices(data);
+  displayPrices(data);
+  setInputValues(data);
+  setMessage('');
+}
+
 document.addEventListener('DOMContentLoaded', () => {
   const cached = loadCachedPrices();
-  if (cached) displayPrices(cached);
+  if (cached) {
+    displayPrices(cached);
+    setInputValues(cached);
+  }
   const btn = document.getElementById('refreshPricesBtn');
   if (btn) btn.addEventListener('click', refreshPrices);
+  const applyBtn = document.getElementById('applyPriceBtn');
+  if (applyBtn) applyBtn.addEventListener('click', applyManualPrices);
   if (!cached) refreshPrices();
 });
