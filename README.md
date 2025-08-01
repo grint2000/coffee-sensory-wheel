@@ -16,6 +16,7 @@ The application runs entirely in the browser, so you can simply double-click `in
 - **Sample Management** – Add, clone, and remove cupping samples. Data is automatically saved locally and can be exported or restored using JSON files.
 - **Comparison Tools** – Select two or more samples to generate charts comparing SCA scores, flavor notes, and defects.
 - **Export Options** – Save your results as images, SNS-ready images, Excel spreadsheets, or JSON files for backup and sharing. The exported images now include the coffee's origin, processing method, roast date, and roast level so you have full context when sharing.
+- **Market Prices** – View the latest C‑Price and London Coffee Exchange index with a one-click refresh. Prices are converted to KRW per kilogram using the current USD exchange rate and stored locally for offline viewing.
 
 ## Browser Compatibility
 
@@ -38,6 +39,10 @@ Click the **로그인** button at the top of the page to set a user name. Data i
 To collaborate with others, click **팀관리** and sign in with a Google account. You can create a new team or join an existing one. Once a team is selected the name appears in the header so you always know which team you belong to.
 
 When the team owner (or any member) adds or edits samples, the changes are saved to Firestore and automatically synced to everyone in the team. If you are online you will see new samples appear instantly. Offline mode still works, and any changes will sync the next time you connect.
+
+## Market Prices
+
+Below the header you can view real-time coffee prices. The widget displays the ICE C‑Price and the London Coffee Exchange index. Click **가격 새로고침** to fetch the latest data. Prices are converted to KRW per kilogram using the current USD exchange rate. The most recent values are cached locally so they remain visible even when offline.
 
 ## Customizing the Header Logo
 
