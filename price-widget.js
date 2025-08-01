@@ -20,10 +20,12 @@ function displayPrices(data) {
   const lEl = document.getElementById('londonPrice');
   const lkEl = document.getElementById('londonKrwPerKg');
   const kEl = document.getElementById('krwPerKg');
+  const tEl = document.getElementById('priceTime');
   if (cEl) cEl.textContent = data.cPriceUsdPerLb ? `${data.cPriceUsdPerLb.toFixed(2)} USD/lb` : '-';
   if (lEl) lEl.textContent = data.londonPriceUsdPerLb ? `${data.londonPriceUsdPerLb.toFixed(2)} USD/lb` : '-';
   if (kEl) kEl.textContent = data.krwPerKg ? `${Math.round(data.krwPerKg).toLocaleString()}원/kg` : '-';
   if (lkEl) lkEl.textContent = data.londonKrwPerKg ? `${Math.round(data.londonKrwPerKg).toLocaleString()}원/kg` : '-';
+  if (tEl) tEl.textContent = data.timestamp ? new Date(data.timestamp).toLocaleString() : '';
 }
 
 function setMessage(msg) {
@@ -31,19 +33,34 @@ function setMessage(msg) {
   if (el) el.textContent = msg || '';
 }
 
-const CORS_PROXY = 'https://api.allorigins.win/raw?url=';
+const PROXIES = [
+  url => fetch(url),
+  url => fetch('https://corsproxy.io/?' + encodeURIComponent(url)),
+  url => fetch('https://api.allorigins.win/raw?url=' + encodeURIComponent(url)),
+  url => fetch('https://thingproxy.freeboard.io/fetch/' + url)
+];
 
 async function fetchJson(url) {
-  const res = await fetch(CORS_PROXY + encodeURIComponent(url));
-  return res.json();
+  for (const fn of PROXIES) {
+    try {
+      const res = await fn(url);
+      if (res.ok) return await res.json();
+    } catch {
+      continue;
+    }
+  }
+  throw new Error('all proxies failed');
 }
 
 async function fetchPrices() {
   const [cJson, lJson, fxJson] = await Promise.all([
-    fetchJson('https://query1.finance.yahoo.com/v7/finance/quote?symbols=KC%3DF'),
-    fetchJson('https://query1.finance.yahoo.com/v7/finance/quote?symbols=RC%3DF'),
-    fetchJson('https://api.exchangerate.host/latest?base=USD&symbols=KRW')
+    fetchJson('https://query1.finance.yahoo.com/v7/finance/quote?symbols=KC%3DF').catch(() => null),
+    fetchJson('https://query1.finance.yahoo.com/v7/finance/quote?symbols=RC%3DF').catch(() => null),
+    fetchJson('https://api.exchangerate.host/latest?base=USD&symbols=KRW').catch(() => null)
   ]);
+  if (!cJson || !lJson || !fxJson) {
+    throw new Error('fetch failed');
+  }
 
   const cCents = cJson.quoteResponse?.result?.[0]?.regularMarketPrice;
   const lUsdLb = lJson.quoteResponse?.result?.[0]?.regularMarketPrice;
