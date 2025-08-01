@@ -1,6 +1,3 @@
-+80
--0
-
 const STORAGE_KEY = 'mollis_sca_price_cache';
 const LB_TO_KG = 0.453592;
 
@@ -21,10 +18,12 @@ function displayPrices(data) {
   if (!data) return;
   const cEl = document.getElementById('cPrice');
   const lEl = document.getElementById('londonPrice');
+  const lkEl = document.getElementById('londonKrwPerKg');
   const kEl = document.getElementById('krwPerKg');
   if (cEl) cEl.textContent = data.cPriceUsdPerLb ? `${data.cPriceUsdPerLb.toFixed(2)} USD/lb` : '-';
-  if (lEl) lEl.textContent = data.londonPriceUsdPerTon ? `${data.londonPriceUsdPerTon.toFixed(0)} USD/ton` : '-';
+  if (lEl) lEl.textContent = data.londonPriceUsdPerLb ? `${data.londonPriceUsdPerLb.toFixed(2)} USD/lb` : '-';
   if (kEl) kEl.textContent = data.krwPerKg ? `${Math.round(data.krwPerKg).toLocaleString()}원/kg` : '-';
+  if (lkEl) lkEl.textContent = data.londonKrwPerKg ? `${Math.round(data.londonKrwPerKg).toLocaleString()}원/kg` : '-';
 }
 
 function setMessage(msg) {
@@ -32,27 +31,31 @@ function setMessage(msg) {
   if (el) el.textContent = msg || '';
 }
 
+const CORS_PROXY = 'https://api.allorigins.win/raw?url=';
+
+async function fetchJson(url) {
+  const res = await fetch(CORS_PROXY + encodeURIComponent(url));
+  return res.json();
+}
+
 async function fetchPrices() {
-  const [cRes, lRes, fxRes] = await Promise.all([
-    fetch('https://query1.finance.yahoo.com/v7/finance/quote?symbols=KC%3DF'),
-    fetch('https://query1.finance.yahoo.com/v7/finance/quote?symbols=RC%3DF'),
-    fetch('https://api.exchangerate.host/latest?base=USD&symbols=KRW')
+  const [cJson, lJson, fxJson] = await Promise.all([
+    fetchJson('https://query1.finance.yahoo.com/v7/finance/quote?symbols=KC%3DF'),
+    fetchJson('https://query1.finance.yahoo.com/v7/finance/quote?symbols=RC%3DF'),
+    fetchJson('https://api.exchangerate.host/latest?base=USD&symbols=KRW')
   ]);
-  const cJson = await cRes.json();
-  const lJson = await lRes.json();
-  const fxJson = await fxRes.json();
 
   const cCents = cJson.quoteResponse?.result?.[0]?.regularMarketPrice;
-  const lUsdTon = lJson.quoteResponse?.result?.[0]?.regularMarketPrice;
+  const lUsdLb = lJson.quoteResponse?.result?.[0]?.regularMarketPrice;
   const usdKrw = fxJson.rates?.KRW;
 
   const cUsdLb = cCents ? cCents / 100 : null;
   const krwPerKg = cUsdLb && usdKrw ? cUsdLb * usdKrw / LB_TO_KG : null;
-  const londonKrwKg = lUsdTon && usdKrw ? (lUsdTon / 1000) * usdKrw : null;
+  const londonKrwKg = lUsdLb && usdKrw ? lUsdLb * usdKrw / LB_TO_KG : null;
 
   const data = {
     cPriceUsdPerLb: cUsdLb,
-    londonPriceUsdPerTon: lUsdTon,
+    londonPriceUsdPerLb: lUsdLb,
     usdToKrw: usdKrw,
     krwPerKg,
     londonKrwPerKg: londonKrwKg,
