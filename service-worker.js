@@ -1,4 +1,4 @@
-const CACHE_NAME = 'mollis-sca-v3';
+const CACHE_NAME = 'noel-sca-v3';
 const urlsToCache = [
   './',
   './index.html',
