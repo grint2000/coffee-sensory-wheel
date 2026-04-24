@@ -3465,6 +3465,32 @@ function formatScoreTotal(sampleData) {
   return (30 + baseScore).toFixed(2);
 }
 
+function getFlavorTextByKey(flavorKey) {
+  const [cat, sub, desc] = String(flavorKey || '').split('|');
+  const rec = FLAVOR_DATA.find((f) => f[0] === cat && f[1] === sub && f[2] === desc);
+  if (!rec) return desc || '-';
+  return currentLanguage === 'ko' && rec.length > 6 ? rec[6] : rec[2];
+}
+
+function getPhaseFlavorSummary(sampleData, phaseId, limit = 3) {
+  const selections = sampleData?.flavorSelections?.[phaseId] || [];
+  if (!selections.length) return '-';
+  const items = selections.slice(0, limit).map(getFlavorTextByKey);
+  const suffix = selections.length > limit ? ` 외 ${selections.length - limit}개` : '';
+  return `${items.join(', ')}${suffix}`;
+}
+
+function getDefectSummary(sampleData) {
+  const picked = DEFECT_PROPS
+    .map((d) => {
+      const level = sampleData?.[d.key] || 'none';
+      if (level === 'none' || !DEFECT_LABELS[level]) return null;
+      return `${d.label}: ${DEFECT_LABELS[level].label}`;
+    })
+    .filter(Boolean);
+  return picked.length ? picked.join(' / ') : '없음';
+}
+
 function createComparisonChart(selectedSamples) {
   const compareArea = document.getElementById('compareArea');
   if (!compareArea) return;
@@ -3503,6 +3529,19 @@ function createComparisonChart(selectedSamples) {
     { label: '결점두수(300g)', key: 'defectCount' }
   ].map((field) => `<tr><th>${field.label}</th>${safeSamples.map((sample) => `<td>${escapeHtml(sample.sampleData?.[field.key] || '-')}</td>`).join('')}</tr>`).join('');
 
+  const sensoryRows = [
+    { label: '프래그런스', value: (sampleData) => getPhaseFlavorSummary(sampleData, 'fragrance') },
+    { label: '아로마', value: (sampleData) => getPhaseFlavorSummary(sampleData, 'aroma') },
+    { label: '플레이버', value: (sampleData) => getPhaseFlavorSummary(sampleData, 'flavor') },
+    { label: '에프터테이스트', value: (sampleData) => getPhaseFlavorSummary(sampleData, 'aftertaste') },
+    { label: '로스팅 디펙트', value: (sampleData) => getDefectSummary(sampleData) },
+    { label: '바디 디스크립터', value: (sampleData) => (sampleData?.bodyDescriptors || []).slice(0, 4).map((id) => {
+        const descriptor = BODY_DESCRIPTORS.find((b) => b.id === id);
+        return descriptor ? descriptor.korean : id;
+      }).join(', ') || '-' },
+    { label: '테이스팅 노트', value: (sampleData) => (sampleData?.tastingNotes || '').trim().slice(0, 120) || '-' }
+  ].map((row) => `<tr><th>${row.label}</th>${safeSamples.map((sample) => `<td>${escapeHtml(row.value(sample.sampleData))}</td>`).join('')}</tr>`).join('');
+
   compareArea.innerHTML = `
     <div class="overflow-x-auto">
       <table class="compare-table w-full text-sm">
@@ -3516,6 +3555,7 @@ function createComparisonChart(selectedSamples) {
           ${totalRows}
           ${scoreRows}
           ${greenRows}
+          ${sensoryRows}
         </tbody>
       </table>
     </div>
