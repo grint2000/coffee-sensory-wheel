@@ -1213,6 +1213,7 @@
       <button type="button" id="scoreResetBtn" class="score-reset-btn">전체 7.00점으로 초기화</button>
       <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-2 score-input-wrap" id="scoreInputGrid"></div>
       <div class="mt-4 sca-total-bar">
+        <div id="mobileScoreSampleName" class="text-xs text-amber-700 font-semibold truncate w-full mb-1"></div>
         <div>
           <label class="text-sm block mb-1">SCA 총점 (100점 만점)</label>
           <span id="totalScore" class="font-bold inline-block text-lg bg-gray-100 px-4 py-2 rounded border">86.00</span>
@@ -1966,8 +1967,8 @@ const DEFECT_LABELS = {
 const DEFECT_PROPS = [
   {key:"defectUnderdevelopment", label:"언더디벨롭먼트", labelEn:"Underdevelopment", desc:"로스팅 불충분, 강한 산미, 피니시/애프터 부족", wheel:"Green/Vegetative"},
   {key:"defectOverdevelopment", label:"오버디벨롭먼트", labelEn:"Overdevelopment", desc:"과도한 로스팅으로 산미, 플레이버 소멸", wheel:"Roasted"},
-  {key:"defectBaked", label:"베이킹(베이크드)", labelEn:"Baked", desc:"팝콘/귀리/시리얼류 결점, 캐러멜화 과잉", wheel:"곡물(Cereal/Grain)"},
-  {key:"defectScorching", label:"스코칭", labelEn:"Scorching", desc:"탄맛, 과다열 노출, 재/탄 노트", wheel:"Roasted"}
+  {key:"defectBaked", label:"베이킹(베이크드)", labelEn:"Baked", desc:"멜라노이딘 발달 부족으로 플랫해지고 단맛·복합미가 낮아지는 결점", wheel:"곡물(Cereal/Grain)"},
+  {key:"defectScorching", label:"스코칭", labelEn:"Scorching", desc:"드럼 내벽 국소 과열로 외부가 탄화되어 거친 탄맛이 나는 결점", wheel:"Roasted"}
 ];
 
 // 향미 카테고리별 그룹핑 (확장)
@@ -2278,8 +2279,8 @@ function createScoreStepper(scoreId, label, tooltipText) {
   wrapper.appendChild(track);
 
   const applyDelta = (delta) => {
-    const current = getScoreValueFromUI(scoreId);
-    const next = normalizeScoreValue(current + delta, current);
+    const current = normalizeScoreValue(getScoreValueFromUI(scoreId), 7);
+    const next = Math.min(10, Math.max(6, Math.round((current + delta) * 4) / 4));
     syncScoreRealtime(scoreId, next);
   };
 
@@ -2307,10 +2308,16 @@ function renderScoreSteppers() {
 }
 
 function getScoreGrade(totalScore) {
-  if (totalScore >= 90) return { label: 'Outstanding', color: '#D4AF37' };
-  if (totalScore >= 85) return { label: 'Excellent', color: '#4CAF50' };
-  if (totalScore >= 80) return { label: 'Very Good', color: '#2196F3' };
-  if (totalScore >= 75) return { label: 'Good', color: '#FF9800' };
+  if (totalScore >= 90) return { label: 'Outstanding · 90+', color: '#D4AF37' };
+  if (totalScore >= 88) return { label: 'Excellent · 88+', color: '#27AE60' };
+  if (totalScore >= 86) return { label: 'Excellent · 86+', color: '#2ECC71' };
+  if (totalScore >= 85) return { label: 'Excellent · 85+', color: '#4CAF50' };
+  if (totalScore >= 84) return { label: 'Very Good · 84+', color: '#1565C0' };
+  if (totalScore >= 82) return { label: 'Very Good · 82+', color: '#1976D2' };
+  if (totalScore >= 80) return { label: 'Very Good · 80+', color: '#2196F3' };
+  if (totalScore >= 78) return { label: 'Good · 78+', color: '#E65100' };
+  if (totalScore >= 76) return { label: 'Good · 76+', color: '#EF6C00' };
+  if (totalScore >= 75) return { label: 'Good · 75+', color: '#FF9800' };
   if (totalScore >= 70) return { label: 'Fair', color: '#9E9E9E' };
   return { label: 'Below Specialty', color: '#F44336' };
 }
@@ -2384,6 +2391,20 @@ function setupGreenBeanSection() {
     el.addEventListener('input', updateGreenBeanWarnings);
     el.addEventListener('change', updateGreenBeanWarnings);
   });
+
+  const harvestYearInput = document.getElementById('harvestYear');
+  const cropStatusSelect = document.getElementById('cropStatus');
+  if (harvestYearInput && cropStatusSelect) {
+    harvestYearInput.addEventListener('change', function() {
+      const year = Number.parseInt(this.value, 10);
+      if (!Number.isFinite(year) || cropStatusSelect.value) return;
+      const diff = new Date().getFullYear() - year;
+      if (diff <= 0) cropStatusSelect.value = 'New Crop';
+      else if (diff === 1) cropStatusSelect.value = 'Current Crop';
+      else if (diff === 2) cropStatusSelect.value = 'Past Crop';
+      else cropStatusSelect.value = 'Old Crop';
+    });
+  }
 }
 
 // 향미 휠 아코디언 토글 함수
@@ -2958,7 +2979,7 @@ function toggleBodyDescriptor(descriptorId) {
   currentSample.sampleData.bodyDescriptors = descriptors;
   
   // UI 즉시 업데이트 (향미 선택과 동일한 방식)
-  const itemElement = document.querySelector(`[data-descriptor="${descriptorId}"]`);
+  const itemElement = document.querySelector(`[data-descriptor-id="${descriptorId}"]`);
   if (itemElement) {
     const checkbox = itemElement.querySelector('input[type="checkbox"]');
     const isSelected = descriptors.includes(descriptorId);
@@ -3524,15 +3545,16 @@ function updateRadar(data) {
 }
 
 // 총점 계산
-function updateTotalScore(data) {
+function updateTotalScore(data, options = {}) {
   const sampleData = data || getCurrentSampleObj()?.sampleData;
+  const useUiFallback = !data && options.useUiFallback === true;
 
   let total = 30;
   SCORE_FIELD_KEYS.forEach(field => {
-    if (data) {
-      total += normalizeScoreValue(sampleData?.[field], 0);
-    } else {
+    if (useUiFallback) {
       total += getScoreValueFromUI(field);
+    } else {
+      total += normalizeScoreValue(sampleData?.[field], 7);
     }
   });
 
@@ -3542,12 +3564,19 @@ function updateTotalScore(data) {
   }
   updateScoreGradeBadge(total);
 
+  const mobileScoreSampleName = document.getElementById('mobileScoreSampleName');
+  if (mobileScoreSampleName) {
+    mobileScoreSampleName.textContent = sampleData?.title
+      ? `현재 샘플: ${sampleData.title}`
+      : '현재 샘플: 미선택';
+  }
+
   document.getElementById('evalDate').textContent = new Date().toLocaleDateString();
 }
 
 function syncScoreRealtime(fieldKey, rawValue) {
   const normalized = setScoreValueToUI(fieldKey, rawValue);
-  updateTotalScore();
+  updateTotalScore(undefined, { useUiFallback: true });
   scheduleAutoSave();
   return normalized;
 }
@@ -3650,7 +3679,9 @@ function saveUIToSample(targetDataObj) {
   sampleData.roastLevel = document.getElementById('roastLevel').value;
   GREEN_BEAN_FIELDS.forEach((field) => {
     const input = document.getElementById(field);
-    sampleData[field] = input ? input.value : '';
+    const raw = input ? input.value : '';
+    const isNumericField = field === 'altitude' || field === 'moistureContent' || field === 'defectCount' || field === 'greenBagWeight';
+    sampleData[field] = isNumericField && raw !== '' ? Number.parseFloat(raw) : raw;
   });
   sampleData.acidityLevel = getCheckedRadio('acidityLevel');
   sampleData.sweetnessLevel = getCheckedRadio('sweetnessLevel');
@@ -4804,7 +4835,6 @@ function setupEventHandlers() {
     const el = document.getElementById(id);
     if (!el) return;
     el.addEventListener('change', saveSessionMetaFromInline);
-    el.addEventListener('blur', saveSessionMetaFromInline);
   });
 
   // 샘플 관리 버튼들
@@ -4997,7 +5027,7 @@ function setupEventHandlers() {
   // 계산 버튼
   const calcScoreBtn = document.getElementById('calcScoreBtn');
   if (calcScoreBtn) calcScoreBtn.addEventListener('click', function() {
-    updateTotalScore();
+    updateTotalScore(undefined, { useUiFallback: true });
   });
 
 
@@ -5162,7 +5192,7 @@ function setupEventHandlers() {
   const exportXlsxBtn = document.getElementById('exportXlsxBtn');
   if (exportXlsxBtn) exportXlsxBtn.addEventListener('click', exportToExcel);
   
-  updateTotalScore();
+  updateTotalScore(undefined, { useUiFallback: true });
 }
 
 // DOM 준비 상태 확인 후 앱 초기화
