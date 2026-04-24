@@ -1,8 +1,3 @@
-import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-app.js";
-import { getAuth, signInWithPopup, GoogleAuthProvider, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-auth.js";
-import { getFirestore, doc, setDoc, updateDoc, arrayUnion, getDoc, onSnapshot, deleteField } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore.js";
-
-
 function notifyMessage(msg) {
   if (typeof window.showToast === 'function') {
     window.showToast(msg);
@@ -11,42 +6,9 @@ function notifyMessage(msg) {
   }
 }
 
-function safeStorageGet(key, fallback = null) {
-  try {
-    const value = localStorage.getItem(key);
-    return value === null ? fallback : value;
-  } catch (e) {
-    return fallback;
-  }
-}
-
-function safeStorageSet(key, value) {
-  try {
-    localStorage.setItem(key, value);
-    return true;
-  } catch (e) {
-    notifyMessage('저장소 접근에 실패했습니다. 브라우저 저장공간을 확인해 주세요.');
-    return false;
-  }
-}
-
-function safeStorageRemove(key) {
-  try {
-    localStorage.removeItem(key);
-  } catch (e) {}
-}
-
-function getCurrentTeamName() {
-  const noelTeam = safeStorageGet('noel_sca_current_team');
-  if (noelTeam) return noelTeam;
-  const legacyTeam = safeStorageGet('mollis_current_team');
-  if (legacyTeam) {
-    safeStorageSet('noel_sca_current_team', legacyTeam);
-    safeStorageRemove('mollis_current_team');
-    return legacyTeam;
-  }
-  return null;
-}
+import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-app.js";
+import { getAuth, signInWithPopup, GoogleAuthProvider, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-auth.js";
+import { getFirestore, doc, setDoc, updateDoc, arrayUnion, getDoc, onSnapshot, deleteField } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyD-rwtilsBrdQ9JDJYFwXb57ebD6DsSqGg",
@@ -66,23 +28,20 @@ window.firebaseLogin = async function() {
     const provider = new GoogleAuthProvider();
     const result = await signInWithPopup(auth, provider);
     window.currentUser = result.user.displayName || result.user.email;
-    const userDisplay = document.getElementById('currentUserDisplay');
-    const logoutBtn = document.getElementById('logoutBtn');
-    const loginBtn = document.getElementById('loginBtn');
-    if (userDisplay) userDisplay.textContent = window.currentUser;
-    safeStorageSet('noel_sca_current_user', window.currentUser);
-    if (logoutBtn) logoutBtn.classList.remove('hidden');
-    if (loginBtn) loginBtn.classList.add('hidden');
+    document.getElementById('currentUserDisplay').textContent = window.currentUser;
+    localStorage.setItem('noel_sca_current_user', window.currentUser);
+    document.getElementById('logoutBtn').classList.remove('hidden');
+    document.getElementById('loginBtn').classList.add('hidden');
   } catch (err) {
-    notifyMessage('로그인 처리 중 오류가 발생했습니다.');
+    console.error(err);
   }
 };
 
 window.logoutFirebase = async function() {
   await signOut(auth);
   window.currentUser = 'default';
-  safeStorageSet('noel_sca_current_user', window.currentUser);
-  safeStorageRemove('noel_sca_current_team');
+  localStorage.setItem('noel_sca_current_user', window.currentUser);
+  localStorage.removeItem('noel_sca_current_team');
   if (window._teamSamplesUnsub) window._teamSamplesUnsub();
   location.reload();
 };
@@ -111,7 +70,7 @@ window.createTeam = async function(teamName) {
     members: [{ uid: auth.currentUser.uid, name: window.currentUser }],
     memberSamples: { [auth.currentUser.uid]: window.samples || [] }
   }, { merge: true });
-  safeStorageSet('noel_sca_current_team', teamName);
+  localStorage.setItem('noel_sca_current_team', teamName);
   updateTeamHeader();
   await syncSamplesToTeam(window.samples || []);
   fetchTeamSamples().then(startTeamSamplesListener);
@@ -133,7 +92,7 @@ window.joinTeam = async function(teamName) {
     members: arrayUnion({ uid: auth.currentUser.uid, name: window.currentUser }),
     [`memberSamples.${auth.currentUser.uid}`]: window.samples || []
   });
-  safeStorageSet('noel_sca_current_team', teamName);
+  localStorage.setItem('noel_sca_current_team', teamName);
   updateTeamHeader();
   await fetchTeamSamples();
   startTeamSamplesListener();
@@ -141,7 +100,7 @@ window.joinTeam = async function(teamName) {
 };
 
 window.loadTeamInfoToModal = async function() {
-  const teamName = getCurrentTeamName();
+  const teamName = localStorage.getItem('noel_sca_current_team');
   const nameEl = document.getElementById('currentTeamDisplay');
   const listEl = document.getElementById('teamMembersList');
   if (nameEl) nameEl.textContent = teamName || '없음';
@@ -169,7 +128,7 @@ window.loadTeamInfoToModal = async function() {
 };
 
 window.removeMemberFromTeam = async function(memberUid) {
-  const teamName = getCurrentTeamName();
+  const teamName = localStorage.getItem('noel_sca_current_team');
   if (!teamName) return;
   const teamRef = doc(db, 'teams', teamName);
   const snap = await getDoc(teamRef);
@@ -190,7 +149,7 @@ window.removeMemberFromTeam = async function(memberUid) {
 function updateTeamHeader() {
   const headerEl = document.getElementById('currentTeamHeader');
   if (headerEl) {
-    const name = getCurrentTeamName();
+    const name = localStorage.getItem('noel_sca_current_team');
     headerEl.textContent = name ? `팀: ${name}` : '';
   }
 }
@@ -198,7 +157,7 @@ function updateTeamHeader() {
 // === Team sample sync functions ===
 
 async function fetchTeamSamples() {
-  const teamName = getCurrentTeamName();
+  const teamName = localStorage.getItem('noel_sca_current_team');
   if (!teamName) return;
   try {
     const snap = await getDoc(doc(db, 'teams', teamName));
@@ -214,7 +173,7 @@ async function fetchTeamSamples() {
       if (samplesData) {
         const key = `noel_sca_samples2_${window.currentUser || 'default'}`;
         const localStr = JSON.stringify(samplesData);
-        safeStorageSet(key, localStr);
+        localStorage.setItem(key, localStr);
         if (typeof loadSamplesFromStorage === 'function') {
           loadSamplesFromStorage();
           if (typeof renderSampleList === 'function') renderSampleList();
@@ -222,12 +181,12 @@ async function fetchTeamSamples() {
       }
     }
   } catch (err) {
-    notifyMessage('팀 샘플 불러오기에 실패했습니다.');
+    console.error('팀 샘플 불러오기 실패', err);
   }
 }
 
 window.syncSamplesToTeam = async function(samples) {
-  const teamName = getCurrentTeamName();
+  const teamName = localStorage.getItem('noel_sca_current_team');
   if (!teamName || !auth.currentUser) return;
   try {
     const teamRef = doc(db, 'teams', teamName);
@@ -236,12 +195,12 @@ window.syncSamplesToTeam = async function(samples) {
     updateObj.updatedAt = Date.now();
     await updateDoc(teamRef, updateObj);
   } catch (err) {
-    notifyMessage('팀 샘플 동기화에 실패했습니다.');
+    console.error('팀 샘플 동기화 실패', err);
   }
 };
 
 window.startTeamSamplesListener = function() {
-  const teamName = getCurrentTeamName();
+  const teamName = localStorage.getItem('noel_sca_current_team');
   if (!teamName) return;
   const teamRef = doc(db, 'teams', teamName);
   if (window._teamSamplesUnsub) window._teamSamplesUnsub();
@@ -258,8 +217,8 @@ window.startTeamSamplesListener = function() {
       if (samplesData) {
         const key = `noel_sca_samples2_${window.currentUser || 'default'}`;
         const newStr = JSON.stringify(samplesData);
-        if (safeStorageGet(key) !== newStr) {
-          safeStorageSet(key, newStr);
+        if (localStorage.getItem(key) !== newStr) {
+          localStorage.setItem(key, newStr);
           if (typeof loadSamplesFromStorage === 'function') {
             loadSamplesFromStorage();
             if (typeof renderSampleList === 'function') renderSampleList();
@@ -273,7 +232,7 @@ window.startTeamSamplesListener = function() {
 };
 
 window.showTeamReport = async function() {
-  const teamName = getCurrentTeamName();
+  const teamName = localStorage.getItem('noel_sca_current_team');
   if (!teamName) return;
   const snap = await getDoc(doc(db, 'teams', teamName));
   if (!snap.exists()) return;

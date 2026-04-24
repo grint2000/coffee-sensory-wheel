@@ -1,6 +1,50 @@
+function notifyMessage(msg) {
+  if (typeof window.showToast === 'function') {
+    window.showToast(msg);
+  } else {
+    alert(msg);
+  }
+}
+
+function safeStorageGet(key, fallback = null) {
+  try {
+    const value = localStorage.getItem(key);
+    return value === null ? fallback : value;
+  } catch (e) {
+    return fallback;
+  }
+}
+
+function safeStorageSet(key, value) {
+  try {
+    localStorage.setItem(key, value);
+    return true;
+  } catch (e) {
+    return false;
+  }
+}
+
+function safeStorageRemove(key) {
+  try {
+    localStorage.removeItem(key);
+  } catch (e) {}
+}
+
+function migrateLegacyUserKey() {
+  const current = safeStorageGet('noel_sca_current_user');
+  if (current) return current;
+  const legacy = safeStorageGet('mollis_current_user');
+  if (legacy) {
+    safeStorageSet('noel_sca_current_user', legacy);
+    safeStorageRemove('mollis_current_user');
+    return legacy;
+  }
+  return 'default';
+}
+
 // Extra features: undo, login, service worker registration
 let undoStack = [];
-window.currentUser = localStorage.getItem('mollis_sca_current_user') || 'default';
+window.currentUser = migrateLegacyUserKey();
 let deferredPrompt;
 
 function pushUndoState() {
@@ -12,11 +56,14 @@ function pushUndoState() {
 
 function undoLastAction() {
   if (!undoStack.length) {
-    alert('실행 취소할 내용이 없습니다.');
+    notifyMessage('실행 취소할 내용이 없습니다.');
     return;
   }
   const state = undoStack.pop();
-  localStorage.setItem(`mollis_sca_samples2_${window.currentUser}`, state.samples);
+  if (!safeStorageSet(`noel_sca_samples2_${window.currentUser}`, state.samples)) {
+    notifyMessage('저장소 접근에 실패했습니다. 저장 공간을 확인해 주세요.');
+    return;
+  }
   location.reload();
 }
 
@@ -28,7 +75,7 @@ function loginUser() {
   const name = prompt('사용자 이름을 입력하세요', window.currentUser);
   if (!name) return;
   window.currentUser = name.trim();
-  localStorage.setItem('mollis_sca_current_user', window.currentUser);
+  safeStorageSet('noel_sca_current_user', window.currentUser);
   location.reload();
 }
 
@@ -40,15 +87,15 @@ function logoutUser() {
 
   if (confirm('로그아웃하시겠습니까?')) {
     window.currentUser = 'default';
-    localStorage.setItem('mollis_sca_current_user', window.currentUser);
-    localStorage.removeItem('mollis_sca_current_team');
+    safeStorageSet('noel_sca_current_user', window.currentUser);
+    safeStorageRemove('noel_sca_current_team');
     location.reload();
   }
 }
 
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => {
-    navigator.serviceWorker.register('service-worker.js').catch(e => console.error('SW registration failed:', e));
+    navigator.serviceWorker.register('service-worker.js').catch(() => {});
   });
 }
 
@@ -59,46 +106,42 @@ window.addEventListener('beforeinstallprompt', (e) => {
   if (installBtn) installBtn.classList.remove('hidden');
 });
 
-
 document.addEventListener('DOMContentLoaded', () => {
-  const loginBtn = document.getElementById('loginBtn');
-  const logoutBtn = document.getElementById('logoutBtn');
-  const installBtn = document.getElementById('installBtn');
-  const display = document.getElementById('currentUserDisplay');
-  if (display) display.textContent = window.currentUser;
-  if (loginBtn) {
-    loginBtn.addEventListener('click', loginUser);
-    if (window.currentUser !== 'default') {
-      loginBtn.classList.add('hidden');
-    }
+  const dom = {
+    loginBtn: document.getElementById('loginBtn'),
+    logoutBtn: document.getElementById('logoutBtn'),
+    installBtn: document.getElementById('installBtn'),
+    display: document.getElementById('currentUserDisplay'),
+    undoBtn: document.getElementById('undoBtn'),
+    addBtn: document.getElementById('addSampleBtn'),
+    removeBtn: document.getElementById('removeSampleBtn'),
+    cloneBtn: document.getElementById('cloneSampleBtn')
+  };
+
+  if (dom.display) dom.display.textContent = window.currentUser;
+  if (dom.loginBtn) {
+    dom.loginBtn.addEventListener('click', loginUser);
+    if (window.currentUser !== 'default') dom.loginBtn.classList.add('hidden');
   }
-  if (logoutBtn) {
-    logoutBtn.addEventListener('click', logoutUser);
-    if (window.currentUser !== 'default') {
-      logoutBtn.classList.remove('hidden');
-    }
+  if (dom.logoutBtn) {
+    dom.logoutBtn.addEventListener('click', logoutUser);
+    if (window.currentUser !== 'default') dom.logoutBtn.classList.remove('hidden');
   }
-  if (installBtn) {
-    const hideInstall = () => installBtn.classList.add('hidden');
-    if (window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone) {
-      hideInstall();
-    }
-    installBtn.addEventListener('click', () => {
-      if (deferredPrompt) {
-        deferredPrompt.prompt();
-        deferredPrompt.userChoice.then(() => {
-          deferredPrompt = null;
-          hideInstall();
-        });
-      }
+  if (dom.installBtn) {
+    const hideInstall = () => dom.installBtn.classList.add('hidden');
+    if (window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone) hideInstall();
+    dom.installBtn.addEventListener('click', () => {
+      if (!deferredPrompt) return;
+      deferredPrompt.prompt();
+      deferredPrompt.userChoice.then(() => {
+        deferredPrompt = null;
+        hideInstall();
+      });
     });
   }
-  const undoBtn = document.getElementById('undoBtn');
-  if (undoBtn) undoBtn.addEventListener('click', undoLastAction);
-  const addBtn = document.getElementById('addSampleBtn');
-  if (addBtn) addBtn.addEventListener('click', pushUndoState);
-  const removeBtn = document.getElementById('removeSampleBtn');
-  if (removeBtn) removeBtn.addEventListener('click', pushUndoState);
-  const cloneBtn = document.getElementById('cloneSampleBtn');
-  if (cloneBtn) cloneBtn.addEventListener('click', pushUndoState);
+
+  if (dom.undoBtn) dom.undoBtn.addEventListener('click', undoLastAction);
+  if (dom.addBtn) dom.addBtn.addEventListener('click', pushUndoState);
+  if (dom.removeBtn) dom.removeBtn.addEventListener('click', pushUndoState);
+  if (dom.cloneBtn) dom.cloneBtn.addEventListener('click', pushUndoState);
 });

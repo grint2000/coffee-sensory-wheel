@@ -1,31 +1,41 @@
 // Theme toggle functionality
-/**
- * Handles applying and toggling the light/dark theme.
- * The user's preference is stored in localStorage so the
- * choice persists across visits.
- */
 (function() {
-  function applyTheme(theme) {
-    if (theme === 'dark') {
-      document.body.classList.add('dark');
-      const icon = document.getElementById('themeToggleIcon');
-      if (icon) icon.className = 'fa fa-sun';
-    } else {
-      document.body.classList.remove('dark');
-      const icon = document.getElementById('themeToggleIcon');
-      if (icon) icon.className = 'fa fa-moon';
+  function safeStorageGet(key, fallback = null) {
+    try {
+      const value = localStorage.getItem(key);
+      return value === null ? fallback : value;
+    } catch (e) {
+      return fallback;
     }
+  }
+
+  function safeStorageSet(key, value) {
+    try {
+      localStorage.setItem(key, value);
+    } catch (e) {}
+  }
+
+  function applyTheme(theme) {
+    const isDark = theme === 'dark';
+    document.body.classList.toggle('dark', isDark);
+    document.documentElement.classList.toggle('dark', isDark);
+
+    const icon = document.getElementById('themeToggleIcon');
+    if (icon) icon.className = isDark ? 'fa fa-sun' : 'fa fa-moon';
   }
 
   function init() {
     const toggle = document.getElementById('themeToggle');
-    const saved = localStorage.getItem('theme') || 'light';
+    const preferred = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+    const saved = safeStorageGet('theme', preferred);
     applyTheme(saved);
+
     if (toggle) {
       toggle.addEventListener('click', function() {
-        const isDark = document.body.classList.toggle('dark');
-        localStorage.setItem('theme', isDark ? 'dark' : 'light');
-        applyTheme(isDark ? 'dark' : 'light');
+        const isDark = !document.body.classList.contains('dark');
+        const nextTheme = isDark ? 'dark' : 'light';
+        safeStorageSet('theme', nextTheme);
+        applyTheme(nextTheme);
       });
     }
   }

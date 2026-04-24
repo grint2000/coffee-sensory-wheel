@@ -2,7 +2,7 @@
 <html lang="ko">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
   <title>Noel SCA 커피 관능 평가 (개선버전)</title>
   <link rel="manifest" href="manifest.json">
   <meta name="theme-color" content="#8B5A2B">
@@ -12,7 +12,7 @@
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
-  
+  <script src="https://cdn.jsdelivr.net/npm/hammerjs@2.0.8/hammer.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
   <style>
     html,body { font-family: 'Noto Sans KR', sans-serif; background: #fcfaf7;}
@@ -1005,7 +1005,7 @@
             <div id="moistureWarning" class="text-xs text-amber-500 mt-1 hidden">※ 적정 수분함량(10~13%)을 벗어났습니다</div>
           </div>
           <div>
-            <label class="block text-sm font-semibold mb-1">스크린사이즈 (Screen #)</label>
+            <label class="block text-sm font-semibold mb-1">스크린사이즈</label>
             <select id="screenSize" class="coffee-input w-full border border-tan-300 rounded p-2">
               <option value="">선택</option><option value="13">13</option><option value="14">14</option><option value="15">15</option>
               <option value="16">16</option><option value="17">17</option><option value="18">18</option><option value="19">19</option>
@@ -1013,27 +1013,27 @@
             </select>
           </div>
           <div>
-            <label class="block text-sm font-semibold mb-1">결점두수 (300g, 개수)</label>
+            <label class="block text-sm font-semibold mb-1">결점두수(300g)</label>
             <input id="defectCount" type="number" min="0" step="1" class="coffee-input w-full border border-tan-300 rounded p-2" />
             <div id="defectCountWarning" class="text-xs text-red-500 mt-1 hidden">⚠ SCA 스페셜티 등급 기준 초과</div>
           </div>
           <div>
-            <label class="block text-sm font-semibold mb-1">로트번호 (Lot #)</label>
-            <input id="lotNumber" class="coffee-input w-full border border-tan-300 rounded p-2" placeholder="예: ETH-GUJI-2026-LOT07" />
+            <label class="block text-sm font-semibold mb-1">로트번호</label>
+            <input id="lotNumber" class="coffee-input w-full border border-tan-300 rounded p-2" />
           </div>
           <div>
-            <label class="block text-sm font-semibold mb-1">공급자 / 수출업체</label>
-            <input id="supplierName" class="coffee-input w-full border border-tan-300 rounded p-2" placeholder="예: Addis Export Trading" />
+            <label class="block text-sm font-semibold mb-1">공급자</label>
+            <input id="supplierName" class="coffee-input w-full border border-tan-300 rounded p-2" />
           </div>
           <div>
-            <label class="block text-sm font-semibold mb-1">생두중량 (kg)</label>
+            <label class="block text-sm font-semibold mb-1">생두중량(kg)</label>
             <input id="greenBagWeight" type="number" min="0" step="0.1" class="coffee-input w-full border border-tan-300 rounded p-2" />
           </div>
         </div>
       </div>
     </section>
     
-    <!-- 2단계 · SCA 향미 선택 -->
+    <!-- SCA 향미 선택 -->
     <section class="mt-8">
       <h3 class="text-base font-bold mb-1 border-b pb-1 border-tan-200 flex items-center"><i class="fa fa-circle-half-stroke mr-2"></i>SCA 향미 선택</h3>
       <div class="text-xs mb-3 text-gray-600">[프래그런스] [아로마] [플레이버] [에프터테이스트] 각 그룹별 향미 선택</div>
@@ -1050,7 +1050,7 @@
       <div id="flavorWheelMultiSelectArea" class="flavor-section border border-gray-50 rounded-lg p-2 bg-gray-50 mb-1"></div>
     </section>
     
-    <!-- 1단계 · 점수 입력 및 단계 속성 -->
+    <!-- 단계 속성 -->
     <section class="mt-8">
       <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
         <div>
@@ -2153,15 +2153,13 @@ function setupLongPress(button, onTick) {
     holdInterval = null;
   };
 
-  button.addEventListener('pointerdown', (event) => {
-    if (event.button !== undefined && event.button !== 0) return;
-    event.preventDefault();
+  button.addEventListener('pointerdown', () => {
     holdTimeout = setTimeout(() => {
-      holdInterval = setInterval(onTick, 120);
-    }, 420);
+      holdInterval = setInterval(onTick, 100);
+    }, 500);
   });
 
-  ['pointerup', 'pointercancel', 'pointerleave', 'lostpointercapture'].forEach(evt =>
+  ['pointerup', 'pointercancel', 'pointerleave'].forEach(evt =>
     button.addEventListener(evt, clearAll)
   );
 }
@@ -2718,7 +2716,7 @@ function switchLanguage(lang) {
   setTimeout(() => {
     // 향미 관련 UI 업데이트
     renderFlavorTabs();
-    scheduleFlavorPhaseRender();
+    renderFlavorPhase();
 
     // 바디감 디스크립터 UI 업데이트
     renderBodyCategoryTabs();
@@ -2742,7 +2740,7 @@ function switchLanguage(lang) {
     
   }, 200);
   
-  
+  console.log(`언어가 ${lang === 'ko' ? '한국어' : '영어'}로 변경되었습니다.`);
 }
 
 // 다국어 텍스트 업데이트 함수
@@ -2776,7 +2774,7 @@ function renderBodyCategoryTabs() {
     tabs.appendChild(btn);
   });
 
-  
+  console.log(`바디감 카테고리 탭 렌더링 완료 (언어: ${currentLanguage})`);
 }
 
 // 바디감 디스크립터 렌더링 개선
@@ -2815,7 +2813,7 @@ function renderBodyDescriptors() {
 
   container.innerHTML = html;
   
-  
+  console.log(`바디감 디스크립터 렌더링 완료 (언어: ${currentLanguage})`);
 }
 
 // 바디감 디스크립터 토글 함수 개선
@@ -2854,7 +2852,7 @@ function toggleBodyDescriptor(descriptorId) {
   renderSelectedFlavorsArea();
   scheduleAutoSave();
   
-  
+  console.log(`바디감 디스크립터 '${descriptorId}' 토글됨:`, descriptors.includes(descriptorId));
 }
 
 /* === 3단계: UI 렌더링 및 상호작용 함수 === */
@@ -2877,12 +2875,12 @@ function renderFlavorTabs() {
     btn.onclick = () => {
       currentFlavorPhase = phase.id;
       renderFlavorTabs();
-      scheduleFlavorPhaseRender();
+      renderFlavorPhase();
     };
     tabs.appendChild(btn);
   });
   
-  
+  console.log(`향미 탭 렌더링 완료 (언어: ${currentLanguage})`);
 }
 
 // 향미 선택 영역 렌더링 개선
@@ -3193,7 +3191,7 @@ if (basicMatch || initialMatch) {
     };
   });
   
-  
+  console.log(`향미 선택 영역 렌더링 완료 (언어: ${currentLanguage})`);
 }
 
 // 향미 특성/속성 실시간 반영 개선 (바디감 디스크립터 포함)
@@ -3317,7 +3315,7 @@ function renderSelectedFlavorsArea(_data) {
     flavorArea.innerHTML = html;
   }
 
-  
+  console.log(`선택된 향미 영역 업데이트 완료 (언어: ${currentLanguage})`);
 }
 
 // 레이더 차트 업데이트
@@ -3966,38 +3964,24 @@ function cloneSample(sampleId) {
 
 // 스와이프로 이전/다음 샘플 이동 (모바일 최적화)
 function setupSwipeNavigation() {
-  const form = document.getElementById('cuppingForm');
-  if (!form) return;
-
-  let startX = 0;
-  let startY = 0;
-
-  form.addEventListener('touchstart', (event) => {
-    const touch = event.changedTouches && event.changedTouches[0];
-    if (!touch) return;
-    startX = touch.clientX;
-    startY = touch.clientY;
-  }, { passive: true });
-
-  form.addEventListener('touchend', (event) => {
-    const touch = event.changedTouches && event.changedTouches[0];
-    if (!touch) return;
-
-    const deltaX = touch.clientX - startX;
-    const deltaY = touch.clientY - startY;
-    if (Math.abs(deltaX) < 60 || Math.abs(deltaX) < Math.abs(deltaY)) return;
-
-    if (deltaX < 0) goToNextSample();
-    else goToPrevSample();
-  }, { passive: true });
-}
-
-function safeStorageSet(key, value) {
   try {
-    localStorage.setItem(key, value);
-    return true;
+    const form = document.getElementById('cuppingForm');
+    if (!form || typeof Hammer === 'undefined') return;
+    
+    const hammer = new Hammer(form);
+    hammer.get('swipe').set({ direction: Hammer.DIRECTION_HORIZONTAL });
+    
+    hammer.on('swipeleft', function(e) {
+      goToNextSample();
+    });
+    
+    hammer.on('swiperight', function(e) {
+      goToPrevSample();
+    });
+    
+    console.log("스와이프 내비게이션이 설정되었습니다.");
   } catch (e) {
-    return false;
+    console.error("스와이프 내비게이션 설정 중 오류:", e);
   }
 }
 
@@ -4011,19 +3995,11 @@ function setupAutoBackup() {
   if (!lastBackup || (now - parseInt(lastBackup)) > 86400000) {
     try {
       syncCurrentSessionSamples();
-      const userKey = window.currentUser || 'default';
-      const backupData = JSON.stringify({
-        sessions,
-        currentSessionId,
-        currentUser: userKey,
-        createdAt: now
-      });
+      const backupData = JSON.stringify(sessions);
       const backupKey = `noel_sca_backup_${new Date().toISOString().slice(0, 10)}`;
-
-      if (!safeStorageSet(backupKey, backupData)) {
-        safeStorageSet('noel_sca_emergency_backup', backupData);
-      }
-      safeStorageSet('noel_sca_last_backup', now.toString());
+      
+      localStorage.setItem(backupKey, backupData);
+      localStorage.setItem('noel_sca_last_backup', now.toString());
       
       const keys = [];
       for (let i = 0; i < localStorage.length; i++) {
@@ -4040,7 +4016,7 @@ function setupAutoBackup() {
         }
       }
       
-      
+      console.log('자동 백업 완료:', backupKey);
     } catch (e) {
       console.error('자동 백업 중 오류:', e);
     }
@@ -4511,7 +4487,7 @@ function enhanceMobileExperience() {
       lastTouchEnd = now;
     }, false);
     
-    
+    console.log("모바일 최적화 기능이 활성화되었습니다.");
   }
 }
 
@@ -4566,7 +4542,7 @@ function setupKeyboardShortcuts() {
       if (phaseIndex < FLAVOR_PHASES.length) {
         currentFlavorPhase = FLAVOR_PHASES[phaseIndex].id;
         renderFlavorTabs();
-        scheduleFlavorPhaseRender();
+        renderFlavorPhase();
       }
     }
     
@@ -4577,7 +4553,7 @@ function setupKeyboardShortcuts() {
     }
   });
   
-  
+  console.log("키보드 단축키가 설정되었습니다.");
 }
 
 // 차트 객체 정리
@@ -4601,16 +4577,6 @@ function cleanupCharts() {
 }
 
 // 성능 최적화 함수
-function debounce(fn, delay) {
-  let timeoutId = null;
-  return function(...args) {
-    clearTimeout(timeoutId);
-    timeoutId = setTimeout(() => fn.apply(this, args), delay);
-  };
-}
-
-const scheduleFlavorPhaseRender = debounce(() => renderFlavorPhase(), 120);
-
 function optimizePerformance() {
   // 디바운싱된 리사이즈 이벤트
   let resizeTimeout;
@@ -4645,7 +4611,7 @@ function optimizePerformance() {
 // 초기화 함수
 function initApp() {
   try {
-    
+    console.log("🚀 Noel SCA 커피 관능 평가 도구 (개선버전) 시작");
     
     renderFlavorTabs();
     renderBodyCategoryTabs();
@@ -4678,10 +4644,10 @@ function initApp() {
       }
     }
     
-    
-    
-    
-    
+    console.log("✅ 애플리케이션 초기화 완료");
+    console.log(`📊 향미 항목: ${FLAVOR_DATA.length}개`);
+    console.log(`🖐 바디감 디스크립터: ${BODY_DESCRIPTORS.length}개`);
+    console.log(`🌐 현재 언어: ${currentLanguage === 'ko' ? '한국어' : '영어'}`);
     
     // 사용자에게 환영 메시지 표시
     setTimeout(() => {
@@ -4894,24 +4860,14 @@ function setupEventHandlers() {
   });
 
 
-  document.addEventListener('click', function(event) {
-    const scoreNavBtn = event.target.closest('[data-score-nav]');
-    if (scoreNavBtn) {
-      const target = document.getElementById(`${scoreNavBtn.dataset.scoreNav}Stepper`);
+  document.querySelectorAll('[data-score-nav]').forEach(btn => {
+    btn.addEventListener('click', function() {
+      const target = document.getElementById(`${this.dataset.scoreNav}Stepper`);
       if (!target) return;
       target.scrollIntoView({ behavior: 'smooth', block: 'center' });
       const input = target.querySelector('.score-stepper-value');
       if (input) input.focus({ preventScroll: true });
-      return;
-    }
-
-    const scorePresetBtn = event.target.closest('[data-score-preset]');
-    if (scorePresetBtn) {
-      const preset = Number.parseFloat(scorePresetBtn.dataset.scorePreset || '7');
-      if (Number.isNaN(preset)) return;
-      SCORE_FIELD_KEYS.forEach(field => syncScoreRealtime(field, preset));
-      showToast(`점수 프리셋 ${preset.toFixed(2)} 적용 완료`);
-    }
+    });
   });
 
   const scoreResetBtn = document.getElementById('scoreResetBtn');
@@ -4920,6 +4876,15 @@ function setupEventHandlers() {
     showToast('모든 점수를 7.00으로 초기화했습니다.');
   });
 
+
+  document.querySelectorAll('[data-score-preset]').forEach(btn => {
+    btn.addEventListener('click', function() {
+      const preset = Number.parseFloat(this.dataset.scorePreset || '7');
+      if (Number.isNaN(preset)) return;
+      SCORE_FIELD_KEYS.forEach(field => syncScoreRealtime(field, preset));
+      showToast(`점수 프리셋 ${preset.toFixed(2)} 적용 완료`);
+    });
+  });
 
   const mobileQuickSaveBtn = document.getElementById('mobileQuickSaveBtn');
   if (mobileQuickSaveBtn) mobileQuickSaveBtn.addEventListener('click', function() {
@@ -5060,7 +5025,7 @@ function setupEventHandlers() {
   if (exportXlsxBtn) exportXlsxBtn.addEventListener('click', exportToExcel);
   
   updateTotalScore();
-  
+  console.log("모든 이벤트 핸들러 설정 완료");
 }
 
 // DOM 준비 상태 확인 후 앱 초기화
