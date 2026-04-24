@@ -1,3 +1,11 @@
+function notifyMessage(msg) {
+  if (typeof window.showToast === 'function') {
+    window.showToast(msg);
+  } else {
+    alert(msg);
+  }
+}
+
 import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-app.js";
 import { getAuth, signInWithPopup, GoogleAuthProvider, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-auth.js";
 import { getFirestore, doc, setDoc, updateDoc, arrayUnion, getDoc, onSnapshot, deleteField } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore.js";
@@ -21,7 +29,7 @@ window.firebaseLogin = async function() {
     const result = await signInWithPopup(auth, provider);
     window.currentUser = result.user.displayName || result.user.email;
     document.getElementById('currentUserDisplay').textContent = window.currentUser;
-    localStorage.setItem('mollis_sca_current_user', window.currentUser);
+    localStorage.setItem('noel_sca_current_user', window.currentUser);
     document.getElementById('logoutBtn').classList.remove('hidden');
     document.getElementById('loginBtn').classList.add('hidden');
   } catch (err) {
@@ -32,8 +40,8 @@ window.firebaseLogin = async function() {
 window.logoutFirebase = async function() {
   await signOut(auth);
   window.currentUser = 'default';
-  localStorage.setItem('mollis_sca_current_user', window.currentUser);
-  localStorage.removeItem('mollis_sca_current_team');
+  localStorage.setItem('noel_sca_current_user', window.currentUser);
+  localStorage.removeItem('noel_sca_current_team');
   if (window._teamSamplesUnsub) window._teamSamplesUnsub();
   location.reload();
 };
@@ -53,7 +61,7 @@ onAuthStateChanged(auth, user => {
 
 window.createTeam = async function(teamName) {
   if (!auth.currentUser) {
-    alert('먼저 로그인하세요');
+    notifyMessage('먼저 로그인하세요');
     return;
   }
   const teamRef = doc(db, 'teams', teamName);
@@ -62,37 +70,37 @@ window.createTeam = async function(teamName) {
     members: [{ uid: auth.currentUser.uid, name: window.currentUser }],
     memberSamples: { [auth.currentUser.uid]: window.samples || [] }
   }, { merge: true });
-  localStorage.setItem('mollis_sca_current_team', teamName);
+  localStorage.setItem('noel_sca_current_team', teamName);
   updateTeamHeader();
   await syncSamplesToTeam(window.samples || []);
   fetchTeamSamples().then(startTeamSamplesListener);
-  alert('팀이 생성되었습니다');
+  notifyMessage('팀이 생성되었습니다');
 };
 
 window.joinTeam = async function(teamName) {
   if (!auth.currentUser) {
-    alert('먼저 로그인하세요');
+    notifyMessage('먼저 로그인하세요');
     return;
   }
   const teamRef = doc(db, 'teams', teamName);
   const snap = await getDoc(teamRef);
   if (!snap.exists()) {
-    alert('팀이 존재하지 않습니다');
+    notifyMessage('팀이 존재하지 않습니다');
     return;
   }
   await updateDoc(teamRef, {
     members: arrayUnion({ uid: auth.currentUser.uid, name: window.currentUser }),
     [`memberSamples.${auth.currentUser.uid}`]: window.samples || []
   });
-  localStorage.setItem('mollis_sca_current_team', teamName);
+  localStorage.setItem('noel_sca_current_team', teamName);
   updateTeamHeader();
   await fetchTeamSamples();
   startTeamSamplesListener();
-  alert('팀에 가입했습니다');
+  notifyMessage('팀에 가입했습니다');
 };
 
 window.loadTeamInfoToModal = async function() {
-  const teamName = localStorage.getItem('mollis_sca_current_team');
+  const teamName = localStorage.getItem('noel_sca_current_team');
   const nameEl = document.getElementById('currentTeamDisplay');
   const listEl = document.getElementById('teamMembersList');
   if (nameEl) nameEl.textContent = teamName || '없음';
@@ -120,14 +128,14 @@ window.loadTeamInfoToModal = async function() {
 };
 
 window.removeMemberFromTeam = async function(memberUid) {
-  const teamName = localStorage.getItem('mollis_sca_current_team');
+  const teamName = localStorage.getItem('noel_sca_current_team');
   if (!teamName) return;
   const teamRef = doc(db, 'teams', teamName);
   const snap = await getDoc(teamRef);
   if (!snap.exists()) return;
   const data = snap.data();
   if (data.owner !== auth.currentUser.uid) {
-    alert('팀장만 팀원을 탈퇴시킬 수 있습니다');
+    notifyMessage('팀장만 팀원을 탈퇴시킬 수 있습니다');
     return;
   }
   const newMembers = (data.members || []).filter(m => m.uid !== memberUid);
@@ -135,13 +143,13 @@ window.removeMemberFromTeam = async function(memberUid) {
   updateObj[`memberSamples.${memberUid}`] = deleteField();
   await updateDoc(teamRef, updateObj);
   loadTeamInfoToModal();
-  alert('팀원이 탈퇴되었습니다');
+  notifyMessage('팀원이 탈퇴되었습니다');
 };
 
 function updateTeamHeader() {
   const headerEl = document.getElementById('currentTeamHeader');
   if (headerEl) {
-    const name = localStorage.getItem('mollis_sca_current_team');
+    const name = localStorage.getItem('noel_sca_current_team');
     headerEl.textContent = name ? `팀: ${name}` : '';
   }
 }
@@ -149,7 +157,7 @@ function updateTeamHeader() {
 // === Team sample sync functions ===
 
 async function fetchTeamSamples() {
-  const teamName = localStorage.getItem('mollis_sca_current_team');
+  const teamName = localStorage.getItem('noel_sca_current_team');
   if (!teamName) return;
   try {
     const snap = await getDoc(doc(db, 'teams', teamName));
@@ -163,7 +171,7 @@ async function fetchTeamSamples() {
         samplesData = data.samples; // backward compatibility
       }
       if (samplesData) {
-        const key = `mollis_sca_samples2_${window.currentUser || 'default'}`;
+        const key = `noel_sca_samples2_${window.currentUser || 'default'}`;
         const localStr = JSON.stringify(samplesData);
         localStorage.setItem(key, localStr);
         if (typeof loadSamplesFromStorage === 'function') {
@@ -178,7 +186,7 @@ async function fetchTeamSamples() {
 }
 
 window.syncSamplesToTeam = async function(samples) {
-  const teamName = localStorage.getItem('mollis_sca_current_team');
+  const teamName = localStorage.getItem('noel_sca_current_team');
   if (!teamName || !auth.currentUser) return;
   try {
     const teamRef = doc(db, 'teams', teamName);
@@ -192,7 +200,7 @@ window.syncSamplesToTeam = async function(samples) {
 };
 
 window.startTeamSamplesListener = function() {
-  const teamName = localStorage.getItem('mollis_sca_current_team');
+  const teamName = localStorage.getItem('noel_sca_current_team');
   if (!teamName) return;
   const teamRef = doc(db, 'teams', teamName);
   if (window._teamSamplesUnsub) window._teamSamplesUnsub();
@@ -207,7 +215,7 @@ window.startTeamSamplesListener = function() {
         samplesData = data.samples; // backward compatibility
       }
       if (samplesData) {
-        const key = `mollis_sca_samples2_${window.currentUser || 'default'}`;
+        const key = `noel_sca_samples2_${window.currentUser || 'default'}`;
         const newStr = JSON.stringify(samplesData);
         if (localStorage.getItem(key) !== newStr) {
           localStorage.setItem(key, newStr);
@@ -224,7 +232,7 @@ window.startTeamSamplesListener = function() {
 };
 
 window.showTeamReport = async function() {
-  const teamName = localStorage.getItem('mollis_sca_current_team');
+  const teamName = localStorage.getItem('noel_sca_current_team');
   if (!teamName) return;
   const snap = await getDoc(doc(db, 'teams', teamName));
   if (!snap.exists()) return;
