@@ -1,11 +1,10 @@
-const CACHE_NAME = 'mollis-sca-v3';
+const CACHE_NAME = 'mollis-sca-v4';
 const urlsToCache = [
   './',
   './index.html',
   './offline.html',
   './manifest.json',
   './extras.js',
-  './price-widget.js',
   './theme.js',
   './icons/icon-192.png',
   './icons/icon-512.png',

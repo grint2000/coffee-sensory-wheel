@@ -26,7 +26,6 @@
       .visual-section-flex { flex-direction: column; gap: 12px;}
       .grid-cols-sample { grid-template-columns:1fr!important;}
       .md\:grid-cols-2 { grid-template-columns: 1fr !important;}
-      .score-input-wrap input[type=number], .score-slider { width: 90px; }
       .defect-block { min-width:110px!important;}
     }
     
@@ -165,8 +164,30 @@
     .no-scrollbar::-webkit-scrollbar {display: none;} 
     .no-scrollbar {-ms-overflow-style: none; scrollbar-width: none;}
     .html2canvas-container { box-shadow: 0 0 0 3px #eee; }
-    .score-slider { width: 100%; }
+    .score-stepper-row { display:flex; align-items:center; gap:8px; margin-top:6px; }
+    .score-stepper-btn { width:48px; height:48px; border:1px solid #d1d5db; background:#fff; border-radius:10px; font-size:22px; font-weight:700; line-height:1; display:flex; align-items:center; justify-content:center; }
+    .score-stepper-btn:disabled { opacity:0.4; cursor:not-allowed; }
+    .score-stepper-value { flex:1; min-width:0; height:48px; border:1px solid #d1d5db; border-radius:10px; font-size:18px; font-weight:700; text-align:center; padding:0 8px; background:#fff; }
+    .score-progress-track { margin-top:8px; height:10px; border-radius:9999px; background:#e5e7eb; overflow:hidden; }
+    .score-progress-fill { height:100%; width:0; border-radius:9999px; transition:width .2s ease, background-color .2s ease; }
+    .score-card { background:#faf7f2; border:1px solid #eadfce; border-radius:10px; padding:10px; }
+    .sca-total-bar { display:flex; flex-wrap:wrap; align-items:flex-end; gap:12px; background:#fff7ed; border:1px solid #fed7aa; border-radius:10px; padding:10px; }
+    .score-grade-badge { display:inline-flex; align-items:center; justify-content:center; min-width:150px; font-size:14px; font-weight:800; border-radius:9999px; padding:8px 14px; border:1px solid transparent; box-shadow: inset 0 0 0 1px rgba(255,255,255,0.35); }
+    .score-preset-row { display:flex; flex-wrap:wrap; gap:8px; margin-top:10px; }
+    .score-preset-btn { border:1px solid #d1d5db; background:#fff; border-radius:8px; padding:6px 10px; font-size:12px; font-weight:600; }
+    .score-live-hint { font-size:12px; color:#6b7280; margin-top:8px; }
+    .score-quick-nav { display:flex; flex-wrap:wrap; gap:6px; margin-bottom:10px; }
+    .score-nav-btn { border:1px solid #d1d5db; background:#fff; border-radius:9999px; padding:5px 10px; font-size:12px; font-weight:600; }
+    .score-reset-btn { margin-top:6px; border:1px solid #d1d5db; border-radius:6px; background:#fff; font-size:11px; padding:4px 8px; }
+    .mobile-quick-actions { position:fixed; left:0; right:0; bottom:0; z-index:60; background:rgba(255,255,255,0.96); border-top:1px solid #e5e7eb; box-shadow:0 -4px 16px rgba(0,0,0,0.08); padding:8px 10px calc(8px + env(safe-area-inset-bottom)); display:none; }
+    .mobile-quick-actions-inner { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:8px; max-width:700px; margin:0 auto; }
+    .mobile-quick-btn { min-height:42px; border-radius:8px; font-size:12px; font-weight:700; border:1px solid #d1d5db; background:#fff; }
     .sample-list-scroll {max-height: 190px; overflow-y: auto; -webkit-overflow-scrolling: touch;}
+    .sample-toolbar { display:flex; align-items:center; gap:8px; margin-bottom:8px; }
+    .sample-search-input { flex:1; min-width:0; border:1px solid #d1d5db; border-radius:8px; padding:7px 10px; font-size:13px; }
+    .sample-search-clear { border:1px solid #d1d5db; background:#fff; border-radius:8px; padding:7px 10px; font-size:12px; line-height:1; }
+    .sample-meta-count { font-size:12px; color:#6b7280; margin-bottom:6px; }
+    .focus-outline:focus-visible { outline: 3px solid #8B5A2B; outline-offset: 2px; }
     .compare-table th, .compare-table td {border:1px solid #e2e2e2; padding:6px 8px; font-size:14px;}
     .compare-table th {background: #f9f3ea;}
     .compare-table tr:nth-child(even) td {background: #f8f6f4;}
@@ -334,6 +355,38 @@
       .mobile-touch-friendly {
         min-height: 44px;
       }
+      .sample-toolbar {
+        flex-direction: column;
+        align-items: stretch;
+      }
+      .sample-search-input,
+      .sample-search-clear {
+        width: 100%;
+        min-height: 44px;
+      }
+      .score-stepper-btn,
+      .score-stepper-value {
+        min-height: 48px;
+      }
+      .sca-total-bar {
+        position: sticky;
+        bottom: 8px;
+        z-index: 10;
+      }
+      .score-quick-nav {
+        overflow-x: auto;
+        flex-wrap: nowrap;
+        padding-bottom: 2px;
+      }
+      .score-nav-btn {
+        white-space: nowrap;
+      }
+      .mobile-quick-actions {
+        display: block;
+      }
+      body {
+        padding-bottom: 76px;
+      }
       .tab-btn-inactive, .tab-btn-active {
         padding: 8px 16px;
         margin-bottom: 8px;
@@ -346,9 +399,6 @@
         padding: 4px 0;
         margin-left: 4px;
         display: inline-block;
-      }
-      .score-slider {
-        height: 20px;
       }
       .flavor-badge {
         padding: 4px 12px;
@@ -734,33 +784,6 @@
     </div>
   </header>
 
-  <div id="priceWidget" class="bg-white shadow rounded-lg p-2 md:p-3 mb-3 text-sm flex flex-col gap-2">
-    <div class="flex flex-wrap items-center gap-4 justify-between">
-      <div class="flex flex-wrap items-center gap-4">
-        <span><span class="font-semibold">C-Price:</span> <span id="cPrice">-</span></span>
-        <span><span class="font-semibold">London:</span> <span id="londonPrice">-</span> (<span id="londonKrwPerKg">-</span>)</span>
-        <span><span class="font-semibold">1kg 가격:</span> <span id="krwPerKg">-</span></span>
-      </div>
-      <div class="flex items-center gap-2">
-        <button id="refreshPricesBtn" class="px-2 py-1 bg-gray-200 hover:bg-gray-300 rounded text-xs">가격 새로고침</button>
-        <span id="priceMessage" class="text-xs text-red-600"></span>
-        <span id="priceTime" class="text-xs text-gray-500"></span>
-      </div>
-    </div>
-    <div class="flex flex-wrap items-end gap-2 text-xs" id="manualPriceInputs">
-      <label>C-Price(US¢/lb)
-        <input id="inputCPrice" type="number" step="0.01" class="border rounded px-1 w-20" />
-      </label>
-      <label>London(USD/ton)
-        <input id="inputLondon" type="number" step="1" class="border rounded px-1 w-24" />
-      </label>
-      <label>환율(KRW/USD)
-        <input id="inputFx" type="number" step="0.01" class="border rounded px-1 w-24" />
-      </label>
-      <button id="applyPriceBtn" class="px-2 py-1 bg-gray-200 hover:bg-gray-300 rounded">값 적용</button>
-    </div>
-  </div>
-
   <!-- Sample/Data/Compare Section -->
   <section class="bg-white shadow rounded-lg p-3 md:p-6 mb-3 flex flex-col md:flex-row gap-3">
     <!-- 샘플 관리 -->
@@ -782,6 +805,11 @@
         <button class="px-2 py-1 bg-blue-100 hover:bg-blue-200 text-blue-700 rounded text-xs flex items-center mobile-touch-friendly" id="cloneSampleBtn"><i class="fa fa-copy mr-2"></i>복제</button>
         <button class="px-2 py-1 bg-purple-100 hover:bg-purple-200 text-purple-700 rounded text-xs flex items-center mobile-touch-friendly" id="undoBtn"><i class="fa fa-undo mr-2"></i>실행취소</button>
       </div>
+      <div class="sample-toolbar">
+        <input id="sampleSearchInput" type="search" class="sample-search-input focus-outline" placeholder="샘플명/원산지/품종 검색" aria-label="샘플 검색">
+        <button type="button" id="sampleSearchClearBtn" class="sample-search-clear focus-outline">초기화</button>
+      </div>
+      <div id="sampleMetaCount" class="sample-meta-count" aria-live="polite"></div>
       <div class="sample-list-scroll bg-gray-50 rounded-lg border p-1.5 no-scrollbar">
         <div id="sampleList" class="sample-sortable-list"></div>
         <div class="text-xs text-gray-500 mt-2 px-2">
@@ -912,6 +940,71 @@
             <option value="medium-dark">Medium-Dark</option>
             <option value="dark">Dark</option>
           </select>
+        </div>
+      </div>
+    </section>
+
+    <!-- [TASK 3] 생두 트레이서빌리티 -->
+    <section class="mt-6">
+      <button type="button" id="greenInfoToggle" class="w-full text-left flex items-center justify-between px-3 py-2 bg-green-50 border border-green-200 rounded-lg">
+        <span class="font-semibold">🌿 생두 상세 정보 (선택사항)</span>
+        <span id="greenInfoToggleIcon"><i class="fas fa-chevron-down"></i></span>
+      </button>
+      <div id="greenInfoBody" class="hidden mt-3">
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+          <div>
+            <label class="block text-sm font-semibold mb-1">농장/협동조합명</label>
+            <input id="farmName" class="coffee-input w-full border border-tan-300 rounded p-2" />
+          </div>
+          <div>
+            <label class="block text-sm font-semibold mb-1">고도(masl)</label>
+            <input id="altitude" type="number" min="0" max="3000" class="coffee-input w-full border border-tan-300 rounded p-2" />
+            <div id="altitudeWarning" class="text-xs text-red-500 mt-1 hidden">일반적인 커피 재배 고도(최대 3000masl)를 초과합니다</div>
+          </div>
+          <div>
+            <label class="block text-sm font-semibold mb-1">수확연도</label>
+            <select id="harvestYear" class="coffee-input w-full border border-tan-300 rounded p-2"></select>
+          </div>
+          <div>
+            <label class="block text-sm font-semibold mb-1">크롭 상태</label>
+            <select id="cropStatus" class="coffee-input w-full border border-tan-300 rounded p-2">
+              <option value="">선택</option>
+              <option value="New Crop">New Crop</option>
+              <option value="Current Crop">Current Crop</option>
+              <option value="Past Crop">Past Crop</option>
+              <option value="Old Crop">Old Crop</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-sm font-semibold mb-1">수분함량(%)</label>
+            <input id="moistureContent" type="number" min="0" max="20" step="0.1" class="coffee-input w-full border border-tan-300 rounded p-2" />
+            <div id="moistureWarning" class="text-xs text-amber-500 mt-1 hidden">※ 적정 수분함량(10~13%)을 벗어났습니다</div>
+          </div>
+          <div>
+            <label class="block text-sm font-semibold mb-1">스크린사이즈</label>
+            <select id="screenSize" class="coffee-input w-full border border-tan-300 rounded p-2">
+              <option value="">선택</option><option value="13">13</option><option value="14">14</option><option value="15">15</option>
+              <option value="16">16</option><option value="17">17</option><option value="18">18</option><option value="19">19</option>
+              <option value="20">20</option><option value="Mixed">Mixed</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-sm font-semibold mb-1">결점두수(300g)</label>
+            <input id="defectCount" type="number" min="0" step="1" class="coffee-input w-full border border-tan-300 rounded p-2" />
+            <div id="defectCountWarning" class="text-xs text-red-500 mt-1 hidden">⚠ SCA 스페셜티 등급 기준 초과</div>
+          </div>
+          <div>
+            <label class="block text-sm font-semibold mb-1">로트번호</label>
+            <input id="lotNumber" class="coffee-input w-full border border-tan-300 rounded p-2" />
+          </div>
+          <div>
+            <label class="block text-sm font-semibold mb-1">공급자</label>
+            <input id="supplierName" class="coffee-input w-full border border-tan-300 rounded p-2" />
+          </div>
+          <div>
+            <label class="block text-sm font-semibold mb-1">생두중량(kg)</label>
+            <input id="greenBagWeight" type="number" min="0" step="0.1" class="coffee-input w-full border border-tan-300 rounded p-2" />
+          </div>
         </div>
       </div>
     </section>
@@ -1080,50 +1173,35 @@
     <!-- SCA 점수 (슬라이더별 점수입력) -->
     <section class="mt-10">
       <h3 class="text-base font-bold mb-2 border-b pb-1 border-tan-200 flex items-center"><i class="fa fa-star mr-2"></i>SCA 점수 (0~10점, 0.25단위)</h3>
-      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-2 score-input-wrap">
-       <div>
-          <label class="block text-sm mb-1 tooltip">프래그런스/아로마<span class="tooltip-text">분쇄한 분말과 물을 부은 후 느껴지는 향</span></label>
-          <input type="range" min="0" max="10" step="0.25" value="7" id="scoreFragranceAroma_slider" class="score-slider mb-1">
-          <input type="number" step="0.25" min="0" max="10" id="scoreFragranceAroma" class="coffee-input w-full p-1.5 text-center border rounded" value="7">
-        </div>
-        <div>
-          <label class="block text-sm mb-1 tooltip">플레이버<span class="tooltip-text">혀로 느껴지는 커피의 전반적 맛 특성</span></label>
-          <input type="range" min="0" max="10" step="0.25" value="7" id="scoreFlavor_slider" class="score-slider mb-1">
-          <input type="number" step="0.25" min="0" max="10" id="scoreFlavor" class="coffee-input w-full p-1.5 text-center border rounded" value="7">
-        </div>
-        <div>
-          <label class="block text-sm mb-1 tooltip">에프터테이스트<span class="tooltip-text">삼킨 후 입안에 남는 좋은 맛의 지속성</span></label>
-          <input type="range" min="0" max="10" step="0.25" value="7" id="scoreAftertaste_slider" class="score-slider mb-1">
-          <input type="number" step="0.25" min="0" max="10" id="scoreAftertaste" class="coffee-input w-full p-1.5 text-center border rounded" value="7">
-        </div>
-        <div>
-          <label class="block text-sm mb-1 tooltip">액시디티<span class="tooltip-text">밝은 산미, 긍정적이면 높게</span></label>
-          <input type="range" min="0" max="10" step="0.25" value="7" id="scoreAcidity_slider" class="score-slider mb-1">
-          <input type="number" step="0.25" min="0" max="10" id="scoreAcidity" class="coffee-input w-full p-1.5 text-center border rounded" value="7">
-        </div>
-        <div>
-          <label class="block text-sm mb-1 tooltip">바디<span class="tooltip-text">입안에서 느껴지는 무게감, 질감</span></label>
-          <input type="range" min="0" max="10" step="0.25" value="7" id="scoreBody_slider" class="score-slider mb-1">
-          <input type="number" step="0.25" min="0" max="10" id="scoreBody" class="coffee-input w-full p-1.5 text-center border rounded" value="7">
-        </div>
-        <div>
-          <label class="block text-sm mb-1 tooltip">밸런스<span class="tooltip-text">각 항목의 조화</span></label>
-          <input type="range" min="0" max="10" step="0.25" value="7" id="scoreBalance_slider" class="score-slider mb-1">
-          <input type="number" step="0.25" min="0" max="10" id="scoreBalance" class="coffee-input w-full p-1.5 text-center border rounded" value="7">
-        </div>
-        <div>
-          <label class="block text-sm mb-1 tooltip">오버럴<span class="tooltip-text">총평, 인상</span></label>
-          <input type="range" min="0" max="10" step="0.25" value="7" id="scoreOverall_slider" class="score-slider mb-1">
-          <input type="number" step="0.25" min="0" max="10" id="scoreOverall" class="coffee-input w-full p-1.5 text-center border rounded" value="7">
-        </div>
+      <div class="score-quick-nav" id="scoreQuickNav">
+        <button type="button" class="score-nav-btn" data-score-nav="scoreFragranceAroma">프래그/아로마</button>
+        <button type="button" class="score-nav-btn" data-score-nav="scoreFlavor">플레이버</button>
+        <button type="button" class="score-nav-btn" data-score-nav="scoreAftertaste">애프터</button>
+        <button type="button" class="score-nav-btn" data-score-nav="scoreAcidity">산미</button>
+        <button type="button" class="score-nav-btn" data-score-nav="scoreBody">바디</button>
+        <button type="button" class="score-nav-btn" data-score-nav="scoreBalance">밸런스</button>
+        <button type="button" class="score-nav-btn" data-score-nav="scoreOverall">오버럴</button>
       </div>
-      <div class="mt-4 flex flex-wrap items-end gap-3">
+      <button type="button" id="scoreResetBtn" class="score-reset-btn">전체 7.00점으로 초기화</button>
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-2 score-input-wrap" id="scoreInputGrid"></div>
+      <div class="mt-4 sca-total-bar">
         <div>
-          <label class="text-sm block mb-1">총점 (기본 30점+합계)</label>
+          <label class="text-sm block mb-1">SCA 총점 (100점 만점)</label>
           <span id="totalScore" class="font-bold inline-block text-lg bg-gray-100 px-4 py-2 rounded border">86.00</span>
+          <div class="text-xs text-gray-500 mt-1">※ Uniformity·Clean Cup·Sweetness 만점(각 10점) 기준</div>
+        </div>
+        <div>
+          <label class="text-sm block mb-1">등급 가이드</label>
+          <span id="scoreGrade" class="ml-2 px-3 py-1 rounded-full text-white text-sm font-bold">Good</span>
         </div>
         <button type="button" id="calcScoreBtn" class="ml-1 mt-2 px-4 py-2 rounded export-btn flex items-center mobile-touch-friendly"><i class="fas fa-equals mr-2"></i>점수 계산</button>
       </div>
+      <div class="score-preset-row" aria-label="점수 프리셋">
+        <button type="button" class="score-preset-btn" data-score-preset="7.5">클린컵 기준 7.5</button>
+        <button type="button" class="score-preset-btn" data-score-preset="8.0">스페셜티 기준 8.0</button>
+        <button type="button" class="score-preset-btn" data-score-preset="8.5">하이엔드 기준 8.5</button>
+      </div>
+      <div class="score-live-hint">점수는 입력 즉시 총점/등급에 반영됩니다.</div>
     </section>
     
     <!-- 테이스팅 노트 -->
@@ -1224,6 +1302,29 @@
       </button>
     </div>
     <div id="teamReportBody" class="modal-body overflow-y-auto" style="max-height:60vh;"></div>
+  </div>
+</div>
+
+<div id="backupRestoreModal" class="modal">
+  <div class="modal-content max-w-lg">
+    <div class="modal-header">
+      <h3 class="font-semibold text-lg">백업 복원</h3>
+      <button id="closeBackupRestoreModal" class="text-gray-500 hover:text-gray-700 mobile-touch-friendly">
+        <i class="fas fa-times"></i>
+      </button>
+    </div>
+    <div class="modal-body">
+      <p class="text-sm text-gray-600 mb-3">복원할 백업을 선택하세요. 선택 즉시 현재 데이터가 해당 시점으로 대체됩니다.</p>
+      <div id="backupRestoreList" class="space-y-2"></div>
+    </div>
+  </div>
+</div>
+
+<div class="mobile-quick-actions" aria-label="모바일 빠른 실행">
+  <div class="mobile-quick-actions-inner">
+    <button type="button" id="mobileQuickSaveBtn" class="mobile-quick-btn">저장</button>
+    <button type="button" id="mobileQuickCompareBtn" class="mobile-quick-btn">비교</button>
+    <button type="button" id="mobileQuickExportBtn" class="mobile-quick-btn">이미지</button>
   </div>
 </div>
 
@@ -1889,7 +1990,251 @@ let currentFlavorCategory = null;
 let currentFlavorPhase = "fragrance";
 let currentBodyCategory = BODY_DESCRIPTOR_CATEGORIES[0].key;
 let lastErrorCount = 0;
+let sampleSearchKeyword = '';
+const SCORE_FIELD_KEYS = ['scoreFragranceAroma', 'scoreFlavor', 'scoreAftertaste', 'scoreAcidity', 'scoreBody', 'scoreBalance', 'scoreOverall'];
+const SCORE_FIELD_CONFIG = [
+  { id: 'scoreFragranceAroma', label: '프래그런스/아로마', tooltip: '분쇄한 분말과 물을 부은 후 느껴지는 향' },
+  { id: 'scoreFlavor', label: '플레이버', tooltip: '혀로 느껴지는 커피의 전반적 맛 특성' },
+  { id: 'scoreAftertaste', label: '에프터테이스트', tooltip: '삼킨 후 입안에 남는 좋은 맛의 지속성' },
+  { id: 'scoreAcidity', label: '액시디티', tooltip: '밝은 산미, 긍정적이면 높게' },
+  { id: 'scoreBody', label: '바디', tooltip: '입안에서 느껴지는 무게감, 질감' },
+  { id: 'scoreBalance', label: '밸런스', tooltip: '각 항목의 조화' },
+  { id: 'scoreOverall', label: '오버럴', tooltip: '총평, 인상' }
+];
+const GREEN_BEAN_FIELDS = ['farmName','altitude','harvestYear','cropStatus','moistureContent','screenSize','defectCount','lotNumber','supplierName','greenBagWeight'];
   
+function escapeHtml(value) {
+  return String(value ?? '').replace(/[&<>"']/g, (char) => ({
+    '&': '&amp;',
+    '<': '&lt;',
+    '>': '&gt;',
+    '"': '&quot;',
+    "'": '&#39;'
+  }[char]));
+}
+
+function escapeHtmlWithLineBreaks(value) {
+  return escapeHtml(value).replace(/\n/g, '<br>');
+}
+
+function sampleMatchesKeyword(sample, keyword) {
+  if (!keyword) return true;
+  const targetFields = [
+    sample.title,
+    sample.sampleData?.coffeeName,
+    sample.sampleData?.origin,
+    sample.sampleData?.variety
+  ].filter(Boolean).join(' ');
+  return matchKoreanInitials(targetFields, keyword);
+}
+
+function updateSampleMetaCount(filteredCount, totalCount) {
+  const metaEl = document.getElementById('sampleMetaCount');
+  if (!metaEl) return;
+  metaEl.textContent = sampleSearchKeyword
+    ? `검색 결과 ${filteredCount}개 / 전체 ${totalCount}개`
+    : `전체 샘플 ${totalCount}개`;
+}
+
+function normalizeScoreValue(value, fallback = 7) {
+  const parsed = Number.parseFloat(value);
+  if (Number.isNaN(parsed)) return fallback;
+  const rounded = Math.round(parsed * 4) / 4;
+  return Math.min(10, Math.max(6, rounded));
+}
+
+function getScoreValueFromUI(fieldKey) {
+  const input = document.getElementById(`${fieldKey}Input`);
+  return normalizeScoreValue(input ? input.value : 7, 7);
+}
+
+function setScoreValueToUI(fieldKey, value) {
+  const normalized = normalizeScoreValue(value, 7);
+  const input = document.getElementById(`${fieldKey}Input`);
+  if (input) input.value = normalized.toFixed(2);
+  const fill = document.getElementById(`${fieldKey}ProgressFill`);
+  if (fill) {
+    const progress = ((normalized - 6) / 4) * 100;
+    fill.style.width = `${Math.min(100, Math.max(0, progress))}%`;
+    if (normalized < 7) fill.style.backgroundColor = '#9ca3af';
+    else if (normalized < 8) fill.style.backgroundColor = '#60a5fa';
+    else if (normalized < 9) fill.style.backgroundColor = '#34d399';
+    else fill.style.backgroundColor = '#d4af37';
+  }
+  const minusBtn = document.getElementById(`${fieldKey}MinusBtn`);
+  const plusBtn = document.getElementById(`${fieldKey}PlusBtn`);
+  if (minusBtn) minusBtn.disabled = normalized <= 6;
+  if (plusBtn) plusBtn.disabled = normalized >= 10;
+  return normalized;
+}
+
+function setupLongPress(button, onTick) {
+  let holdTimeout = null;
+  let holdInterval = null;
+
+  const clearAll = () => {
+    if (holdTimeout) clearTimeout(holdTimeout);
+    if (holdInterval) clearInterval(holdInterval);
+    holdTimeout = null;
+    holdInterval = null;
+  };
+
+  button.addEventListener('pointerdown', () => {
+    holdTimeout = setTimeout(() => {
+      holdInterval = setInterval(onTick, 100);
+    }, 500);
+  });
+
+  ['pointerup', 'pointercancel', 'pointerleave'].forEach(evt =>
+    button.addEventListener(evt, clearAll)
+  );
+}
+
+function createScoreStepper(scoreId, label, tooltipText) {
+  const wrapper = document.createElement('div');
+  wrapper.className = 'score-card';
+  wrapper.id = `${scoreId}Stepper`;
+
+  const labelEl = document.createElement('label');
+  labelEl.className = 'block text-sm mb-1 tooltip';
+  labelEl.innerHTML = `${label}<span class=\"tooltip-text\">${tooltipText}</span>`;
+
+  const row = document.createElement('div');
+  row.className = 'score-stepper-row';
+
+  const minusBtn = document.createElement('button');
+  minusBtn.type = 'button';
+  minusBtn.id = `${scoreId}MinusBtn`;
+  minusBtn.className = 'score-stepper-btn';
+  minusBtn.textContent = '−';
+
+  const input = document.createElement('input');
+  input.type = 'number';
+  input.step = '0.25';
+  input.min = '6';
+  input.max = '10';
+  input.value = '7.00';
+  input.id = `${scoreId}Input`;
+  input.className = 'score-stepper-value';
+  input.inputMode = 'decimal';
+
+  const plusBtn = document.createElement('button');
+  plusBtn.type = 'button';
+  plusBtn.id = `${scoreId}PlusBtn`;
+  plusBtn.className = 'score-stepper-btn';
+  plusBtn.textContent = '+';
+
+  row.appendChild(minusBtn);
+  row.appendChild(input);
+  row.appendChild(plusBtn);
+
+  const track = document.createElement('div');
+  track.className = 'score-progress-track';
+
+  const fill = document.createElement('div');
+  fill.className = 'score-progress-fill';
+  fill.id = `${scoreId}ProgressFill`;
+  track.appendChild(fill);
+
+  wrapper.appendChild(labelEl);
+  wrapper.appendChild(row);
+  wrapper.appendChild(track);
+
+  const applyDelta = (delta) => {
+    const current = getScoreValueFromUI(scoreId);
+    const next = normalizeScoreValue(current + delta, current);
+    syncScoreRealtime(scoreId, next);
+  };
+
+  minusBtn.addEventListener('click', () => applyDelta(-0.25));
+  plusBtn.addEventListener('click', () => applyDelta(0.25));
+  setupLongPress(minusBtn, () => applyDelta(-1));
+  setupLongPress(plusBtn, () => applyDelta(1));
+
+  const handleManualInput = () => syncScoreRealtime(scoreId, input.value);
+  input.addEventListener('input', handleManualInput);
+  input.addEventListener('change', handleManualInput);
+  input.addEventListener('blur', () => setScoreValueToUI(scoreId, input.value));
+
+  setScoreValueToUI(scoreId, 7);
+  return wrapper;
+}
+
+function renderScoreSteppers() {
+  const container = document.getElementById('scoreInputGrid');
+  if (!container) return;
+  container.innerHTML = '';
+  SCORE_FIELD_CONFIG.forEach(field => {
+    container.appendChild(createScoreStepper(field.id, field.label, field.tooltip));
+  });
+}
+
+function getScoreGrade(totalScore) {
+  if (totalScore >= 90) return { label: 'Outstanding (90+)', className: 'bg-purple-100 text-purple-800 border-purple-300' };
+  if (totalScore >= 86) return { label: 'Excellent (86+)', className: 'bg-emerald-100 text-emerald-800 border-emerald-300' };
+  if (totalScore >= 84) return { label: 'Very Good (84+)', className: 'bg-sky-100 text-sky-800 border-sky-300' };
+  if (totalScore >= 80) return { label: 'Specialty (80+)', className: 'bg-amber-100 text-amber-800 border-amber-300' };
+  return { label: 'Below Specialty (<80)', className: 'bg-rose-100 text-rose-700 border-rose-300' };
+}
+
+function updateScoreGradeBadge(totalScore) {
+  const badge = document.getElementById('scoreGrade');
+  if (!badge) return;
+  const grade = getScoreGrade(totalScore);
+  badge.className = `score-grade-badge ${grade.className}`;
+  badge.textContent = grade.label;
+}
+
+
+function populateHarvestYearOptions() {
+  const select = document.getElementById('harvestYear');
+  if (!select) return;
+  const currentYear = new Date().getFullYear();
+  const options = ['<option value="">선택</option>'];
+  for (let y = currentYear; y >= currentYear - 15; y -= 1) {
+    options.push(`<option value="${y}">${y}</option>`);
+  }
+  select.innerHTML = options.join('');
+}
+
+function updateGreenBeanWarnings() {
+  const altitude = Number.parseFloat(document.getElementById('altitude')?.value || '');
+  const moisture = Number.parseFloat(document.getElementById('moistureContent')?.value || '');
+  const defectCount = Number.parseFloat(document.getElementById('defectCount')?.value || '');
+
+  const altitudeWarning = document.getElementById('altitudeWarning');
+  const moistureWarning = document.getElementById('moistureWarning');
+  const defectCountWarning = document.getElementById('defectCountWarning');
+
+  if (altitudeWarning) altitudeWarning.classList.toggle('hidden', Number.isNaN(altitude) || altitude <= 3000);
+  if (moistureWarning) moistureWarning.classList.toggle('hidden', Number.isNaN(moisture) || (moisture >= 10 && moisture <= 13));
+  if (defectCountWarning) defectCountWarning.classList.toggle('hidden', Number.isNaN(defectCount) || defectCount <= 5);
+}
+
+function setupGreenBeanSection() {
+  populateHarvestYearOptions();
+
+  const toggleBtn = document.getElementById('greenInfoToggle');
+  const body = document.getElementById('greenInfoBody');
+  const icon = document.getElementById('greenInfoToggleIcon');
+
+  if (toggleBtn && body && icon) {
+    toggleBtn.addEventListener('click', () => {
+      body.classList.toggle('hidden');
+      icon.innerHTML = body.classList.contains('hidden')
+        ? '<i class="fas fa-chevron-down"></i>'
+        : '<i class="fas fa-chevron-up"></i>';
+    });
+  }
+
+  ['altitude', 'moistureContent', 'defectCount'].forEach((id) => {
+    const el = document.getElementById(id);
+    if (!el) return;
+    el.addEventListener('input', updateGreenBeanWarnings);
+    el.addEventListener('change', updateGreenBeanWarnings);
+  });
+}
+
 // 향미 휠 아코디언 토글 함수
 function toggleAccordion(header) {
   if (!header) return;
@@ -1982,6 +2327,8 @@ function getEmptySampleData() {
   FLAVOR_PHASES.forEach(phase => flavorSelections[phase.id] = []);
   return {
     title: "", coffeeName: "", origin: "", variety: "", process: "", roastDate: "", roastLevel: "",
+    farmName: "", altitude: "", harvestYear: "", cropStatus: "", moistureContent: "", screenSize: "", defectCount: "",
+    lotNumber: "", supplierName: "", greenBagWeight: "",
     flavorSelections, acidityLevel: "", sweetnessLevel: "", bodyLevel: "",
     bodyDescriptors: [], // 바디감 디스크립터 추가
     defectUnderdevelopment: "none", defectOverdevelopment: "none", defectBaked: "none", defectScorching: "none",
@@ -2241,7 +2588,7 @@ function renderBodyDescriptors() {
              onclick="toggleBodyDescriptor('${descriptor.id}')">
           <input type="checkbox" ${isSelected ? 'checked' : ''}>
           <span class="checkbox-custom"></span>
-          <span>${displayText}</span>
+          <span>${escapeHtml(displayText)}</span>
         </div>
       `;
     });
@@ -2690,7 +3037,7 @@ function buildFlavorSummaryHtml(sampleData) {
         const displayText = currentLanguage === 'ko' ? descriptor.korean : descriptor.label;
         const textColor = getContrastColor(descriptor.color);
         html += `<span class="flavor-badge" style="background:${descriptor.color};color:${textColor};">
-          ${displayText}
+          ${escapeHtml(displayText)}
         </span>`;
       }
     });
@@ -2827,30 +3174,31 @@ function updateRadar(data) {
 
 // 총점 계산
 function updateTotalScore(data) {
-  let sampleData = data;
-  
-  if (!data) {
-    const currentSample = getCurrentSampleObj();
-    if (!currentSample) return;
-    sampleData = currentSample.sampleData;
-  }
-  
-  const scoreFields = [
-    'scoreFragranceAroma', 'scoreFlavor', 'scoreAftertaste',
-    'scoreAcidity', 'scoreBody', 'scoreBalance', 'scoreOverall'
-  ];
-  
+  const sampleData = data || getCurrentSampleObj()?.sampleData;
+
   let total = 30;
-  scoreFields.forEach(field => {
-    total += parseFloat(sampleData[field] || 0);
+  SCORE_FIELD_KEYS.forEach(field => {
+    if (data) {
+      total += normalizeScoreValue(sampleData?.[field], 0);
+    } else {
+      total += getScoreValueFromUI(field);
+    }
   });
-  
-  let totalScoreEl = document.getElementById('totalScore');
+
+  const totalScoreEl = document.getElementById('totalScore');
   if (totalScoreEl) {
     totalScoreEl.textContent = total.toFixed(2);
   }
-  
+  updateScoreGradeBadge(total);
+
   document.getElementById('evalDate').textContent = new Date().toLocaleDateString();
+}
+
+function syncScoreRealtime(fieldKey, rawValue) {
+  const normalized = setScoreValueToUI(fieldKey, rawValue);
+  updateTotalScore();
+  scheduleAutoSave();
+  return normalized;
 }
 
 // 자동 저장
@@ -2890,6 +3238,12 @@ function setUIFromSample(sampleData) {
   document.getElementById('process').value = sampleData.process || '';
   document.getElementById('roastDate').value = sampleData.roastDate || '';
   document.getElementById('roastLevel').value = sampleData.roastLevel || '';
+
+  GREEN_BEAN_FIELDS.forEach((field) => {
+    const input = document.getElementById(field);
+    if (input) input.value = sampleData[field] ?? '';
+  });
+  updateGreenBeanWarnings();
   
   // 라디오 버튼 상태 설정
   ["acidity", "sweetness", "body"].forEach(group => {
@@ -2912,14 +3266,10 @@ function setUIFromSample(sampleData) {
   });
   
   // SCA 점수 설정
-  [
-    ["scoreFragranceAroma", "scoreFragranceAroma"],
-    ["scoreFlavor", "scoreFlavor"], ["scoreAftertaste", "scoreAftertaste"],
-    ["scoreAcidity", "scoreAcidity"], ["scoreBody", "scoreBody"],
-    ["scoreBalance", "scoreBalance"], ["scoreOverall", "scoreOverall"]
-  ].forEach(([key, id]) => {
-    document.getElementById(id).value = sampleData[key] || 7;
-    document.getElementById(id + "_slider").value = sampleData[key] || 7;
+  SCORE_FIELD_KEYS.forEach((key) => {
+    const normalized = normalizeScoreValue(sampleData[key], 7);
+    sampleData[key] = normalized;
+    setScoreValueToUI(key, normalized);
   });
   
   document.getElementById('tastingNotes').value = sampleData.tastingNotes || '';
@@ -2947,6 +3297,10 @@ function saveUIToSample(targetDataObj) {
   sampleData.process = document.getElementById('process').value;
   sampleData.roastDate = document.getElementById('roastDate').value;
   sampleData.roastLevel = document.getElementById('roastLevel').value;
+  GREEN_BEAN_FIELDS.forEach((field) => {
+    const input = document.getElementById(field);
+    sampleData[field] = input ? input.value : '';
+  });
   sampleData.acidityLevel = getCheckedRadio('acidityLevel');
   sampleData.sweetnessLevel = getCheckedRadio('sweetnessLevel');
   sampleData.bodyLevel = getCheckedRadio('bodyLevel');
@@ -2955,45 +3309,52 @@ function saveUIToSample(targetDataObj) {
     sampleData[d.key] = getCheckedRadio(d.key) || "none";
   });
   
-  sampleData.scoreFragranceAroma = parseFloat(document.getElementById('scoreFragranceAroma').value) || 0;
-  sampleData.scoreFlavor = parseFloat(document.getElementById('scoreFlavor').value) || 0;
-  sampleData.scoreAftertaste = parseFloat(document.getElementById('scoreAftertaste').value) || 0;
-  sampleData.scoreAcidity = parseFloat(document.getElementById('scoreAcidity').value) || 0;
-  sampleData.scoreBody = parseFloat(document.getElementById('scoreBody').value) || 0;
-  sampleData.scoreBalance = parseFloat(document.getElementById('scoreBalance').value) || 0;
-  sampleData.scoreOverall = parseFloat(document.getElementById('scoreOverall').value) || 0;
+  SCORE_FIELD_KEYS.forEach((field) => {
+    sampleData[field] = getScoreValueFromUI(field);
+    setScoreValueToUI(field, sampleData[field]);
+  });
   sampleData.tastingNotes = document.getElementById('tastingNotes').value;
   sampleData.lastEdit = +(new Date());
 }
 
 // 샘플 목록 렌더링 (드래그 앤 드롭 지원)
 function renderSampleList() {
-  let listDiv = document.getElementById('sampleList');
+  const listDiv = document.getElementById('sampleList');
+  const filteredSamples = samples.filter(sample => sampleMatchesKeyword(sample, sampleSearchKeyword));
+  updateSampleMetaCount(filteredSamples.length, samples.length);
+
   if (!samples.length) {
     listDiv.innerHTML = `<div class="text-gray-500 text-xs my-3 text-center">샘플 없음<br>새로 추가하세요.</div>`;
     updateNavigationButtons();
     updateCurrentSampleIndicator();
     return;
   }
-  
+
+  if (!filteredSamples.length) {
+    listDiv.innerHTML = `<div class="text-gray-500 text-xs my-3 text-center">검색 결과가 없습니다.<br>다른 키워드를 입력해보세요.</div>`;
+    updateNavigationButtons();
+    updateCurrentSampleIndicator();
+    renderCompareList();
+    return;
+  }
+
   let html = '';
-  samples.forEach(sm => {
+  filteredSamples.forEach(sm => {
     html += `
-      <div class="flex justify-between items-center border rounded-lg px-2 py-1 mb-1 sample-item ${sm.id === currentSampleId ? "bg-yellow-100 border-yellow-700" : "bg-white border-gray-200"}" data-id="${sm.id}">
-        <div class="sample-drag-handle"><i class="fas fa-grip-lines"></i></div>
-        <span class="truncate text-sm flex-1 ${sm.id === currentSampleId ? "font-bold" : ""}">${sm.title || "샘플"}</span>
-        <span class="text-xs ml-2 text-gray-400">${sm.sampleData && sm.sampleData.roastDate ? sm.sampleData.roastDate : ""}</span>
+      <div class="flex justify-between items-center border rounded-lg px-2 py-1 mb-1 sample-item ${sm.id === currentSampleId ? "bg-yellow-100 border-yellow-700" : "bg-white border-gray-200"}" data-id="${sm.id}" role="button" tabindex="0" aria-label="${escapeHtml(sm.title || '샘플')} 샘플 선택">
+        <div class="sample-drag-handle" aria-label="샘플 순서 이동"><i class="fas fa-grip-lines"></i></div>
+        <span class="truncate text-sm flex-1 ${sm.id === currentSampleId ? "font-bold" : ""}">${escapeHtml(sm.title || "샘플")}</span>
+        <span class="text-xs ml-2 text-gray-400">${escapeHtml(sm.sampleData && sm.sampleData.roastDate ? sm.sampleData.roastDate : "")}</span>
       </div>
     `;
   });
-  
+
   listDiv.innerHTML = html;
-  
-  // 샘플 클릭 이벤트
+
   Array.from(listDiv.querySelectorAll('.sample-item')).forEach(el => {
     el.addEventListener('click', (e) => {
       if (!e.target.closest('.sample-drag-handle')) {
-        let id = el.getAttribute('data-id');
+        const id = el.getAttribute('data-id');
         if (id !== currentSampleId) {
           loadSample(id);
           const sample = samples.find(s => s.id === id);
@@ -3003,51 +3364,62 @@ function renderSampleList() {
         }
       }
     });
-    
-    // 모바일 길게 누르기로 복제
+
+    el.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        el.click();
+      }
+    });
+
     el.addEventListener('touchstart', function(e) {
       if (e.target.closest('.sample-drag-handle')) return;
-      
+
       const longPressTimer = setTimeout(() => {
         const sampleId = el.getAttribute('data-id');
         if (confirm("이 샘플을 복제하시겠습니까?")) {
           cloneSample(sampleId);
         }
       }, 800);
-      
+
       const clearTimer = () => clearTimeout(longPressTimer);
       el.addEventListener('touchend', clearTimer, { once: true });
       el.addEventListener('touchcancel', clearTimer, { once: true });
     });
   });
-  
-  // Sortable.js 초기화
+
   if (sortableInstance) {
     sortableInstance.destroy();
   }
-  
-  if (samples.length > 1) {
+
+  if (filteredSamples.length > 1) {
     sortableInstance = new Sortable(listDiv, {
       animation: 150,
       handle: '.sample-drag-handle',
       ghostClass: 'sortable-ghost',
       chosenClass: 'sortable-chosen',
       onEnd: function (evt) {
-        const oldIndex = evt.oldIndex;
-        const newIndex = evt.newIndex;
-        
-        if (oldIndex !== newIndex) {
-          const item = samples[oldIndex];
-          samples.splice(oldIndex, 1);
-          samples.splice(newIndex, 0, item);
-          saveSamplesToStorage();
-          updateNavigationButtons();
-          updateCurrentSampleIndicator();
-        }
+        const movedId = evt.item?.getAttribute('data-id');
+        if (!movedId) return;
+
+        const fromIndex = samples.findIndex(s => s.id === movedId);
+        if (fromIndex === -1) return;
+
+        const item = samples[fromIndex];
+        samples.splice(fromIndex, 1);
+
+        const beforeEl = evt.to.children[evt.newIndex + 1];
+        const beforeId = beforeEl ? beforeEl.getAttribute('data-id') : null;
+        const insertIndex = beforeId ? samples.findIndex(s => s.id === beforeId) : samples.length;
+        samples.splice(insertIndex, 0, item);
+
+        saveSamplesToStorage();
+        updateNavigationButtons();
+        updateCurrentSampleIndicator();
       }
     });
   }
-  
+
   updateNavigationButtons();
   updateCurrentSampleIndicator();
   renderCompareList();
@@ -3070,7 +3442,7 @@ function renderCompareList() {
     html += `
       <label class="flex items-center bg-gray-100 hover:bg-gray-200 rounded px-3 py-1 text-sm mobile-touch-friendly">
         <input type="checkbox" class="compare-checkbox mr-1.5" value="${sm.id}">
-        ${sm.title || "샘플"}
+        ${escapeHtml(sm.title || "샘플")}
       </label>
     `;
   });
@@ -3251,322 +3623,65 @@ function showBackupList() {
       backups.push({ key, date });
     }
   }
-  
+
   if (backups.length === 0) {
     showToast("저장된 백업이 없습니다.");
     return;
   }
-  
+
   backups.sort((a, b) => b.date.localeCompare(a.date));
-  
-  let message = "백업 목록: (최근 날짜순)\n\n";
-  backups.forEach((backup, i) => {
-    message += `${i + 1}. ${backup.date}\n`;
+
+  const modal = document.getElementById('backupRestoreModal');
+  const listEl = document.getElementById('backupRestoreList');
+  if (!modal || !listEl) {
+    showToast('백업 UI를 불러올 수 없습니다.');
+    return;
+  }
+
+  listEl.innerHTML = '';
+  backups.forEach((backup, index) => {
+    const row = document.createElement('div');
+    row.className = 'flex items-center justify-between border rounded p-2';
+
+    const label = document.createElement('span');
+    label.className = 'text-sm';
+    label.textContent = `${index + 1}. ${backup.date}`;
+
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'px-3 py-1 text-xs bg-amber-600 hover:bg-amber-700 text-white rounded mobile-touch-friendly';
+    btn.textContent = '이 백업 복원';
+    btn.addEventListener('click', () => restoreBackup(backup));
+
+    row.appendChild(label);
+    row.appendChild(btn);
+    listEl.appendChild(row);
   });
-  
-  message += "\n복원할 백업 번호를 입력하세요 (취소는 0):";
-  
-  const choice = prompt(message, "");
-  if (!choice) return;
-  
-  const num = parseInt(choice, 10);
-  if (isNaN(num) || num === 0) return;
-  
-  if (num > 0 && num <= backups.length) {
-    const selectedBackup = backups[num - 1];
-    
-    if (confirm(`${selectedBackup.date} 백업을 복원하시겠습니까? 현재 데이터는 덮어씌워집니다.`)) {
-      try {
-        const backupData = localStorage.getItem(selectedBackup.key);
-        const parsedData = JSON.parse(backupData);
-        
-        if (Array.isArray(parsedData) && parsedData.length > 0) {
-          samples = parsedData;
-          currentSampleId = samples[0].id;
-          setUIFromSample(samples[0].sampleData);
-          renderSampleList();
-          saveSamplesToStorage();
-          showToast(`${selectedBackup.date} 백업을 성공적으로 복원했습니다.`);
-        } else {
-          showToast("백업 데이터 형식이 올바르지 않습니다.");
-        }
-      } catch (e) {
-        console.error("백업 복원 중 오류:", e);
-        showToast("백업 복원 중 오류가 발생했습니다.");
-      }
+
+  modal.classList.add('show');
+}
+
+function restoreBackup(backup) {
+  if (!backup || !backup.key) return;
+  try {
+    const backupData = localStorage.getItem(backup.key);
+    const parsedData = JSON.parse(backupData);
+
+    if (Array.isArray(parsedData) && parsedData.length > 0) {
+      samples = parsedData;
+      currentSampleId = samples[0].id;
+      setUIFromSample(samples[0].sampleData);
+      renderSampleList();
+      saveSamplesToStorage();
+      document.getElementById('backupRestoreModal')?.classList.remove('show');
+      showToast(`${backup.date} 백업을 성공적으로 복원했습니다.`);
+    } else {
+      showToast("백업 데이터 형식이 올바르지 않습니다.");
     }
-  } else {
-    showToast("올바른 백업 번호를 입력하세요.");
+  } catch (e) {
+    console.error("백업 복원 중 오류:", e);
+    showToast("백업 복원 중 오류가 발생했습니다.");
   }
-}
-
-// 차트 메모리 정리
-function cleanupCharts() {
-  Object.keys(chartObjects).forEach(key => {
-    const chart = chartObjects[key];
-    if (chart) {
-      try {
-        chart.destroy();
-        chartObjects[key] = null;
-      } catch (e) {
-        console.warn(`차트(${key}) 정리 중 오류:`, e);
-      }
-    }
-  });
-}
-
-// 비교 차트 생성
-function createComparisonChart(selectedSamples) {
-  const compareArea = document.getElementById('compareArea');
-  if (!compareArea) return;
-  
-  if (chartObjects.comparisonRadar) {
-    chartObjects.comparisonRadar.destroy();
-    chartObjects.comparisonRadar = null;
-  }
-  
-  let html = `
-    <div class="bg-white rounded-lg p-4 shadow-md mt-4">
-      <h4 class="font-semibold mb-4">SCA 점수 비교 차트</h4>
-      <div class="chart-container">
-        <canvas id="comparisonRadar"></canvas>
-      </div>
-    </div>
-    
-    <div class="bg-white rounded-lg p-4 shadow-md mt-4">
-      <h4 class="font-semibold mb-4">점수 비교 테이블</h4>
-      <div class="overflow-x-auto">
-        <table class="compare-table w-full">
-          <thead>
-            <tr>
-              <th>항목</th>
-  `;
-  
-  selectedSamples.forEach(sample => {
-    html += `<th>${sample.title || '샘플'}</th>`;
-  });
-  
-  html += `</tr></thead><tbody>`;
-  
-  const scoreFields = [
-    { key: 'scoreFragranceAroma', label: '프래그런스/아로마' },
-    { key: 'scoreFlavor', label: '플레이버' },
-    { key: 'scoreAftertaste', label: '에프터테이스트' },
-    { key: 'scoreAcidity', label: '액시디티' },
-    { key: 'scoreBody', label: '바디' },
-    { key: 'scoreBalance', label: '밸런스' },
-    { key: 'scoreOverall', label: '오버럴' }
-  ];
-  
-  scoreFields.forEach(field => {
-    html += `<tr><td>${field.label}</td>`;
-    selectedSamples.forEach(sample => {
-      html += `<td>${parseFloat(sample.sampleData[field.key] || 0).toFixed(2)}</td>`;
-    });
-    html += `</tr>`;
-  });
-  
-  html += `<tr class="font-bold"><td>총점 (30+합계)</td>`;
-  selectedSamples.forEach(sample => {
-    let total = 30;
-    scoreFields.forEach(field => {
-      total += parseFloat(sample.sampleData[field.key] || 0);
-    });
-    html += `<td>${total.toFixed(2)}</td>`;
-  });
-  html += `</tr>`;
-  
-  html += `</tbody></table></div></div>`;
-
-  html += `<div class="bg-white rounded-lg p-4 shadow-md mt-4">`;
-  html += `<h4 class="font-semibold mb-4">선택 향미</h4>`;
-  html += `<div class="grid md:grid-cols-${selectedSamples.length} gap-4">`;
-  selectedSamples.forEach(sample => {
-    html += `<div>`;
-    html += `<h5 class="font-semibold mb-2">${sample.title || '샘플'}</h5>`;
-    html += buildFlavorSummaryHtml(sample.sampleData);
-    html += `</div>`;
-  });
-  html += `</div></div>`;
-  
-  compareArea.innerHTML = html;
-  
-  // 차트 생성
-  const ctx = document.getElementById('comparisonRadar');
-  if (!ctx) return;
-  
-  const chartData = {
-    labels: ['프래그런스/아로마', '플레이버', '에프터테이스트', '액시디티', '바디', '밸런스', '오버럴'],
-    datasets: []
-  };
-  
-  const colors = [
-    { bg: 'rgba(139, 90, 43, 0.2)', border: 'rgba(139, 90, 43, 0.8)' },
-    { bg: 'rgba(54, 162, 235, 0.2)', border: 'rgba(54, 162, 235, 0.8)' },
-    { bg: 'rgba(255, 99, 132, 0.2)', border: 'rgba(255, 99, 132, 0.8)' },
-    { bg: 'rgba(75, 192, 192, 0.2)', border: 'rgba(75, 192, 192, 0.8)' },
-    { bg: 'rgba(153, 102, 255, 0.2)', border: 'rgba(153, 102, 255, 0.8)' },
-    { bg: 'rgba(255, 159, 64, 0.2)', border: 'rgba(255, 159, 64, 0.8)' }
-  ];
-  
-  selectedSamples.forEach((sample, index) => {
-    const color = colors[index % colors.length];
-    
-    chartData.datasets.push({
-      label: sample.title || '샘플',
-      data: [
-        parseFloat(sample.sampleData.scoreFragranceAroma || 0),
-        parseFloat(sample.sampleData.scoreFlavor || 0),
-        parseFloat(sample.sampleData.scoreAftertaste || 0),
-        parseFloat(sample.sampleData.scoreAcidity || 0),
-        parseFloat(sample.sampleData.scoreBody || 0),
-        parseFloat(sample.sampleData.scoreBalance || 0),
-        parseFloat(sample.sampleData.scoreOverall || 0)
-      ],
-      backgroundColor: color.bg,
-      borderColor: color.border,
-      borderWidth: 2,
-      pointRadius: 4
-    });
-  });
-  
-  const options = {
-    scales: {
-      r: {
-        angleLines: { display: true },
-        min: 0,
-        max: 10,
-        ticks: {
-          stepSize: 2,
-          backdropColor: 'rgba(255, 255, 255, 0)'
-        }
-      }
-    }
-  };
-  
-  chartObjects.comparisonRadar = new Chart(ctx, {
-    type: 'radar',
-    data: chartData,
-    options: options
-  });
-  
-  compareArea.scrollIntoView({ behavior: 'smooth', block: 'start' });
-}
-
-// 고급 비교 테이블 생성
-
-// 분할 화면 셀렉트 박스 업데이트
-function updateSplitViewSelects() {
-  const leftSelect = document.getElementById('leftSampleSelect');
-  const rightSelect = document.getElementById('rightSampleSelect');
-  
-  if (!leftSelect || !rightSelect) return;
-  
-  leftSelect.innerHTML = '';
-  rightSelect.innerHTML = '';
-  
-  leftSelect.add(new Option('선택하세요', ''));
-  rightSelect.add(new Option('선택하세요', ''));
-  
-  samples.forEach(sample => {
-    leftSelect.add(new Option(sample.title || '샘플', sample.id));
-    rightSelect.add(new Option(sample.title || '샘플', sample.id));
-  });
-  
-  if (samples.length >= 2) {
-    leftSelect.value = samples[0].id;
-    rightSelect.value = samples[1].id;
-    updateSplitView();
-  }
-}
-
-// 분할 화면 업데이트
-function updateSplitView() {
-  const leftSelect = document.getElementById('leftSampleSelect');
-  const rightSelect = document.getElementById('rightSampleSelect');
-  const leftView = document.getElementById('leftSampleView');
-  const rightView = document.getElementById('rightSampleView');
-  
-  if (!leftSelect || !rightSelect || !leftView || !rightView) return;
-  
-  const leftSample = samples.find(s => s.id === leftSelect.value);
-  const rightSample = samples.find(s => s.id === rightSelect.value);
-  
-  if (leftSample) {
-    leftView.innerHTML = createSampleSummary(leftSample);
-  } else {
-    leftView.innerHTML = '<div class="text-center text-gray-500">왼쪽 샘플을 선택하세요</div>';
-  }
-  
-  if (rightSample) {
-    rightView.innerHTML = createSampleSummary(rightSample);
-  } else {
-    rightView.innerHTML = '<div class="text-center text-gray-500">오른쪽 샘플을 선택하세요</div>';
-  }
-}
-
-// 샘플 요약 HTML 생성
-function createSampleSummary(sample) {
-  if (!sample) return '';
-  
-  const sampleData = sample.sampleData;
-  let html = `
-    <h3 class="font-bold text-lg mb-3">${sample.title || '샘플'}</h3>
-    <div class="mb-3">
-      <div><span class="font-semibold">커피명:</span> ${sampleData.coffeeName || '-'}</div>
-      <div><span class="font-semibold">원산지:</span> ${sampleData.origin || '-'}</div>
-      <div><span class="font-semibold">품종:</span> ${sampleData.variety || '-'}</div>
-      <div><span class="font-semibold">가공법:</span> ${sampleData.process || '-'}</div>
-      <div><span class="font-semibold">로스팅 날짜:</span> ${sampleData.roastDate || '-'}</div>
-    </div>
-    
-    <h4 class="font-bold mt-4 mb-2">SCA 점수</h4>
-    <div class="grid grid-cols-2 gap-2">
-      <div><span class="font-semibold">프래그런스/아로마:</span> ${parseFloat(sampleData.scoreFragranceAroma || 0).toFixed(2)}</div>
-      <div><span class="font-semibold">플레이버:</span> ${parseFloat(sampleData.scoreFlavor || 0).toFixed(2)}</div>
-      <div><span class="font-semibold">에프터테이스트:</span> ${parseFloat(sampleData.scoreAftertaste || 0).toFixed(2)}</div>
-      <div><span class="font-semibold">액시디티:</span> ${parseFloat(sampleData.scoreAcidity || 0).toFixed(2)}</div>
-      <div><span class="font-semibold">바디:</span> ${parseFloat(sampleData.scoreBody || 0).toFixed(2)}</div>
-      <div><span class="font-semibold">밸런스:</span> ${parseFloat(sampleData.scoreBalance || 0).toFixed(2)}</div>
-      <div><span class="font-semibold">오버럴:</span> ${parseFloat(sampleData.scoreOverall || 0).toFixed(2)}</div>
-    </div>
-    
-  <div class="mt-2">
-      <span class="font-bold">총점: </span>
-      ${(30 + parseFloat(sampleData.scoreFragranceAroma || 0) +
-          parseFloat(sampleData.scoreFlavor || 0) +
-          parseFloat(sampleData.scoreAftertaste || 0) +
-          parseFloat(sampleData.scoreAcidity || 0) +
-          parseFloat(sampleData.scoreBody || 0) +
-          parseFloat(sampleData.scoreBalance || 0) +
-          parseFloat(sampleData.scoreOverall || 0)).toFixed(2)}
-    </div>
-  `;
-
-  html += buildFlavorSummaryHtml(sampleData);
-  
-  // 바디감 디스크립터 표시
-  if (sampleData.bodyDescriptors && sampleData.bodyDescriptors.length > 0) {
-    html += `<h4 class="font-bold mt-4 mb-2">바디감 디스크립터</h4>`;
-    
-    sampleData.bodyDescriptors.forEach(descriptorId => {
-      const descriptor = BODY_DESCRIPTORS.find(d => d.id === descriptorId);
-      if (descriptor) {
-        const displayText = currentLanguage === 'ko' ? descriptor.korean : descriptor.label;
-        const textColor = getContrastColor(descriptor.color);
-        html += `<span class="flavor-badge" style="background:${descriptor.color};color:${textColor};">${displayText}</span> `;
-      }
-    });
-  }
-  
-  if (sampleData.tastingNotes) {
-    html += `
-      <h4 class="font-bold mt-4 mb-2">테이스팅 노트</h4>
-      <div class="bg-gray-50 p-3 rounded text-sm">${sampleData.tastingNotes.replace(/\n/g, '<br>')}</div>
-    `;
-  }
-  
-  return html;
 }
 
 // SNS형 이미지 내보내기 함수
@@ -3662,7 +3777,7 @@ function exportSnsImage() {
           if (descriptor) {
             const displayText = currentLanguage === 'ko' ? descriptor.korean : descriptor.label;
             const textColor = getContrastColor(descriptor.color);
-            return `<span style="display: inline-block; padding: 4px 10px; border-radius: 12px; font-size: 12px; color: ${textColor}; background: ${descriptor.color}; font-weight: 500;">${displayText}</span>`;
+            return `<span style="display: inline-block; padding: 4px 10px; border-radius: 12px; font-size: 12px; color: ${textColor}; background: ${descriptor.color}; font-weight: 500;">${escapeHtml(displayText)}</span>`;
           }
           return '';
         }).join('')}
@@ -3722,11 +3837,11 @@ function exportResultImage() {
 
   const wrapper = document.createElement('div');
   wrapper.style.cssText = 'background:white;padding:20px;position:absolute;left:-9999px;top:0;font-family:\'Noto Sans KR\',sans-serif;';
-  wrapper.innerHTML = `<h2 style="text-align:center;font-weight:bold;color:#8B5A2B;margin-bottom:8px;">${currentSample.title || currentSample.sampleData.coffeeName || '커핑 샘플'}</h2>
+  wrapper.innerHTML = `<h2 style="text-align:center;font-weight:bold;color:#8B5A2B;margin-bottom:8px;">${escapeHtml(currentSample.title || currentSample.sampleData.coffeeName || '커핑 샘플')}</h2>
   <div style="text-align:center;font-size:14px;color:#555;margin-bottom:16px;line-height:1.4;">
-    <div>원산지: ${currentSample.sampleData.origin || '-'}</div>
-    <div>가공법: ${currentSample.sampleData.process || '-'}</div>
-    <div>로스팅: ${currentSample.sampleData.roastDate || '-'} / ${currentSample.sampleData.roastLevel || '-'}</div>
+    <div>원산지: ${escapeHtml(currentSample.sampleData.origin || '-')}</div>
+    <div>가공법: ${escapeHtml(currentSample.sampleData.process || '-')}</div>
+    <div>로스팅: ${escapeHtml(currentSample.sampleData.roastDate || '-')} / ${escapeHtml(currentSample.sampleData.roastLevel || '-')}</div>
   </div>`;
   const visual = document.querySelector('.visual-section-flex');
   if (visual) {
@@ -3769,7 +3884,7 @@ function exportToExcel() {
     return;
   }
 
-  const header = ['샘플명','커피명','원산지','품종','가공방식','로스팅 날짜','로스팅 레벨','산미','단맛','바디','바디 디스크립터','프래그런스','아로마','플레이버','에프터테이스트','테이스팅 노트'];
+  const header = ['샘플명','커피명','원산지','품종','가공방식','로스팅 날짜','로스팅 레벨','농장/협동조합','고도(masl)','수확연도','크롭상태','수분함량(%)','스크린사이즈','결점두수(300g)','로트번호','공급자','생두중량(kg)','산미','단맛','바디','바디 디스크립터','프래그런스','아로마','플레이버','에프터테이스트','테이스팅 노트'];
   const rows = [header];
 
   samples.forEach(sample => {
@@ -3793,6 +3908,16 @@ function exportToExcel() {
       d.process || '',
       d.roastDate || '',
       d.roastLevel || '',
+      d.farmName || '',
+      d.altitude || '',
+      d.harvestYear || '',
+      d.cropStatus || '',
+      d.moistureContent || '',
+      d.screenSize || '',
+      d.defectCount || '',
+      d.lotNumber || '',
+      d.supplierName || '',
+      d.greenBagWeight || '',
       d.acidityLevel || '',
       d.sweetnessLevel || '',
       d.bodyLevel || '',
@@ -3827,11 +3952,13 @@ function validateSampleData(sampleData) {
     }
     
     // 점수 필드 검증
-    const scoreFields = ['scoreFragranceAroma', 'scoreFlavor', 'scoreAftertaste',
-                        'scoreAcidity', 'scoreBody', 'scoreBalance', 'scoreOverall'];
-    scoreFields.forEach(field => {
-      if (typeof sampleData[field] !== 'number' || isNaN(sampleData[field])) {
-        sampleData[field] = 7; // 기본값
+    SCORE_FIELD_KEYS.forEach(field => {
+      sampleData[field] = normalizeScoreValue(sampleData[field], 7);
+    });
+
+    GREEN_BEAN_FIELDS.forEach((field) => {
+      if (sampleData[field] === undefined || sampleData[field] === null) {
+        sampleData[field] = '';
       }
     });
     
@@ -4054,6 +4181,7 @@ function initApp() {
     
     renderFlavorTabs();
     renderBodyCategoryTabs();
+    renderScoreSteppers();
     loadSamplesFromStorage();
     
     // 모든 샘플 데이터 검증 및 수정
@@ -4100,6 +4228,8 @@ function initApp() {
 
 // 이벤트 핸들러 설정
 function setupEventHandlers() {
+  setupGreenBeanSection();
+
   // 샘플 관리 버튼들
   const addSampleBtn = document.getElementById('addSampleBtn');
   if (addSampleBtn) addSampleBtn.addEventListener('click', function() {
@@ -4147,6 +4277,24 @@ function setupEventHandlers() {
     if (!currentSampleId) return;
     cloneSample(currentSampleId);
   });
+
+
+  const sampleSearchInput = document.getElementById('sampleSearchInput');
+  const sampleSearchClearBtn = document.getElementById('sampleSearchClearBtn');
+  if (sampleSearchInput) {
+    sampleSearchInput.addEventListener('input', function(e) {
+      sampleSearchKeyword = e.target.value.trim();
+      renderSampleList();
+    });
+  }
+  if (sampleSearchClearBtn) {
+    sampleSearchClearBtn.addEventListener('click', function() {
+      sampleSearchKeyword = '';
+      if (sampleSearchInput) sampleSearchInput.value = '';
+      renderSampleList();
+      sampleSearchInput?.focus();
+    });
+  }
   
   // 데이터 관리 버튼들
   const saveSamplesBtn = document.getElementById('saveSamplesBtn');
@@ -4241,28 +4389,52 @@ function setupEventHandlers() {
     e.target.value = '';
   });
   
-  // 슬라이더/입력 동기화
-  document.querySelectorAll('.score-slider').forEach(slider => {
-    const inputId = slider.id.replace('_slider', '');
-    const input = document.getElementById(inputId);
-    
-    slider.addEventListener('input', function() {
-      input.value = this.value;
-      updateTotalScore();
-      scheduleAutoSave();
-    });
-    
-    input.addEventListener('input', function() {
-      slider.value = this.value;
-      updateTotalScore();
-      scheduleAutoSave();
-    });
-  });
-  
   // 계산 버튼
   const calcScoreBtn = document.getElementById('calcScoreBtn');
   if (calcScoreBtn) calcScoreBtn.addEventListener('click', function() {
     updateTotalScore();
+  });
+
+
+  document.querySelectorAll('[data-score-nav]').forEach(btn => {
+    btn.addEventListener('click', function() {
+      const target = document.getElementById(`${this.dataset.scoreNav}Stepper`);
+      if (!target) return;
+      target.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      const input = target.querySelector('.score-stepper-value');
+      if (input) input.focus({ preventScroll: true });
+    });
+  });
+
+  const scoreResetBtn = document.getElementById('scoreResetBtn');
+  if (scoreResetBtn) scoreResetBtn.addEventListener('click', function() {
+    SCORE_FIELD_KEYS.forEach(field => syncScoreRealtime(field, 7));
+    showToast('모든 점수를 7.00으로 초기화했습니다.');
+  });
+
+
+  document.querySelectorAll('[data-score-preset]').forEach(btn => {
+    btn.addEventListener('click', function() {
+      const preset = Number.parseFloat(this.dataset.scorePreset || '7');
+      if (Number.isNaN(preset)) return;
+      SCORE_FIELD_KEYS.forEach(field => syncScoreRealtime(field, preset));
+      showToast(`점수 프리셋 ${preset.toFixed(2)} 적용 완료`);
+    });
+  });
+
+  const mobileQuickSaveBtn = document.getElementById('mobileQuickSaveBtn');
+  if (mobileQuickSaveBtn) mobileQuickSaveBtn.addEventListener('click', function() {
+    document.getElementById('saveSamplesBtn')?.click();
+  });
+
+  const mobileQuickCompareBtn = document.getElementById('mobileQuickCompareBtn');
+  if (mobileQuickCompareBtn) mobileQuickCompareBtn.addEventListener('click', function() {
+    document.getElementById('compareBtn')?.click();
+  });
+
+  const mobileQuickExportBtn = document.getElementById('mobileQuickExportBtn');
+  if (mobileQuickExportBtn) mobileQuickExportBtn.addEventListener('click', function() {
+    document.getElementById('exportImgBtn')?.click();
   });
   
   // 변경 감지 이벤트들
@@ -4381,6 +4553,7 @@ function setupEventHandlers() {
   const exportXlsxBtn = document.getElementById('exportXlsxBtn');
   if (exportXlsxBtn) exportXlsxBtn.addEventListener('click', exportToExcel);
   
+  updateTotalScore();
   console.log("모든 이벤트 핸들러 설정 완료");
 }
 
@@ -4410,7 +4583,6 @@ window.addEventListener('beforeunload', function(e) {
 
 </script>
 <script type="module" src="team.js"></script>
-<script src="price-widget.js"></script>
 <script src="extras.js"></script>
 <script src="theme.js"></script>
 </body>
