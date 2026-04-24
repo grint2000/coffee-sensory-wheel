@@ -167,6 +167,11 @@
     .html2canvas-container { box-shadow: 0 0 0 3px #eee; }
     .score-slider { width: 100%; }
     .sample-list-scroll {max-height: 190px; overflow-y: auto; -webkit-overflow-scrolling: touch;}
+    .sample-toolbar { display:flex; align-items:center; gap:8px; margin-bottom:8px; }
+    .sample-search-input { flex:1; min-width:0; border:1px solid #d1d5db; border-radius:8px; padding:7px 10px; font-size:13px; }
+    .sample-search-clear { border:1px solid #d1d5db; background:#fff; border-radius:8px; padding:7px 10px; font-size:12px; line-height:1; }
+    .sample-meta-count { font-size:12px; color:#6b7280; margin-bottom:6px; }
+    .focus-outline:focus-visible { outline: 3px solid #8B5A2B; outline-offset: 2px; }
     .compare-table th, .compare-table td {border:1px solid #e2e2e2; padding:6px 8px; font-size:14px;}
     .compare-table th {background: #f9f3ea;}
     .compare-table tr:nth-child(even) td {background: #f8f6f4;}
@@ -332,6 +337,15 @@
         font-size: 12px;
       }
       .mobile-touch-friendly {
+        min-height: 44px;
+      }
+      .sample-toolbar {
+        flex-direction: column;
+        align-items: stretch;
+      }
+      .sample-search-input,
+      .sample-search-clear {
+        width: 100%;
         min-height: 44px;
       }
       .tab-btn-inactive, .tab-btn-active {
@@ -782,6 +796,11 @@
         <button class="px-2 py-1 bg-blue-100 hover:bg-blue-200 text-blue-700 rounded text-xs flex items-center mobile-touch-friendly" id="cloneSampleBtn"><i class="fa fa-copy mr-2"></i>복제</button>
         <button class="px-2 py-1 bg-purple-100 hover:bg-purple-200 text-purple-700 rounded text-xs flex items-center mobile-touch-friendly" id="undoBtn"><i class="fa fa-undo mr-2"></i>실행취소</button>
       </div>
+      <div class="sample-toolbar">
+        <input id="sampleSearchInput" type="search" class="sample-search-input focus-outline" placeholder="샘플명/원산지/품종 검색" aria-label="샘플 검색">
+        <button type="button" id="sampleSearchClearBtn" class="sample-search-clear focus-outline">초기화</button>
+      </div>
+      <div id="sampleMetaCount" class="sample-meta-count" aria-live="polite"></div>
       <div class="sample-list-scroll bg-gray-50 rounded-lg border p-1.5 no-scrollbar">
         <div id="sampleList" class="sample-sortable-list"></div>
         <div class="text-xs text-gray-500 mt-2 px-2">
@@ -1889,7 +1908,37 @@ let currentFlavorCategory = null;
 let currentFlavorPhase = "fragrance";
 let currentBodyCategory = BODY_DESCRIPTOR_CATEGORIES[0].key;
 let lastErrorCount = 0;
+let sampleSearchKeyword = '';
   
+function escapeHtml(value) {
+  return String(value ?? '').replace(/[&<>"']/g, (char) => ({
+    '&': '&amp;',
+    '<': '&lt;',
+    '>': '&gt;',
+    '"': '&quot;',
+    "'": '&#39;'
+  }[char]));
+}
+
+function sampleMatchesKeyword(sample, keyword) {
+  if (!keyword) return true;
+  const targetFields = [
+    sample.title,
+    sample.sampleData?.coffeeName,
+    sample.sampleData?.origin,
+    sample.sampleData?.variety
+  ].filter(Boolean).join(' ');
+  return matchKoreanInitials(targetFields, keyword);
+}
+
+function updateSampleMetaCount(filteredCount, totalCount) {
+  const metaEl = document.getElementById('sampleMetaCount');
+  if (!metaEl) return;
+  metaEl.textContent = sampleSearchKeyword
+    ? `검색 결과 ${filteredCount}개 / 전체 ${totalCount}개`
+    : `전체 샘플 ${totalCount}개`;
+}
+
 // 향미 휠 아코디언 토글 함수
 function toggleAccordion(header) {
   if (!header) return;
@@ -2968,32 +3017,42 @@ function saveUIToSample(targetDataObj) {
 
 // 샘플 목록 렌더링 (드래그 앤 드롭 지원)
 function renderSampleList() {
-  let listDiv = document.getElementById('sampleList');
+  const listDiv = document.getElementById('sampleList');
+  const filteredSamples = samples.filter(sample => sampleMatchesKeyword(sample, sampleSearchKeyword));
+  updateSampleMetaCount(filteredSamples.length, samples.length);
+
   if (!samples.length) {
     listDiv.innerHTML = `<div class="text-gray-500 text-xs my-3 text-center">샘플 없음<br>새로 추가하세요.</div>`;
     updateNavigationButtons();
     updateCurrentSampleIndicator();
     return;
   }
-  
+
+  if (!filteredSamples.length) {
+    listDiv.innerHTML = `<div class="text-gray-500 text-xs my-3 text-center">검색 결과가 없습니다.<br>다른 키워드를 입력해보세요.</div>`;
+    updateNavigationButtons();
+    updateCurrentSampleIndicator();
+    renderCompareList();
+    return;
+  }
+
   let html = '';
-  samples.forEach(sm => {
+  filteredSamples.forEach(sm => {
     html += `
-      <div class="flex justify-between items-center border rounded-lg px-2 py-1 mb-1 sample-item ${sm.id === currentSampleId ? "bg-yellow-100 border-yellow-700" : "bg-white border-gray-200"}" data-id="${sm.id}">
-        <div class="sample-drag-handle"><i class="fas fa-grip-lines"></i></div>
-        <span class="truncate text-sm flex-1 ${sm.id === currentSampleId ? "font-bold" : ""}">${sm.title || "샘플"}</span>
-        <span class="text-xs ml-2 text-gray-400">${sm.sampleData && sm.sampleData.roastDate ? sm.sampleData.roastDate : ""}</span>
+      <div class="flex justify-between items-center border rounded-lg px-2 py-1 mb-1 sample-item ${sm.id === currentSampleId ? "bg-yellow-100 border-yellow-700" : "bg-white border-gray-200"}" data-id="${sm.id}" role="button" tabindex="0" aria-label="${escapeHtml(sm.title || '샘플')} 샘플 선택">
+        <div class="sample-drag-handle" aria-label="샘플 순서 이동"><i class="fas fa-grip-lines"></i></div>
+        <span class="truncate text-sm flex-1 ${sm.id === currentSampleId ? "font-bold" : ""}">${escapeHtml(sm.title || "샘플")}</span>
+        <span class="text-xs ml-2 text-gray-400">${escapeHtml(sm.sampleData && sm.sampleData.roastDate ? sm.sampleData.roastDate : "")}</span>
       </div>
     `;
   });
-  
+
   listDiv.innerHTML = html;
-  
-  // 샘플 클릭 이벤트
+
   Array.from(listDiv.querySelectorAll('.sample-item')).forEach(el => {
     el.addEventListener('click', (e) => {
       if (!e.target.closest('.sample-drag-handle')) {
-        let id = el.getAttribute('data-id');
+        const id = el.getAttribute('data-id');
         if (id !== currentSampleId) {
           loadSample(id);
           const sample = samples.find(s => s.id === id);
@@ -3003,51 +3062,62 @@ function renderSampleList() {
         }
       }
     });
-    
-    // 모바일 길게 누르기로 복제
+
+    el.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        el.click();
+      }
+    });
+
     el.addEventListener('touchstart', function(e) {
       if (e.target.closest('.sample-drag-handle')) return;
-      
+
       const longPressTimer = setTimeout(() => {
         const sampleId = el.getAttribute('data-id');
         if (confirm("이 샘플을 복제하시겠습니까?")) {
           cloneSample(sampleId);
         }
       }, 800);
-      
+
       const clearTimer = () => clearTimeout(longPressTimer);
       el.addEventListener('touchend', clearTimer, { once: true });
       el.addEventListener('touchcancel', clearTimer, { once: true });
     });
   });
-  
-  // Sortable.js 초기화
+
   if (sortableInstance) {
     sortableInstance.destroy();
   }
-  
-  if (samples.length > 1) {
+
+  if (filteredSamples.length > 1) {
     sortableInstance = new Sortable(listDiv, {
       animation: 150,
       handle: '.sample-drag-handle',
       ghostClass: 'sortable-ghost',
       chosenClass: 'sortable-chosen',
       onEnd: function (evt) {
-        const oldIndex = evt.oldIndex;
-        const newIndex = evt.newIndex;
-        
-        if (oldIndex !== newIndex) {
-          const item = samples[oldIndex];
-          samples.splice(oldIndex, 1);
-          samples.splice(newIndex, 0, item);
-          saveSamplesToStorage();
-          updateNavigationButtons();
-          updateCurrentSampleIndicator();
-        }
+        const movedId = evt.item?.getAttribute('data-id');
+        if (!movedId) return;
+
+        const fromIndex = samples.findIndex(s => s.id === movedId);
+        if (fromIndex === -1) return;
+
+        const item = samples[fromIndex];
+        samples.splice(fromIndex, 1);
+
+        const beforeEl = evt.to.children[evt.newIndex + 1];
+        const beforeId = beforeEl ? beforeEl.getAttribute('data-id') : null;
+        const insertIndex = beforeId ? samples.findIndex(s => s.id === beforeId) : samples.length;
+        samples.splice(insertIndex, 0, item);
+
+        saveSamplesToStorage();
+        updateNavigationButtons();
+        updateCurrentSampleIndicator();
       }
     });
   }
-  
+
   updateNavigationButtons();
   updateCurrentSampleIndicator();
   renderCompareList();
@@ -3070,7 +3140,7 @@ function renderCompareList() {
     html += `
       <label class="flex items-center bg-gray-100 hover:bg-gray-200 rounded px-3 py-1 text-sm mobile-touch-friendly">
         <input type="checkbox" class="compare-checkbox mr-1.5" value="${sm.id}">
-        ${sm.title || "샘플"}
+        ${escapeHtml(sm.title || "샘플")}
       </label>
     `;
   });
@@ -4147,6 +4217,24 @@ function setupEventHandlers() {
     if (!currentSampleId) return;
     cloneSample(currentSampleId);
   });
+
+
+  const sampleSearchInput = document.getElementById('sampleSearchInput');
+  const sampleSearchClearBtn = document.getElementById('sampleSearchClearBtn');
+  if (sampleSearchInput) {
+    sampleSearchInput.addEventListener('input', function(e) {
+      sampleSearchKeyword = e.target.value.trim();
+      renderSampleList();
+    });
+  }
+  if (sampleSearchClearBtn) {
+    sampleSearchClearBtn.addEventListener('click', function() {
+      sampleSearchKeyword = '';
+      if (sampleSearchInput) sampleSearchInput.value = '';
+      renderSampleList();
+      sampleSearchInput?.focus();
+    });
+  }
   
   // 데이터 관리 버튼들
   const saveSamplesBtn = document.getElementById('saveSamplesBtn');
