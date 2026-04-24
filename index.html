@@ -11,7 +11,6 @@
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&display=swap" rel="stylesheet">
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/hammerjs@2.0.8/hammer.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
@@ -808,6 +807,19 @@
             <i class="fa fa-plus mr-1"></i>새 세션
           </button>
         </div>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-1 mb-2">
+          <select id="sessionPurposeInline" class="border rounded p-1.5 text-xs mobile-touch-friendly">
+            <option value="구매검토">목적: 구매검토</option>
+            <option value="품질확인">목적: 품질확인</option>
+            <option value="로스팅평가">목적: 로스팅평가</option>
+            <option value="블렌딩">목적: 블렌딩</option>
+            <option value="기타">목적: 기타</option>
+          </select>
+          <input id="sessionCupperInline" type="text" placeholder="평가자 이름" class="border rounded p-1.5 text-xs mobile-touch-friendly" />
+          <input id="sessionWaterTempInline" type="number" placeholder="수온(°C)" class="border rounded p-1.5 text-xs mobile-touch-friendly" />
+          <input id="sessionLocationInline" type="text" placeholder="장소" class="border rounded p-1.5 text-xs mobile-touch-friendly" />
+        </div>
+        <button type="button" id="saveSessionMetaBtn" class="w-full px-2 py-1 bg-white border border-amber-300 rounded text-xs mobile-touch-friendly">세션 정보 저장</button>
         <div id="sessionMeta" class="text-xs text-gray-700 leading-5"></div>
       </div>
       <div class="flex items-center gap-1 mb-2">
@@ -2452,6 +2464,14 @@ function renderSessionMeta() {
     <div>목적: <span class="font-semibold">${escapeHtml(session.purpose || '기타')}</span> | 날짜: ${escapeHtml(session.date || '-')}</div>
     <div>평가자: ${escapeHtml(session.cupper || '-')} | 수온: ${escapeHtml(String(session.waterTemp ?? 93))}°C</div>
   `;
+  const purposeInline = document.getElementById('sessionPurposeInline');
+  const cupperInline = document.getElementById('sessionCupperInline');
+  const waterTempInline = document.getElementById('sessionWaterTempInline');
+  const locationInline = document.getElementById('sessionLocationInline');
+  if (purposeInline) purposeInline.value = session.purpose || '기타';
+  if (cupperInline) cupperInline.value = session.cupper || '';
+  if (waterTempInline) waterTempInline.value = String(session.waterTemp ?? 93);
+  if (locationInline) locationInline.value = session.location || '';
 }
 
 function renderSessionSelect() {
@@ -2527,6 +2547,17 @@ function exportCurrentSessionJson() {
   a.click();
   a.remove();
   URL.revokeObjectURL(url);
+}
+
+function saveSessionMetaFromInline() {
+  const session = getCurrentSessionObj();
+  if (!session) return;
+  session.purpose = document.getElementById('sessionPurposeInline')?.value || '기타';
+  session.cupper = document.getElementById('sessionCupperInline')?.value.trim() || '';
+  session.waterTemp = Number.parseFloat(document.getElementById('sessionWaterTempInline')?.value || '93') || 93;
+  session.location = document.getElementById('sessionLocationInline')?.value.trim() || '';
+  renderSessionMeta();
+  saveSessionsToStorage();
 }
 
 // 샘플 이동 시 토스트 메시지 표시
@@ -4062,7 +4093,7 @@ function restoreBackup(backup) {
 }
 
 // SNS형 이미지 내보내기 함수
-async function exportSnsImage() {
+function exportSnsImage() {
   saveCurrentSample();
   
   const currentSample = getCurrentSampleObj();
@@ -4075,31 +4106,18 @@ async function exportSnsImage() {
   
   // SNS용 임시 DOM 요소 생성 (심플한 흰색 배경)
   const tempRoot = document.createElement('div');
-  const ratio = prompt('SNS 비율 선택: 1=정사각형(1:1), 4=세로형(4:5), 16=가로형(16:9)', '1');
-  const ratioMap = {
-    '1': { width: 500, height: 500 },
-    '4': { width: 500, height: 625 },
-    '16': { width: 500, height: 281 }
-  };
-  const selectedRatio = ratioMap[ratio || '1'] || ratioMap['1'];
-
   tempRoot.style.cssText = `
     background: white;
     padding: 40px;
-    width: ${selectedRatio.width}px;
-    height: ${selectedRatio.height}px;
+    max-width: 720px;
     font-family: 'Noto Sans KR', sans-serif;
-    position: fixed;
-    left: 0;
+    position: absolute;
+    left: -9999px;
     top: 0;
-    visibility: hidden;
-    pointer-events: none;
-    z-index: -1;
     border-radius: 12px;
     color: #333;
     box-shadow: 0 4px 20px rgba(0,0,0,0.1);
     border: 2px solid #f0f0f0;
-    overflow: hidden;
   `;
   
   // SNS용 간결한 HTML 구성 (커피명 + 향미특성/속성만)
@@ -4107,7 +4125,7 @@ async function exportSnsImage() {
   <div style="text-align: center; margin-bottom: 30px;">
     <h2 style="margin: 0; font-size: 24px; font-weight: bold; color: #8B5A2B;">${s.title || s.coffeeName || '커피 테이스팅'}</h2>
     ${s.coffeeName && s.title !== s.coffeeName ? `<div style="font-size: 16px; color: #666; margin-top: 5px;">${s.coffeeName}</div>` : ''}
-    <div id="snsMetaBlock" style="font-size: 14px; color: #555; margin-top: 10px; line-height: 1.4;">
+    <div style="font-size: 14px; color: #555; margin-top: 10px; line-height: 1.4;">
       <div>원산지: ${s.origin || '-'}</div>
       <div>가공법: ${s.process || '-'}</div>
       <div>로스팅: ${s.roastDate || '-'} / ${s.roastLevel || '-'}</div>
@@ -4185,16 +4203,6 @@ async function exportSnsImage() {
   
   document.body.appendChild(tempRoot);
   
-  const currentSession = getCurrentSessionObj();
-  const greenSummary = [s.farmName && `농장:${s.farmName}`, s.altitude && `고도:${s.altitude}masl`, s.harvestYear && `수확:${s.harvestYear}`, s.cropStatus && `크롭:${s.cropStatus}`].filter(Boolean).join(' | ');
-  tempRoot.querySelector('#snsMetaBlock')?.insertAdjacentHTML('beforeend', `
-    <div>세션: ${(currentSession?.title || '-')} / 목적: ${(currentSession?.purpose || '-')} / 평가자: ${(currentSession?.cupper || '-')}</div>
-    ${greenSummary ? `<div>생두: ${greenSummary}</div>` : ''}
-  `);
-
-  await document.fonts.ready;
-  await Promise.all(Array.from(tempRoot.querySelectorAll('img')).map((img) => img.decode?.().catch(() => null)));
-
   html2canvas(tempRoot, {
     backgroundColor: "white",
     scale: 2,
@@ -4273,99 +4281,6 @@ function exportResultImage() {
     showToast('이미지 저장 중 오류가 발생했습니다.');
     if (document.body.contains(wrapper)) document.body.removeChild(wrapper);
   });
-}
-
-function renderSamplePdfPages(doc, sample, session, isFirstPage = false) {
-  const data = sample.sampleData || {};
-  if (!isFirstPage) doc.addPage();
-
-  doc.setFontSize(16);
-  doc.text('Noel', 15, 20);
-  doc.setFontSize(14);
-  doc.text('SCA Cupping Form', 75, 20);
-  doc.setFontSize(9);
-  doc.text(`${new Date().toISOString().slice(0, 10)} | ${session?.title || '-'}`, 135, 20);
-  doc.line(15, 25, 195, 25);
-
-  doc.setFontSize(10);
-  const rows = [
-    `샘플명: ${sample.title || '-'}`,
-    `커피명: ${data.coffeeName || '-'}`,
-    `원산지: ${data.origin || '-'}`,
-    `품종: ${data.variety || '-'}`,
-    `가공방식: ${data.process || '-'}`,
-    `로스팅: ${data.roastDate || '-'} / ${data.roastLevel || '-'}`,
-    `세션목적: ${session?.purpose || '-'}`,
-    `평가자: ${session?.cupper || '-'}`,
-    `생두: ${[data.farmName, data.altitude && `${data.altitude}masl`, data.harvestYear, data.cropStatus].filter(Boolean).join(' / ') || '-'}`
-  ];
-  rows.forEach((line, idx) => doc.text(line, 15, 34 + idx * 7));
-
-  const total = Number.parseFloat(formatScoreTotal(data));
-  doc.setFontSize(11);
-  doc.text(`총점: ${total.toFixed(2)} (${getScoreGrade(total).label})`, 15, 102);
-  let y = 111;
-  SCORE_FIELD_CONFIG.forEach((field) => {
-    const score = normalizeScoreValue(data[field.id], 7);
-    doc.text(`${field.label}: ${score.toFixed(2)}`, 15, y);
-    doc.setFillColor(230, 230, 230);
-    doc.rect(70, y - 3, 90, 3, 'F');
-    doc.setFillColor(139, 90, 43);
-    doc.rect(70, y - 3, ((score - 6) / 4) * 90, 3, 'F');
-    y += 8;
-  });
-
-  doc.addPage();
-  const radarCanvas = document.getElementById('cuppingRadar');
-  if (radarCanvas) {
-    doc.addImage(radarCanvas.toDataURL('image/png'), 'PNG', 15, 20, 80, 80);
-  }
-  doc.setFontSize(10);
-  doc.text(`프래그런스: ${getPhaseFlavorSummary(data, 'fragrance', 6)}`, 105, 28);
-  doc.text(`아로마: ${getPhaseFlavorSummary(data, 'aroma', 6)}`, 105, 38);
-  doc.text(`플레이버: ${getPhaseFlavorSummary(data, 'flavor', 6)}`, 105, 48);
-  doc.text(`에프터: ${getPhaseFlavorSummary(data, 'aftertaste', 6)}`, 105, 58);
-  doc.text(`디펙트: ${getDefectSummary(data)}`, 15, 118);
-  const notes = doc.splitTextToSize(data.tastingNotes || '-', 180);
-  doc.text(notes, 15, 135);
-}
-
-function exportToPDF(sampleIds = null) {
-  saveCurrentSample();
-  if (!window.jspdf || !window.jspdf.jsPDF) {
-    throw new Error('jsPDF 라이브러리를 불러오지 못했습니다.');
-  }
-  const selectedSamples = Array.isArray(sampleIds) && sampleIds.length
-    ? samples.filter((sample) => sampleIds.includes(sample.id))
-    : [getCurrentSampleObj()].filter(Boolean);
-  if (!selectedSamples.length) {
-    showToast('내보낼 샘플이 없습니다.');
-    return;
-  }
-
-  const session = getCurrentSessionObj();
-  const { jsPDF } = window.jspdf;
-  const doc = new jsPDF('p', 'mm', 'a4');
-  selectedSamples.forEach((sample, index) => {
-    renderSamplePdfPages(doc, sample, session, index === 0);
-  });
-
-  if (selectedSamples.length > 1) {
-    doc.addPage();
-    doc.setFontSize(12);
-    doc.text('세션 비교 요약', 15, 20);
-    let y = 30;
-    selectedSamples.forEach((sample) => {
-      const total = Number.parseFloat(formatScoreTotal(sample.sampleData));
-      doc.text(`${sample.title || '샘플'}: ${total.toFixed(2)} / ${getScoreGrade(total).label}`, 15, y);
-      y += 8;
-    });
-  }
-
-  const fileBase = selectedSamples.length === 1
-    ? (selectedSamples[0].title || selectedSamples[0].sampleData?.coffeeName || 'cupping')
-    : (session?.title || 'session');
-  doc.save(`${fileBase.replace(/[^\w가-힣-]+/g, '_')}_${new Date().toISOString().slice(0, 10)}.pdf`);
 }
 
 // Excel 내보내기
@@ -4762,6 +4677,14 @@ function setupEventHandlers() {
   if (closeSessionModal) closeSessionModal.addEventListener('click', () => document.getElementById('sessionModal')?.classList.remove('show'));
   const createSessionConfirmBtn = document.getElementById('createSessionConfirmBtn');
   if (createSessionConfirmBtn) createSessionConfirmBtn.addEventListener('click', createSessionFromModal);
+  const saveSessionMetaBtn = document.getElementById('saveSessionMetaBtn');
+  if (saveSessionMetaBtn) saveSessionMetaBtn.addEventListener('click', saveSessionMetaFromInline);
+  ['sessionPurposeInline', 'sessionCupperInline', 'sessionWaterTempInline', 'sessionLocationInline'].forEach((id) => {
+    const el = document.getElementById(id);
+    if (!el) return;
+    el.addEventListener('change', saveSessionMetaFromInline);
+    el.addEventListener('blur', saveSessionMetaFromInline);
+  });
 
   // 샘플 관리 버튼들
   const addSampleBtn = document.getElementById('addSampleBtn');
@@ -5093,15 +5016,7 @@ function setupEventHandlers() {
   
   // 내보내기 버튼들 (기존 코드 유지 - 생략하여 길이 단축)
   const exportImgBtn = document.getElementById('exportImgBtn');
-  if (exportImgBtn) exportImgBtn.addEventListener('click', async function() {
-    try {
-      const mode = confirm('현재 세션의 모든 샘플을 PDF로 내보낼까요? (취소 시 현재 샘플만 내보냅니다)');
-      exportToPDF(mode ? samples.map((sample) => sample.id) : null);
-    } catch (e) {
-      console.error('PDF 내보내기 실패, 이미지로 폴백:', e);
-      exportResultImage();
-    }
-  });
+  if (exportImgBtn) exportImgBtn.addEventListener('click', exportResultImage);
 
   const exportSnsImgBtn = document.getElementById('exportSnsImgBtn');
   if (exportSnsImgBtn) exportSnsImgBtn.addEventListener('click', exportSnsImage);
