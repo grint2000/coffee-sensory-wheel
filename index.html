@@ -809,6 +809,8 @@
           </button>
         </div>
         <div class="grid grid-cols-1 md:grid-cols-2 gap-1 mb-2">
+          <input id="sessionDateInline" type="date" class="border rounded p-1.5 text-xs mobile-touch-friendly" />
+          <input id="sessionTimeInline" type="time" class="border rounded p-1.5 text-xs mobile-touch-friendly" />
           <select id="sessionPurposeInline" class="border rounded p-1.5 text-xs mobile-touch-friendly">
             <option value="구매검토">목적: 구매검토</option>
             <option value="품질확인">목적: 품질확인</option>
@@ -1040,7 +1042,7 @@
       <h3 class="text-base font-bold mb-1 border-b pb-1 border-tan-200 flex items-center"><i class="fa fa-circle-half-stroke mr-2"></i>SCA 향미 선택</h3>
       <div class="text-xs mb-3 text-gray-600">[프래그런스] [아로마] [플레이버] [에프터테이스트] 각 그룹별 향미 선택</div>
       <div class="mb-4 flex flex-wrap items-center">
-        <button type="button" class="px-2 py-1 rounded bg-gray-100 text-xs mobile-touch-friendly mr-2" onclick="window.open('https://sca.coffee/research/coffee-tasters-flavor-wheel', '_blank');">
+        <button type="button" id="flavorWheelOfficialBtn" class="px-2 py-1 rounded bg-gray-100 text-xs mobile-touch-friendly mr-2">
           플레이버 휠 공식자료 <i class="fas fa-external-link-alt ml-1 text-xs"></i>
         </button>
         <div class="lang-toggle">
@@ -1211,6 +1213,7 @@
       <button type="button" id="scoreResetBtn" class="score-reset-btn">전체 7.00점으로 초기화</button>
       <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-2 score-input-wrap" id="scoreInputGrid"></div>
       <div class="mt-4 sca-total-bar">
+        <div id="mobileScoreSampleName" class="text-xs text-amber-700 font-semibold truncate w-full mb-1"></div>
         <div>
           <label class="text-sm block mb-1">SCA 총점 (100점 만점)</label>
           <span id="totalScore" class="font-bold inline-block text-lg bg-gray-100 px-4 py-2 rounded border">86.00</span>
@@ -1317,6 +1320,14 @@
         <div>
           <label class="block text-sm mb-1">평가자</label>
           <input id="sessionCupperInput" class="w-full border rounded p-2" />
+        </div>
+        <div>
+          <label class="block text-sm mb-1">날짜</label>
+          <input id="sessionDateInput" type="date" class="w-full border rounded p-2" />
+        </div>
+        <div>
+          <label class="block text-sm mb-1">시간</label>
+          <input id="sessionTimeInput" type="time" class="w-full border rounded p-2" />
         </div>
         <div>
           <label class="block text-sm mb-1">수온(°C)</label>
@@ -1956,8 +1967,8 @@ const DEFECT_LABELS = {
 const DEFECT_PROPS = [
   {key:"defectUnderdevelopment", label:"언더디벨롭먼트", labelEn:"Underdevelopment", desc:"로스팅 불충분, 강한 산미, 피니시/애프터 부족", wheel:"Green/Vegetative"},
   {key:"defectOverdevelopment", label:"오버디벨롭먼트", labelEn:"Overdevelopment", desc:"과도한 로스팅으로 산미, 플레이버 소멸", wheel:"Roasted"},
-  {key:"defectBaked", label:"베이킹(베이크드)", labelEn:"Baked", desc:"팝콘/귀리/시리얼류 결점, 캐러멜화 과잉", wheel:"곡물(Cereal/Grain)"},
-  {key:"defectScorching", label:"스코칭", labelEn:"Scorching", desc:"탄맛, 과다열 노출, 재/탄 노트", wheel:"Roasted"}
+  {key:"defectBaked", label:"베이킹(베이크드)", labelEn:"Baked", desc:"멜라노이딘 발달 부족으로 플랫해지고 단맛·복합미가 낮아지는 결점", wheel:"곡물(Cereal/Grain)"},
+  {key:"defectScorching", label:"스코칭", labelEn:"Scorching", desc:"드럼 내벽 국소 과열로 외부가 탄화되어 거친 탄맛이 나는 결점", wheel:"Roasted"}
 ];
 
 // 향미 카테고리별 그룹핑 (확장)
@@ -2268,8 +2279,8 @@ function createScoreStepper(scoreId, label, tooltipText) {
   wrapper.appendChild(track);
 
   const applyDelta = (delta) => {
-    const current = getScoreValueFromUI(scoreId);
-    const next = normalizeScoreValue(current + delta, current);
+    const current = normalizeScoreValue(getScoreValueFromUI(scoreId), 7);
+    const next = Math.min(10, Math.max(6, Math.round((current + delta) * 4) / 4));
     syncScoreRealtime(scoreId, next);
   };
 
@@ -2297,10 +2308,16 @@ function renderScoreSteppers() {
 }
 
 function getScoreGrade(totalScore) {
-  if (totalScore >= 90) return { label: 'Outstanding', color: '#D4AF37' };
-  if (totalScore >= 85) return { label: 'Excellent', color: '#4CAF50' };
-  if (totalScore >= 80) return { label: 'Very Good', color: '#2196F3' };
-  if (totalScore >= 75) return { label: 'Good', color: '#FF9800' };
+  if (totalScore >= 90) return { label: 'Outstanding · 90+', color: '#D4AF37' };
+  if (totalScore >= 88) return { label: 'Excellent · 88+', color: '#27AE60' };
+  if (totalScore >= 86) return { label: 'Excellent · 86+', color: '#2ECC71' };
+  if (totalScore >= 85) return { label: 'Excellent · 85+', color: '#4CAF50' };
+  if (totalScore >= 84) return { label: 'Very Good · 84+', color: '#1565C0' };
+  if (totalScore >= 82) return { label: 'Very Good · 82+', color: '#1976D2' };
+  if (totalScore >= 80) return { label: 'Very Good · 80+', color: '#2196F3' };
+  if (totalScore >= 78) return { label: 'Good · 78+', color: '#E65100' };
+  if (totalScore >= 76) return { label: 'Good · 76+', color: '#EF6C00' };
+  if (totalScore >= 75) return { label: 'Good · 75+', color: '#FF9800' };
   if (totalScore >= 70) return { label: 'Fair', color: '#9E9E9E' };
   return { label: 'Below Specialty', color: '#F44336' };
 }
@@ -2374,6 +2391,20 @@ function setupGreenBeanSection() {
     el.addEventListener('input', updateGreenBeanWarnings);
     el.addEventListener('change', updateGreenBeanWarnings);
   });
+
+  const harvestYearInput = document.getElementById('harvestYear');
+  const cropStatusSelect = document.getElementById('cropStatus');
+  if (harvestYearInput && cropStatusSelect) {
+    harvestYearInput.addEventListener('change', function() {
+      const year = Number.parseInt(this.value, 10);
+      if (!Number.isFinite(year) || cropStatusSelect.value) return;
+      const diff = new Date().getFullYear() - year;
+      if (diff <= 0) cropStatusSelect.value = 'New Crop';
+      else if (diff === 1) cropStatusSelect.value = 'Current Crop';
+      else if (diff === 2) cropStatusSelect.value = 'Past Crop';
+      else cropStatusSelect.value = 'Old Crop';
+    });
+  }
 }
 
 // 향미 휠 아코디언 토글 함수
@@ -2486,13 +2517,19 @@ function createNewSampleObj(title) {
 
 function createNewSessionObj(overrides = {}) {
   const today = new Date().toISOString().slice(0, 10);
+  const timeNow = new Date().toTimeString().slice(0, 5);
   const sessionId = `session_${Date.now()}_${Math.floor(Math.random() * 10000)}`;
+  const date = overrides.date || today;
+  const time = overrides.time || timeNow;
+  const location = overrides.location || '';
+  const autoTitle = `커핑 ${date} ${time}${location ? ` @ ${location}` : ''}`;
   return {
     id: overrides.id || sessionId,
-    title: overrides.title || `커핑 ${today}`,
-    date: overrides.date || today,
+    title: overrides.title || autoTitle,
+    date,
+    time,
     purpose: overrides.purpose || '기타',
-    location: overrides.location || '',
+    location,
     cupper: overrides.cupper || '',
     waterTemp: Number.parseFloat(overrides.waterTemp ?? 93) || 93,
     grindSize: overrides.grindSize || '',
@@ -2521,13 +2558,17 @@ function renderSessionMeta() {
     return;
   }
   metaEl.innerHTML = `
-    <div>목적: <span class="font-semibold">${escapeHtml(session.purpose || '기타')}</span> | 날짜: ${escapeHtml(session.date || '-')}</div>
-    <div>평가자: ${escapeHtml(session.cupper || '-')} | 수온: ${escapeHtml(String(session.waterTemp ?? 93))}°C</div>
+    <div>목적: <span class="font-semibold">${escapeHtml(session.purpose || '기타')}</span> | 날짜: ${escapeHtml(session.date || '-')} ${escapeHtml(session.time || '')}</div>
+    <div>장소: ${escapeHtml(session.location || '-')} | 평가자: ${escapeHtml(session.cupper || '-')} | 수온: ${escapeHtml(String(session.waterTemp ?? 93))}°C</div>
   `;
+  const dateInline = document.getElementById('sessionDateInline');
+  const timeInline = document.getElementById('sessionTimeInline');
   const purposeInline = document.getElementById('sessionPurposeInline');
   const cupperInline = document.getElementById('sessionCupperInline');
   const waterTempInline = document.getElementById('sessionWaterTempInline');
   const locationInline = document.getElementById('sessionLocationInline');
+  if (dateInline) dateInline.value = session.date || new Date().toISOString().slice(0, 10);
+  if (timeInline) timeInline.value = session.time || '';
   if (purposeInline) purposeInline.value = session.purpose || '기타';
   if (cupperInline) cupperInline.value = session.cupper || '';
   if (waterTempInline) waterTempInline.value = String(session.waterTemp ?? 93);
@@ -2537,12 +2578,27 @@ function renderSessionMeta() {
 function renderSessionSelect() {
   const select = document.getElementById('sessionSelect');
   if (!select) return;
-  const options = sessions.map((session) => `<option value="${session.id}">${escapeHtml(session.title || '세션')}</option>`).join('');
+  const options = sessions.map((session) => {
+    const dateText = [session.date || '', session.time || ''].filter(Boolean).join(' ');
+    const locationText = session.location ? ` · ${session.location}` : '';
+    return `<option value="${session.id}">${escapeHtml(session.title || '세션')}${dateText ? ` (${escapeHtml(dateText)}${escapeHtml(locationText)})` : ''}</option>`;
+  }).join('');
   select.innerHTML = options;
   if (currentSessionId) {
     select.value = currentSessionId;
   }
   renderSessionMeta();
+}
+
+function buildAutoSessionTitle(dateValue, timeValue, locationValue) {
+  const safeDate = dateValue || new Date().toISOString().slice(0, 10);
+  const safeTime = timeValue || new Date().toTimeString().slice(0, 5);
+  const safeLocation = locationValue ? ` @ ${locationValue}` : '';
+  return `커핑 ${safeDate} ${safeTime}${safeLocation}`;
+}
+
+function isAutoSessionTitle(title) {
+  return /^커핑 \d{4}-\d{2}-\d{2} \d{2}:\d{2}( @ .+)?$/.test((title || '').trim());
 }
 
 function switchSession(sessionId) {
@@ -2560,8 +2616,14 @@ function switchSession(sessionId) {
     samples = [createNewSampleObj('샘플 #1')];
     session.samples = samples;
   }
-  currentSampleId = samples[0].id;
-  setUIFromSample(samples[0].sampleData);
+
+  const savedSampleId = APP_STORAGE.get(`noel_sca_current_sample_${window.currentUser || 'default'}`);
+  const restoredSample = samples.find(sample => sample.id === savedSampleId);
+  const selectedSample = restoredSample || samples[0];
+
+  currentSampleId = selectedSample.id;
+  APP_STORAGE.set(`noel_sca_current_sample_${window.currentUser || 'default'}`, currentSampleId);
+  setUIFromSample(selectedSample.sampleData);
   renderSessionSelect();
   renderSampleList();
 }
@@ -2569,23 +2631,36 @@ function switchSession(sessionId) {
 function openSessionModal() {
   const modal = document.getElementById('sessionModal');
   const today = new Date().toISOString().slice(0, 10);
+  const now = new Date();
+  const hh = String(now.getHours()).padStart(2, '0');
+  const mm = String(now.getMinutes()).padStart(2, '0');
   const titleInput = document.getElementById('sessionTitleInput');
   const cupperInput = document.getElementById('sessionCupperInput');
+  const dateInput = document.getElementById('sessionDateInput');
+  const timeInput = document.getElementById('sessionTimeInput');
   const waterTempInput = document.getElementById('sessionWaterTempInput');
-  if (titleInput) titleInput.value = `커핑 ${today}`;
+  if (titleInput) titleInput.value = `커핑 ${today} ${hh}:${mm}`;
   if (cupperInput) cupperInput.value = window.currentUser && window.currentUser !== 'default' ? window.currentUser : '';
+  if (dateInput) dateInput.value = today;
+  if (timeInput) timeInput.value = `${hh}:${mm}`;
   if (waterTempInput) waterTempInput.value = '93';
   modal?.classList.add('show');
 }
 
 function createSessionFromModal() {
+  const dateValue = document.getElementById('sessionDateInput')?.value || new Date().toISOString().slice(0, 10);
+  const timeValue = document.getElementById('sessionTimeInput')?.value || new Date().toTimeString().slice(0, 5);
+  const locationValue = document.getElementById('sessionLocationInput')?.value.trim() || '';
+  const titleValue = document.getElementById('sessionTitleInput')?.value.trim();
   const session = createNewSessionObj({
-    title: document.getElementById('sessionTitleInput')?.value.trim() || undefined,
+    title: titleValue || buildAutoSessionTitle(dateValue, timeValue, locationValue),
+    date: dateValue,
+    time: timeValue,
     purpose: document.getElementById('sessionPurposeInput')?.value || '기타',
     cupper: document.getElementById('sessionCupperInput')?.value.trim() || '',
     waterTemp: document.getElementById('sessionWaterTempInput')?.value || 93,
     grindSize: document.getElementById('sessionGrindSizeInput')?.value.trim() || '',
-    location: document.getElementById('sessionLocationInput')?.value.trim() || ''
+    location: locationValue
   });
   sessions.unshift(session);
   saveSessionsToStorage();
@@ -2602,7 +2677,8 @@ function exportCurrentSessionJson() {
   const a = document.createElement('a');
   const safeTitle = (session.title || 'session').replace(/[^\w가-힣-]+/g, '_');
   a.href = url;
-  a.download = `session_${safeTitle}_${new Date().toISOString().slice(0, 10)}.json`;
+  const safeTime = (session.time || '').replace(':', '') || new Date().toTimeString().slice(0, 5).replace(':', '');
+  a.download = `session_${safeTitle}_${new Date().toISOString().slice(0, 10)}_${safeTime}.json`;
   document.body.appendChild(a);
   a.click();
   a.remove();
@@ -2622,10 +2698,17 @@ function exportCurrentSessionExcel() {
 function saveSessionMetaFromInline() {
   const session = getCurrentSessionObj();
   if (!session) return;
+  const shouldSyncTitle = !session.title || isAutoSessionTitle(session.title);
+  session.date = document.getElementById('sessionDateInline')?.value || session.date || new Date().toISOString().slice(0, 10);
+  session.time = document.getElementById('sessionTimeInline')?.value || session.time || '';
   session.purpose = document.getElementById('sessionPurposeInline')?.value || '기타';
   session.cupper = document.getElementById('sessionCupperInline')?.value.trim() || '';
   session.waterTemp = Number.parseFloat(document.getElementById('sessionWaterTempInline')?.value || '93') || 93;
   session.location = document.getElementById('sessionLocationInline')?.value.trim() || '';
+  if (shouldSyncTitle) {
+    session.title = buildAutoSessionTitle(session.date, session.time, session.location);
+  }
+  renderSessionSelect();
   renderSessionMeta();
   saveSessionsToStorage();
 }
@@ -2834,11 +2917,11 @@ function renderBodyCategoryTabs() {
     btn.className = 'font-bold rounded px-4 py-1 mr-1 mb-1 mobile-touch-friendly ' +
       (currentBodyCategory === cat.key ? 'tab-btn-active' : 'tab-btn-inactive');
     btn.textContent = currentLanguage === 'ko' ? cat.name : cat.nameEn;
-    btn.onclick = () => {
+    btn.addEventListener('click', () => {
       currentBodyCategory = cat.key;
       renderBodyCategoryTabs();
       renderBodyDescriptors();
-    };
+    });
     tabs.appendChild(btn);
   });
 }
@@ -2866,9 +2949,8 @@ function renderBodyDescriptors() {
 
       html += `
         <div class="body-descriptor-item ${selectedClass}"
-             data-descriptor="${descriptor.id}"
              style="border-color: ${descriptor.color};"
-             onclick="toggleBodyDescriptor('${descriptor.id}')">
+             data-descriptor-id="${descriptor.id}">
           <input type="checkbox" ${isSelected ? 'checked' : ''}>
           <span class="checkbox-custom"></span>
           <span>${escapeHtml(displayText)}</span>
@@ -2897,7 +2979,7 @@ function toggleBodyDescriptor(descriptorId) {
   currentSample.sampleData.bodyDescriptors = descriptors;
   
   // UI 즉시 업데이트 (향미 선택과 동일한 방식)
-  const itemElement = document.querySelector(`[data-descriptor="${descriptorId}"]`);
+  const itemElement = document.querySelector(`[data-descriptor-id="${descriptorId}"]`);
   if (itemElement) {
     const checkbox = itemElement.querySelector('input[type="checkbox"]');
     const isSelected = descriptors.includes(descriptorId);
@@ -2934,11 +3016,11 @@ function renderFlavorTabs() {
     // 언어에 따른 레이블 표시
     btn.textContent = currentLanguage === 'ko' ? phase.label : phase.labelEn;
     btn.dataset.flavorphase = phase.id;
-    btn.onclick = () => {
+    btn.addEventListener('click', () => {
       currentFlavorPhase = phase.id;
       renderFlavorTabs();
       renderFlavorPhase();
-    };
+    });
     tabs.appendChild(btn);
   });
 }
@@ -2993,7 +3075,7 @@ function renderFlavorPhase(force = false) {
     const categoryName = currentLanguage === 'ko' ? category.name : category.nameEn;
     html += `
       <button type="button" class="flavor-category-tab ${currentFlavorCategory === categoryName ? 'active' : ''}" 
-              data-category="${categoryName}" onclick="filterByCategory('${categoryName}')">
+              data-category="${categoryName}">
         ${categoryName}
       </button>
     `;
@@ -3058,7 +3140,7 @@ function renderFlavorPhase(force = false) {
 
     html += `
       <div class="flavor-category-accordion mb-3 ${isFilteredOut ? 'flavor-fix-hidden' : ''}" data-category="${categoryName}">
-        <div class="flavor-category-header" onclick="toggleAccordion(this)">
+        <div class="flavor-category-header">
           <h4>${categoryName}</h4>
           <span class="accordion-icon"><i class="fas fa-chevron-${isOpen ? 'up' : 'down'}"></i></span>
         </div>
@@ -3123,6 +3205,17 @@ function renderFlavorPhase(force = false) {
   });
   
   outer.innerHTML = html;
+
+  outer.querySelectorAll('.flavor-category-tab').forEach(tab => {
+    tab.addEventListener('click', () => {
+      const category = tab.dataset.category;
+      if (category) filterByCategory(category);
+    });
+  });
+
+  outer.querySelectorAll('.flavor-category-header').forEach(header => {
+    header.addEventListener('click', () => toggleAccordion(header));
+  });
   
   // 향미 검색 기능
   const searchInput = document.getElementById('flavorSearchInput');
@@ -3452,15 +3545,16 @@ function updateRadar(data) {
 }
 
 // 총점 계산
-function updateTotalScore(data) {
+function updateTotalScore(data, options = {}) {
   const sampleData = data || getCurrentSampleObj()?.sampleData;
+  const useUiFallback = !data && options.useUiFallback === true;
 
   let total = 30;
   SCORE_FIELD_KEYS.forEach(field => {
-    if (data) {
-      total += normalizeScoreValue(sampleData?.[field], 0);
-    } else {
+    if (useUiFallback) {
       total += getScoreValueFromUI(field);
+    } else {
+      total += normalizeScoreValue(sampleData?.[field], 7);
     }
   });
 
@@ -3470,12 +3564,19 @@ function updateTotalScore(data) {
   }
   updateScoreGradeBadge(total);
 
+  const mobileScoreSampleName = document.getElementById('mobileScoreSampleName');
+  if (mobileScoreSampleName) {
+    mobileScoreSampleName.textContent = sampleData?.title
+      ? `현재 샘플: ${sampleData.title}`
+      : '현재 샘플: 미선택';
+  }
+
   document.getElementById('evalDate').textContent = new Date().toLocaleDateString();
 }
 
 function syncScoreRealtime(fieldKey, rawValue) {
   const normalized = setScoreValueToUI(fieldKey, rawValue);
-  updateTotalScore();
+  updateTotalScore(undefined, { useUiFallback: true });
   scheduleAutoSave();
   return normalized;
 }
@@ -3578,7 +3679,9 @@ function saveUIToSample(targetDataObj) {
   sampleData.roastLevel = document.getElementById('roastLevel').value;
   GREEN_BEAN_FIELDS.forEach((field) => {
     const input = document.getElementById(field);
-    sampleData[field] = input ? input.value : '';
+    const raw = input ? input.value : '';
+    const isNumericField = field === 'altitude' || field === 'moistureContent' || field === 'defectCount' || field === 'greenBagWeight';
+    sampleData[field] = isNumericField && raw !== '' ? Number.parseFloat(raw) : raw;
   });
   sampleData.acidityLevel = getCheckedRadio('acidityLevel');
   sampleData.sweetnessLevel = getCheckedRadio('sweetnessLevel');
@@ -3909,6 +4012,7 @@ function loadSample(sampleId) {
   let sampleObj = samples.find(s => s.id === sampleId);
   if (sampleObj) {
     currentSampleId = sampleId;
+    APP_STORAGE.set(`noel_sca_current_sample_${window.currentUser || 'default'}`, currentSampleId);
     setUIFromSample(sampleObj.sampleData);
     renderSampleList();
   }
@@ -3948,11 +4052,17 @@ function loadSamplesFromStorage() {
   if (!Array.isArray(sessions) || !sessions.length) {
     sessions = [createNewSessionObj()];
   }
-  sessions = sessions.map((session) => ({
-    ...createNewSessionObj(),
-    ...session,
-    samples: Array.isArray(session.samples) ? session.samples : []
-  }));
+  sessions = sessions.map((session) => {
+    const normalized = {
+      ...createNewSessionObj(),
+      ...session,
+      samples: Array.isArray(session.samples) ? session.samples : []
+    };
+    if (!Object.prototype.hasOwnProperty.call(session, 'time')) {
+      normalized.time = '';
+    }
+    return normalized;
+  });
   sessions.forEach((session) => {
     session.samples = session.samples.map((sample, index) => {
       const normalized = {
@@ -3971,9 +4081,14 @@ function loadSamplesFromStorage() {
     samples = [createNewSampleObj("샘플 #1")];
     if (activeSession) activeSession.samples = samples;
   }
-  currentSampleId = samples[0].id;
+
+  const savedSampleId = APP_STORAGE.get(`noel_sca_current_sample_${window.currentUser || 'default'}`);
+  const restoredSample = samples.find(sample => sample.id === savedSampleId);
+  const selectedSample = restoredSample || samples[0];
+
+  currentSampleId = selectedSample.id;
   renderSessionSelect();
-  if (samples[0]) setUIFromSample(samples[0].sampleData);
+  if (selectedSample) setUIFromSample(selectedSample.sampleData);
   renderSampleList();
 }
 
@@ -3988,7 +4103,8 @@ function saveSessionsToStorage() {
     const userKey = window.currentUser || 'default';
     const didSaveSessions = APP_STORAGE.set(`noel_sca_sessions_${userKey}`, JSON.stringify(sessions));
     const didSaveSamples = APP_STORAGE.set(`noel_sca_samples2_${userKey}`, JSON.stringify(samples));
-    if (!didSaveSessions || !didSaveSamples) throw new Error('localStorage write failed');
+    const didSaveCurrentSample = APP_STORAGE.set(`noel_sca_current_sample_${userKey}`, currentSampleId || '');
+    if (!didSaveSessions || !didSaveSamples || !didSaveCurrentSample) throw new Error('localStorage write failed');
     if (typeof syncSamplesToTeam === 'function') {
       try { syncSamplesToTeam(samples); } catch(e) { console.error(e); }
     }
@@ -4315,7 +4431,7 @@ function buildSessionExcelRows(session) {
   const sessionSamples = Array.isArray(session?.samples) ? session.samples : [];
   const header = ['샘플명','커피명','원산지','품종','가공방식','로스팅 날짜','로스팅 레벨','농장명','고도(masl)','수확연도','크롭상태','수분함량(%)','스크린사이즈','결점두수','로트번호','공급자','생두중량(kg)','산미','단맛','바디','바디 디스크립터','프래그런스','아로마','플레이버','에프터테이스트','테이스팅 노트','총점','등급'];
   const rows = [
-    ['세션명', session?.title || '-', '날짜', session?.date || '-', '목적', session?.purpose || '-', '평가자', session?.cupper || '-', '수온', `${session?.waterTemp || 93}`],
+    ['세션명', session?.title || '-', '날짜', session?.date || '-', '시간', session?.time || '-', '장소', session?.location || '-', '목적', session?.purpose || '-', '평가자', session?.cupper || '-', '수온', `${session?.waterTemp || 93}`],
     [],
     header
   ];
@@ -4384,8 +4500,9 @@ function exportSessionToExcel(session, useSessionFileName = false) {
 
   const safeFileTitle = (session.title || 'session').replace(/[^\w가-힣-]+/g, '_');
   const dateText = new Date().toISOString().slice(0, 10);
+  const safeTime = (session.time || '').replace(':', '') || new Date().toTimeString().slice(0, 5).replace(':', '');
   const filename = useSessionFileName
-    ? `session_${safeFileTitle}_${dateText}.xlsx`
+    ? `session_${safeFileTitle}_${dateText}_${safeTime}.xlsx`
     : 'cupping_data.xlsx';
 
   XLSX.writeFile(wb, filename);
@@ -4714,11 +4831,10 @@ function setupEventHandlers() {
   if (createSessionConfirmBtn) createSessionConfirmBtn.addEventListener('click', createSessionFromModal);
   const saveSessionMetaBtn = document.getElementById('saveSessionMetaBtn');
   if (saveSessionMetaBtn) saveSessionMetaBtn.addEventListener('click', saveSessionMetaFromInline);
-  ['sessionPurposeInline', 'sessionCupperInline', 'sessionWaterTempInline', 'sessionLocationInline'].forEach((id) => {
+  ['sessionDateInline', 'sessionTimeInline', 'sessionPurposeInline', 'sessionCupperInline', 'sessionWaterTempInline', 'sessionLocationInline'].forEach((id) => {
     const el = document.getElementById(id);
     if (!el) return;
     el.addEventListener('change', saveSessionMetaFromInline);
-    el.addEventListener('blur', saveSessionMetaFromInline);
   });
 
   // 샘플 관리 버튼들
@@ -4769,6 +4885,24 @@ function setupEventHandlers() {
     cloneSample(currentSampleId);
   });
 
+  const flavorWheelOfficialBtn = document.getElementById('flavorWheelOfficialBtn');
+  if (flavorWheelOfficialBtn) {
+    flavorWheelOfficialBtn.addEventListener('click', () => {
+      const ref = window.open('https://sca.coffee/research/coffee-tasters-flavor-wheel', '_blank', 'noopener,noreferrer');
+      if (ref) ref.opener = null;
+    });
+  }
+
+  const bodyDescriptorArea = document.getElementById('bodyDescriptorArea');
+  if (bodyDescriptorArea) {
+    bodyDescriptorArea.addEventListener('click', event => {
+      const descriptorItem = event.target.closest('.body-descriptor-item');
+      if (!descriptorItem) return;
+      const descriptorId = descriptorItem.dataset.descriptorId;
+      if (!descriptorId) return;
+      toggleBodyDescriptor(descriptorId);
+    });
+  }
 
   const sampleSearchInput = document.getElementById('sampleSearchInput');
   const sampleSearchClearBtn = document.getElementById('sampleSearchClearBtn');
@@ -4893,7 +5027,7 @@ function setupEventHandlers() {
   // 계산 버튼
   const calcScoreBtn = document.getElementById('calcScoreBtn');
   if (calcScoreBtn) calcScoreBtn.addEventListener('click', function() {
-    updateTotalScore();
+    updateTotalScore(undefined, { useUiFallback: true });
   });
 
 
@@ -5058,7 +5192,7 @@ function setupEventHandlers() {
   const exportXlsxBtn = document.getElementById('exportXlsxBtn');
   if (exportXlsxBtn) exportXlsxBtn.addEventListener('click', exportToExcel);
   
-  updateTotalScore();
+  updateTotalScore(undefined, { useUiFallback: true });
 }
 
 // DOM 준비 상태 확인 후 앱 초기화

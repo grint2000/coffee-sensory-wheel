@@ -1,40 +1,72 @@
-const CACHE_NAME = 'noel-sca-v4';
-const urlsToCache = [
+const APP_CACHE = 'noel-sca-app-v5';
+const RUNTIME_CACHE = 'noel-sca-runtime-v5';
+
+const APP_SHELL_FILES = [
   './',
   './index.html',
   './offline.html',
   './manifest.json',
   './extras.js',
   './theme.js',
+  './team.js',
   './icons/icon-192.png',
   './icons/icon-512.png',
-  './icons/header-logo.png',
-  'https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css',
-  'https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.5.2/css/all.min.css',
-  'https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js',
-  'https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js',
-  'https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js',
-  'https://cdn.jsdelivr.net/npm/hammerjs@2.0.8/hammer.min.js',
-  'https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js'
+  './icons/header-logo.png'
 ];
+
 self.addEventListener('install', event => {
-  event.waitUntil(
-    caches.open(CACHE_NAME).then(cache => cache.addAll(urlsToCache))
-  );
+  event.waitUntil((async () => {
+    const cache = await caches.open(APP_CACHE);
+    await Promise.allSettled(APP_SHELL_FILES.map(file => cache.add(file)));
+    await self.skipWaiting();
+  })());
 });
 
 self.addEventListener('activate', event => {
-  event.waitUntil(
-    caches.keys().then(keys => Promise.all(
-      keys.filter(k => k !== CACHE_NAME).map(k => caches.delete(k))
-    ))
-  );
-  return self.clients.claim();
+  event.waitUntil((async () => {
+    const keys = await caches.keys();
+    await Promise.all(
+      keys
+        .filter(key => key !== APP_CACHE && key !== RUNTIME_CACHE)
+        .map(key => caches.delete(key))
+    );
+    await self.clients.claim();
+  })());
 });
+
 self.addEventListener('fetch', event => {
-  event.respondWith(
-        caches.match(event.request).then(resp => {
-      return resp || fetch(event.request).catch(() => caches.match('./offline.html'));
-    })
-  );
+  const { request } = event;
+  if (request.method !== 'GET') return;
+
+  event.respondWith((async () => {
+    const url = new URL(request.url);
+
+    const isRuntimeAsset =
+      url.origin === self.location.origin ||
+      url.hostname.includes('cdn.jsdelivr.net') ||
+      url.hostname.includes('gstatic.com') ||
+      url.hostname.includes('googleapis.com');
+
+    if (!isRuntimeAsset) {
+      return fetch(request);
+    }
+
+    const runtimeCache = await caches.open(RUNTIME_CACHE);
+    const cached = await runtimeCache.match(request);
+
+    try {
+      const networkResponse = await fetch(request);
+      if (networkResponse && networkResponse.ok) {
+        runtimeCache.put(request, networkResponse.clone());
+      }
+      return networkResponse;
+    } catch (_) {
+      if (cached) return cached;
+      if (request.mode === 'navigate') {
+        const offline = await caches.match('./offline.html');
+        if (offline) return offline;
+      }
+      return new Response('Network error', { status: 503, statusText: 'Service Unavailable' });
+    }
+  })());
 });

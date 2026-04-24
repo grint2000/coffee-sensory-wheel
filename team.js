@@ -23,11 +23,12 @@ const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
 
-
 const TEAM_STORAGE_KEYS = {
   currentUser: 'noel_sca_current_user',
   currentTeam: 'noel_sca_current_team'
 };
+
+const TEAM_NAME_REGEX = /^[0-9A-Za-z가-힣_-]{2,40}$/;
 
 function safeGetStorage(key, fallback = null) {
   try {
@@ -62,27 +63,49 @@ function getCurrentTeamName() {
   return safeGetStorage('mollis_sca_current_team', '');
 }
 
+function normalizeTeamName(rawName) {
+  const teamName = (rawName || '').trim();
+  if (!TEAM_NAME_REGEX.test(teamName)) {
+    notifyMessage('팀 이름은 2~40자의 한글/영문/숫자/밑줄/하이픈만 사용할 수 있습니다.');
+    return '';
+  }
+  return teamName;
+}
+
 window.firebaseLogin = async function() {
   try {
     const provider = new GoogleAuthProvider();
     const result = await signInWithPopup(auth, provider);
     window.currentUser = result.user.displayName || result.user.email;
-    document.getElementById('currentUserDisplay').textContent = window.currentUser;
+
+    const display = document.getElementById('currentUserDisplay');
+    if (display) display.textContent = window.currentUser;
+
     safeSetStorage(TEAM_STORAGE_KEYS.currentUser, window.currentUser);
-    document.getElementById('logoutBtn').classList.remove('hidden');
-    document.getElementById('loginBtn').classList.add('hidden');
+
+    const logoutBtn = document.getElementById('logoutBtn');
+    if (logoutBtn) logoutBtn.classList.remove('hidden');
+
+    const loginBtn = document.getElementById('loginBtn');
+    if (loginBtn) loginBtn.classList.add('hidden');
   } catch (err) {
     console.error(err);
+    notifyMessage('Google 로그인에 실패했습니다. 팝업 차단 여부를 확인해 주세요.');
   }
 };
 
 window.logoutFirebase = async function() {
-  await signOut(auth);
-  window.currentUser = 'default';
-  safeSetStorage(TEAM_STORAGE_KEYS.currentUser, window.currentUser);
-  safeRemoveStorage(TEAM_STORAGE_KEYS.currentTeam);
-  if (window._teamSamplesUnsub) window._teamSamplesUnsub();
-  location.reload();
+  try {
+    await signOut(auth);
+    window.currentUser = 'default';
+    safeSetStorage(TEAM_STORAGE_KEYS.currentUser, window.currentUser);
+    safeRemoveStorage(TEAM_STORAGE_KEYS.currentTeam);
+    if (window._teamSamplesUnsub) window._teamSamplesUnsub();
+    location.reload();
+  } catch (err) {
+    console.error(err);
+    notifyMessage('로그아웃에 실패했습니다. 네트워크 상태를 확인한 뒤 다시 시도해 주세요.');
+  }
 };
 
 onAuthStateChanged(auth, user => {
@@ -98,11 +121,14 @@ onAuthStateChanged(auth, user => {
   }
 });
 
-window.createTeam = async function(teamName) {
+window.createTeam = async function(rawName) {
   if (!auth.currentUser) {
     notifyMessage('먼저 로그인하세요');
     return;
   }
+  const teamName = normalizeTeamName(rawName);
+  if (!teamName) return;
+
   const teamRef = doc(db, 'teams', teamName);
   await setDoc(teamRef, {
     owner: auth.currentUser.uid,
@@ -116,11 +142,14 @@ window.createTeam = async function(teamName) {
   notifyMessage('팀이 생성되었습니다');
 };
 
-window.joinTeam = async function(teamName) {
+window.joinTeam = async function(rawName) {
   if (!auth.currentUser) {
     notifyMessage('먼저 로그인하세요');
     return;
   }
+  const teamName = normalizeTeamName(rawName);
+  if (!teamName) return;
+
   const teamRef = doc(db, 'teams', teamName);
   const snap = await getDoc(teamRef);
   if (!snap.exists()) {
@@ -145,38 +174,48 @@ window.loadTeamInfoToModal = async function() {
   if (nameEl) nameEl.textContent = teamName || '없음';
   if (!teamName || !listEl) return;
   listEl.innerHTML = '';
+
   const snap = await getDoc(doc(db, 'teams', teamName));
-  if (snap.exists()) {
-    const data = snap.data();
-    (data.members || []).forEach(m => {
-      const li = document.createElement('li');
-      li.className = 'flex justify-between items-center';
-      const span = document.createElement('span');
-      span.textContent = m.name || m.uid;
-      li.appendChild(span);
-      if (data.owner === auth.currentUser.uid && m.uid !== data.owner) {
-        const btn = document.createElement('button');
-        btn.textContent = '탈퇴';
-        btn.className = 'text-red-600 text-xs border px-1 rounded';
-        btn.addEventListener('click', () => removeMemberFromTeam(m.uid));
-        li.appendChild(btn);
-      }
-      listEl.appendChild(li);
-    });
-  }
+  if (!snap.exists()) return;
+
+  const data = snap.data();
+  (data.members || []).forEach(m => {
+    const li = document.createElement('li');
+    li.className = 'flex justify-between items-center';
+
+    const span = document.createElement('span');
+    span.textContent = m.name || m.uid;
+    li.appendChild(span);
+
+    if (auth.currentUser && data.owner === auth.currentUser.uid && m.uid !== data.owner) {
+      const btn = document.createElement('button');
+      btn.textContent = '탈퇴';
+      btn.className = 'text-red-600 text-xs border px-1 rounded';
+      btn.addEventListener('click', () => removeMemberFromTeam(m.uid));
+      li.appendChild(btn);
+    }
+    listEl.appendChild(li);
+  });
 };
 
 window.removeMemberFromTeam = async function(memberUid) {
+  if (!auth.currentUser) {
+    notifyMessage('로그인 후 이용해 주세요');
+    return;
+  }
+
   const teamName = getCurrentTeamName();
   if (!teamName) return;
   const teamRef = doc(db, 'teams', teamName);
   const snap = await getDoc(teamRef);
   if (!snap.exists()) return;
+
   const data = snap.data();
   if (data.owner !== auth.currentUser.uid) {
     notifyMessage('팀장만 팀원을 탈퇴시킬 수 있습니다');
     return;
   }
+
   const newMembers = (data.members || []).filter(m => m.uid !== memberUid);
   const updateObj = { members: newMembers };
   updateObj[`memberSamples.${memberUid}`] = deleteField();
@@ -273,34 +312,44 @@ window.startTeamSamplesListener = function() {
 window.showTeamReport = async function() {
   const teamName = getCurrentTeamName();
   if (!teamName) return;
+
   const snap = await getDoc(doc(db, 'teams', teamName));
   if (!snap.exists()) return;
+
   const data = snap.data();
   const bodyEl = document.getElementById('teamReportBody');
-  if (!bodyEl) return;
+  const reportModal = document.getElementById('teamReportModal');
+  if (!bodyEl || !reportModal) return;
+
   bodyEl.innerHTML = '';
   (data.members || []).forEach(m => {
     const memberSamples = (data.memberSamples && data.memberSamples[m.uid]) || [];
     const wrapper = document.createElement('div');
     wrapper.className = 'mb-4';
+
     const nameEl = document.createElement('h4');
     nameEl.className = 'font-semibold';
     nameEl.textContent = m.name || m.uid;
     wrapper.appendChild(nameEl);
+
     memberSamples.forEach(sample => {
       const div = document.createElement('div');
       div.className = 'border rounded p-2 my-2';
+
       const title = document.createElement('div');
       title.className = 'font-medium mb-1';
-      title.textContent = sample.title;
+      title.textContent = sample.title || '제목 없는 샘플';
       div.appendChild(title);
+
       const summary = buildFlavorSummaryHtml(sample.sampleData);
       div.insertAdjacentHTML('beforeend', summary);
       wrapper.appendChild(div);
     });
+
     bodyEl.appendChild(wrapper);
   });
-  document.getElementById('teamReportModal').classList.add('show');
+
+  reportModal.classList.add('show');
 };
 
 document.addEventListener('DOMContentLoaded', () => {
