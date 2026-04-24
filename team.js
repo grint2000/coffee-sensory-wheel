@@ -29,7 +29,7 @@ window.firebaseLogin = async function() {
     const result = await signInWithPopup(auth, provider);
     window.currentUser = result.user.displayName || result.user.email;
     document.getElementById('currentUserDisplay').textContent = window.currentUser;
-    localStorage.setItem('mollis_sca_current_user', window.currentUser);
+    localStorage.setItem('noel_sca_current_user', window.currentUser);
     document.getElementById('logoutBtn').classList.remove('hidden');
     document.getElementById('loginBtn').classList.add('hidden');
   } catch (err) {
@@ -40,8 +40,8 @@ window.firebaseLogin = async function() {
 window.logoutFirebase = async function() {
   await signOut(auth);
   window.currentUser = 'default';
-  localStorage.setItem('mollis_sca_current_user', window.currentUser);
-  localStorage.removeItem('mollis_sca_current_team');
+  localStorage.setItem('noel_sca_current_user', window.currentUser);
+  localStorage.removeItem('noel_sca_current_team');
   if (window._teamSamplesUnsub) window._teamSamplesUnsub();
   location.reload();
 };
@@ -70,7 +70,7 @@ window.createTeam = async function(teamName) {
     members: [{ uid: auth.currentUser.uid, name: window.currentUser }],
     memberSamples: { [auth.currentUser.uid]: window.samples || [] }
   }, { merge: true });
-  localStorage.setItem('mollis_sca_current_team', teamName);
+  localStorage.setItem('noel_sca_current_team', teamName);
   updateTeamHeader();
   await syncSamplesToTeam(window.samples || []);
   fetchTeamSamples().then(startTeamSamplesListener);
@@ -92,7 +92,7 @@ window.joinTeam = async function(teamName) {
     members: arrayUnion({ uid: auth.currentUser.uid, name: window.currentUser }),
     [`memberSamples.${auth.currentUser.uid}`]: window.samples || []
   });
-  localStorage.setItem('mollis_sca_current_team', teamName);
+  localStorage.setItem('noel_sca_current_team', teamName);
   updateTeamHeader();
   await fetchTeamSamples();
   startTeamSamplesListener();
@@ -100,7 +100,7 @@ window.joinTeam = async function(teamName) {
 };
 
 window.loadTeamInfoToModal = async function() {
-  const teamName = localStorage.getItem('mollis_sca_current_team');
+  const teamName = localStorage.getItem('noel_sca_current_team');
   const nameEl = document.getElementById('currentTeamDisplay');
   const listEl = document.getElementById('teamMembersList');
   if (nameEl) nameEl.textContent = teamName || '없음';
@@ -128,7 +128,7 @@ window.loadTeamInfoToModal = async function() {
 };
 
 window.removeMemberFromTeam = async function(memberUid) {
-  const teamName = localStorage.getItem('mollis_sca_current_team');
+  const teamName = localStorage.getItem('noel_sca_current_team');
   if (!teamName) return;
   const teamRef = doc(db, 'teams', teamName);
   const snap = await getDoc(teamRef);
@@ -149,7 +149,7 @@ window.removeMemberFromTeam = async function(memberUid) {
 function updateTeamHeader() {
   const headerEl = document.getElementById('currentTeamHeader');
   if (headerEl) {
-    const name = localStorage.getItem('mollis_sca_current_team');
+    const name = localStorage.getItem('noel_sca_current_team');
     headerEl.textContent = name ? `팀: ${name}` : '';
   }
 }
@@ -157,7 +157,7 @@ function updateTeamHeader() {
 // === Team sample sync functions ===
 
 async function fetchTeamSamples() {
-  const teamName = localStorage.getItem('mollis_sca_current_team');
+  const teamName = localStorage.getItem('noel_sca_current_team');
   if (!teamName) return;
   try {
     const snap = await getDoc(doc(db, 'teams', teamName));
@@ -171,7 +171,7 @@ async function fetchTeamSamples() {
         samplesData = data.samples; // backward compatibility
       }
       if (samplesData) {
-        const key = `mollis_sca_samples2_${window.currentUser || 'default'}`;
+        const key = `noel_sca_samples2_${window.currentUser || 'default'}`;
         const localStr = JSON.stringify(samplesData);
         localStorage.setItem(key, localStr);
         if (typeof loadSamplesFromStorage === 'function') {
@@ -186,7 +186,7 @@ async function fetchTeamSamples() {
 }
 
 window.syncSamplesToTeam = async function(samples) {
-  const teamName = localStorage.getItem('mollis_sca_current_team');
+  const teamName = localStorage.getItem('noel_sca_current_team');
   if (!teamName || !auth.currentUser) return;
   try {
     const teamRef = doc(db, 'teams', teamName);
@@ -200,7 +200,7 @@ window.syncSamplesToTeam = async function(samples) {
 };
 
 window.startTeamSamplesListener = function() {
-  const teamName = localStorage.getItem('mollis_sca_current_team');
+  const teamName = localStorage.getItem('noel_sca_current_team');
   if (!teamName) return;
   const teamRef = doc(db, 'teams', teamName);
   if (window._teamSamplesUnsub) window._teamSamplesUnsub();
@@ -215,7 +215,7 @@ window.startTeamSamplesListener = function() {
         samplesData = data.samples; // backward compatibility
       }
       if (samplesData) {
-        const key = `mollis_sca_samples2_${window.currentUser || 'default'}`;
+        const key = `noel_sca_samples2_${window.currentUser || 'default'}`;
         const newStr = JSON.stringify(samplesData);
         if (localStorage.getItem(key) !== newStr) {
           localStorage.setItem(key, newStr);
@@ -232,7 +232,7 @@ window.startTeamSamplesListener = function() {
 };
 
 window.showTeamReport = async function() {
-  const teamName = localStorage.getItem('mollis_sca_current_team');
+  const teamName = localStorage.getItem('noel_sca_current_team');
   if (!teamName) return;
   const snap = await getDoc(doc(db, 'teams', teamName));
   if (!snap.exists()) return;

@@ -42,7 +42,7 @@ When the team owner (or any member) adds or edits samples, the changes are saved
 ## Customizing the Header Logo
 
 1. Replace the file `icons/header-logo.png` with your own image (recommended size around 192×192 pixels).
-2. Open `index.html` and reload the page. Your image will appear next to the **mollis** text at the top.
+2. Open `index.html` and reload the page. Your image will appear next to the **Noel** text at the top.
 
 This update applies both on desktop and mobile views and is cached for offline use by the PWA service worker.
 

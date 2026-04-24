@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>Mollis SCA 커피 관능 평가 (개선버전)</title>
+  <title>Noel SCA 커피 관능 평가 (개선버전)</title>
   <link rel="manifest" href="manifest.json">
   <meta name="theme-color" content="#8B5A2B">
   <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
@@ -765,10 +765,11 @@
 <body class="min-h-screen bg-[#fcfaf7]">
 <div class="max-w-5xl mx-auto p-1 md:p-4 bg-[#fcfaf7]">
   <!-- Header -->
-  <header class="flex flex-col md:flex-row items-center justify-between py-4 mb-2 border-b border-tan-300 bg-white rounded-lg shadow-sm">
-    <div class="flex items-center">
-            <img src="icons/header-logo.png" alt="Logo" class="mr-2 w-12 h-12" />
-      <span class="text-2xl md:text-3xl font-bold text-tan-900 select-none">mollis</span>
+  <header class="flex flex-col md:flex-row items-center justify-between py-4 mb-2 border-b border-tan-300 bg-white rounded-lg shadow-sm gap-3">
+    <div class="flex items-center gap-3 rounded-xl px-3 py-2 bg-amber-50 border border-amber-100">
+      <div class="w-14 h-14 md:w-16 md:h-16 rounded-lg overflow-hidden bg-white border border-amber-200 shadow-sm flex items-center justify-center">
+        <img src="icons/header-logo.png" alt="Noel 로고" class="w-full h-full object-contain p-1" />
+      </div>
     </div>
     <div class="mt-3 md:mt-0 text-center md:text-right">
       <h2 class="text-lg md:text-2xl font-semibold">SCA 커피 관능 평가 (개선버전)</h2>
@@ -1239,7 +1240,7 @@
         <button id="exportSnsImgBtn" type="button" class="sns-export-btn px-6 py-2 rounded flex items-center mobile-touch-friendly"><i class="fas fa-share-alt mr-2"></i>SNS형 이미지</button>
         <button id="exportXlsxBtn" type="button" class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded flex items-center mobile-touch-friendly"><i class="fas fa-file-excel mr-2"></i>엑셀로 내보내기</button>
       </div>
-      <div class="text-xs text-gray-400 mt-8 md:mt-12 text-center"> 평가일: <span id="evalDate"></span> | mollis SCA 커피 관능 평가</div>
+      <div class="text-xs text-gray-400 mt-8 md:mt-12 text-center"> 평가일: <span id="evalDate"></span> | Noel SCA 커피 관능 평가</div>
     </section>
   </form>
 </div>
@@ -3823,8 +3824,8 @@ function loadSample(sampleId) {
 // 스토리지에서 샘플 로드
 function loadSamplesFromStorage() {
   const userKey = window.currentUser || 'default';
-  const sessionsKey = `mollis_sca_sessions_${userKey}`;
-  const legacyKey = `mollis_sca_samples2_${userKey}`;
+  const sessionsKey = `noel_sca_sessions_${userKey}`;
+  const legacyKey = `noel_sca_samples2_${userKey}`;
   try {
     const rawSessions = localStorage.getItem(sessionsKey);
     if (rawSessions) {
@@ -3892,8 +3893,8 @@ function saveSamplesToStorage() {
 function saveSessionsToStorage() {
   try {
     const userKey = window.currentUser || 'default';
-    localStorage.setItem(`mollis_sca_sessions_${userKey}`, JSON.stringify(sessions));
-    localStorage.setItem(`mollis_sca_samples2_${userKey}`, JSON.stringify(samples));
+    localStorage.setItem(`noel_sca_sessions_${userKey}`, JSON.stringify(sessions));
+    localStorage.setItem(`noel_sca_samples2_${userKey}`, JSON.stringify(samples));
     if (typeof syncSamplesToTeam === 'function') {
       try { syncSamplesToTeam(samples); } catch(e) { console.error(e); }
     }
@@ -3957,22 +3958,22 @@ function setupSwipeNavigation() {
 
 // 자동 백업 기능
 function setupAutoBackup() {
-  const lastBackup = localStorage.getItem('mollis_sca_last_backup');
+  const lastBackup = localStorage.getItem('noel_sca_last_backup');
   const now = Date.now();
   
   if (!lastBackup || (now - parseInt(lastBackup)) > 86400000) {
     try {
       syncCurrentSessionSamples();
       const backupData = JSON.stringify(sessions);
-      const backupKey = `mollis_sca_backup_${new Date().toISOString().slice(0, 10)}`;
+      const backupKey = `noel_sca_backup_${new Date().toISOString().slice(0, 10)}`;
       
       localStorage.setItem(backupKey, backupData);
-      localStorage.setItem('mollis_sca_last_backup', now.toString());
+      localStorage.setItem('noel_sca_last_backup', now.toString());
       
       const keys = [];
       for (let i = 0; i < localStorage.length; i++) {
         const key = localStorage.key(i);
-        if (key && key.startsWith('mollis_sca_backup_')) {
+        if (key && key.startsWith('noel_sca_backup_')) {
           keys.push(key);
         }
       }
@@ -3996,8 +3997,8 @@ function showBackupList() {
   const backups = [];
   for (let i = 0; i < localStorage.length; i++) {
     const key = localStorage.key(i);
-    if (key && key.startsWith('mollis_sca_backup_')) {
-      const date = key.replace('mollis_sca_backup_', '');
+    if (key && key.startsWith('noel_sca_backup_')) {
+      const date = key.replace('noel_sca_backup_', '');
       backups.push({ key, date });
     }
   }
@@ -4086,7 +4087,7 @@ async function exportSnsImage() {
     background: white;
     padding: 40px;
     width: ${selectedRatio.width}px;
-    min-height: ${selectedRatio.height}px;
+    height: ${selectedRatio.height}px;
     font-family: 'Noto Sans KR', sans-serif;
     position: fixed;
     left: 0;
@@ -4098,6 +4099,7 @@ async function exportSnsImage() {
     color: #333;
     box-shadow: 0 4px 20px rgba(0,0,0,0.1);
     border: 2px solid #f0f0f0;
+    overflow: hidden;
   `;
   
   // SNS용 간결한 HTML 구성 (커피명 + 향미특성/속성만)
@@ -4105,7 +4107,7 @@ async function exportSnsImage() {
   <div style="text-align: center; margin-bottom: 30px;">
     <h2 style="margin: 0; font-size: 24px; font-weight: bold; color: #8B5A2B;">${s.title || s.coffeeName || '커피 테이스팅'}</h2>
     ${s.coffeeName && s.title !== s.coffeeName ? `<div style="font-size: 16px; color: #666; margin-top: 5px;">${s.coffeeName}</div>` : ''}
-    <div style="font-size: 14px; color: #555; margin-top: 10px; line-height: 1.4;">
+    <div id="snsMetaBlock" style="font-size: 14px; color: #555; margin-top: 10px; line-height: 1.4;">
       <div>원산지: ${s.origin || '-'}</div>
       <div>가공법: ${s.process || '-'}</div>
       <div>로스팅: ${s.roastDate || '-'} / ${s.roastLevel || '-'}</div>
@@ -4175,7 +4177,7 @@ async function exportSnsImage() {
     
     <div style="margin-top: 20px; padding-top: 15px; border-top: 1px solid #e5e5e5; text-align: center;">
       <div style="font-size: 12px; color: #888;">
-        ${new Date().toLocaleDateString()} | mollis Coffee Cupping
+        ${new Date().toLocaleDateString()} | Noel Coffee Cupping
       </div>
     </div>
   </div>
@@ -4185,12 +4187,13 @@ async function exportSnsImage() {
   
   const currentSession = getCurrentSessionObj();
   const greenSummary = [s.farmName && `농장:${s.farmName}`, s.altitude && `고도:${s.altitude}masl`, s.harvestYear && `수확:${s.harvestYear}`, s.cropStatus && `크롭:${s.cropStatus}`].filter(Boolean).join(' | ');
-  tempRoot.querySelector('div[style*="font-size: 14px"]')?.insertAdjacentHTML('beforeend', `
+  tempRoot.querySelector('#snsMetaBlock')?.insertAdjacentHTML('beforeend', `
     <div>세션: ${(currentSession?.title || '-')} / 목적: ${(currentSession?.purpose || '-')} / 평가자: ${(currentSession?.cupper || '-')}</div>
     ${greenSummary ? `<div>생두: ${greenSummary}</div>` : ''}
   `);
 
   await document.fonts.ready;
+  await Promise.all(Array.from(tempRoot.querySelectorAll('img')).map((img) => img.decode?.().catch(() => null)));
 
   html2canvas(tempRoot, {
     backgroundColor: "white",
@@ -4232,7 +4235,7 @@ function exportResultImage() {
   }
 
   const wrapper = document.createElement('div');
-  wrapper.style.cssText = 'background:white;padding:20px;position:absolute;left:-9999px;top:0;font-family:\'Noto Sans KR\',sans-serif;';
+  wrapper.style.cssText = 'background:white;padding:20px;position:fixed;left:0;top:0;visibility:hidden;pointer-events:none;z-index:-1;font-family:\'Noto Sans KR\',sans-serif;';
   wrapper.innerHTML = `<h2 style="text-align:center;font-weight:bold;color:#8B5A2B;margin-bottom:8px;">${escapeHtml(currentSample.title || currentSample.sampleData.coffeeName || '커핑 샘플')}</h2>
   <div style="text-align:center;font-size:14px;color:#555;margin-bottom:16px;line-height:1.4;">
     <div>원산지: ${escapeHtml(currentSample.sampleData.origin || '-')}</div>
@@ -4256,7 +4259,7 @@ function exportResultImage() {
   }
 
   document.body.appendChild(wrapper);
-  html2canvas(wrapper, {backgroundColor: 'white', scale: 2, useCORS: true}).then(canvas => {
+  document.fonts.ready.then(() => html2canvas(wrapper, {backgroundColor: 'white', scale: 2, useCORS: true})).then(canvas => {
     const a = document.createElement('a');
     a.href = canvas.toDataURL('image/png');
     a.download = (currentSample.title || 'cupping') + '.png';
@@ -4272,23 +4275,12 @@ function exportResultImage() {
   });
 }
 
-function exportToPDF() {
-  saveCurrentSample();
-  const sample = getCurrentSampleObj();
-  if (!sample) {
-    showToast('내보낼 샘플이 없습니다.');
-    return;
-  }
-  if (!window.jspdf || !window.jspdf.jsPDF) {
-    throw new Error('jsPDF 라이브러리를 불러오지 못했습니다.');
-  }
-  const { jsPDF } = window.jspdf;
-  const doc = new jsPDF('p', 'mm', 'a4');
+function renderSamplePdfPages(doc, sample, session, isFirstPage = false) {
   const data = sample.sampleData || {};
-  const session = getCurrentSessionObj();
+  if (!isFirstPage) doc.addPage();
 
   doc.setFontSize(16);
-  doc.text('mollis', 15, 20);
+  doc.text('Noel', 15, 20);
   doc.setFontSize(14);
   doc.text('SCA Cupping Form', 75, 20);
   doc.setFontSize(9);
@@ -4297,6 +4289,7 @@ function exportToPDF() {
 
   doc.setFontSize(10);
   const rows = [
+    `샘플명: ${sample.title || '-'}`,
     `커피명: ${data.coffeeName || '-'}`,
     `원산지: ${data.origin || '-'}`,
     `품종: ${data.variety || '-'}`,
@@ -4310,8 +4303,8 @@ function exportToPDF() {
 
   const total = Number.parseFloat(formatScoreTotal(data));
   doc.setFontSize(11);
-  doc.text(`총점: ${total.toFixed(2)} (${getScoreGrade(total).label})`, 15, 95);
-  let y = 104;
+  doc.text(`총점: ${total.toFixed(2)} (${getScoreGrade(total).label})`, 15, 102);
+  let y = 111;
   SCORE_FIELD_CONFIG.forEach((field) => {
     const score = normalizeScoreValue(data[field.id], 7);
     doc.text(`${field.label}: ${score.toFixed(2)}`, 15, y);
@@ -4335,9 +4328,44 @@ function exportToPDF() {
   doc.text(`디펙트: ${getDefectSummary(data)}`, 15, 118);
   const notes = doc.splitTextToSize(data.tastingNotes || '-', 180);
   doc.text(notes, 15, 135);
+}
 
-  const name = (sample.title || data.coffeeName || 'cupping').replace(/[^\w가-힣-]+/g, '_');
-  doc.save(`${name}_${new Date().toISOString().slice(0, 10)}.pdf`);
+function exportToPDF(sampleIds = null) {
+  saveCurrentSample();
+  if (!window.jspdf || !window.jspdf.jsPDF) {
+    throw new Error('jsPDF 라이브러리를 불러오지 못했습니다.');
+  }
+  const selectedSamples = Array.isArray(sampleIds) && sampleIds.length
+    ? samples.filter((sample) => sampleIds.includes(sample.id))
+    : [getCurrentSampleObj()].filter(Boolean);
+  if (!selectedSamples.length) {
+    showToast('내보낼 샘플이 없습니다.');
+    return;
+  }
+
+  const session = getCurrentSessionObj();
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF('p', 'mm', 'a4');
+  selectedSamples.forEach((sample, index) => {
+    renderSamplePdfPages(doc, sample, session, index === 0);
+  });
+
+  if (selectedSamples.length > 1) {
+    doc.addPage();
+    doc.setFontSize(12);
+    doc.text('세션 비교 요약', 15, 20);
+    let y = 30;
+    selectedSamples.forEach((sample) => {
+      const total = Number.parseFloat(formatScoreTotal(sample.sampleData));
+      doc.text(`${sample.title || '샘플'}: ${total.toFixed(2)} / ${getScoreGrade(total).label}`, 15, y);
+      y += 8;
+    });
+  }
+
+  const fileBase = selectedSamples.length === 1
+    ? (selectedSamples[0].title || selectedSamples[0].sampleData?.coffeeName || 'cupping')
+    : (session?.title || 'session');
+  doc.save(`${fileBase.replace(/[^\w가-힣-]+/g, '_')}_${new Date().toISOString().slice(0, 10)}.pdf`);
 }
 
 // Excel 내보내기
@@ -4463,8 +4491,8 @@ function setupErrorMonitoring() {
         
         for (let i = 0; i < localStorage.length; i++) {
           const key = localStorage.key(i);
-          if (key && key.startsWith('mollis_sca_backup_')) {
-            const date = key.replace('mollis_sca_backup_', '');
+          if (key && key.startsWith('noel_sca_backup_')) {
+            const date = key.replace('noel_sca_backup_', '');
             if (!lastBackupKey || date > lastBackupDate) {
               lastBackupKey = key;
               lastBackupDate = date;
@@ -4477,7 +4505,7 @@ function setupErrorMonitoring() {
           const backupData = JSON.parse(localStorage.getItem(lastBackupKey));
           
           if (Array.isArray(backupData) && backupData.length > 0) {
-            localStorage.setItem('mollis_sca_emergency_backup', JSON.stringify(emergency_copy));
+            localStorage.setItem('noel_sca_emergency_backup', JSON.stringify(emergency_copy));
             showToast("오류로 인해 마지막 백업 상태로 복원합니다...");
             
             sessions = backupData;
@@ -4668,7 +4696,7 @@ function optimizePerformance() {
 // 초기화 함수
 function initApp() {
   try {
-    console.log("🚀 Mollis SCA 커피 관능 평가 도구 (개선버전) 시작");
+    console.log("🚀 Noel SCA 커피 관능 평가 도구 (개선버전) 시작");
     
     renderFlavorTabs();
     renderBodyCategoryTabs();
@@ -4708,7 +4736,7 @@ function initApp() {
     
     // 사용자에게 환영 메시지 표시
     setTimeout(() => {
-      showToast("Mollis SCA 커피 관능 평가 도구 (개선버전)에 오신 것을 환영합니다!");
+      showToast("Noel SCA 커피 관능 평가 도구 (개선버전)에 오신 것을 환영합니다!");
     }, 1000);
     
   } catch (e) {
@@ -4839,7 +4867,7 @@ function setupEventHandlers() {
       const dataStr = JSON.stringify(sessions, null, 2);
       const dataUri = 'data:application/json;charset=utf-8,' + encodeURIComponent(dataStr);
       
-      const exportFileName = `mollis_coffee_samples_${new Date().toISOString().slice(0, 10)}.json`;
+      const exportFileName = `noel_coffee_samples_${new Date().toISOString().slice(0, 10)}.json`;
       
       const linkElement = document.createElement('a');
       linkElement.setAttribute('href', dataUri);
@@ -5067,7 +5095,8 @@ function setupEventHandlers() {
   const exportImgBtn = document.getElementById('exportImgBtn');
   if (exportImgBtn) exportImgBtn.addEventListener('click', async function() {
     try {
-      exportToPDF();
+      const mode = confirm('현재 세션의 모든 샘플을 PDF로 내보낼까요? (취소 시 현재 샘플만 내보냅니다)');
+      exportToPDF(mode ? samples.map((sample) => sample.id) : null);
     } catch (e) {
       console.error('PDF 내보내기 실패, 이미지로 폴백:', e);
       exportResultImage();
