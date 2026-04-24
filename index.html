@@ -845,6 +845,7 @@
         <button class="px-3 py-1 bg-blue-200 hover:bg-blue-300 text-blue-900 rounded text-xs flex items-center mobile-touch-friendly" id="loadSamplesWebBtn"><i class="fa fa-cloud-download-alt mr-1"></i>웹에서 불러오기</button>
         <button class="px-3 py-1 bg-green-100 hover:bg-green-200 text-green-800 rounded text-xs flex items-center mobile-touch-friendly" id="exportSamplesBtn"><i class="fa fa-download mr-1"></i>JSON 내보내기</button>
         <button class="px-3 py-1 bg-emerald-100 hover:bg-emerald-200 text-emerald-800 rounded text-xs flex items-center mobile-touch-friendly" id="exportCurrentSessionBtn"><i class="fa fa-box-archive mr-1"></i>현재 세션 내보내기</button>
+        <button class="px-3 py-1 bg-teal-100 hover:bg-teal-200 text-teal-800 rounded text-xs flex items-center mobile-touch-friendly" id="exportCurrentSessionXlsxBtn"><i class="fa fa-file-excel mr-1"></i>현재 세션 엑셀</button>
         <label class="px-3 py-1 bg-yellow-100 hover:bg-yellow-200 text-yellow-800 rounded text-xs flex items-center cursor-pointer mb-0 mobile-touch-friendly"><i class="fa fa-upload mr-1"></i>불러오기<input type="file" id="importSamplesInput" accept=".json" class="hidden"></label>
         <button class="px-3 py-1 bg-indigo-100 hover:bg-indigo-200 text-indigo-800 rounded text-xs flex items-center mobile-touch-friendly" id="backupManageBtn"><i class="fa fa-history mr-1"></i>백업 복원</button>
       </div>
@@ -1249,7 +1250,6 @@
         </div>
       </div>
       <div class="flex flex-wrap mt-6 gap-2">
-        <button id="exportImgBtn" type="button" class="export-btn px-6 py-2 rounded flex items-center mobile-touch-friendly"><i class="fas fa-image mr-2"></i>이미지로 내보내기</button>
         <button id="exportSnsImgBtn" type="button" class="sns-export-btn px-6 py-2 rounded flex items-center mobile-touch-friendly"><i class="fas fa-share-alt mr-2"></i>SNS형 이미지</button>
         <button id="exportXlsxBtn" type="button" class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded flex items-center mobile-touch-friendly"><i class="fas fa-file-excel mr-2"></i>엑셀로 내보내기</button>
       </div>
@@ -1397,7 +1397,7 @@
   <div class="mobile-quick-actions-inner">
     <button type="button" id="mobileQuickSaveBtn" class="mobile-quick-btn">저장</button>
     <button type="button" id="mobileQuickCompareBtn" class="mobile-quick-btn">비교</button>
-    <button type="button" id="mobileQuickExportBtn" class="mobile-quick-btn">이미지</button>
+    <button type="button" id="mobileQuickExportBtn" class="mobile-quick-btn">SNS</button>
   </div>
 </div>
 
@@ -2086,6 +2086,45 @@ const GREEN_BEAN_DOM = {
   defectCountWarning: null
 };
 
+const APP_STORAGE = {
+  get(key, fallback = null) {
+    try {
+      const value = localStorage.getItem(key);
+      return value === null ? fallback : value;
+    } catch (_) {
+      return fallback;
+    }
+  },
+  set(key, value) {
+    try {
+      localStorage.setItem(key, value);
+      return true;
+    } catch (_) {
+      return false;
+    }
+  },
+  remove(key) {
+    try {
+      localStorage.removeItem(key);
+      return true;
+    } catch (_) {
+      return false;
+    }
+  },
+  keys() {
+    const items = [];
+    try {
+      for (let i = 0; i < localStorage.length; i += 1) {
+        const key = localStorage.key(i);
+        if (key) items.push(key);
+      }
+    } catch (_) {
+      return items;
+    }
+    return items;
+  }
+};
+
   
 function escapeHtml(value) {
   return String(value ?? '').replace(/[&<>"']/g, (char) => ({
@@ -2568,6 +2607,16 @@ function exportCurrentSessionJson() {
   a.click();
   a.remove();
   URL.revokeObjectURL(url);
+}
+
+
+function exportCurrentSessionExcel() {
+  const session = getCurrentSessionObj();
+  if (!session) {
+    showToast('내보낼 세션이 없습니다.');
+    return;
+  }
+  exportSessionToExcel(session, true);
 }
 
 function saveSessionMetaFromInline() {
@@ -3871,11 +3920,11 @@ function loadSamplesFromStorage() {
   const sessionsKey = `noel_sca_sessions_${userKey}`;
   const legacyKey = `noel_sca_samples2_${userKey}`;
   try {
-    const rawSessions = localStorage.getItem(sessionsKey);
+    const rawSessions = APP_STORAGE.get(sessionsKey);
     if (rawSessions) {
       sessions = JSON.parse(rawSessions);
     } else {
-      const legacyRaw = localStorage.getItem(legacyKey);
+      const legacyRaw = APP_STORAGE.get(legacyKey);
       if (legacyRaw) {
         const legacySamples = JSON.parse(legacyRaw);
         if (Array.isArray(legacySamples) && legacySamples.length) {
@@ -3886,8 +3935,8 @@ function loadSamplesFromStorage() {
             purpose: '기타',
             samples: legacySamples
           })];
-          localStorage.setItem(sessionsKey, JSON.stringify(sessions));
-          localStorage.removeItem(legacyKey);
+          APP_STORAGE.set(sessionsKey, JSON.stringify(sessions));
+          APP_STORAGE.remove(legacyKey);
         }
       }
     }
@@ -3937,8 +3986,9 @@ function saveSamplesToStorage() {
 function saveSessionsToStorage() {
   try {
     const userKey = window.currentUser || 'default';
-    localStorage.setItem(`noel_sca_sessions_${userKey}`, JSON.stringify(sessions));
-    localStorage.setItem(`noel_sca_samples2_${userKey}`, JSON.stringify(samples));
+    const didSaveSessions = APP_STORAGE.set(`noel_sca_sessions_${userKey}`, JSON.stringify(sessions));
+    const didSaveSamples = APP_STORAGE.set(`noel_sca_samples2_${userKey}`, JSON.stringify(samples));
+    if (!didSaveSessions || !didSaveSamples) throw new Error('localStorage write failed');
     if (typeof syncSamplesToTeam === 'function') {
       try { syncSamplesToTeam(samples); } catch(e) { console.error(e); }
     }
@@ -4013,7 +4063,7 @@ function setupSwipeNavigation() {
 
 // 자동 백업 기능
 function setupAutoBackup() {
-  const lastBackup = localStorage.getItem('noel_sca_last_backup');
+  const lastBackup = APP_STORAGE.get('noel_sca_last_backup');
   const now = Date.now();
   
   if (!lastBackup || (now - parseInt(lastBackup)) > 86400000) {
@@ -4022,12 +4072,17 @@ function setupAutoBackup() {
       const backupData = JSON.stringify(sessions);
       const backupKey = `noel_sca_backup_${new Date().toISOString().slice(0, 10)}`;
       
-      localStorage.setItem(backupKey, backupData);
-      localStorage.setItem('noel_sca_last_backup', now.toString());
+      if (!APP_STORAGE.set(backupKey, backupData)) {
+        const keys = APP_STORAGE.keys().filter((k) => k.startsWith('noel_sca_backup_')).sort();
+        while (keys.length) {
+          APP_STORAGE.remove(keys.shift());
+          if (APP_STORAGE.set(backupKey, backupData)) break;
+        }
+      }
+      APP_STORAGE.set('noel_sca_last_backup', now.toString());
       
       const keys = [];
-      for (let i = 0; i < localStorage.length; i++) {
-        const key = localStorage.key(i);
+      for (const key of APP_STORAGE.keys()) {
         if (key && key.startsWith('noel_sca_backup_')) {
           keys.push(key);
         }
@@ -4036,7 +4091,7 @@ function setupAutoBackup() {
       if (keys.length > 7) {
         keys.sort();
         while (keys.length > 7) {
-          localStorage.removeItem(keys.shift());
+          APP_STORAGE.remove(keys.shift());
         }
       }
     } catch (e) {
@@ -4048,8 +4103,7 @@ function setupAutoBackup() {
 // 백업 목록 표시 및 복원
 function showBackupList() {
   const backups = [];
-  for (let i = 0; i < localStorage.length; i++) {
-    const key = localStorage.key(i);
+  for (const key of APP_STORAGE.keys()) {
     if (key && key.startsWith('noel_sca_backup_')) {
       const date = key.replace('noel_sca_backup_', '');
       backups.push({ key, date });
@@ -4096,7 +4150,8 @@ function showBackupList() {
 function restoreBackup(backup) {
   if (!backup || !backup.key) return;
   try {
-    const backupData = localStorage.getItem(backup.key);
+    const backupData = APP_STORAGE.get(backup.key);
+    if (!backupData) throw new Error('backup missing');
     const parsedData = JSON.parse(backupData);
 
     if (Array.isArray(parsedData) && parsedData.length > 0) {
@@ -4255,75 +4310,19 @@ function exportSnsImage() {
   });
 }
 
-// 결과 이미지 내보내기 (향미/속성 + 레이더 차트)
-function exportResultImage() {
-  saveCurrentSample();
-  const currentSample = getCurrentSampleObj();
-  if (!currentSample) {
-    showToast("내보낼 샘플이 없습니다.");
-    return;
-  }
-
-  const wrapper = document.createElement('div');
-  wrapper.style.cssText = 'background:white;padding:20px;position:fixed;left:0;top:0;visibility:hidden;pointer-events:none;z-index:-1;font-family:\'Noto Sans KR\',sans-serif;';
-  wrapper.innerHTML = `<h2 style="text-align:center;font-weight:bold;color:#8B5A2B;margin-bottom:8px;">${escapeHtml(currentSample.title || currentSample.sampleData.coffeeName || '커핑 샘플')}</h2>
-  <div style="text-align:center;font-size:14px;color:#555;margin-bottom:16px;line-height:1.4;">
-    <div>원산지: ${escapeHtml(currentSample.sampleData.origin || '-')}</div>
-    <div>가공법: ${escapeHtml(currentSample.sampleData.process || '-')}</div>
-    <div>로스팅: ${escapeHtml(currentSample.sampleData.roastDate || '-')} / ${escapeHtml(currentSample.sampleData.roastLevel || '-')}</div>
-  </div>`;
-  const visual = document.querySelector('.visual-section-flex');
-  if (visual) {
-    const clone = visual.cloneNode(true);
-    const origCanvas = visual.querySelector('#cuppingRadar');
-    const cloneCanvas = clone.querySelector('#cuppingRadar');
-    if (origCanvas && cloneCanvas) {
-      const img = document.createElement('img');
-      img.src = origCanvas.toDataURL('image/png');
-      img.style.maxWidth = '100%';
-      img.width = origCanvas.width;
-      img.height = origCanvas.height;
-      cloneCanvas.parentNode.replaceChild(img, cloneCanvas);
-    }
-    wrapper.appendChild(clone);
-  }
-
-  document.body.appendChild(wrapper);
-  document.fonts.ready.then(() => html2canvas(wrapper, {backgroundColor: 'white', scale: 2, useCORS: true})).then(canvas => {
-    const a = document.createElement('a');
-    a.href = canvas.toDataURL('image/png');
-    a.download = (currentSample.title || 'cupping') + '.png';
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    document.body.removeChild(wrapper);
-    showToast('이미지가 저장되었습니다!');
-  }).catch(e => {
-    console.error('이미지 저장 오류:', e);
-    showToast('이미지 저장 중 오류가 발생했습니다.');
-    if (document.body.contains(wrapper)) document.body.removeChild(wrapper);
-  });
-}
-
 // Excel 내보내기
-function exportToExcel() {
-  saveCurrentSample();
-  const currentSession = getCurrentSessionObj();
-  if (!samples.length) {
-    showToast('내보낼 데이터가 없습니다.');
-    return;
-  }
-
+function buildSessionExcelRows(session) {
+  const sessionSamples = Array.isArray(session?.samples) ? session.samples : [];
   const header = ['샘플명','커피명','원산지','품종','가공방식','로스팅 날짜','로스팅 레벨','농장명','고도(masl)','수확연도','크롭상태','수분함량(%)','스크린사이즈','결점두수','로트번호','공급자','생두중량(kg)','산미','단맛','바디','바디 디스크립터','프래그런스','아로마','플레이버','에프터테이스트','테이스팅 노트','총점','등급'];
   const rows = [
-    ['세션명', currentSession?.title || '-', '날짜', currentSession?.date || '-', '목적', currentSession?.purpose || '-', '평가자', currentSession?.cupper || '-', '수온', `${currentSession?.waterTemp || 93}`],
+    ['세션명', session?.title || '-', '날짜', session?.date || '-', '목적', session?.purpose || '-', '평가자', session?.cupper || '-', '수온', `${session?.waterTemp || 93}`],
     [],
     header
   ];
 
-  samples.forEach(sample => {
-    const d = sample.sampleData;
-    const flavors = FLAVOR_PHASES.map(ph => (d.flavorSelections[ph.id] || []).map(key => {
+  sessionSamples.forEach(sample => {
+    const d = sample.sampleData || {};
+    const flavors = FLAVOR_PHASES.map(ph => ((d.flavorSelections && d.flavorSelections[ph.id]) || []).map(key => {
       const parts = key.split('|');
       const rec = FLAVOR_DATA.find(f => f[0] === parts[0] && f[1] === parts[1] && f[2] === parts[2]);
       return rec ? (currentLanguage === 'ko' && rec.length > 6 ? rec[6] : rec[2]) : parts[2];
@@ -4363,16 +4362,40 @@ function exportToExcel() {
       flavors[2] || '',
       flavors[3] || '',
       d.tastingNotes || '',
-      totalScore.toFixed(2),
+      Number.isNaN(totalScore) ? '' : totalScore.toFixed(2),
       grade
     ]);
   });
 
+  return rows;
+}
+
+function exportSessionToExcel(session, useSessionFileName = false) {
+  if (!session || !Array.isArray(session.samples) || session.samples.length === 0) {
+    showToast('내보낼 데이터가 없습니다.');
+    return;
+  }
+
+  const rows = buildSessionExcelRows(session);
   const ws = XLSX.utils.aoa_to_sheet(rows);
   const wb = XLSX.utils.book_new();
-  XLSX.utils.book_append_sheet(wb, ws, (currentSession?.title || 'Cupping').slice(0, 31));
-  XLSX.writeFile(wb, 'cupping_data.xlsx');
+  const safeSheetTitle = (session.title || 'Cupping').slice(0, 31);
+  XLSX.utils.book_append_sheet(wb, ws, safeSheetTitle);
+
+  const safeFileTitle = (session.title || 'session').replace(/[^\w가-힣-]+/g, '_');
+  const dateText = new Date().toISOString().slice(0, 10);
+  const filename = useSessionFileName
+    ? `session_${safeFileTitle}_${dateText}.xlsx`
+    : 'cupping_data.xlsx';
+
+  XLSX.writeFile(wb, filename);
   showToast('엑셀 파일이 저장되었습니다.');
+}
+
+function exportToExcel() {
+  saveCurrentSample();
+  const currentSession = getCurrentSessionObj();
+  exportSessionToExcel(currentSession, false);
 }
 
 // 데이터 무결성 검증 함수
@@ -4784,6 +4807,8 @@ function setupEventHandlers() {
 
   const exportCurrentSessionBtn = document.getElementById('exportCurrentSessionBtn');
   if (exportCurrentSessionBtn) exportCurrentSessionBtn.addEventListener('click', exportCurrentSessionJson);
+  const exportCurrentSessionXlsxBtn = document.getElementById('exportCurrentSessionXlsxBtn');
+  if (exportCurrentSessionXlsxBtn) exportCurrentSessionXlsxBtn.addEventListener('click', exportCurrentSessionExcel);
   
   const backupManageBtn = document.getElementById('backupManageBtn');
   if (backupManageBtn) backupManageBtn.addEventListener('click', function() {
@@ -4910,7 +4935,7 @@ function setupEventHandlers() {
 
   const mobileQuickExportBtn = document.getElementById('mobileQuickExportBtn');
   if (mobileQuickExportBtn) mobileQuickExportBtn.addEventListener('click', function() {
-    document.getElementById('exportImgBtn')?.click();
+    document.getElementById('exportSnsImgBtn')?.click();
   });
   
   // 변경 감지 이벤트들
@@ -5027,9 +5052,6 @@ function setupEventHandlers() {
   });
   
   // 내보내기 버튼들 (기존 코드 유지 - 생략하여 길이 단축)
-  const exportImgBtn = document.getElementById('exportImgBtn');
-  if (exportImgBtn) exportImgBtn.addEventListener('click', exportResultImage);
-
   const exportSnsImgBtn = document.getElementById('exportSnsImgBtn');
   if (exportSnsImgBtn) exportSnsImgBtn.addEventListener('click', exportSnsImage);
 
