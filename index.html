@@ -11,6 +11,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&display=swap" rel="stylesheet">
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/hammerjs@2.0.8/hammer.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
@@ -799,6 +800,15 @@
         </div>
       </div>
       <h3 class="text-base font-bold mb-2 border-b pb-1 border-tan-200 flex items-center"><i class="fa fa-database mr-2"></i>샘플 관리/불러오기</h3>
+      <div class="border rounded-lg p-2 mb-2 bg-amber-50">
+        <div class="flex flex-wrap items-center gap-2 mb-2">
+          <select id="sessionSelect" class="flex-1 min-w-[150px] border rounded p-1.5 text-xs mobile-touch-friendly"></select>
+          <button type="button" id="newSessionBtn" class="px-2 py-1 bg-amber-600 hover:bg-amber-700 text-white rounded text-xs mobile-touch-friendly">
+            <i class="fa fa-plus mr-1"></i>새 세션
+          </button>
+        </div>
+        <div id="sessionMeta" class="text-xs text-gray-700 leading-5"></div>
+      </div>
       <div class="flex items-center gap-1 mb-2">
         <button class="px-2 py-1 export-btn rounded text-xs flex items-center mobile-touch-friendly" id="addSampleBtn"><i class="fa fa-plus mr-2"></i>샘플 추가</button>
         <button class="px-2 py-1 bg-gray-200 hover:bg-gray-300 rounded text-xs flex items-center mobile-touch-friendly" id="removeSampleBtn"><i class="fa fa-trash mr-2"></i>샘플 삭제</button>
@@ -820,6 +830,7 @@
         <button class="px-3 py-1 bg-blue-100 hover:bg-blue-200 text-blue-800 rounded text-xs flex items-center mobile-touch-friendly" id="saveSamplesBtn"><i class="fa fa-save mr-1"></i>웹에 전체 저장</button>
         <button class="px-3 py-1 bg-blue-200 hover:bg-blue-300 text-blue-900 rounded text-xs flex items-center mobile-touch-friendly" id="loadSamplesWebBtn"><i class="fa fa-cloud-download-alt mr-1"></i>웹에서 불러오기</button>
         <button class="px-3 py-1 bg-green-100 hover:bg-green-200 text-green-800 rounded text-xs flex items-center mobile-touch-friendly" id="exportSamplesBtn"><i class="fa fa-download mr-1"></i>JSON 내보내기</button>
+        <button class="px-3 py-1 bg-emerald-100 hover:bg-emerald-200 text-emerald-800 rounded text-xs flex items-center mobile-touch-friendly" id="exportCurrentSessionBtn"><i class="fa fa-box-archive mr-1"></i>현재 세션 내보내기</button>
         <label class="px-3 py-1 bg-yellow-100 hover:bg-yellow-200 text-yellow-800 rounded text-xs flex items-center cursor-pointer mb-0 mobile-touch-friendly"><i class="fa fa-upload mr-1"></i>불러오기<input type="file" id="importSamplesInput" accept=".json" class="hidden"></label>
         <button class="px-3 py-1 bg-indigo-100 hover:bg-indigo-200 text-indigo-800 rounded text-xs flex items-center mobile-touch-friendly" id="backupManageBtn"><i class="fa fa-history mr-1"></i>백업 복원</button>
       </div>
@@ -1260,6 +1271,54 @@
         <div class="split-view-container" id="rightSampleView">
           <div class="text-center text-gray-500">오른쪽 샘플을 선택하세요</div>
         </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="sessionModal" class="modal">
+  <div class="modal-content max-w-lg">
+    <div class="modal-header">
+      <h3 class="font-bold text-lg">새 커핑 세션</h3>
+      <button id="closeSessionModal" class="text-gray-500 hover:text-gray-700 mobile-touch-friendly">
+        <i class="fas fa-times text-xl"></i>
+      </button>
+    </div>
+    <div class="modal-body">
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-2">
+        <div class="md:col-span-2">
+          <label class="block text-sm mb-1">세션 이름</label>
+          <input id="sessionTitleInput" class="w-full border rounded p-2" />
+        </div>
+        <div>
+          <label class="block text-sm mb-1">목적</label>
+          <select id="sessionPurposeInput" class="w-full border rounded p-2">
+            <option value="구매검토">구매검토</option>
+            <option value="품질확인">품질확인</option>
+            <option value="로스팅평가">로스팅평가</option>
+            <option value="블렌딩">블렌딩</option>
+            <option value="기타">기타</option>
+          </select>
+        </div>
+        <div>
+          <label class="block text-sm mb-1">평가자</label>
+          <input id="sessionCupperInput" class="w-full border rounded p-2" />
+        </div>
+        <div>
+          <label class="block text-sm mb-1">수온(°C)</label>
+          <input id="sessionWaterTempInput" type="number" value="93" class="w-full border rounded p-2" />
+        </div>
+        <div>
+          <label class="block text-sm mb-1">분쇄도 메모</label>
+          <input id="sessionGrindSizeInput" class="w-full border rounded p-2" />
+        </div>
+        <div class="md:col-span-2">
+          <label class="block text-sm mb-1">장소</label>
+          <input id="sessionLocationInput" class="w-full border rounded p-2" />
+        </div>
+      </div>
+      <div class="mt-3 flex justify-end">
+        <button id="createSessionConfirmBtn" class="px-3 py-1 bg-amber-600 hover:bg-amber-700 text-white rounded mobile-touch-friendly">세션 생성</button>
       </div>
     </div>
   </div>
@@ -1980,6 +2039,8 @@ const I18N_TEXTS = {
 
 // 전역 변수들
 let samples = [];
+let sessions = [];
+let currentSessionId = null;
 let currentSampleId = null;
 let sampleSaveTimeout = null;
 let flavorProfileChart = null;
@@ -2170,18 +2231,20 @@ function renderScoreSteppers() {
 }
 
 function getScoreGrade(totalScore) {
-  if (totalScore >= 90) return { label: 'Outstanding (90+)', className: 'bg-purple-100 text-purple-800 border-purple-300' };
-  if (totalScore >= 86) return { label: 'Excellent (86+)', className: 'bg-emerald-100 text-emerald-800 border-emerald-300' };
-  if (totalScore >= 84) return { label: 'Very Good (84+)', className: 'bg-sky-100 text-sky-800 border-sky-300' };
-  if (totalScore >= 80) return { label: 'Specialty (80+)', className: 'bg-amber-100 text-amber-800 border-amber-300' };
-  return { label: 'Below Specialty (<80)', className: 'bg-rose-100 text-rose-700 border-rose-300' };
+  if (totalScore >= 90) return { label: 'Outstanding', color: '#D4AF37' };
+  if (totalScore >= 85) return { label: 'Excellent', color: '#4CAF50' };
+  if (totalScore >= 80) return { label: 'Very Good', color: '#2196F3' };
+  if (totalScore >= 75) return { label: 'Good', color: '#FF9800' };
+  if (totalScore >= 70) return { label: 'Fair', color: '#9E9E9E' };
+  return { label: 'Below Specialty', color: '#F44336' };
 }
 
 function updateScoreGradeBadge(totalScore) {
   const badge = document.getElementById('scoreGrade');
   if (!badge) return;
   const grade = getScoreGrade(totalScore);
-  badge.className = `score-grade-badge ${grade.className}`;
+  badge.className = 'score-grade-badge text-white';
+  badge.style.backgroundColor = grade.color;
   badge.textContent = grade.label;
 }
 
@@ -2191,7 +2254,7 @@ function populateHarvestYearOptions() {
   if (!select) return;
   const currentYear = new Date().getFullYear();
   const options = ['<option value="">선택</option>'];
-  for (let y = currentYear; y >= currentYear - 15; y -= 1) {
+  for (let y = currentYear + 1; y >= 2020; y -= 1) {
     options.push(`<option value="${y}">${y}</option>`);
   }
   select.innerHTML = options.join('');
@@ -2205,10 +2268,15 @@ function updateGreenBeanWarnings() {
   const altitudeWarning = document.getElementById('altitudeWarning');
   const moistureWarning = document.getElementById('moistureWarning');
   const defectCountWarning = document.getElementById('defectCountWarning');
+  const moistureInput = document.getElementById('moistureContent');
 
   if (altitudeWarning) altitudeWarning.classList.toggle('hidden', Number.isNaN(altitude) || altitude <= 3000);
-  if (moistureWarning) moistureWarning.classList.toggle('hidden', Number.isNaN(moisture) || (moisture >= 10 && moisture <= 13));
-  if (defectCountWarning) defectCountWarning.classList.toggle('hidden', Number.isNaN(defectCount) || defectCount <= 5);
+  const moistureOutOfRange = !Number.isNaN(moisture) && (moisture < 10 || moisture > 13);
+  if (moistureWarning) moistureWarning.classList.toggle('hidden', !moistureOutOfRange);
+  if (moistureInput) {
+    moistureInput.style.borderColor = moistureOutOfRange ? '#F59E0B' : '';
+  }
+  if (defectCountWarning) defectCountWarning.classList.toggle('hidden', Number.isNaN(defectCount) || defectCount < 1);
 }
 
 function setupGreenBeanSection() {
@@ -2341,6 +2409,123 @@ function getEmptySampleData() {
 function createNewSampleObj(title) {
   let id = "sample_" + Date.now() + "_" + Math.floor(Math.random() * 10000);
   return {id, title: title || "새 샘플", sampleData: getEmptySampleData(), lastEdit: +(new Date())};
+}
+
+function createNewSessionObj(overrides = {}) {
+  const today = new Date().toISOString().slice(0, 10);
+  const sessionId = `session_${Date.now()}_${Math.floor(Math.random() * 10000)}`;
+  return {
+    id: overrides.id || sessionId,
+    title: overrides.title || `커핑 ${today}`,
+    date: overrides.date || today,
+    purpose: overrides.purpose || '기타',
+    location: overrides.location || '',
+    cupper: overrides.cupper || '',
+    waterTemp: Number.parseFloat(overrides.waterTemp ?? 93) || 93,
+    grindSize: overrides.grindSize || '',
+    samples: Array.isArray(overrides.samples) && overrides.samples.length ? overrides.samples : [createNewSampleObj('샘플 #1')],
+    createdAt: overrides.createdAt || Date.now()
+  };
+}
+
+function getCurrentSessionObj() {
+  return sessions.find((session) => session.id === currentSessionId) || null;
+}
+
+function syncCurrentSessionSamples() {
+  const currentSession = getCurrentSessionObj();
+  if (currentSession) {
+    currentSession.samples = samples;
+  }
+}
+
+function renderSessionMeta() {
+  const metaEl = document.getElementById('sessionMeta');
+  if (!metaEl) return;
+  const session = getCurrentSessionObj();
+  if (!session) {
+    metaEl.innerHTML = '<span class="text-gray-400">세션 정보 없음</span>';
+    return;
+  }
+  metaEl.innerHTML = `
+    <div>목적: <span class="font-semibold">${escapeHtml(session.purpose || '기타')}</span> | 날짜: ${escapeHtml(session.date || '-')}</div>
+    <div>평가자: ${escapeHtml(session.cupper || '-')} | 수온: ${escapeHtml(String(session.waterTemp ?? 93))}°C</div>
+  `;
+}
+
+function renderSessionSelect() {
+  const select = document.getElementById('sessionSelect');
+  if (!select) return;
+  const options = sessions.map((session) => `<option value="${session.id}">${escapeHtml(session.title || '세션')}</option>`).join('');
+  select.innerHTML = options;
+  if (currentSessionId) {
+    select.value = currentSessionId;
+  }
+  renderSessionMeta();
+}
+
+function switchSession(sessionId) {
+  if (!sessionId) return;
+  if (currentSessionId && currentSampleId) {
+    saveCurrentSample();
+    syncCurrentSessionSamples();
+  }
+
+  const session = sessions.find((item) => item.id === sessionId);
+  if (!session) return;
+  currentSessionId = session.id;
+  samples = Array.isArray(session.samples) ? session.samples : [];
+  if (!samples.length) {
+    samples = [createNewSampleObj('샘플 #1')];
+    session.samples = samples;
+  }
+  currentSampleId = samples[0].id;
+  setUIFromSample(samples[0].sampleData);
+  renderSessionSelect();
+  renderSampleList();
+}
+
+function openSessionModal() {
+  const modal = document.getElementById('sessionModal');
+  const today = new Date().toISOString().slice(0, 10);
+  const titleInput = document.getElementById('sessionTitleInput');
+  const cupperInput = document.getElementById('sessionCupperInput');
+  const waterTempInput = document.getElementById('sessionWaterTempInput');
+  if (titleInput) titleInput.value = `커핑 ${today}`;
+  if (cupperInput) cupperInput.value = window.currentUser && window.currentUser !== 'default' ? window.currentUser : '';
+  if (waterTempInput) waterTempInput.value = '93';
+  modal?.classList.add('show');
+}
+
+function createSessionFromModal() {
+  const session = createNewSessionObj({
+    title: document.getElementById('sessionTitleInput')?.value.trim() || undefined,
+    purpose: document.getElementById('sessionPurposeInput')?.value || '기타',
+    cupper: document.getElementById('sessionCupperInput')?.value.trim() || '',
+    waterTemp: document.getElementById('sessionWaterTempInput')?.value || 93,
+    grindSize: document.getElementById('sessionGrindSizeInput')?.value.trim() || '',
+    location: document.getElementById('sessionLocationInput')?.value.trim() || ''
+  });
+  sessions.unshift(session);
+  saveSessionsToStorage();
+  document.getElementById('sessionModal')?.classList.remove('show');
+  switchSession(session.id);
+  showToast('새 세션이 생성되었습니다.');
+}
+
+function exportCurrentSessionJson() {
+  const session = getCurrentSessionObj();
+  if (!session) return;
+  const blob = new Blob([JSON.stringify(session, null, 2)], { type: 'application/json;charset=utf-8' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  const safeTitle = (session.title || 'session').replace(/[^\w가-힣-]+/g, '_');
+  a.href = url;
+  a.download = `session_${safeTitle}_${new Date().toISOString().slice(0, 10)}.json`;
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  URL.revokeObjectURL(url);
 }
 
 // 샘플 이동 시 토스트 메시지 표시
@@ -3553,8 +3738,8 @@ function createComparisonChart(selectedSamples) {
         </thead>
         <tbody>
           ${totalRows}
-          ${scoreRows}
           ${greenRows}
+          ${scoreRows}
           ${sensoryRows}
         </tbody>
       </table>
@@ -3637,39 +3822,78 @@ function loadSample(sampleId) {
 
 // 스토리지에서 샘플 로드
 function loadSamplesFromStorage() {
+  const userKey = window.currentUser || 'default';
+  const sessionsKey = `mollis_sca_sessions_${userKey}`;
+  const legacyKey = `mollis_sca_samples2_${userKey}`;
   try {
-    let key = `mollis_sca_samples2_${window.currentUser || 'default'}`;
-    let raw = localStorage.getItem(key);
-    if (raw) { 
-      samples = JSON.parse(raw); 
-      if (!Array.isArray(samples)) {
-        samples = [];
+    const rawSessions = localStorage.getItem(sessionsKey);
+    if (rawSessions) {
+      sessions = JSON.parse(rawSessions);
+    } else {
+      const legacyRaw = localStorage.getItem(legacyKey);
+      if (legacyRaw) {
+        const legacySamples = JSON.parse(legacyRaw);
+        if (Array.isArray(legacySamples) && legacySamples.length) {
+          sessions = [createNewSessionObj({
+            id: `session_migrated_${Date.now()}`,
+            title: '기존 데이터',
+            date: new Date().toISOString().slice(0, 10),
+            purpose: '기타',
+            samples: legacySamples
+          })];
+          localStorage.setItem(sessionsKey, JSON.stringify(sessions));
+          localStorage.removeItem(legacyKey);
+        }
       }
     }
   } catch(e) {
     console.error("저장된 샘플 로딩 중 오류:", e);
-    samples = [];
+    sessions = [];
   }
-  
-  if (samples.length === 0) {
-    let defaultSample = createNewSampleObj("샘플 #1");
-    samples.push(defaultSample);
-    currentSampleId = defaultSample.id;
-    saveSamplesToStorage();
+
+  if (!Array.isArray(sessions) || !sessions.length) {
+    sessions = [createNewSessionObj()];
   }
-  
-  if (!currentSampleId || !samples.find(s => s.id === currentSampleId)) { 
-    currentSampleId = samples[0].id; 
+  sessions = sessions.map((session) => ({
+    ...createNewSessionObj(),
+    ...session,
+    samples: Array.isArray(session.samples) ? session.samples : []
+  }));
+  sessions.forEach((session) => {
+    session.samples = session.samples.map((sample, index) => {
+      const normalized = {
+        ...createNewSampleObj(`샘플 #${index + 1}`),
+        ...sample
+      };
+      validateSampleData(normalized.sampleData);
+      return normalized;
+    });
+  });
+
+  currentSessionId = sessions[0].id;
+  const activeSession = getCurrentSessionObj();
+  samples = activeSession?.samples || [];
+  if (!samples.length) {
+    samples = [createNewSampleObj("샘플 #1")];
+    if (activeSession) activeSession.samples = samples;
   }
-  
+  currentSampleId = samples[0].id;
+  renderSessionSelect();
+  if (samples[0]) setUIFromSample(samples[0].sampleData);
   renderSampleList();
 }
 
 // 스토리지에 샘플 저장
 function saveSamplesToStorage() {
+  syncCurrentSessionSamples();
+  saveSessionsToStorage();
+}
+
+function saveSessionsToStorage() {
   try {
-    let key = `mollis_sca_samples2_${window.currentUser || 'default'}`;
-    localStorage.setItem(key, JSON.stringify(samples));
+    const userKey = window.currentUser || 'default';
+    localStorage.setItem(`mollis_sca_sessions_${userKey}`, JSON.stringify(sessions));
+    localStorage.setItem(`mollis_sca_samples2_${userKey}`, JSON.stringify(samples));
     if (typeof syncSamplesToTeam === 'function') {
       try { syncSamplesToTeam(samples); } catch(e) { console.error(e); }
     }
@@ -3738,7 +3962,8 @@ function setupAutoBackup() {
   
   if (!lastBackup || (now - parseInt(lastBackup)) > 86400000) {
     try {
-      const backupData = JSON.stringify(samples);
+      syncCurrentSessionSamples();
+      const backupData = JSON.stringify(sessions);
       const backupKey = `mollis_sca_backup_${new Date().toISOString().slice(0, 10)}`;
       
       localStorage.setItem(backupKey, backupData);
@@ -3821,11 +4046,9 @@ function restoreBackup(backup) {
     const parsedData = JSON.parse(backupData);
 
     if (Array.isArray(parsedData) && parsedData.length > 0) {
-      samples = parsedData;
-      currentSampleId = samples[0].id;
-      setUIFromSample(samples[0].sampleData);
-      renderSampleList();
-      saveSamplesToStorage();
+      sessions = parsedData;
+      switchSession(sessions[0].id);
+      saveSessionsToStorage();
       document.getElementById('backupRestoreModal')?.classList.remove('show');
       showToast(`${backup.date} 백업을 성공적으로 복원했습니다.`);
     } else {
@@ -3838,7 +4061,7 @@ function restoreBackup(backup) {
 }
 
 // SNS형 이미지 내보내기 함수
-function exportSnsImage() {
+async function exportSnsImage() {
   saveCurrentSample();
   
   const currentSample = getCurrentSampleObj();
@@ -3851,14 +4074,26 @@ function exportSnsImage() {
   
   // SNS용 임시 DOM 요소 생성 (심플한 흰색 배경)
   const tempRoot = document.createElement('div');
+  const ratio = prompt('SNS 비율 선택: 1=정사각형(1:1), 4=세로형(4:5), 16=가로형(16:9)', '1');
+  const ratioMap = {
+    '1': { width: 500, height: 500 },
+    '4': { width: 500, height: 625 },
+    '16': { width: 500, height: 281 }
+  };
+  const selectedRatio = ratioMap[ratio || '1'] || ratioMap['1'];
+
   tempRoot.style.cssText = `
     background: white;
     padding: 40px;
-    max-width: 500px;
+    width: ${selectedRatio.width}px;
+    min-height: ${selectedRatio.height}px;
     font-family: 'Noto Sans KR', sans-serif;
-    position: absolute;
-    left: -9999px;
+    position: fixed;
+    left: 0;
     top: 0;
+    visibility: hidden;
+    pointer-events: none;
+    z-index: -1;
     border-radius: 12px;
     color: #333;
     box-shadow: 0 4px 20px rgba(0,0,0,0.1);
@@ -3948,7 +4183,15 @@ function exportSnsImage() {
   
   document.body.appendChild(tempRoot);
   
-  // SNS용 이미지 생성
+  const currentSession = getCurrentSessionObj();
+  const greenSummary = [s.farmName && `농장:${s.farmName}`, s.altitude && `고도:${s.altitude}masl`, s.harvestYear && `수확:${s.harvestYear}`, s.cropStatus && `크롭:${s.cropStatus}`].filter(Boolean).join(' | ');
+  tempRoot.querySelector('div[style*="font-size: 14px"]')?.insertAdjacentHTML('beforeend', `
+    <div>세션: ${(currentSession?.title || '-')} / 목적: ${(currentSession?.purpose || '-')} / 평가자: ${(currentSession?.cupper || '-')}</div>
+    ${greenSummary ? `<div>생두: ${greenSummary}</div>` : ''}
+  `);
+
+  await document.fonts.ready;
+
   html2canvas(tempRoot, {
     backgroundColor: "white",
     scale: 2,
@@ -4029,16 +4272,89 @@ function exportResultImage() {
   });
 }
 
+function exportToPDF() {
+  saveCurrentSample();
+  const sample = getCurrentSampleObj();
+  if (!sample) {
+    showToast('내보낼 샘플이 없습니다.');
+    return;
+  }
+  if (!window.jspdf || !window.jspdf.jsPDF) {
+    throw new Error('jsPDF 라이브러리를 불러오지 못했습니다.');
+  }
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF('p', 'mm', 'a4');
+  const data = sample.sampleData || {};
+  const session = getCurrentSessionObj();
+
+  doc.setFontSize(16);
+  doc.text('mollis', 15, 20);
+  doc.setFontSize(14);
+  doc.text('SCA Cupping Form', 75, 20);
+  doc.setFontSize(9);
+  doc.text(`${new Date().toISOString().slice(0, 10)} | ${session?.title || '-'}`, 135, 20);
+  doc.line(15, 25, 195, 25);
+
+  doc.setFontSize(10);
+  const rows = [
+    `커피명: ${data.coffeeName || '-'}`,
+    `원산지: ${data.origin || '-'}`,
+    `품종: ${data.variety || '-'}`,
+    `가공방식: ${data.process || '-'}`,
+    `로스팅: ${data.roastDate || '-'} / ${data.roastLevel || '-'}`,
+    `세션목적: ${session?.purpose || '-'}`,
+    `평가자: ${session?.cupper || '-'}`,
+    `생두: ${[data.farmName, data.altitude && `${data.altitude}masl`, data.harvestYear, data.cropStatus].filter(Boolean).join(' / ') || '-'}`
+  ];
+  rows.forEach((line, idx) => doc.text(line, 15, 34 + idx * 7));
+
+  const total = Number.parseFloat(formatScoreTotal(data));
+  doc.setFontSize(11);
+  doc.text(`총점: ${total.toFixed(2)} (${getScoreGrade(total).label})`, 15, 95);
+  let y = 104;
+  SCORE_FIELD_CONFIG.forEach((field) => {
+    const score = normalizeScoreValue(data[field.id], 7);
+    doc.text(`${field.label}: ${score.toFixed(2)}`, 15, y);
+    doc.setFillColor(230, 230, 230);
+    doc.rect(70, y - 3, 90, 3, 'F');
+    doc.setFillColor(139, 90, 43);
+    doc.rect(70, y - 3, ((score - 6) / 4) * 90, 3, 'F');
+    y += 8;
+  });
+
+  doc.addPage();
+  const radarCanvas = document.getElementById('cuppingRadar');
+  if (radarCanvas) {
+    doc.addImage(radarCanvas.toDataURL('image/png'), 'PNG', 15, 20, 80, 80);
+  }
+  doc.setFontSize(10);
+  doc.text(`프래그런스: ${getPhaseFlavorSummary(data, 'fragrance', 6)}`, 105, 28);
+  doc.text(`아로마: ${getPhaseFlavorSummary(data, 'aroma', 6)}`, 105, 38);
+  doc.text(`플레이버: ${getPhaseFlavorSummary(data, 'flavor', 6)}`, 105, 48);
+  doc.text(`에프터: ${getPhaseFlavorSummary(data, 'aftertaste', 6)}`, 105, 58);
+  doc.text(`디펙트: ${getDefectSummary(data)}`, 15, 118);
+  const notes = doc.splitTextToSize(data.tastingNotes || '-', 180);
+  doc.text(notes, 15, 135);
+
+  const name = (sample.title || data.coffeeName || 'cupping').replace(/[^\w가-힣-]+/g, '_');
+  doc.save(`${name}_${new Date().toISOString().slice(0, 10)}.pdf`);
+}
+
 // Excel 내보내기
 function exportToExcel() {
   saveCurrentSample();
-  if (samples.length === 0) {
+  const currentSession = getCurrentSessionObj();
+  if (!samples.length) {
     showToast('내보낼 데이터가 없습니다.');
     return;
   }
 
-  const header = ['샘플명','커피명','원산지','품종','가공방식','로스팅 날짜','로스팅 레벨','농장/협동조합','고도(masl)','수확연도','크롭상태','수분함량(%)','스크린사이즈','결점두수(300g)','로트번호','공급자','생두중량(kg)','산미','단맛','바디','바디 디스크립터','프래그런스','아로마','플레이버','에프터테이스트','테이스팅 노트'];
-  const rows = [header];
+  const header = ['샘플명','커피명','원산지','품종','가공방식','로스팅 날짜','로스팅 레벨','농장명','고도(masl)','수확연도','크롭상태','수분함량(%)','스크린사이즈','결점두수','로트번호','공급자','생두중량(kg)','산미','단맛','바디','바디 디스크립터','프래그런스','아로마','플레이버','에프터테이스트','테이스팅 노트','총점','등급'];
+  const rows = [
+    ['세션명', currentSession?.title || '-', '날짜', currentSession?.date || '-', '목적', currentSession?.purpose || '-', '평가자', currentSession?.cupper || '-', '수온', `${currentSession?.waterTemp || 93}`],
+    [],
+    header
+  ];
 
   samples.forEach(sample => {
     const d = sample.sampleData;
@@ -4053,6 +4369,8 @@ function exportToExcel() {
       return descriptor ? descriptor.korean : id;
     }).join(', ');
 
+    const totalScore = Number.parseFloat(formatScoreTotal(d));
+    const grade = getScoreGrade(totalScore).label;
     rows.push([
       sample.title || '',
       d.coffeeName || '',
@@ -4079,13 +4397,15 @@ function exportToExcel() {
       flavors[1] || '',
       flavors[2] || '',
       flavors[3] || '',
-      d.tastingNotes || ''
+      d.tastingNotes || '',
+      totalScore.toFixed(2),
+      grade
     ]);
   });
 
   const ws = XLSX.utils.aoa_to_sheet(rows);
   const wb = XLSX.utils.book_new();
-  XLSX.utils.book_append_sheet(wb, ws, 'Cupping');
+  XLSX.utils.book_append_sheet(wb, ws, (currentSession?.title || 'Cupping').slice(0, 31));
   XLSX.writeFile(wb, 'cupping_data.xlsx');
   showToast('엑셀 파일이 저장되었습니다.');
 }
@@ -4153,19 +4473,17 @@ function setupErrorMonitoring() {
         }
         
         if (lastBackupKey) {
-          const emergency_copy = JSON.parse(JSON.stringify(samples));
+          const emergency_copy = JSON.parse(JSON.stringify(sessions));
           const backupData = JSON.parse(localStorage.getItem(lastBackupKey));
           
           if (Array.isArray(backupData) && backupData.length > 0) {
             localStorage.setItem('mollis_sca_emergency_backup', JSON.stringify(emergency_copy));
             showToast("오류로 인해 마지막 백업 상태로 복원합니다...");
             
-            samples = backupData;
-            if (samples.length > 0) {
-              currentSampleId = samples[0].id;
-              setUIFromSample(samples[0].sampleData);
-              renderSampleList();
-              saveSamplesToStorage();
+            sessions = backupData;
+            if (sessions.length > 0) {
+              switchSession(sessions[0].id);
+              saveSessionsToStorage();
             }
           }
         }
@@ -4403,6 +4721,20 @@ function initApp() {
 function setupEventHandlers() {
   setupGreenBeanSection();
 
+  const sessionSelect = document.getElementById('sessionSelect');
+  if (sessionSelect) {
+    sessionSelect.addEventListener('change', function() {
+      switchSession(this.value);
+      saveSessionsToStorage();
+    });
+  }
+  const newSessionBtn = document.getElementById('newSessionBtn');
+  if (newSessionBtn) newSessionBtn.addEventListener('click', openSessionModal);
+  const closeSessionModal = document.getElementById('closeSessionModal');
+  if (closeSessionModal) closeSessionModal.addEventListener('click', () => document.getElementById('sessionModal')?.classList.remove('show'));
+  const createSessionConfirmBtn = document.getElementById('createSessionConfirmBtn');
+  if (createSessionConfirmBtn) createSessionConfirmBtn.addEventListener('click', createSessionFromModal);
+
   // 샘플 관리 버튼들
   const addSampleBtn = document.getElementById('addSampleBtn');
   if (addSampleBtn) addSampleBtn.addEventListener('click', function() {
@@ -4483,13 +4815,12 @@ function setupEventHandlers() {
   if (loadSamplesWebBtn) loadSamplesWebBtn.addEventListener('click', function() {
     if (confirm("웹 스토리지에서 샘플을 불러오시겠습니까? 저장되지 않은 변경사항은 사라집니다.")) {
       loadSamplesFromStorage();
-      if (samples.length > 0) {
-        currentSampleId = samples[0].id;
-        setUIFromSample(samples[0].sampleData);
-      }
       showToast("웹 스토리지에서 샘플을 불러왔습니다.");
     }
   });
+
+  const exportCurrentSessionBtn = document.getElementById('exportCurrentSessionBtn');
+  if (exportCurrentSessionBtn) exportCurrentSessionBtn.addEventListener('click', exportCurrentSessionJson);
   
   const backupManageBtn = document.getElementById('backupManageBtn');
   if (backupManageBtn) backupManageBtn.addEventListener('click', function() {
@@ -4504,7 +4835,8 @@ function setupEventHandlers() {
     }
     
     try {
-      const dataStr = JSON.stringify(samples, null, 2);
+      syncCurrentSessionSamples();
+      const dataStr = JSON.stringify(sessions, null, 2);
       const dataUri = 'data:application/json;charset=utf-8,' + encodeURIComponent(dataStr);
       
       const exportFileName = `mollis_coffee_samples_${new Date().toISOString().slice(0, 10)}.json`;
@@ -4537,16 +4869,24 @@ function setupEventHandlers() {
         
         if (Array.isArray(importedData) && importedData.length > 0) {
           if (confirm("불러온 데이터로 기존 데이터를 대체하시겠습니까?")) {
-            samples = importedData;
-            // 데이터 검증
-            samples.forEach(sample => {
-              validateSampleData(sample.sampleData);
-            });
-            
-            currentSampleId = samples[0].id;
-            setUIFromSample(samples[0].sampleData);
-            renderSampleList();
-            saveSamplesToStorage();
+            const first = importedData[0];
+            if (first && Array.isArray(first.samples)) {
+              sessions = importedData.map((session) => ({
+                ...createNewSessionObj(),
+                ...session,
+                samples: (session.samples || []).map((sample) => ({
+                  ...createNewSampleObj('샘플'),
+                  ...sample
+                }))
+              }));
+            } else {
+              samples = importedData;
+              sessions = [createNewSessionObj({ title: '가져온 데이터', samples })];
+            }
+            sessions.forEach((session) => (session.samples || []).forEach((sample) => validateSampleData(sample.sampleData)));
+            currentSessionId = sessions[0].id;
+            switchSession(currentSessionId);
+            saveSessionsToStorage();
             showToast("샘플 데이터를 성공적으로 불러왔습니다.");
           }
         } else {
@@ -4725,7 +5065,14 @@ function setupEventHandlers() {
   
   // 내보내기 버튼들 (기존 코드 유지 - 생략하여 길이 단축)
   const exportImgBtn = document.getElementById('exportImgBtn');
-  if (exportImgBtn) exportImgBtn.addEventListener('click', exportResultImage);
+  if (exportImgBtn) exportImgBtn.addEventListener('click', async function() {
+    try {
+      exportToPDF();
+    } catch (e) {
+      console.error('PDF 내보내기 실패, 이미지로 폴백:', e);
+      exportResultImage();
+    }
+  });
 
   const exportSnsImgBtn = document.getElementById('exportSnsImgBtn');
   if (exportSnsImgBtn) exportSnsImgBtn.addEventListener('click', exportSnsImage);
