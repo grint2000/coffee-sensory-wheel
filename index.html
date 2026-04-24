@@ -1040,7 +1040,7 @@
       <h3 class="text-base font-bold mb-1 border-b pb-1 border-tan-200 flex items-center"><i class="fa fa-circle-half-stroke mr-2"></i>SCA 향미 선택</h3>
       <div class="text-xs mb-3 text-gray-600">[프래그런스] [아로마] [플레이버] [에프터테이스트] 각 그룹별 향미 선택</div>
       <div class="mb-4 flex flex-wrap items-center">
-        <button type="button" class="px-2 py-1 rounded bg-gray-100 text-xs mobile-touch-friendly mr-2" onclick="window.open('https://sca.coffee/research/coffee-tasters-flavor-wheel', '_blank');">
+        <button type="button" id="flavorWheelOfficialBtn" class="px-2 py-1 rounded bg-gray-100 text-xs mobile-touch-friendly mr-2">
           플레이버 휠 공식자료 <i class="fas fa-external-link-alt ml-1 text-xs"></i>
         </button>
         <div class="lang-toggle">
@@ -2560,8 +2560,13 @@ function switchSession(sessionId) {
     samples = [createNewSampleObj('샘플 #1')];
     session.samples = samples;
   }
-  currentSampleId = samples[0].id;
-  setUIFromSample(samples[0].sampleData);
+
+  const savedSampleId = APP_STORAGE.get(`noel_sca_current_sample_${window.currentUser || 'default'}`);
+  const restoredSample = samples.find(sample => sample.id === savedSampleId);
+  const selectedSample = restoredSample || samples[0];
+
+  currentSampleId = selectedSample.id;
+  setUIFromSample(selectedSample.sampleData);
   renderSessionSelect();
   renderSampleList();
 }
@@ -2834,11 +2839,11 @@ function renderBodyCategoryTabs() {
     btn.className = 'font-bold rounded px-4 py-1 mr-1 mb-1 mobile-touch-friendly ' +
       (currentBodyCategory === cat.key ? 'tab-btn-active' : 'tab-btn-inactive');
     btn.textContent = currentLanguage === 'ko' ? cat.name : cat.nameEn;
-    btn.onclick = () => {
+    btn.addEventListener('click', () => {
       currentBodyCategory = cat.key;
       renderBodyCategoryTabs();
       renderBodyDescriptors();
-    };
+    });
     tabs.appendChild(btn);
   });
 }
@@ -2866,9 +2871,8 @@ function renderBodyDescriptors() {
 
       html += `
         <div class="body-descriptor-item ${selectedClass}"
-             data-descriptor="${descriptor.id}"
              style="border-color: ${descriptor.color};"
-             onclick="toggleBodyDescriptor('${descriptor.id}')">
+             data-descriptor-id="${descriptor.id}">
           <input type="checkbox" ${isSelected ? 'checked' : ''}>
           <span class="checkbox-custom"></span>
           <span>${escapeHtml(displayText)}</span>
@@ -2934,11 +2938,11 @@ function renderFlavorTabs() {
     // 언어에 따른 레이블 표시
     btn.textContent = currentLanguage === 'ko' ? phase.label : phase.labelEn;
     btn.dataset.flavorphase = phase.id;
-    btn.onclick = () => {
+    btn.addEventListener('click', () => {
       currentFlavorPhase = phase.id;
       renderFlavorTabs();
       renderFlavorPhase();
-    };
+    });
     tabs.appendChild(btn);
   });
 }
@@ -2993,7 +2997,7 @@ function renderFlavorPhase(force = false) {
     const categoryName = currentLanguage === 'ko' ? category.name : category.nameEn;
     html += `
       <button type="button" class="flavor-category-tab ${currentFlavorCategory === categoryName ? 'active' : ''}" 
-              data-category="${categoryName}" onclick="filterByCategory('${categoryName}')">
+              data-category="${categoryName}">
         ${categoryName}
       </button>
     `;
@@ -3058,7 +3062,7 @@ function renderFlavorPhase(force = false) {
 
     html += `
       <div class="flavor-category-accordion mb-3 ${isFilteredOut ? 'flavor-fix-hidden' : ''}" data-category="${categoryName}">
-        <div class="flavor-category-header" onclick="toggleAccordion(this)">
+        <div class="flavor-category-header">
           <h4>${categoryName}</h4>
           <span class="accordion-icon"><i class="fas fa-chevron-${isOpen ? 'up' : 'down'}"></i></span>
         </div>
@@ -3123,6 +3127,17 @@ function renderFlavorPhase(force = false) {
   });
   
   outer.innerHTML = html;
+
+  outer.querySelectorAll('.flavor-category-tab').forEach(tab => {
+    tab.addEventListener('click', () => {
+      const category = tab.dataset.category;
+      if (category) filterByCategory(category);
+    });
+  });
+
+  outer.querySelectorAll('.flavor-category-header').forEach(header => {
+    header.addEventListener('click', () => toggleAccordion(header));
+  });
   
   // 향미 검색 기능
   const searchInput = document.getElementById('flavorSearchInput');
@@ -3971,9 +3986,14 @@ function loadSamplesFromStorage() {
     samples = [createNewSampleObj("샘플 #1")];
     if (activeSession) activeSession.samples = samples;
   }
-  currentSampleId = samples[0].id;
+
+  const savedSampleId = APP_STORAGE.get(`noel_sca_current_sample_${window.currentUser || 'default'}`);
+  const restoredSample = samples.find(sample => sample.id === savedSampleId);
+  const selectedSample = restoredSample || samples[0];
+
+  currentSampleId = selectedSample.id;
   renderSessionSelect();
-  if (samples[0]) setUIFromSample(samples[0].sampleData);
+  if (selectedSample) setUIFromSample(selectedSample.sampleData);
   renderSampleList();
 }
 
@@ -3988,7 +4008,8 @@ function saveSessionsToStorage() {
     const userKey = window.currentUser || 'default';
     const didSaveSessions = APP_STORAGE.set(`noel_sca_sessions_${userKey}`, JSON.stringify(sessions));
     const didSaveSamples = APP_STORAGE.set(`noel_sca_samples2_${userKey}`, JSON.stringify(samples));
-    if (!didSaveSessions || !didSaveSamples) throw new Error('localStorage write failed');
+    const didSaveCurrentSample = APP_STORAGE.set(`noel_sca_current_sample_${userKey}`, currentSampleId || '');
+    if (!didSaveSessions || !didSaveSamples || !didSaveCurrentSample) throw new Error('localStorage write failed');
     if (typeof syncSamplesToTeam === 'function') {
       try { syncSamplesToTeam(samples); } catch(e) { console.error(e); }
     }
@@ -4769,6 +4790,23 @@ function setupEventHandlers() {
     cloneSample(currentSampleId);
   });
 
+  const flavorWheelOfficialBtn = document.getElementById('flavorWheelOfficialBtn');
+  if (flavorWheelOfficialBtn) {
+    flavorWheelOfficialBtn.addEventListener('click', () => {
+      window.open('https://sca.coffee/research/coffee-tasters-flavor-wheel', '_blank', 'noopener,noreferrer');
+    });
+  }
+
+  const bodyDescriptorArea = document.getElementById('bodyDescriptorArea');
+  if (bodyDescriptorArea) {
+    bodyDescriptorArea.addEventListener('click', event => {
+      const descriptorItem = event.target.closest('.body-descriptor-item');
+      if (!descriptorItem) return;
+      const descriptorId = descriptorItem.dataset.descriptorId;
+      if (!descriptorId) return;
+      toggleBodyDescriptor(descriptorId);
+    });
+  }
 
   const sampleSearchInput = document.getElementById('sampleSearchInput');
   const sampleSearchClearBtn = document.getElementById('sampleSearchClearBtn');

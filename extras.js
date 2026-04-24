@@ -69,6 +69,9 @@ function undoLastAction() {
   }
   const state = undoStack.pop();
   safeSetStorage(`noel_sca_samples2_${window.currentUser}`, state.samples);
+  if (state.currentSampleId) {
+    safeSetStorage(`noel_sca_current_sample_${window.currentUser}`, state.currentSampleId);
+  }
   location.reload();
 }
 
@@ -149,21 +152,24 @@ document.addEventListener('DOMContentLoaded', () => {
     const target = event.target;
     if (!(target instanceof HTMLElement)) return;
 
-    if (target.id === 'loginBtn') {
-      loginUser();
-      return;
-    }
-    if (target.id === 'logoutBtn') {
-      logoutUser();
-      return;
-    }
-    if (target.id === 'undoBtn') {
-      undoLastAction();
+    const button = target.closest('button');
+    if (!button) return;
+
+    if (button.id === 'addSampleBtn' || button.id === 'removeSampleBtn' || button.id === 'cloneSampleBtn') {
+      pushUndoState();
       return;
     }
 
-    if (target.id === 'addSampleBtn' || target.id === 'removeSampleBtn' || target.id === 'cloneSampleBtn') {
-      pushUndoState();
+    if (button.id === 'loginBtn') {
+      loginUser();
+      return;
     }
-  });
+    if (button.id === 'logoutBtn') {
+      logoutUser();
+      return;
+    }
+    if (button.id === 'undoBtn') {
+      undoLastAction();
+    }
+  }, true);
 });
