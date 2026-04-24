@@ -1,3 +1,11 @@
+function notifyMessage(msg) {
+  if (typeof window.showToast === 'function') {
+    window.showToast(msg);
+  } else {
+    alert(msg);
+  }
+}
+
 import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-app.js";
 import { getAuth, signInWithPopup, GoogleAuthProvider, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-auth.js";
 import { getFirestore, doc, setDoc, updateDoc, arrayUnion, getDoc, onSnapshot, deleteField } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore.js";
@@ -53,7 +61,7 @@ onAuthStateChanged(auth, user => {
 
 window.createTeam = async function(teamName) {
   if (!auth.currentUser) {
-    alert('먼저 로그인하세요');
+    notifyMessage('먼저 로그인하세요');
     return;
   }
   const teamRef = doc(db, 'teams', teamName);
@@ -66,18 +74,18 @@ window.createTeam = async function(teamName) {
   updateTeamHeader();
   await syncSamplesToTeam(window.samples || []);
   fetchTeamSamples().then(startTeamSamplesListener);
-  alert('팀이 생성되었습니다');
+  notifyMessage('팀이 생성되었습니다');
 };
 
 window.joinTeam = async function(teamName) {
   if (!auth.currentUser) {
-    alert('먼저 로그인하세요');
+    notifyMessage('먼저 로그인하세요');
     return;
   }
   const teamRef = doc(db, 'teams', teamName);
   const snap = await getDoc(teamRef);
   if (!snap.exists()) {
-    alert('팀이 존재하지 않습니다');
+    notifyMessage('팀이 존재하지 않습니다');
     return;
   }
   await updateDoc(teamRef, {
@@ -88,7 +96,7 @@ window.joinTeam = async function(teamName) {
   updateTeamHeader();
   await fetchTeamSamples();
   startTeamSamplesListener();
-  alert('팀에 가입했습니다');
+  notifyMessage('팀에 가입했습니다');
 };
 
 window.loadTeamInfoToModal = async function() {
@@ -127,7 +135,7 @@ window.removeMemberFromTeam = async function(memberUid) {
   if (!snap.exists()) return;
   const data = snap.data();
   if (data.owner !== auth.currentUser.uid) {
-    alert('팀장만 팀원을 탈퇴시킬 수 있습니다');
+    notifyMessage('팀장만 팀원을 탈퇴시킬 수 있습니다');
     return;
   }
   const newMembers = (data.members || []).filter(m => m.uid !== memberUid);
@@ -135,7 +143,7 @@ window.removeMemberFromTeam = async function(memberUid) {
   updateObj[`memberSamples.${memberUid}`] = deleteField();
   await updateDoc(teamRef, updateObj);
   loadTeamInfoToModal();
-  alert('팀원이 탈퇴되었습니다');
+  notifyMessage('팀원이 탈퇴되었습니다');
 };
 
 function updateTeamHeader() {

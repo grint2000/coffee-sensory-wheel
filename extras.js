@@ -1,3 +1,11 @@
+function notifyMessage(msg) {
+  if (typeof window.showToast === 'function') {
+    window.showToast(msg);
+  } else {
+    alert(msg);
+  }
+}
+
 // Extra features: undo, login, service worker registration
 let undoStack = [];
 window.currentUser = localStorage.getItem('mollis_sca_current_user') || 'default';
@@ -12,7 +20,7 @@ function pushUndoState() {
 
 function undoLastAction() {
   if (!undoStack.length) {
-    alert('실행 취소할 내용이 없습니다.');
+    notifyMessage('실행 취소할 내용이 없습니다.');
     return;
   }
   const state = undoStack.pop();
