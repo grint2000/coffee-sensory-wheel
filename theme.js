@@ -5,6 +5,26 @@
  * choice persists across visits.
  */
 (function() {
+  const THEME_KEY = 'noel_sca_theme';
+  const LEGACY_THEME_KEY = 'theme';
+
+  function safeGetTheme() {
+    try {
+      return localStorage.getItem(THEME_KEY) || localStorage.getItem(LEGACY_THEME_KEY) || 'light';
+    } catch (_) {
+      return 'light';
+    }
+  }
+
+  function safeSetTheme(theme) {
+    try {
+      localStorage.setItem(THEME_KEY, theme);
+      localStorage.setItem(LEGACY_THEME_KEY, theme);
+    } catch (_) {
+      // keep UI functional even when storage is blocked
+    }
+  }
+
   function applyTheme(theme) {
     if (theme === 'dark') {
       document.body.classList.add('dark');
@@ -19,13 +39,14 @@
 
   function init() {
     const toggle = document.getElementById('themeToggle');
-    const saved = localStorage.getItem('theme') || 'light';
+    const saved = safeGetTheme();
     applyTheme(saved);
     if (toggle) {
       toggle.addEventListener('click', function() {
         const isDark = document.body.classList.toggle('dark');
-        localStorage.setItem('theme', isDark ? 'dark' : 'light');
-        applyTheme(isDark ? 'dark' : 'light');
+        const theme = isDark ? 'dark' : 'light';
+        safeSetTheme(theme);
+        applyTheme(theme);
       });
     }
   }

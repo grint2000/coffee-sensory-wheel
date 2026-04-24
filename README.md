@@ -16,7 +16,6 @@ The application runs entirely in the browser, so you can simply double-click `in
 - **Sample Management** – Add, clone, and remove cupping samples. Data is automatically saved locally and can be exported or restored using JSON files.
 - **Comparison Tools** – Select two or more samples to generate charts comparing SCA scores, flavor notes, and defects.
 - **Export Options** – Save your results as images, SNS-ready images, Excel spreadsheets, or JSON files for backup and sharing. The exported images now include the coffee's origin, processing method, roast date, and roast level so you have full context when sharing.
-- **Market Prices** – View the latest C‑Price and London Coffee Exchange index with a one-click refresh. Prices are converted to KRW per kilogram using the current USD exchange rate and stored locally for offline viewing.
 
 ## Browser Compatibility
 
@@ -40,15 +39,10 @@ To collaborate with others, click **팀관리** and sign in with a Google accoun
 
 When the team owner (or any member) adds or edits samples, the changes are saved to Firestore and automatically synced to everyone in the team. If you are online you will see new samples appear instantly. Offline mode still works, and any changes will sync the next time you connect.
 
-## Market Prices
-
-Below the header you can view coffee prices and even enter them yourself. Click **가격 새로고침** to try fetching the latest C‑Price, London Coffee Exchange index, and the current exchange rate. When the network is unreliable you can manually type the index values (C‑Price in US¢/lb, London index in USD/ton) along with the exchange rate, then press **값 적용** to see the KRW per kilogram. The most recent numbers are saved locally so they appear again when you return to the page.
-The conversion uses `지수 × 환율 × 2.2046 / 100` for the C‑Price and `지수 / 1000 × 환율` for the London index.
-
 ## Customizing the Header Logo
 
 1. Replace the file `icons/header-logo.png` with your own image (recommended size around 192×192 pixels).
-2. Open `index.html` and reload the page. Your image will appear next to the **mollis** text at the top.
+2. Open `index.html` and reload the page. Your image will appear next to the **Noel** text at the top.
 
 This update applies both on desktop and mobile views and is cached for offline use by the PWA service worker.
 
