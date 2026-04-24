@@ -23,13 +23,52 @@ const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
 
+
+const TEAM_STORAGE_KEYS = {
+  currentUser: 'noel_sca_current_user',
+  currentTeam: 'noel_sca_current_team'
+};
+
+function safeGetStorage(key, fallback = null) {
+  try {
+    const value = localStorage.getItem(key);
+    return value === null ? fallback : value;
+  } catch (_) {
+    return fallback;
+  }
+}
+
+function safeSetStorage(key, value) {
+  try {
+    localStorage.setItem(key, value);
+    return true;
+  } catch (_) {
+    notifyMessage('로컬 저장소 저장에 실패했습니다. 브라우저 설정을 확인해 주세요.');
+    return false;
+  }
+}
+
+function safeRemoveStorage(key) {
+  try {
+    localStorage.removeItem(key);
+  } catch (_) {
+    notifyMessage('로컬 저장소 정리에 실패했습니다.');
+  }
+}
+
+function getCurrentTeamName() {
+  const current = safeGetStorage(TEAM_STORAGE_KEYS.currentTeam);
+  if (current) return current;
+  return safeGetStorage('mollis_sca_current_team', '');
+}
+
 window.firebaseLogin = async function() {
   try {
     const provider = new GoogleAuthProvider();
     const result = await signInWithPopup(auth, provider);
     window.currentUser = result.user.displayName || result.user.email;
     document.getElementById('currentUserDisplay').textContent = window.currentUser;
-    localStorage.setItem('noel_sca_current_user', window.currentUser);
+    safeSetStorage(TEAM_STORAGE_KEYS.currentUser, window.currentUser);
     document.getElementById('logoutBtn').classList.remove('hidden');
     document.getElementById('loginBtn').classList.add('hidden');
   } catch (err) {
@@ -40,8 +79,8 @@ window.firebaseLogin = async function() {
 window.logoutFirebase = async function() {
   await signOut(auth);
   window.currentUser = 'default';
-  localStorage.setItem('noel_sca_current_user', window.currentUser);
-  localStorage.removeItem('noel_sca_current_team');
+  safeSetStorage(TEAM_STORAGE_KEYS.currentUser, window.currentUser);
+  safeRemoveStorage(TEAM_STORAGE_KEYS.currentTeam);
   if (window._teamSamplesUnsub) window._teamSamplesUnsub();
   location.reload();
 };
@@ -70,7 +109,7 @@ window.createTeam = async function(teamName) {
     members: [{ uid: auth.currentUser.uid, name: window.currentUser }],
     memberSamples: { [auth.currentUser.uid]: window.samples || [] }
   }, { merge: true });
-  localStorage.setItem('noel_sca_current_team', teamName);
+  safeSetStorage(TEAM_STORAGE_KEYS.currentTeam, teamName);
   updateTeamHeader();
   await syncSamplesToTeam(window.samples || []);
   fetchTeamSamples().then(startTeamSamplesListener);
@@ -92,7 +131,7 @@ window.joinTeam = async function(teamName) {
     members: arrayUnion({ uid: auth.currentUser.uid, name: window.currentUser }),
     [`memberSamples.${auth.currentUser.uid}`]: window.samples || []
   });
-  localStorage.setItem('noel_sca_current_team', teamName);
+  safeSetStorage(TEAM_STORAGE_KEYS.currentTeam, teamName);
   updateTeamHeader();
   await fetchTeamSamples();
   startTeamSamplesListener();
@@ -100,7 +139,7 @@ window.joinTeam = async function(teamName) {
 };
 
 window.loadTeamInfoToModal = async function() {
-  const teamName = localStorage.getItem('noel_sca_current_team');
+  const teamName = getCurrentTeamName();
   const nameEl = document.getElementById('currentTeamDisplay');
   const listEl = document.getElementById('teamMembersList');
   if (nameEl) nameEl.textContent = teamName || '없음';
@@ -128,7 +167,7 @@ window.loadTeamInfoToModal = async function() {
 };
 
 window.removeMemberFromTeam = async function(memberUid) {
-  const teamName = localStorage.getItem('noel_sca_current_team');
+  const teamName = getCurrentTeamName();
   if (!teamName) return;
   const teamRef = doc(db, 'teams', teamName);
   const snap = await getDoc(teamRef);
@@ -149,7 +188,7 @@ window.removeMemberFromTeam = async function(memberUid) {
 function updateTeamHeader() {
   const headerEl = document.getElementById('currentTeamHeader');
   if (headerEl) {
-    const name = localStorage.getItem('noel_sca_current_team');
+    const name = getCurrentTeamName();
     headerEl.textContent = name ? `팀: ${name}` : '';
   }
 }
@@ -157,7 +196,7 @@ function updateTeamHeader() {
 // === Team sample sync functions ===
 
 async function fetchTeamSamples() {
-  const teamName = localStorage.getItem('noel_sca_current_team');
+  const teamName = getCurrentTeamName();
   if (!teamName) return;
   try {
     const snap = await getDoc(doc(db, 'teams', teamName));
@@ -173,7 +212,7 @@ async function fetchTeamSamples() {
       if (samplesData) {
         const key = `noel_sca_samples2_${window.currentUser || 'default'}`;
         const localStr = JSON.stringify(samplesData);
-        localStorage.setItem(key, localStr);
+        safeSetStorage(key, localStr);
         if (typeof loadSamplesFromStorage === 'function') {
           loadSamplesFromStorage();
           if (typeof renderSampleList === 'function') renderSampleList();
@@ -186,7 +225,7 @@ async function fetchTeamSamples() {
 }
 
 window.syncSamplesToTeam = async function(samples) {
-  const teamName = localStorage.getItem('noel_sca_current_team');
+  const teamName = getCurrentTeamName();
   if (!teamName || !auth.currentUser) return;
   try {
     const teamRef = doc(db, 'teams', teamName);
@@ -200,7 +239,7 @@ window.syncSamplesToTeam = async function(samples) {
 };
 
 window.startTeamSamplesListener = function() {
-  const teamName = localStorage.getItem('noel_sca_current_team');
+  const teamName = getCurrentTeamName();
   if (!teamName) return;
   const teamRef = doc(db, 'teams', teamName);
   if (window._teamSamplesUnsub) window._teamSamplesUnsub();
@@ -217,8 +256,8 @@ window.startTeamSamplesListener = function() {
       if (samplesData) {
         const key = `noel_sca_samples2_${window.currentUser || 'default'}`;
         const newStr = JSON.stringify(samplesData);
-        if (localStorage.getItem(key) !== newStr) {
-          localStorage.setItem(key, newStr);
+        if (safeGetStorage(key) !== newStr) {
+          safeSetStorage(key, newStr);
           if (typeof loadSamplesFromStorage === 'function') {
             loadSamplesFromStorage();
             if (typeof renderSampleList === 'function') renderSampleList();
@@ -232,7 +271,7 @@ window.startTeamSamplesListener = function() {
 };
 
 window.showTeamReport = async function() {
-  const teamName = localStorage.getItem('noel_sca_current_team');
+  const teamName = getCurrentTeamName();
   if (!teamName) return;
   const snap = await getDoc(doc(db, 'teams', teamName));
   if (!snap.exists()) return;

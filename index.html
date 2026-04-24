@@ -12,7 +12,6 @@
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/hammerjs@2.0.8/hammer.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
   <style>
     html,body { font-family: 'Noto Sans KR', sans-serif; background: #fcfaf7;}
@@ -181,11 +180,13 @@
     .score-reset-btn { margin-top:6px; border:1px solid #d1d5db; border-radius:6px; background:#fff; font-size:11px; padding:4px 8px; }
     .mobile-quick-actions { position:fixed; left:0; right:0; bottom:0; z-index:60; background:rgba(255,255,255,0.96); border-top:1px solid #e5e7eb; box-shadow:0 -4px 16px rgba(0,0,0,0.08); padding:8px 10px calc(8px + env(safe-area-inset-bottom)); display:none; }
     .mobile-quick-actions-inner { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:8px; max-width:700px; margin:0 auto; }
-    .mobile-quick-btn { min-height:42px; border-radius:8px; font-size:12px; font-weight:700; border:1px solid #d1d5db; background:#fff; }
+    .mobile-quick-btn { min-height:44px; border-radius:8px; font-size:12px; font-weight:700; border:1px solid #d1d5db; background:#fff; }
     .sample-list-scroll {max-height: 190px; overflow-y: auto; -webkit-overflow-scrolling: touch;}
     .sample-toolbar { display:flex; align-items:center; gap:8px; margin-bottom:8px; }
     .sample-search-input { flex:1; min-width:0; border:1px solid #d1d5db; border-radius:8px; padding:7px 10px; font-size:13px; }
     .sample-search-clear { border:1px solid #d1d5db; background:#fff; border-radius:8px; padding:7px 10px; font-size:12px; line-height:1; }
+    .mobile-touch-friendly { min-height:44px; min-width:44px; }
+    button, .score-nav-btn, .score-preset-btn, .sample-search-clear { min-height:44px; }
     .sample-meta-count { font-size:12px; color:#6b7280; margin-bottom:6px; }
     .focus-outline:focus-visible { outline: 3px solid #8B5A2B; outline-offset: 2px; }
     .compare-table th, .compare-table td {border:1px solid #e2e2e2; padding:6px 8px; font-size:14px;}
@@ -1018,11 +1019,11 @@
             <div id="defectCountWarning" class="text-xs text-red-500 mt-1 hidden">⚠ SCA 스페셜티 등급 기준 초과</div>
           </div>
           <div>
-            <label class="block text-sm font-semibold mb-1">로트번호</label>
+            <label class="block text-sm font-semibold mb-1">로트번호(Lot Number)</label>
             <input id="lotNumber" class="coffee-input w-full border border-tan-300 rounded p-2" />
           </div>
           <div>
-            <label class="block text-sm font-semibold mb-1">공급자</label>
+            <label class="block text-sm font-semibold mb-1">공급자명(Supplier Name)</label>
             <input id="supplierName" class="coffee-input w-full border border-tan-300 rounded p-2" />
           </div>
           <div>
@@ -2076,6 +2077,15 @@ const SCORE_FIELD_CONFIG = [
   { id: 'scoreOverall', label: '오버럴', tooltip: '총평, 인상' }
 ];
 const GREEN_BEAN_FIELDS = ['farmName','altitude','harvestYear','cropStatus','moistureContent','screenSize','defectCount','lotNumber','supplierName','greenBagWeight'];
+const GREEN_BEAN_DOM = {
+  altitudeInput: null,
+  moistureInput: null,
+  defectInput: null,
+  altitudeWarning: null,
+  moistureWarning: null,
+  defectCountWarning: null
+};
+
   
 function escapeHtml(value) {
   return String(value ?? '').replace(/[&<>"']/g, (char) => ({
@@ -2153,15 +2163,19 @@ function setupLongPress(button, onTick) {
     holdInterval = null;
   };
 
-  button.addEventListener('pointerdown', () => {
+  button.addEventListener('pointerdown', (event) => {
+    if (event.button !== 0 || button.disabled) return;
+    clearAll();
     holdTimeout = setTimeout(() => {
       holdInterval = setInterval(onTick, 100);
-    }, 500);
+    }, 420);
   });
 
-  ['pointerup', 'pointercancel', 'pointerleave'].forEach(evt =>
+  button.addEventListener('contextmenu', (event) => event.preventDefault());
+  ['pointerup', 'pointercancel', 'pointerleave', 'lostpointercapture'].forEach(evt =>
     button.addEventListener(evt, clearAll)
   );
+  window.addEventListener('blur', clearAll);
 }
 
 function createScoreStepper(scoreId, label, tooltipText) {
@@ -2274,26 +2288,34 @@ function populateHarvestYearOptions() {
 }
 
 function updateGreenBeanWarnings() {
-  const altitude = Number.parseFloat(document.getElementById('altitude')?.value || '');
-  const moisture = Number.parseFloat(document.getElementById('moistureContent')?.value || '');
-  const defectCount = Number.parseFloat(document.getElementById('defectCount')?.value || '');
+  const altitude = Number.parseFloat(GREEN_BEAN_DOM.altitudeInput?.value || '');
+  const moisture = Number.parseFloat(GREEN_BEAN_DOM.moistureInput?.value || '');
+  const defectCount = Number.parseFloat(GREEN_BEAN_DOM.defectInput?.value || '');
 
-  const altitudeWarning = document.getElementById('altitudeWarning');
-  const moistureWarning = document.getElementById('moistureWarning');
-  const defectCountWarning = document.getElementById('defectCountWarning');
-  const moistureInput = document.getElementById('moistureContent');
-
-  if (altitudeWarning) altitudeWarning.classList.toggle('hidden', Number.isNaN(altitude) || altitude <= 3000);
-  const moistureOutOfRange = !Number.isNaN(moisture) && (moisture < 10 || moisture > 13);
-  if (moistureWarning) moistureWarning.classList.toggle('hidden', !moistureOutOfRange);
-  if (moistureInput) {
-    moistureInput.style.borderColor = moistureOutOfRange ? '#F59E0B' : '';
+  if (GREEN_BEAN_DOM.altitudeWarning) {
+    GREEN_BEAN_DOM.altitudeWarning.classList.toggle('hidden', Number.isNaN(altitude) || altitude <= 3000);
   }
-  if (defectCountWarning) defectCountWarning.classList.toggle('hidden', Number.isNaN(defectCount) || defectCount < 1);
+  const moistureOutOfRange = !Number.isNaN(moisture) && (moisture < 10 || moisture > 13);
+  if (GREEN_BEAN_DOM.moistureWarning) {
+    GREEN_BEAN_DOM.moistureWarning.classList.toggle('hidden', !moistureOutOfRange);
+  }
+  if (GREEN_BEAN_DOM.moistureInput) {
+    GREEN_BEAN_DOM.moistureInput.style.borderColor = moistureOutOfRange ? '#F59E0B' : '';
+  }
+  if (GREEN_BEAN_DOM.defectCountWarning) {
+    GREEN_BEAN_DOM.defectCountWarning.classList.toggle('hidden', Number.isNaN(defectCount) || defectCount < 1);
+  }
 }
 
 function setupGreenBeanSection() {
   populateHarvestYearOptions();
+
+  GREEN_BEAN_DOM.altitudeInput = document.getElementById('altitude');
+  GREEN_BEAN_DOM.moistureInput = document.getElementById('moistureContent');
+  GREEN_BEAN_DOM.defectInput = document.getElementById('defectCount');
+  GREEN_BEAN_DOM.altitudeWarning = document.getElementById('altitudeWarning');
+  GREEN_BEAN_DOM.moistureWarning = document.getElementById('moistureWarning');
+  GREEN_BEAN_DOM.defectCountWarning = document.getElementById('defectCountWarning');
 
   const toggleBtn = document.getElementById('greenInfoToggle');
   const body = document.getElementById('greenInfoBody');
@@ -2308,8 +2330,7 @@ function setupGreenBeanSection() {
     });
   }
 
-  ['altitude', 'moistureContent', 'defectCount'].forEach((id) => {
-    const el = document.getElementById(id);
+  [GREEN_BEAN_DOM.altitudeInput, GREEN_BEAN_DOM.moistureInput, GREEN_BEAN_DOM.defectInput].forEach((el) => {
     if (!el) return;
     el.addEventListener('input', updateGreenBeanWarnings);
     el.addEventListener('change', updateGreenBeanWarnings);
@@ -2739,8 +2760,6 @@ function switchLanguage(lang) {
     }, 100);
     
   }, 200);
-  
-  console.log(`언어가 ${lang === 'ko' ? '한국어' : '영어'}로 변경되었습니다.`);
 }
 
 // 다국어 텍스트 업데이트 함수
@@ -2773,8 +2792,6 @@ function renderBodyCategoryTabs() {
     };
     tabs.appendChild(btn);
   });
-
-  console.log(`바디감 카테고리 탭 렌더링 완료 (언어: ${currentLanguage})`);
 }
 
 // 바디감 디스크립터 렌더링 개선
@@ -2812,8 +2829,6 @@ function renderBodyDescriptors() {
   }
 
   container.innerHTML = html;
-  
-  console.log(`바디감 디스크립터 렌더링 완료 (언어: ${currentLanguage})`);
 }
 
 // 바디감 디스크립터 토글 함수 개선
@@ -2851,8 +2866,6 @@ function toggleBodyDescriptor(descriptorId) {
   
   renderSelectedFlavorsArea();
   scheduleAutoSave();
-  
-  console.log(`바디감 디스크립터 '${descriptorId}' 토글됨:`, descriptors.includes(descriptorId));
 }
 
 /* === 3단계: UI 렌더링 및 상호작용 함수 === */
@@ -2879,12 +2892,16 @@ function renderFlavorTabs() {
     };
     tabs.appendChild(btn);
   });
-  
-  console.log(`향미 탭 렌더링 완료 (언어: ${currentLanguage})`);
 }
 
 // 향미 선택 영역 렌더링 개선
-function renderFlavorPhase() {
+function renderFlavorPhase(force = false) {
+  if (!force) {
+    if (renderFlavorPhase._timer) clearTimeout(renderFlavorPhase._timer);
+    renderFlavorPhase._timer = setTimeout(() => renderFlavorPhase(true), 40);
+    return;
+  }
+
   const currentSample = getCurrentSampleObj();
   if (!currentSample) return;
   
@@ -3190,8 +3207,6 @@ if (basicMatch || initialMatch) {
       scheduleAutoSave();
     };
   });
-  
-  console.log(`향미 선택 영역 렌더링 완료 (언어: ${currentLanguage})`);
 }
 
 // 향미 특성/속성 실시간 반영 개선 (바디감 디스크립터 포함)
@@ -3314,8 +3329,6 @@ function renderSelectedFlavorsArea(_data) {
   if (flavorArea) {
     flavorArea.innerHTML = html;
   }
-
-  console.log(`선택된 향미 영역 업데이트 완료 (언어: ${currentLanguage})`);
 }
 
 // 레이더 차트 업데이트
@@ -3964,25 +3977,36 @@ function cloneSample(sampleId) {
 
 // 스와이프로 이전/다음 샘플 이동 (모바일 최적화)
 function setupSwipeNavigation() {
-  try {
-    const form = document.getElementById('cuppingForm');
-    if (!form || typeof Hammer === 'undefined') return;
-    
-    const hammer = new Hammer(form);
-    hammer.get('swipe').set({ direction: Hammer.DIRECTION_HORIZONTAL });
-    
-    hammer.on('swipeleft', function(e) {
-      goToNextSample();
-    });
-    
-    hammer.on('swiperight', function(e) {
-      goToPrevSample();
-    });
-    
-    console.log("스와이프 내비게이션이 설정되었습니다.");
-  } catch (e) {
-    console.error("스와이프 내비게이션 설정 중 오류:", e);
-  }
+  const form = document.getElementById('cuppingForm');
+  if (!form || form.dataset.swipeBound === 'true') return;
+
+  let startX = 0;
+  let startY = 0;
+  let startTime = 0;
+
+  form.addEventListener('touchstart', (e) => {
+    const touch = e.changedTouches && e.changedTouches[0];
+    if (!touch) return;
+    startX = touch.clientX;
+    startY = touch.clientY;
+    startTime = Date.now();
+  }, { passive: true });
+
+  form.addEventListener('touchend', (e) => {
+    const touch = e.changedTouches && e.changedTouches[0];
+    if (!touch) return;
+    const dx = touch.clientX - startX;
+    const dy = touch.clientY - startY;
+    const elapsed = Date.now() - startTime;
+
+    if (elapsed > 450) return;
+    if (Math.abs(dx) < 50 || Math.abs(dx) < Math.abs(dy) * 1.2) return;
+
+    if (dx < 0) goToNextSample();
+    else goToPrevSample();
+  }, { passive: true });
+
+  form.dataset.swipeBound = 'true';
 }
 
 /* === 4단계: 고급 기능 및 마무리 === */
@@ -4015,8 +4039,6 @@ function setupAutoBackup() {
           localStorage.removeItem(keys.shift());
         }
       }
-      
-      console.log('자동 백업 완료:', backupKey);
     } catch (e) {
       console.error('자동 백업 중 오류:', e);
     }
@@ -4486,8 +4508,6 @@ function enhanceMobileExperience() {
       }
       lastTouchEnd = now;
     }, false);
-    
-    console.log("모바일 최적화 기능이 활성화되었습니다.");
   }
 }
 
@@ -4552,8 +4572,6 @@ function setupKeyboardShortcuts() {
       switchLanguage(currentLanguage === 'ko' ? 'en' : 'ko');
     }
   });
-  
-  console.log("키보드 단축키가 설정되었습니다.");
 }
 
 // 차트 객체 정리
@@ -4611,7 +4629,6 @@ function optimizePerformance() {
 // 초기화 함수
 function initApp() {
   try {
-    console.log("🚀 Noel SCA 커피 관능 평가 도구 (개선버전) 시작");
     
     renderFlavorTabs();
     renderBodyCategoryTabs();
@@ -4643,11 +4660,6 @@ function initApp() {
         setUIFromSample(currentSample.sampleData);
       }
     }
-    
-    console.log("✅ 애플리케이션 초기화 완료");
-    console.log(`📊 향미 항목: ${FLAVOR_DATA.length}개`);
-    console.log(`🖐 바디감 디스크립터: ${BODY_DESCRIPTORS.length}개`);
-    console.log(`🌐 현재 언어: ${currentLanguage === 'ko' ? '한국어' : '영어'}`);
     
     // 사용자에게 환영 메시지 표시
     setTimeout(() => {
@@ -5025,7 +5037,6 @@ function setupEventHandlers() {
   if (exportXlsxBtn) exportXlsxBtn.addEventListener('click', exportToExcel);
   
   updateTotalScore();
-  console.log("모든 이벤트 핸들러 설정 완료");
 }
 
 // DOM 준비 상태 확인 후 앱 초기화
