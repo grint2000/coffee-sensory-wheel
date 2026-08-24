@@ -166,6 +166,15 @@
       );
     }
 
+    if (tier1 === 'Sweet') {
+      return profile(
+        'limited-coffee-evidence',
+        '설탕·꿀·바닐라·제과명은 단일 향미분자가 아닌 복합 레퍼런스입니다. 커피에서 확인된 sweet/caramel 계열 성분만 보조 근거로 표시합니다.',
+        [],
+        [rank('4-Hydroxy-2,5-dimethyl-3(2H)-furanone (furaneol)', 'sweet/caramel-like key odorant in coffee; this does not establish a specific confectionery note', ['coffeeKeyOdorants', 'coffeePotentOdorants'], 2), rank('Vanillin', 'reported as a potent coffee odorant; it does not establish “vanilla bean” as a single-note cause', ['coffeePotentOdorants', 'espressoReview'], 2)]
+      );
+    }
+
     if (tier1 === 'Nutty/Cocoa') {
       return profile(
         'key-coffee-evidence',
@@ -260,6 +269,30 @@
       return profile(
         'limited-coffee-evidence',
         '이 결점명에 대한 특정 분자 원인은 현재 데이터셋의 검증 기준을 충족하지 않았습니다. 임의로 분자를 배정하지 않습니다.',
+        []
+      );
+    }
+
+    if (tier1 === 'Other' && tier2 === 'Chemical') {
+      return profile(
+        'not-established',
+        'Chemical·medicinal·rubber·plastic·tar·solvent는 서로 다른 원인(오염, 포장재, 로스팅, 결점)을 가질 수 있는 경고성 감각 레퍼런스입니다. 이 데이터셋의 엄격한 기준에서는 특정 분자를 임의로 지정하지 않습니다.',
+        []
+      );
+    }
+
+    if (tier1 === 'Other' && tier2 === 'Animal') {
+      return profile(
+        'not-established',
+        '동물성·밀랍 레퍼런스는 복합 감각 표현입니다. 커피에서 이 세부 노트의 단일 원인 분자는 확인되지 않았습니다.',
+        []
+      );
+    }
+
+    if (tier1 === 'Other' && tier2 === 'Mineral') {
+      return profile(
+        'not-established',
+        '미네랄·돌·소금은 대개 향기분자가 아닌 맛·촉감·연상 표현입니다. 단일 휘발성 향미분자로 환원하지 않습니다.',
         []
       );
     }
