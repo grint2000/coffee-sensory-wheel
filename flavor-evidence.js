@@ -18,12 +18,16 @@
       url: 'https://doi.org/10.1021/jf9505988'
     },
     coffeePotentOdorants: {
-      short: 'Czerny & Grosch, Z. Lebensm. Unters. Forsch. 2000; 211:272–276',
-      url: 'https://doi.org/10.1007/s002170000158'
+      short: 'Czerny, Mayer & Grosch, J. Agric. Food Chem. 1999; 47:695–699',
+      url: 'https://doi.org/10.1021/jf980759i'
     },
     coffeeModel: {
-      short: 'Mayer, Czerny & Grosch, Eur. Food Res. Technol. 2000; 211:272–276',
-      url: 'https://doi.org/10.1007/s002170000158'
+      short: 'Czerny, Mayer & Grosch, J. Agric. Food Chem. 1999; 47:695–699',
+      url: 'https://doi.org/10.1021/jf980759i'
+    },
+    rawCoffee: {
+      short: 'Czerny & Grosch, J. Agric. Food Chem. 2000; 48:868–872',
+      url: 'https://doi.org/10.1021/jf990609n'
     },
     espressoReview: {
       short: 'Angeloni et al., Molecules 2021; 26:3856',
@@ -107,7 +111,7 @@
     'Green/Vegetative|Fresh Green|Green Bell Pepper': profile(
       'key-coffee-evidence',
       '커피에서 methoxypyrazine류는 pea-like/green 계열의 강한 향기활성 성분으로 보고되었습니다. 피망이라는 세부 레퍼런스까지의 직접 인과는 별도입니다.',
-      [rank('3-Isobutyl-2-methoxypyrazine (IBMP)', 'potent pea-like/green odorant identified in coffee', ['coffeePotentOdorants', 'espressoReview'], 1)],
+      [rank('3-Isobutyl-2-methoxypyrazine (IBMP)', 'potent pea-like/green odorant identified in coffee', ['rawCoffee', 'espressoReview'], 1)],
       [rank('2-Isopropyl-3-methoxypyrazine (IPMP)', 'green/potato-like methoxypyrazine; especially relevant to defective coffee', ['potato'], 2)]
     ),
     'Sour/Fermented|Clean Acidity|Citric Acid': profile('key-coffee-evidence', '산은 휘발성 향미분자가 아니라 맛·산미에 기여하는 비휘발성 화합물입니다.', [rank('Citric acid', 'quantified in brewed coffee; concentration changes systematically with roast', ['acids'], 1)]),
@@ -215,7 +219,7 @@
       return profile(
         'key-coffee-evidence',
         'green/pea-like 커피 향에는 methoxypyrazine류가 강하게 기여할 수 있습니다. 특정 허브·채소 종명의 직접 인과는 확인되지 않았습니다.',
-        [rank('3-Isobutyl-2-methoxypyrazine (IBMP)', 'potent pea-like/green coffee odorant', ['coffeePotentOdorants', 'espressoReview'], 1)],
+        [rank('3-Isobutyl-2-methoxypyrazine (IBMP)', 'potent pea-like/green coffee odorant', ['rawCoffee', 'espressoReview'], 1)],
         [rank('2-Isopropyl-3-methoxypyrazine (IPMP)', 'green/potato-like methoxypyrazine associated with defective coffee', ['potato'], 2)]
       );
     }
