@@ -3397,8 +3397,14 @@ function openFlavorEvidenceModal(key) {
   if (!rec || typeof window.getFlavorEvidence !== 'function') return;
   const evidence = window.getFlavorEvidence(key);
   const label = currentLanguage === 'ko' ? (rec[6] || rec[2]) : rec[2];
+  const statusText = {
+    'key-coffee-evidence': '커피 핵심 기여 근거',
+    'limited-coffee-evidence': '커피 직접 인과 미확정',
+    'reference-only': '레퍼런스 식품 근거',
+    'not-established': '분자 배정 보류'
+  }[evidence.status] || '근거 상태 확인 필요';
   const modal = ensureFlavorEvidenceModal();
-  modal.innerHTML = `<article class="flavor-evidence-panel" aria-labelledby="flavorEvidenceTitle"><div class="flavor-evidence-head"><div><h3 id="flavorEvidenceTitle">${escapeHtml(label)} · 향미분자 근거</h3><p class="text-xs text-gray-500 mt-1">${escapeHtml(rec[0])} › ${escapeHtml(rec[1])} › ${escapeHtml(rec[2])}</p></div><button type="button" class="flavor-evidence-close" aria-label="닫기">×</button></div><p class="flavor-evidence-legend">1순위: 커피 향기활성·핵심 기여 근거 / 2순위: 커피 검출 또는 감각 상관 근거 / 3순위: 레퍼런스 식품 근거만 존재</p><p class="flavor-evidence-note">${escapeHtml(evidence.note || '')}</p>${formatEvidenceRanks('1순위 · 커피 핵심 기여', evidence.primary)}${formatEvidenceRanks('2순위 · 커피 보조 근거', evidence.secondary)}${formatEvidenceRanks('3순위 · 레퍼런스 식품 근거', evidence.tertiary)}</article>`;
+  modal.innerHTML = `<article class="flavor-evidence-panel" aria-labelledby="flavorEvidenceTitle"><div class="flavor-evidence-head"><div><h3 id="flavorEvidenceTitle">${escapeHtml(label)} · 향미분자 근거</h3><p class="text-xs text-gray-500 mt-1">${escapeHtml(rec[0])} › ${escapeHtml(rec[1])} › ${escapeHtml(rec[2])}</p><p class="text-xs font-semibold mt-2 ${escapeHtml(evidence.status || '')}">${escapeHtml(statusText)}</p></div><button type="button" class="flavor-evidence-close" aria-label="닫기">×</button></div><p class="flavor-evidence-legend">1순위: 커피 향기활성·핵심 기여 근거 / 2순위: 커피 검출 또는 감각 상관 근거 / 3순위: 레퍼런스 식품 근거만 존재</p><p class="flavor-evidence-note">${escapeHtml(evidence.note || '')}</p>${formatEvidenceRanks('1순위 · 커피 핵심 기여', evidence.primary)}${formatEvidenceRanks('2순위 · 커피 보조 근거', evidence.secondary)}${formatEvidenceRanks('3순위 · 레퍼런스 식품 근거', evidence.tertiary)}</article>`;
   modal.querySelector('.flavor-evidence-close').addEventListener('click', closeFlavorEvidenceModal);
   modal.classList.add('is-open');
   modal.querySelector('.flavor-evidence-close').focus();
@@ -3436,7 +3442,6 @@ function bindFlavorEvidenceTriggers(outer) {
     }, true);
   });
 }
-
 
 // 향미 특성/속성 실시간 반영 개선 (바디감 디스크립터 포함)
 function buildFlavorSummaryHtml(sampleData) {
