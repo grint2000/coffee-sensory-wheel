@@ -50,7 +50,7 @@
       url: 'https://doi.org/10.1007/s002170100305'
     },
     fruitReference: {
-      short: 'El Hadi et al., Advances in Fruit Aroma Volatile Research, 2013',
+      short: 'Advances in Fruit Aroma Volatile Research, PMCID: PMC6270112',
       url: 'https://pmc.ncbi.nlm.nih.gov/articles/PMC6270112/'
     },
     floralReference: {
@@ -62,11 +62,11 @@
       url: 'https://doi.org/10.3390/molecules27196403'
     },
     teaReference: {
-      short: 'Guo et al., Recent Advances in Volatiles of Teas, 2018',
+      short: 'Recent Advances in Volatiles of Teas, PMCID: PMC6273888',
       url: 'https://pmc.ncbi.nlm.nih.gov/articles/PMC6273888/'
     },
     teaKeyOdorants: {
-      short: 'Foods 2025, Identification of Key Flavor Compounds in Tea',
+      short: 'Identification of Key Flavor Compounds and Color Substances in Tea, 2025',
       url: 'https://doi.org/10.1007/s44187-025-00545-w'
     }
   };
@@ -264,17 +264,29 @@
     'Floral|White Flowers': [['Linalool', 'Benzyl acetate'], 'floralReference'],
     'Floral|Colored Flowers': [['Linalool', 'Geraniol', 'β-Ionone'], 'floralReference'],
     'Floral|Herbal Flowers': [['Linalool', 'Benzyl acetate'], 'floralReference'],
+    'Nutty/Cocoa|Tree Nuts': [['2,5-Dimethylpyrazine', '2-Ethyl-3,5-dimethylpyrazine'], 'spiceReference'],
+    'Nutty/Cocoa|Other Nuts': [['2,5-Dimethylpyrazine', '2-Ethyl-3,5-dimethylpyrazine'], 'spiceReference'],
+    'Nutty/Cocoa|Cocoa': [['2,3,5-Trimethylpyrazine', '2-Ethyl-3,5-dimethylpyrazine'], 'spiceReference'],
+    'Spices|Warm Spices': [['(E)-Cinnamaldehyde', 'Eugenol'], 'spiceReference'],
+    'Spices|Hot Spices': [['Rotundone', 'β-Caryophyllene'], 'spiceReference'],
+    'Spices|Aromatic Spices': [['Linalool', '1,8-Cineole'], 'spiceReference'],
     'Tea|Black Tea': [['Linalool', '(E)-β-Damascenone', 'Benzyl alcohol'], 'teaReference'],
     'Tea|Green Tea': [['Linalool', 'Geraniol', 'Indole'], 'teaKeyOdorants'],
     'Tea|Oolong': [['Linalool', 'Geraniol', 'Nerolidol'], 'teaReference'],
     'Tea|White Tea': [['Linalool', 'Benzyl alcohol'], 'teaReference'],
     'Tea|Herbal Tea': [['Linalool', '1,8-Cineole'], 'spiceReference'],
+    'Tea|Puer': [['Geosmin', '(E)-β-Damascenone'], 'teaReference'],
     'Cereal/Grain|Baked': [['2-Acetyl-1-pyrroline', '2-Furfurylthiol'], 'spiceReference'],
     'Cereal/Grain|Malted': [['Maltol', '2-Acetyl-1-pyrroline'], 'spiceReference'],
     'Cereal/Grain|Raw Grains': [['(Z)-3-Hexanal', '2-Acetyl-1-pyrroline'], 'fruitReference'],
+    'Cereal/Grain|Processed': [['Maltol', '2-Acetyl-1-pyrroline'], 'spiceReference'],
     'Green/Vegetative|Fresh Green': [['(Z)-3-Hexenal', '(Z)-3-Hexenol'], 'fruitReference'],
     'Green/Vegetative|Herbaceous': [['Linalool', '1,8-Cineole'], 'spiceReference'],
     'Green/Vegetative|Vegetal': [['(Z)-3-Hexenal', 'Dimethyl sulfide'], 'fruitReference'],
+    'Sour/Fermented|Clean Acidity': [['Citric acid', 'Malic acid'], 'fruitReference'],
+    'Sour/Fermented|Sour': [['Acetic acid', 'Ethyl acetate'], 'fruitReference'],
+    'Sour/Fermented|Fermented': [['Ethyl acetate', 'Diacetyl', 'Lactic acid'], 'fruitReference'],
+    'Sour/Fermented|Aged/Funky': [['Geosmin', '2-Methylisoborneol'], 'mouldy'],
     'Other|Woody': [['α-Pinene', '1,8-Cineole'], 'floralReference']
   };
 
