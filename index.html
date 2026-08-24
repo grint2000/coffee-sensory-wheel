@@ -1412,6 +1412,7 @@
   </div>
 </div>
 
+<script src="flavor-evidence.js"></script>
 <script>
 /* === 1단계: 기본 데이터 구조 및 상수 정의 === */
 
@@ -3104,6 +3105,7 @@ function renderFlavorPhase(force = false) {
           <input type="checkbox" class="flavorSelectBox" data-key="${key}" ${checked}>
           <span class="checkbox-custom"></span>
           ${displayName}
+          <button type="button" class="flavor-evidence-trigger" data-evidence-key="${key}" aria-label="${displayName} 향미분자 근거 보기" title="길게 누르거나 이 버튼을 눌러 분자 근거 보기"><i class="fas fa-flask" aria-hidden="true"></i></button>
         </label>
       `;
     }
@@ -3191,6 +3193,7 @@ function renderFlavorPhase(force = false) {
             <input type="checkbox" class="flavorSelectBox" data-key="${id}" ${checked}>
             <span class="checkbox-custom"></span>
             ${displayName}
+            <button type="button" class="flavor-evidence-trigger" data-evidence-key="${id}" aria-label="${displayName} 향미분자 근거 보기" title="길게 누르거나 이 버튼을 눌러 분자 근거 보기"><i class="fas fa-flask" aria-hidden="true"></i></button>
           </label>
         `;
       });
@@ -3205,6 +3208,8 @@ function renderFlavorPhase(force = false) {
   });
   
   outer.innerHTML = html;
+
+  bindFlavorEvidenceTriggers(outer);
 
   outer.querySelectorAll('.flavor-category-tab').forEach(tab => {
     tab.addEventListener('click', () => {
@@ -3350,6 +3355,88 @@ if (basicMatch || initialMatch) {
     };
   });
 }
+
+function formatEvidenceRanks(title, items) {
+  if (!items || !items.length) {
+    return `<section class="flavor-evidence-rank"><h4>${title}</h4><p class="flavor-evidence-empty">확인된 분자 없음</p></section>`;
+  }
+  return `<section class="flavor-evidence-rank"><h4>${title}</h4><ul>${items.map(item => {
+    const citations = [...new Set((item.sources || []).map(id => window.FLAVOR_EVIDENCE_SOURCES?.[id]?.short).filter(Boolean))];
+    return `<li><strong>${escapeHtml(item.name)}</strong><span>${escapeHtml(item.reason || '')}</span>${citations.length ? `<small>${escapeHtml(citations.join(' · '))}</small>` : ''}</li>`;
+  }).join('')}</ul></section>`;
+}
+
+function ensureFlavorEvidenceModal() {
+  let modal = document.getElementById('flavorEvidenceModal');
+  if (modal) return modal;
+  const style = document.createElement('style');
+  style.textContent = `
+    .flavor-evidence-trigger{display:inline-flex;align-items:center;justify-content:center;width:19px;height:19px;margin-left:5px;border:1px solid currentColor;border-radius:50%;background:rgba(255,255,255,.36);color:inherit;font-size:11px;line-height:1;vertical-align:middle;cursor:pointer}
+    .flavor-evidence-trigger:focus-visible{outline:2px solid #1f2937;outline-offset:2px}
+    .flavor-evidence-modal{position:fixed;inset:0;z-index:10000;display:none;align-items:flex-end;justify-content:center;background:rgba(17,24,39,.52);padding:16px}
+    .flavor-evidence-modal.is-open{display:flex}.flavor-evidence-panel{width:min(760px,100%);max-height:min(82vh,780px);overflow:auto;background:#fff;border-radius:16px 16px 12px 12px;box-shadow:0 18px 60px rgba(0,0,0,.28);padding:22px;color:#1f2937}
+    .flavor-evidence-head{display:flex;gap:14px;align-items:flex-start;justify-content:space-between;border-bottom:1px solid #e5e7eb;padding-bottom:12px}.flavor-evidence-head h3{margin:0;font-size:18px;font-weight:800}.flavor-evidence-close{width:36px;height:36px;border:0;border-radius:8px;background:#f3f4f6;color:#374151;font-size:24px;line-height:1;cursor:pointer}.flavor-evidence-note{margin:14px 0;color:#4b5563;font-size:13px;line-height:1.55}.flavor-evidence-legend{margin:0 0 12px;padding:10px 12px;border-radius:8px;background:#fffbeb;color:#92400e;font-size:12px;line-height:1.5}.flavor-evidence-rank{margin-top:12px;border:1px solid #e5e7eb;border-radius:10px;padding:12px}.flavor-evidence-rank h4{margin:0 0 8px;font-size:14px}.flavor-evidence-rank ul{margin:0;padding:0;list-style:none}.flavor-evidence-rank li+li{border-top:1px solid #f1f5f9;margin-top:10px;padding-top:10px}.flavor-evidence-rank strong{display:block;font-size:13px}.flavor-evidence-rank span,.flavor-evidence-rank small{display:block;margin-top:3px;font-size:12px;line-height:1.45}.flavor-evidence-rank span{color:#4b5563}.flavor-evidence-rank small{color:#9a3412}.flavor-evidence-empty{margin:0;color:#6b7280;font-size:13px}@media(min-width:700px){.flavor-evidence-modal{align-items:center}.flavor-evidence-panel{border-radius:16px}}
+  `;
+  document.head.appendChild(style);
+  modal = document.createElement('div');
+  modal.id = 'flavorEvidenceModal';
+  modal.className = 'flavor-evidence-modal';
+  modal.setAttribute('role', 'dialog');
+  modal.setAttribute('aria-modal', 'true');
+  modal.addEventListener('click', event => { if (event.target === modal) closeFlavorEvidenceModal(); });
+  document.body.appendChild(modal);
+  return modal;
+}
+
+function closeFlavorEvidenceModal() {
+  document.getElementById('flavorEvidenceModal')?.classList.remove('is-open');
+}
+
+function openFlavorEvidenceModal(key) {
+  const rec = FLAVOR_DATA.find(f => `${f[0]}|${f[1]}|${f[2]}` === key);
+  if (!rec || typeof window.getFlavorEvidence !== 'function') return;
+  const evidence = window.getFlavorEvidence(key);
+  const label = currentLanguage === 'ko' ? (rec[6] || rec[2]) : rec[2];
+  const modal = ensureFlavorEvidenceModal();
+  modal.innerHTML = `<article class="flavor-evidence-panel" aria-labelledby="flavorEvidenceTitle"><div class="flavor-evidence-head"><div><h3 id="flavorEvidenceTitle">${escapeHtml(label)} · 향미분자 근거</h3><p class="text-xs text-gray-500 mt-1">${escapeHtml(rec[0])} › ${escapeHtml(rec[1])} › ${escapeHtml(rec[2])}</p></div><button type="button" class="flavor-evidence-close" aria-label="닫기">×</button></div><p class="flavor-evidence-legend">1순위: 커피 향기활성·핵심 기여 근거 / 2순위: 커피 검출 또는 감각 상관 근거 / 3순위: 레퍼런스 식품 근거만 존재</p><p class="flavor-evidence-note">${escapeHtml(evidence.note || '')}</p>${formatEvidenceRanks('1순위 · 커피 핵심 기여', evidence.primary)}${formatEvidenceRanks('2순위 · 커피 보조 근거', evidence.secondary)}${formatEvidenceRanks('3순위 · 레퍼런스 식품 근거', evidence.tertiary)}</article>`;
+  modal.querySelector('.flavor-evidence-close').addEventListener('click', closeFlavorEvidenceModal);
+  modal.classList.add('is-open');
+  modal.querySelector('.flavor-evidence-close').focus();
+}
+
+function bindFlavorEvidenceTriggers(outer) {
+  outer.querySelectorAll('.flavor-evidence-trigger').forEach(trigger => {
+    trigger.addEventListener('click', event => {
+      event.preventDefault();
+      event.stopPropagation();
+      openFlavorEvidenceModal(trigger.dataset.evidenceKey);
+    });
+  });
+  outer.querySelectorAll('.flavor-checkbox-label').forEach(label => {
+    let timer = null;
+    let longPressed = false;
+    const clearPress = () => { if (timer) clearTimeout(timer); timer = null; };
+    label.addEventListener('pointerdown', event => {
+      if (event.target.closest('.flavor-evidence-trigger')) return;
+      longPressed = false;
+      timer = setTimeout(() => {
+        longPressed = true;
+        const key = label.querySelector('.flavorSelectBox')?.dataset.key;
+        if (key) openFlavorEvidenceModal(key);
+      }, 600);
+    });
+    label.addEventListener('pointerup', clearPress);
+    label.addEventListener('pointercancel', clearPress);
+    label.addEventListener('pointerleave', clearPress);
+    label.addEventListener('click', event => {
+      if (!longPressed) return;
+      event.preventDefault();
+      event.stopPropagation();
+      longPressed = false;
+    }, true);
+  });
+}
+
 
 // 향미 특성/속성 실시간 반영 개선 (바디감 디스크립터 포함)
 function buildFlavorSummaryHtml(sampleData) {
