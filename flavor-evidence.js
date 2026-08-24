@@ -48,6 +48,26 @@
     mouldy: {
       short: 'Cantergiani et al., Eur. Food Res. Technol. 2001; 212:648–657',
       url: 'https://doi.org/10.1007/s002170100305'
+    },
+    fruitReference: {
+      short: 'El Hadi et al., Advances in Fruit Aroma Volatile Research, 2013',
+      url: 'https://pmc.ncbi.nlm.nih.gov/articles/PMC6270112/'
+    },
+    floralReference: {
+      short: 'Mostafa et al., Frontiers in Plant Science 2022; 13:860157',
+      url: 'https://doi.org/10.3389/fpls.2022.860157'
+    },
+    spiceReference: {
+      short: 'Molecules 2022; 27:6403, Spices Volatilomic Fingerprinting',
+      url: 'https://doi.org/10.3390/molecules27196403'
+    },
+    teaReference: {
+      short: 'Guo et al., Recent Advances in Volatiles of Teas, 2018',
+      url: 'https://pmc.ncbi.nlm.nih.gov/articles/PMC6273888/'
+    },
+    teaKeyOdorants: {
+      short: 'Foods 2025, Identification of Key Flavor Compounds in Tea',
+      url: 'https://doi.org/10.1007/s44187-025-00545-w'
     }
   };
 
@@ -133,8 +153,140 @@
     Kumquat: ['Limonene'], Citron: ['Limonene', 'Citral (neral + geranial)'], 'Blood Orange': ['Limonene', 'Linalool'], Pomelo: ['Nootkatone', 'Linalool'], 'Key Lime': ['Limonene', 'Citral (neral + geranial)']
   };
 
-  function foodReference(names) {
-    return names.map(name => rank(name, '레퍼런스 식품의 대표 향기 성분. 커피에서 이 세부 노트의 직접 원인으로 입증된 것은 아닙니다.', [], 3));
+  // Tier 3 mapping is intentionally a reference-food library. It never claims
+  // that the listed molecule is the direct cause of the same note in coffee.
+  const REFERENCE_BY_NOTE = {
+    'Fruity|Other Fruit|Apple': [['Hexyl acetate', 'Butyl acetate'], 'fruitReference'],
+    'Fruity|Other Fruit|Green Apple': [['Hexyl acetate', '(E)-2-Hexenal'], 'fruitReference'],
+    'Fruity|Other Fruit|Red Apple': [['Hexyl acetate', '2-Methylbutyl acetate'], 'fruitReference'],
+    'Fruity|Other Fruit|Pear': [['Ethyl (2E,4Z)-deca-2,4-dienoate', 'Hexyl acetate'], 'fruitReference'],
+    'Fruity|Other Fruit|Asian Pear': [['Ethyl (2E,4Z)-deca-2,4-dienoate', 'Hexyl acetate'], 'fruitReference'],
+    'Fruity|Other Fruit|Grape': [['Linalool', 'Geraniol'], 'fruitReference'],
+    'Fruity|Other Fruit|White Grape': [['Linalool', 'Geraniol'], 'fruitReference'],
+    'Fruity|Other Fruit|Red Grape': [['Linalool', '(E)-β-Damascenone'], 'fruitReference'],
+    'Fruity|Other Fruit|Melon': [['(Z)-6-Nonenal', '(E,Z)-2,6-Nonadienal'], 'fruitReference'],
+    'Fruity|Other Fruit|Cantaloupe': [['(Z)-6-Nonenal', '(E,Z)-2,6-Nonadienal'], 'fruitReference'],
+    'Fruity|Other Fruit|Honeydew': [['(Z)-6-Nonenal', '(E,Z)-2,6-Nonadienal'], 'fruitReference'],
+    'Fruity|Other Fruit|Watermelon': [['(Z)-3-Nonenal', '(E,Z)-2,6-Nonadienal'], 'fruitReference'],
+    'Fruity|Berry|Strawberry': [['4-Hydroxy-2,5-dimethyl-3(2H)-furanone (furaneol)', 'Methyl butyrate'], 'fruitReference'],
+    'Fruity|Berry|Wild Strawberry': [['4-Hydroxy-2,5-dimethyl-3(2H)-furanone (furaneol)', 'Methyl butyrate'], 'fruitReference'],
+    'Fruity|Berry|Raspberry': [['4-(4-Hydroxyphenyl)-2-butanone (raspberry ketone)', 'α-Ionone'], 'fruitReference'],
+    'Fruity|Berry|Black Currant': [['4-Mercapto-4-methylpentan-2-one', '3-Mercaptohexanol'], 'fruitReference'],
+    'Fruity|Stone Fruit|Peach': [['γ-Decalactone', 'γ-Dodecalactone'], 'fruitReference'],
+    'Fruity|Stone Fruit|White Peach': [['γ-Decalactone', 'γ-Dodecalactone'], 'fruitReference'],
+    'Fruity|Stone Fruit|Yellow Peach': [['γ-Decalactone', 'γ-Dodecalactone'], 'fruitReference'],
+    'Fruity|Stone Fruit|Nectarine': [['γ-Decalactone', 'γ-Dodecalactone'], 'fruitReference'],
+    'Fruity|Stone Fruit|Apricot': [['γ-Decalactone', 'β-Ionone'], 'fruitReference'],
+    'Fruity|Stone Fruit|Cherry': [['Benzaldehyde', '(E)-2-Hexenal'], 'fruitReference'],
+    'Fruity|Stone Fruit|Plum': [['γ-Decalactone', 'Linalool'], 'fruitReference'],
+    'Fruity|Tropical Fruit|Pineapple': [['Ethyl butyrate', 'Methyl butyrate', 'Ethyl hexanoate'], 'fruitReference'],
+    'Fruity|Tropical Fruit|Fresh Pineapple': [['Ethyl butyrate', 'Methyl butyrate', 'Ethyl hexanoate'], 'fruitReference'],
+    'Fruity|Tropical Fruit|Grilled Pineapple': [['Ethyl butyrate', 'Furaneol'], 'fruitReference'],
+    'Fruity|Tropical Fruit|Coconut': [['δ-Decalactone', 'γ-Nonalactone'], 'fruitReference'],
+    'Fruity|Tropical Fruit|Young Coconut': [['δ-Decalactone', 'γ-Nonalactone'], 'fruitReference'],
+    'Fruity|Tropical Fruit|Passion Fruit': [['Ethyl butyrate', '3-Mercaptohexyl acetate'], 'fruitReference'],
+    'Fruity|Tropical Fruit|Banana': [['3-Methylbutyl acetate (isoamyl acetate)', 'Butyl acetate'], 'fruitReference'],
+    'Fruity|Tropical Fruit|Ripe Banana': [['3-Methylbutyl acetate (isoamyl acetate)', 'Butyl acetate'], 'fruitReference'],
+    'Fruity|Tropical Fruit|Mango': [['δ-3-Carene', 'Myrcene'], 'fruitReference'],
+    'Fruity|Tropical Fruit|Lychee': [['Linalool', 'Rose oxide'], 'fruitReference'],
+    'Fruity|Tropical Fruit|Papaya': [['Linalool', 'Benzyl isothiocyanate'], 'fruitReference'],
+    'Fruity|Tropical Fruit|Durian': [['Ethanethiol', 'Diethyl disulfide'], 'fruitReference'],
+    'Sweet|Vanilla|Vanilla': [['Vanillin', 'p-Hydroxybenzaldehyde'], 'spiceReference'],
+    'Sweet|Vanilla|Vanilla Bean': [['Vanillin', 'p-Hydroxybenzaldehyde'], 'spiceReference'],
+    'Sweet|Molasses|Maple Syrup': [['Sotolon', 'Vanillin'], 'fruitReference'],
+    'Sweet|Molasses|Molasses': [['Furaneol', 'Maltol'], 'fruitReference'],
+    'Sweet|Caramelized|Butterscotch': [['Diacetyl', 'Furaneol'], 'fruitReference'],
+    'Sweet|Vanilla|Cream': [['Diacetyl', 'δ-Decalactone'], 'fruitReference'],
+    'Floral|White Flowers|Jasmine': [['Benzyl acetate', 'Linalool', 'Indole'], 'floralReference'],
+    'Floral|White Flowers|Orange Blossom': [['Linalool', 'Methyl anthranilate', 'Indole'], 'floralReference'],
+    'Floral|White Flowers|Gardenia': [['Linalool', 'Methyl benzoate'], 'floralReference'],
+    'Floral|Colored Flowers|Rose': [['2-Phenylethanol', 'Citronellol', 'Geraniol'], 'floralReference'],
+    'Floral|Colored Flowers|Red Rose': [['2-Phenylethanol', 'Citronellol', 'Geraniol'], 'floralReference'],
+    'Floral|Colored Flowers|Pink Rose': [['2-Phenylethanol', 'Citronellol', 'Geraniol'], 'floralReference'],
+    'Floral|Colored Flowers|Lavender': [['Linalool', 'Linalyl acetate'], 'floralReference'],
+    'Floral|Colored Flowers|Violet': [['β-Ionone', 'α-Ionone'], 'floralReference'],
+    'Floral|Colored Flowers|Geranium': [['Citronellol', 'Geraniol'], 'floralReference'],
+    'Floral|Herbal Flowers|Chamomile': [['α-Bisabolol', 'Chamazulene'], 'floralReference'],
+    'Floral|Herbal Flowers|Osmanthus': [['β-Ionone', 'Dihydro-β-ionone'], 'floralReference'],
+    'Spices|Warm Spices|Cinnamon': [['(E)-Cinnamaldehyde', 'Eugenol'], 'spiceReference'],
+    'Spices|Warm Spices|Ceylon Cinnamon': [['(E)-Cinnamaldehyde', 'Eugenol'], 'spiceReference'],
+    'Spices|Warm Spices|Cassia': [['(E)-Cinnamaldehyde', 'Coumarin'], 'spiceReference'],
+    'Spices|Warm Spices|Clove': [['Eugenol', 'Eugenyl acetate'], 'spiceReference'],
+    'Spices|Warm Spices|Cardamom': [['α-Terpinyl acetate', '1,8-Cineole'], 'spiceReference'],
+    'Spices|Warm Spices|Nutmeg': [['Sabinene', 'Myristicin'], 'spiceReference'],
+    'Spices|Warm Spices|Mace': [['Sabinene', 'Myristicin'], 'spiceReference'],
+    'Spices|Hot Spices|Black Pepper': [['Rotundone', 'β-Caryophyllene'], 'spiceReference'],
+    'Spices|Aromatic Spices|Ginger': [['Zingiberene', 'Citral'], 'spiceReference'],
+    'Spices|Aromatic Spices|Star Anise': [['(E)-Anethole'], 'spiceReference'],
+    'Spices|Aromatic Spices|Anise': [['(E)-Anethole'], 'spiceReference'],
+    'Spices|Aromatic Spices|Fennel': [['(E)-Anethole', 'Fenchone'], 'spiceReference'],
+    'Spices|Aromatic Spices|Cumin': [['Cuminaldehyde', 'p-Cymene'], 'spiceReference'],
+    'Spices|Aromatic Spices|Coriander Seed': [['Linalool', 'α-Pinene'], 'spiceReference'],
+    'Spices|Aromatic Spices|Turmeric': [['ar-Turmerone', 'α-Turmerone'], 'spiceReference'],
+    'Spices|Aromatic Spices|Saffron': [['Safranal'], 'spiceReference'],
+    'Spices|Aromatic Spices|Juniper Berries': [['α-Pinene', 'Sabinene'], 'spiceReference'],
+    'Spices|Aromatic Spices|Fenugreek': [['Sotolon'], 'spiceReference'],
+    'Tea|Black Tea|Earl Grey': [['Linalyl acetate', 'Linalool'], 'teaReference'],
+    'Tea|Green Tea|Matcha': [['Linalool', 'Geraniol', 'Indole'], 'teaKeyOdorants'],
+    'Tea|Green Tea|Sencha': [['Linalool', 'Geraniol', 'Indole'], 'teaKeyOdorants'],
+    'Tea|Oolong|Oolong': [['Linalool', 'Geraniol', 'Nerolidol'], 'teaReference'],
+    'Tea|Herbal Tea|Peppermint': [['Menthol', 'Menthone'], 'spiceReference'],
+    'Tea|Herbal Tea|Lemongrass': [['Citral (neral + geranial)', 'Myrcene'], 'spiceReference'],
+    'Cereal/Grain|Baked|Toast': [['2-Acetyl-1-pyrroline', '2-Furfurylthiol'], 'spiceReference'],
+    'Cereal/Grain|Baked|Brioche': [['2-Acetyl-1-pyrroline', 'Diacetyl'], 'spiceReference'],
+    'Green/Vegetative|Fresh Green|Grass': [['(Z)-3-Hexenal', '(Z)-3-Hexenol'], 'fruitReference'],
+    'Green/Vegetative|Fresh Green|Fresh Cut Grass': [['(Z)-3-Hexenal', '(Z)-3-Hexenol'], 'fruitReference'],
+    'Green/Vegetative|Herbaceous|Mint': [['Menthol', 'Menthone'], 'spiceReference'],
+    'Green/Vegetative|Herbaceous|Spearmint': [['(−)-Carvone', 'Limonene'], 'spiceReference'],
+    'Green/Vegetative|Herbaceous|Peppermint': [['Menthol', 'Menthone'], 'spiceReference'],
+    'Green/Vegetative|Herbaceous|Basil': [['Linalool', 'Estragole'], 'spiceReference'],
+    'Green/Vegetative|Herbaceous|Rosemary': [['1,8-Cineole', 'α-Pinene'], 'spiceReference'],
+    'Green/Vegetative|Herbaceous|Thyme': [['Thymol', 'p-Cymene'], 'spiceReference'],
+    'Green/Vegetative|Herbaceous|Oregano': [['Carvacrol', 'Thymol'], 'spiceReference'],
+    'Other|Woody|Oak': [['cis-Whisky lactone', 'trans-Whisky lactone', 'Eugenol'], 'spiceReference'],
+    'Other|Woody|Cedar': [['Cedrol', 'Thujopsene'], 'floralReference'],
+    'Other|Woody|Pine': [['α-Pinene', 'β-Pinene'], 'floralReference'],
+    'Other|Woody|Sandalwood': [['α-Santalol', 'β-Santalol'], 'floralReference'],
+    'Other|Woody|Eucalyptus': [['1,8-Cineole'], 'floralReference']
+  };
+
+  const REFERENCE_BY_GROUP = {
+    'Fruity|Other Fruit': [['Ethyl butyrate', 'Hexyl acetate'], 'fruitReference'],
+    'Fruity|Berry': [['Linalool', 'β-Ionone'], 'fruitReference'],
+    'Fruity|Stone Fruit': [['γ-Decalactone', 'β-Ionone'], 'fruitReference'],
+    'Fruity|Tropical Fruit': [['Ethyl butyrate', 'Ethyl hexanoate'], 'fruitReference'],
+    'Fruity|Dried Fruit': [['Furaneol', 'Sotolon'], 'fruitReference'],
+    'Sweet|Brown Sugar': [['Furaneol', 'Maltol'], 'fruitReference'],
+    'Sweet|Caramelized': [['Furaneol', 'Sotolon'], 'fruitReference'],
+    'Sweet|Vanilla': [['Vanillin', 'Diacetyl'], 'spiceReference'],
+    'Sweet|Molasses': [['Sotolon', 'Furaneol'], 'fruitReference'],
+    'Sweet|Confectionery': [['Vanillin', 'Furaneol'], 'fruitReference'],
+    'Floral|White Flowers': [['Linalool', 'Benzyl acetate'], 'floralReference'],
+    'Floral|Colored Flowers': [['Linalool', 'Geraniol', 'β-Ionone'], 'floralReference'],
+    'Floral|Herbal Flowers': [['Linalool', 'Benzyl acetate'], 'floralReference'],
+    'Tea|Black Tea': [['Linalool', '(E)-β-Damascenone', 'Benzyl alcohol'], 'teaReference'],
+    'Tea|Green Tea': [['Linalool', 'Geraniol', 'Indole'], 'teaKeyOdorants'],
+    'Tea|Oolong': [['Linalool', 'Geraniol', 'Nerolidol'], 'teaReference'],
+    'Tea|White Tea': [['Linalool', 'Benzyl alcohol'], 'teaReference'],
+    'Tea|Herbal Tea': [['Linalool', '1,8-Cineole'], 'spiceReference'],
+    'Cereal/Grain|Baked': [['2-Acetyl-1-pyrroline', '2-Furfurylthiol'], 'spiceReference'],
+    'Cereal/Grain|Malted': [['Maltol', '2-Acetyl-1-pyrroline'], 'spiceReference'],
+    'Cereal/Grain|Raw Grains': [['(Z)-3-Hexanal', '2-Acetyl-1-pyrroline'], 'fruitReference'],
+    'Green/Vegetative|Fresh Green': [['(Z)-3-Hexenal', '(Z)-3-Hexenol'], 'fruitReference'],
+    'Green/Vegetative|Herbaceous': [['Linalool', '1,8-Cineole'], 'spiceReference'],
+    'Green/Vegetative|Vegetal': [['(Z)-3-Hexenal', 'Dimethyl sulfide'], 'fruitReference'],
+    'Other|Woody': [['α-Pinene', '1,8-Cineole'], 'floralReference']
+  };
+
+  function foodReference(names, sources = []) {
+    return names.map(name => rank(name, '레퍼런스 식품 문헌의 대표 휘발성 성분입니다. 커피에서 이 세부 노트의 직접 원인으로 입증된 것은 아닙니다.', sources, 3));
+  }
+
+  function referenceFoodForKey(key, fallback = []) {
+    const [tier1, tier2] = String(key || '').split('|');
+    const entry = REFERENCE_BY_NOTE[key] || REFERENCE_BY_GROUP[`${tier1}|${tier2}`];
+    if (!entry) return foodReference(fallback);
+    return foodReference(entry[0], [entry[1]]);
   }
 
   function getFlavorEvidence(key) {
@@ -148,7 +300,7 @@
         '2025년 Panama Geisha 연구는 citrus/bergamot 감각 특성과 terpene 사이의 선형 인과를 확정하지 못했습니다. 따라서 아래 과일 기준 분자는 3순위 레퍼런스용이며 커피의 직접 원인으로 표기하지 않습니다.',
         [],
         [rank('Linalool', '커피에서 검출되며 floral/bergamot 관련 차이가 보고됐으나, 이 세부 감귤 노트의 직접 원인으로 확정되지 않았습니다.', ['geisha'], 2), rank('Geraniol', '커피에서 검출되며 floral/bergamot 관련 차이가 보고됐으나, 이 세부 감귤 노트의 직접 원인으로 확정되지 않았습니다.', ['geisha'], 2)],
-        foodReference(ref)
+        referenceFoodForKey(key, ref)
       );
     }
 
@@ -157,7 +309,8 @@
         'limited-coffee-evidence',
         '세부 과일명은 인간의 연상 레퍼런스입니다. 커피에서 해당 과일을 단일 분자로 재현했다는 직접 증거는 확인되지 않았습니다.',
         [],
-        [rank('(E)-β-Damascenone', 'potent fruity/honey-like odorant identified in roasted coffee', ['coffeePotentOdorants', 'espressoReview'], 2), rank('Phenylacetaldehyde', 'floral/honey-like aroma-active compound reported in coffee studies', ['espressoReview'], 2)]
+        [rank('(E)-β-Damascenone', 'potent fruity/honey-like odorant identified in roasted coffee', ['coffeePotentOdorants', 'espressoReview'], 2), rank('Phenylacetaldehyde', 'floral/honey-like aroma-active compound reported in coffee studies', ['espressoReview'], 2)],
+        referenceFoodForKey(key)
       );
     }
 
@@ -166,7 +319,8 @@
         'limited-coffee-evidence',
         '꽃의 종(자스민·장미 등)을 단일 커피분자로 특정할 수 없습니다. 커피에서 확인된 floral 계열 후보만 2순위로 표시합니다.',
         [],
-        [rank('Linalool', 'reported in coffee and associated with floral/bergamot differences, not a single-flower proof', ['geisha', 'espressoReview'], 2), rank('Geraniol', 'reported in coffee and associated with floral/bergamot differences, not a single-flower proof', ['geisha'], 2), rank('Phenylacetaldehyde', 'floral/honey-like aroma-active compound reported in coffee studies', ['espressoReview'], 2)]
+        [rank('Linalool', 'reported in coffee and associated with floral/bergamot differences, not a single-flower proof', ['geisha', 'espressoReview'], 2), rank('Geraniol', 'reported in coffee and associated with floral/bergamot differences, not a single-flower proof', ['geisha'], 2), rank('Phenylacetaldehyde', 'floral/honey-like aroma-active compound reported in coffee studies', ['espressoReview'], 2)],
+        referenceFoodForKey(key)
       );
     }
 
@@ -175,7 +329,8 @@
         'limited-coffee-evidence',
         '설탕·꿀·바닐라·제과명은 단일 향미분자가 아닌 복합 레퍼런스입니다. 커피에서 확인된 sweet/caramel 계열 성분만 보조 근거로 표시합니다.',
         [],
-        [rank('4-Hydroxy-2,5-dimethyl-3(2H)-furanone (furaneol)', 'sweet/caramel-like key odorant in coffee; this does not establish a specific confectionery note', ['coffeeKeyOdorants', 'coffeePotentOdorants'], 2), rank('Vanillin', 'reported as a potent coffee odorant; it does not establish “vanilla bean” as a single-note cause', ['coffeePotentOdorants', 'espressoReview'], 2)]
+        [rank('4-Hydroxy-2,5-dimethyl-3(2H)-furanone (furaneol)', 'sweet/caramel-like key odorant in coffee; this does not establish a specific confectionery note', ['coffeeKeyOdorants', 'coffeePotentOdorants'], 2), rank('Vanillin', 'reported as a potent coffee odorant; it does not establish “vanilla bean” as a single-note cause', ['coffeePotentOdorants', 'espressoReview'], 2)],
+        referenceFoodForKey(key)
       );
     }
 
@@ -184,7 +339,8 @@
         'key-coffee-evidence',
         '견과·코코아는 단일 식품 종이 아니라 로스팅 유래 pyrazine·furanone 등의 복합 지각입니다. 특정 견과종까지의 직접 인과는 입증되지 않았습니다.',
         [rank('2-Ethyl-3,5-dimethylpyrazine', 'potent nutty/roasty coffee odorant', ['coffeePotentOdorants', 'espressoReview'], 1), rank('2,3-Diethyl-5-methylpyrazine', 'potent nutty/roasty coffee odorant', ['coffeePotentOdorants'], 1)],
-        [rank('4-Hydroxy-2,5-dimethyl-3(2H)-furanone (furaneol)', 'sweet/caramel-like coffee key odorant that can support cocoa-like impressions', ['coffeeKeyOdorants'], 2)]
+        [rank('4-Hydroxy-2,5-dimethyl-3(2H)-furanone (furaneol)', 'sweet/caramel-like coffee key odorant that can support cocoa-like impressions', ['coffeeKeyOdorants'], 2)],
+        referenceFoodForKey(key)
       );
     }
 
@@ -193,7 +349,8 @@
         'key-coffee-evidence',
         '향신료 종명은 레퍼런스입니다. 커피에서 직접 확인된 것은 phenolic/spicy 계열의 향기활성 성분입니다.',
         [rank('Guaiacol', 'potent phenolic/spicy coffee odorant', ['coffeeKeyOdorants', 'espressoReview'], 1), rank('4-Vinylguaiacol', 'potent spicy/phenolic coffee odorant', ['coffeePotentOdorants', 'espressoReview'], 1)],
-        [rank('4-Ethylguaiacol', 'roasted phenolic coffee odorant', ['espressoReview'], 2)]
+        [rank('4-Ethylguaiacol', 'roasted phenolic coffee odorant', ['espressoReview'], 2)],
+        referenceFoodForKey(key)
       );
     }
 
@@ -202,7 +359,8 @@
         'key-coffee-evidence',
         '곡물·토스트는 Maillard/로스팅 향의 복합 지각입니다. 브랜드·제품명까지의 분자 대응은 과학적으로 확정할 수 없습니다.',
         [rank('2-Ethyl-3,5-dimethylpyrazine', 'potent roasty/nutty coffee odorant', ['coffeePotentOdorants', 'espressoReview'], 1), rank('2-Furfurylthiol', 'key roasty coffee odorant', ['coffeePotentOdorants'], 1)],
-        [rank('4-Hydroxy-2,5-dimethyl-3(2H)-furanone (furaneol)', 'sweet/caramel-like coffee odorant', ['coffeeKeyOdorants'], 2)]
+        [rank('4-Hydroxy-2,5-dimethyl-3(2H)-furanone (furaneol)', 'sweet/caramel-like coffee odorant', ['coffeeKeyOdorants'], 2)],
+        referenceFoodForKey(key)
       );
     }
 
@@ -211,7 +369,8 @@
         'key-coffee-evidence',
         '로스팅 명칭은 배전도·공정 표현이며 단일 향미분자가 아닙니다. 아래는 로스팅 커피의 핵심 향기활성 성분입니다.',
         [rank('2-Furfurylthiol', 'key roasty/sulfurous coffee odorant', ['coffeePotentOdorants', 'espressoReview'], 1), rank('3-Mercapto-3-methylbutyl formate', 'potent roasty coffee odorant', ['coffeePotentOdorants', 'coffeeModel'], 1)],
-        [rank('Guaiacol', 'potent phenolic roasted-coffee odorant', ['coffeeKeyOdorants'], 2), rank('4-Vinylguaiacol', 'roasted phenolic coffee odorant', ['coffeePotentOdorants'], 2)]
+        [rank('Guaiacol', 'potent phenolic roasted-coffee odorant', ['coffeeKeyOdorants'], 2), rank('4-Vinylguaiacol', 'roasted phenolic coffee odorant', ['coffeePotentOdorants'], 2)],
+        referenceFoodForKey(key)
       );
     }
 
@@ -220,7 +379,8 @@
         'key-coffee-evidence',
         'green/pea-like 커피 향에는 methoxypyrazine류가 강하게 기여할 수 있습니다. 특정 허브·채소 종명의 직접 인과는 확인되지 않았습니다.',
         [rank('3-Isobutyl-2-methoxypyrazine (IBMP)', 'potent pea-like/green coffee odorant', ['rawCoffee', 'espressoReview'], 1)],
-        [rank('2-Isopropyl-3-methoxypyrazine (IPMP)', 'green/potato-like methoxypyrazine associated with defective coffee', ['potato'], 2)]
+        [rank('2-Isopropyl-3-methoxypyrazine (IPMP)', 'green/potato-like methoxypyrazine associated with defective coffee', ['potato'], 2)],
+        referenceFoodForKey(key)
       );
     }
 
@@ -229,7 +389,8 @@
         'limited-coffee-evidence',
         '이 항목은 향기분자가 아니라 산미를 만드는 유기·무기산입니다. Tartaric acid는 이 기준 연구의 5개 정량 대상에 포함되지 않았으므로 직접 근거 부족으로 표시합니다.',
         [],
-        [rank('Citric / malic / acetic / lactic / phosphoric acid', '각 산은 brewed coffee에서 정량됐으나, 특정 레퍼런스의 산미를 단독으로 결정하지는 않습니다.', ['acids'], 2)]
+        [rank('Citric / malic / acetic / lactic / phosphoric acid', '각 산은 brewed coffee에서 정량됐으나, 특정 레퍼런스의 산미를 단독으로 결정하지는 않습니다.', ['acids'], 2)],
+        referenceFoodForKey(key)
       );
     }
 
@@ -238,7 +399,8 @@
         'limited-coffee-evidence',
         '발효 식품·주류명은 다성분 레퍼런스입니다. 커피에서 해당 제품과 동일한 분자 조합이 증명된 것은 아닙니다.',
         [],
-        [rank('Acetic acid', 'quantified in brewed coffee; roast-dependent concentration change', ['acids'], 2), rank('Ethyl 2-methylbutyrate / ethyl 3-methylbutyrate', 'reported as fermentation-associated coffee volatiles; not a specific wine/beer proof', ['espressoReview'], 2)]
+        [rank('Acetic acid', 'quantified in brewed coffee; roast-dependent concentration change', ['acids'], 2), rank('Ethyl 2-methylbutyrate / ethyl 3-methylbutyrate', 'reported as fermentation-associated coffee volatiles; not a specific wine/beer proof', ['espressoReview'], 2)],
+        referenceFoodForKey(key)
       );
     }
 
@@ -247,7 +409,8 @@
         'reference-only',
         '차의 종류·블렌드는 다성분 레퍼런스입니다. 해당 차의 향기분자를 커피의 직접 원인으로 이식하지 않습니다.',
         [],
-        [rank('Linalool / phenylacetaldehyde / (E)-β-damascenone', '차에서도 중요할 수 있는 향기물질이나, 이 차 노트의 커피 직접 근거는 아닙니다.', ['geisha', 'espressoReview'], 2)]
+        [rank('Linalool / phenylacetaldehyde / (E)-β-damascenone', '차에서도 중요할 수 있는 향기물질이나, 이 차 노트의 커피 직접 근거는 아닙니다.', ['geisha', 'espressoReview'], 2)],
+        referenceFoodForKey(key)
       );
     }
 
@@ -256,7 +419,8 @@
         'key-coffee-evidence',
         'earthy/mouldy는 결점 맥락에서의 강한 과학 근거가 있습니다. 긍정적 토양·트러플 레퍼런스와 자동으로 동일시하지 않습니다.',
         [rank('Geosmin', 'principal mouldy/earthy coffee off-flavour contributor', ['mouldy'], 1), rank('2-Methylisoborneol', 'principal mouldy/earthy coffee off-flavour contributor', ['mouldy'], 1)],
-        [rank('2,4,6-Trichloroanisole', 'mouldy/earthy coffee off-flavour contributor', ['mouldy'], 2)]
+        [rank('2,4,6-Trichloroanisole', 'mouldy/earthy coffee off-flavour contributor', ['mouldy'], 2)],
+        referenceFoodForKey(key)
       );
     }
 
@@ -265,7 +429,8 @@
         'limited-coffee-evidence',
         '수종은 레퍼런스입니다. 커피에는 phenolic 계열이 woody/phenolic 인상에 기여할 수 있지만 특정 목재종을 확정하지 않습니다.',
         [],
-        [rank('Guaiacol', 'potent phenolic coffee odorant', ['coffeeKeyOdorants'], 2), rank('4-Ethylguaiacol', 'roasted phenolic coffee odorant', ['espressoReview'], 2)]
+        [rank('Guaiacol', 'potent phenolic coffee odorant', ['coffeeKeyOdorants'], 2), rank('4-Ethylguaiacol', 'roasted phenolic coffee odorant', ['espressoReview'], 2)],
+        referenceFoodForKey(key)
       );
     }
 
