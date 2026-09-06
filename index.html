@@ -3407,6 +3407,16 @@ function formatEvidenceRanks(title, items) {
   }).join('')}</ul></section>`;
 }
 
+function formatMoleculeRankingItems(items) {
+  const numberFormat = new Intl.NumberFormat('en-US', { maximumFractionDigits: 1 });
+  return `<ol class="molecule-ranking-list">${items.map(item => `<li class="molecule-ranking-item"><span class="molecule-rank-badge" aria-label="${item.rank}위">${item.rank}</span><span class="molecule-ranking-name">${escapeHtml(item.name)}</span><strong class="molecule-ranking-value">${escapeHtml(numberFormat.format(item.value))} <small>${escapeHtml(item.unit)}</small></strong></li>`).join('')}</ol>`;
+}
+
+function formatQuantitativeMoleculeRanking(ranking) {
+  const source = window.FLAVOR_EVIDENCE_SOURCES?.[ranking.source];
+  return `<p class="flavor-evidence-legend"><strong>두 순위는 서로 다른 지표입니다.</strong><br>OAV는 검출량을 후각 역치로 나눈 향기기여 지표이고, 함량은 시료에서 방출되어 측정된 양입니다.</p><div class="molecule-ranking-grid"><section class="molecule-ranking-section molecule-ranking-primary"><h4>향기기여 TOP 3 <span>OAV</span></h4>${formatMoleculeRankingItems(ranking.oav)}</section><section class="molecule-ranking-section"><h4>검출 함량 TOP 3 <span>방출 VOC</span></h4>${formatMoleculeRankingItems(ranking.abundance)}</section></div><dl class="molecule-ranking-meta"><div><dt>시료</dt><dd>${escapeHtml(ranking.sample)}</dd></div><div><dt>측정 대상</dt><dd>${escapeHtml(ranking.matrix)}</dd></div><div><dt>산정 방식</dt><dd>${escapeHtml(ranking.method)}</dd></div></dl><p class="flavor-evidence-note"><strong>적용 범위:</strong> ${escapeHtml(ranking.scope)}</p><p class="flavor-evidence-note"><strong>주의:</strong> ${escapeHtml(ranking.caveat)}</p>${source ? `<div class="molecule-ranking-source"><strong>근거 원문</strong>${formatEvidenceSource(source)}</div>` : ''}`;
+}
+
 function ensureFlavorEvidenceModal() {
   let modal = document.getElementById('flavorEvidenceModal');
   if (modal) return modal;
@@ -3417,6 +3427,13 @@ function ensureFlavorEvidenceModal() {
     .flavor-evidence-modal{position:fixed;inset:0;z-index:10000;display:none;align-items:flex-end;justify-content:center;background:rgba(17,24,39,.52);padding:16px}
     .flavor-evidence-modal.is-open{display:flex}.flavor-evidence-panel{width:min(760px,100%);max-height:min(82vh,780px);overflow:auto;background:#fff;border-radius:16px 16px 12px 12px;box-shadow:0 18px 60px rgba(0,0,0,.28);padding:22px;color:#1f2937}
     .flavor-evidence-head{display:flex;gap:14px;align-items:flex-start;justify-content:space-between;border-bottom:1px solid #e5e7eb;padding-bottom:12px}.flavor-evidence-head h3{margin:0;font-size:18px;font-weight:800}.flavor-evidence-close{width:44px;height:44px;flex:0 0 auto;border:0;border-radius:8px;background:#f3f4f6;color:#374151;font-size:24px;line-height:1;cursor:pointer}.flavor-evidence-note{margin:14px 0;color:#4b5563;font-size:13px;line-height:1.55}.flavor-evidence-legend{margin:0 0 12px;padding:10px 12px;border-radius:8px;background:#fffbeb;color:#92400e;font-size:12px;line-height:1.55}.flavor-evidence-rank{margin-top:12px;border:1px solid #e5e7eb;border-radius:10px;padding:12px}.flavor-evidence-rank h4{margin:0 0 8px;font-size:14px}.flavor-evidence-rank ul{margin:0;padding:0;list-style:none}.flavor-evidence-rank li+li{border-top:1px solid #f1f5f9;margin-top:10px;padding-top:10px}.flavor-evidence-rank strong{display:block;font-size:13px}.flavor-evidence-rank li>span,.flavor-evidence-rank small{display:block;margin-top:3px;font-size:12px;line-height:1.45}.flavor-evidence-rank li>span{color:#4b5563}.flavor-evidence-sources{margin-top:7px!important;color:#7c2d12!important}.flavor-evidence-sources>b{display:block;margin-bottom:3px}.flavor-evidence-source{display:block!important;margin-top:4px!important}.flavor-evidence-source a{color:#9a3412;text-decoration:underline;text-underline-offset:2px}.flavor-evidence-source a:hover{color:#7c2d12}.flavor-evidence-source em{display:block;color:#6b7280;font-style:normal}.flavor-evidence-empty{margin:0;color:#6b7280;font-size:13px}@media(max-width:699px){.flavor-evidence-trigger{width:44px;height:44px;margin-right:3px}.flavor-evidence-panel{padding:18px}}@media(min-width:700px){.flavor-evidence-modal{align-items:center}.flavor-evidence-panel{border-radius:16px}}
+  `;
+  style.textContent += `
+    .molecule-ranking-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin-top:12px}
+    .molecule-ranking-section{border:1px solid #dbe4ee;border-radius:12px;padding:13px;background:#f8fafc}.molecule-ranking-primary{border-color:#f59e0b;background:#fffbeb}.molecule-ranking-section h4{display:flex;align-items:center;justify-content:space-between;gap:8px;margin:0 0 10px;font-size:14px}.molecule-ranking-section h4 span{padding:3px 7px;border-radius:999px;background:#fff;color:#6b7280;font-size:10px}
+    .molecule-ranking-list{display:grid;gap:8px;margin:0;padding:0;list-style:none}.molecule-ranking-item{display:grid;grid-template-columns:30px minmax(0,1fr) auto;align-items:center;gap:8px}.molecule-rank-badge{display:inline-flex;width:28px;height:28px;align-items:center;justify-content:center;border-radius:50%;background:#1f2937;color:#fff;font-size:12px;font-weight:800}.molecule-ranking-name{min-width:0;font-size:12px;line-height:1.35}.molecule-ranking-value{font-size:12px;white-space:nowrap}.molecule-ranking-value small{font-size:10px;color:#6b7280}
+    .molecule-ranking-meta{display:grid;gap:7px;margin:14px 0 0}.molecule-ranking-meta div{display:grid;grid-template-columns:78px minmax(0,1fr);gap:8px;font-size:12px}.molecule-ranking-meta dt{font-weight:700;color:#374151}.molecule-ranking-meta dd{margin:0;color:#4b5563}.molecule-ranking-source{margin-top:12px;padding-top:10px;border-top:1px solid #e5e7eb;font-size:12px}.molecule-ranking-source>strong{display:block}.quantified-reference{color:#b45309}
+    @media(max-width:699px){.molecule-ranking-grid{grid-template-columns:1fr}.molecule-ranking-item{grid-template-columns:30px minmax(0,1fr)}.molecule-ranking-value{grid-column:2}}
   `;
   document.head.appendChild(style);
   modal = document.createElement('div');
@@ -3466,6 +3483,7 @@ function openFlavorEvidenceModal(key, trigger = document.activeElement) {
   const rec = FLAVOR_DATA.find(f => `${f[0]}|${f[1]}|${f[2]}` === key);
   if (!rec || typeof window.getFlavorEvidence !== 'function') return;
   const evidence = window.getFlavorEvidence(key);
+  const ranking = typeof window.getFlavorMoleculeRanking === 'function' ? window.getFlavorMoleculeRanking(key) : null;
   const label = currentLanguage === 'ko' ? (rec[6] || rec[2]) : rec[2];
   const statusText = {
     'key-coffee-evidence': '1단계 · 해당 노트/결점 직접 근거',
@@ -3474,7 +3492,13 @@ function openFlavorEvidenceModal(key, trigger = document.activeElement) {
     'not-established': '분자 배정 보류'
   }[evidence.status] || '근거 상태 확인 필요';
   const modal = ensureFlavorEvidenceModal();
-  modal.innerHTML = `<article class="flavor-evidence-panel" aria-labelledby="flavorEvidenceTitle" tabindex="-1"><div class="flavor-evidence-head"><div><h3 id="flavorEvidenceTitle">${escapeHtml(label)} · 향미분자 근거</h3><p class="text-xs text-gray-500 mt-1">${escapeHtml(rec[0])} › ${escapeHtml(rec[1])} › ${escapeHtml(rec[2])}</p><p class="text-xs font-semibold mt-2 ${escapeHtml(evidence.status || '')}">${escapeHtml(statusText)}</p></div><button type="button" class="flavor-evidence-close" aria-label="근거 창 닫기">×</button></div><p class="flavor-evidence-legend"><strong>근거 단계이며, 분자의 농도·OAV·실제 기여도 순위가 아닙니다.</strong><br>1단계: 표시 노트/결점에 대한 직접 근거 · 2단계: 커피 내 계열·검출·상관 근거 · 3단계: 레퍼런스 식품의 향기 근거</p><p class="flavor-evidence-note">${escapeHtml(evidence.note || '')}</p>${formatEvidenceRanks('1단계 · 표시 노트 직접 근거', evidence.primary)}${formatEvidenceRanks('2단계 · 커피 계열/연관 근거', evidence.secondary)}${formatEvidenceRanks('3단계 · 레퍼런스 식품 근거', evidence.tertiary)}</article>`;
+  const body = ranking
+    ? formatQuantitativeMoleculeRanking(ranking)
+    : `<p class="flavor-evidence-legend"><strong>근거 단계이며, 분자의 농도·OAV·실제 기여도 순위가 아닙니다.</strong><br>1단계: 표시 노트/결점에 대한 직접 근거 · 2단계: 커피 내 계열·검출·상관 근거 · 3단계: 레퍼런스 식품의 향기 근거</p><p class="flavor-evidence-note">${escapeHtml(evidence.note || '')}</p>${formatEvidenceRanks('1단계 · 표시 노트 직접 근거', evidence.primary)}${formatEvidenceRanks('2단계 · 커피 계열/연관 근거', evidence.secondary)}${formatEvidenceRanks('3단계 · 레퍼런스 식품 근거', evidence.tertiary)}`;
+  const heading = ranking ? `${label} · 향기분자 TOP 3` : `${label} · 향미분자 근거`;
+  const substatus = ranking ? '정량 연구 기반 · 레퍼런스 식품' : statusText;
+  const statusClass = ranking ? ranking.status : evidence.status;
+  modal.innerHTML = `<article class="flavor-evidence-panel" aria-labelledby="flavorEvidenceTitle" tabindex="-1"><div class="flavor-evidence-head"><div><h3 id="flavorEvidenceTitle">${escapeHtml(heading)}</h3><p class="text-xs text-gray-500 mt-1">${escapeHtml(rec[0])} › ${escapeHtml(rec[1])} › ${escapeHtml(rec[2])}</p><p class="text-xs font-semibold mt-2 ${escapeHtml(statusClass || '')}">${escapeHtml(substatus)}</p></div><button type="button" class="flavor-evidence-close" aria-label="근거 창 닫기">×</button></div>${body}</article>`;
   modal.querySelector('.flavor-evidence-close').addEventListener('click', closeFlavorEvidenceModal);
   lastFlavorEvidenceTrigger = trigger instanceof HTMLElement ? trigger : null;
   flavorEvidencePreviousBodyOverflow = document.body.style.overflow;
