@@ -27,6 +27,8 @@ Press and hold a flavor chip, or select its flask button, to inspect the evidenc
 
 Each entry links to its supporting paper and identifies the study scope or analytical method. Acids are treated separately as nonvolatile taste compounds. Mappings intentionally remain unassigned when the available evidence does not justify a molecule-level claim.
 
+Strawberry is the first quantitative-ranking pilot. Its dialog separates the top three emitted-VOC concentrations from the top three odor activity values (OAVs), because the most abundant molecule is not necessarily the largest sensory contributor. These ranks apply only to the fresh-strawberry sample and method reported by the cited paper; they are not presented as molecule ranks for a strawberry note in coffee.
+
 ## Browser Compatibility
 
 The page is designed with responsive layouts and touch-friendly controls. It works in modern browsers on Windows, macOS, Android, and iOS. For the best experience, keep your browser up to date.
