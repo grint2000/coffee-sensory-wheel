@@ -3496,12 +3496,14 @@ function bindFlavorEvidenceTriggers(outer) {
   outer.querySelectorAll('.flavor-checkbox-label').forEach(label => {
     let timer = null;
     let longPressed = false;
+    let pressMoved = false;
     let startX = 0;
     let startY = 0;
     const clearPress = () => { if (timer) clearTimeout(timer); timer = null; };
     label.addEventListener('pointerdown', event => {
       if (event.pointerType === 'mouse' && event.button !== 0) return;
       longPressed = false;
+      pressMoved = false;
       startX = event.clientX;
       startY = event.clientY;
       timer = setTimeout(() => {
@@ -3514,16 +3516,20 @@ function bindFlavorEvidenceTriggers(outer) {
       }, 600);
     });
     label.addEventListener('pointermove', event => {
-      if (Math.hypot(event.clientX - startX, event.clientY - startY) > 10) clearPress();
+      if (Math.hypot(event.clientX - startX, event.clientY - startY) > 10) {
+        pressMoved = true;
+        clearPress();
+      }
     });
     label.addEventListener('pointerup', clearPress);
     label.addEventListener('pointercancel', clearPress);
     label.addEventListener('pointerleave', clearPress);
     label.addEventListener('click', event => {
-      if (!longPressed) return;
+      if (!longPressed && !pressMoved) return;
       event.preventDefault();
       event.stopPropagation();
       longPressed = false;
+      pressMoved = false;
     }, true);
   });
 }
