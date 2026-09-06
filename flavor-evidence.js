@@ -77,6 +77,11 @@
       url: 'https://doi.org/10.1111/j.1750-3841.2007.00445.x',
       method: 'Ten strawberry cultivars · quantification, OAV and sensory correlation'
     },
+    strawberryReleasedVocs: {
+      short: 'Kim et al., Sensors 2013; 13:7939–7978',
+      url: 'https://doi.org/10.3390/s130607939',
+      method: 'Fresh strawberry, storage day 0 (SRD-0) · emitted headspace VOC quantification and OAV'
+    },
     peachKey: {
       short: 'Zhu & Xiao, Eur. Food Res. Technol. 2019; 245:129–141',
       url: 'https://doi.org/10.1007/s00217-018-3145-x',
@@ -301,6 +306,33 @@
     'Other|Woody|Eucalyptus': [['1,8-Cineole'], 'floralReference']
   };
 
+  /*
+   * Quantitative rankings are separate from the evidence-stage resolver.
+   * Each ranking is tied to one paper, sample state, matrix and metric. It is
+   * not a universal ranking for the note and is not direct evidence in coffee.
+   */
+  const QUANTITATIVE_RANKINGS = {
+    'Fruity|Berry|Strawberry': {
+      status: 'quantified-reference',
+      title: '딸기',
+      sample: '생딸기 · 저장 0일(SRD-0)',
+      matrix: '딸기 시료에서 방출된 headspace VOC',
+      method: 'VOC 정량값 및 odor threshold 기반 OAV',
+      scope: '레퍼런스 딸기 시료의 결과이며, 커피 속 딸기 노트의 분자 순위가 아닙니다.',
+      oav: [
+        { rank: 1, name: 'Ethyl butyrate (Ethyl butanoate)', value: 6160, unit: 'OAV' },
+        { rank: 2, name: 'Ethyl hexanoate', value: 3608, unit: 'OAV' },
+        { rank: 3, name: 'Ethyl isovalerate (Ethyl 3-methylbutanoate)', value: 1592, unit: 'OAV' }
+      ],
+      abundance: [
+        { rank: 1, name: 'Ethyl acetate', value: 518, unit: 'mg·m⁻³' },
+        { rank: 2, name: 'Methyl acetate', value: 239, unit: 'mg·m⁻³' },
+        { rank: 3, name: 'Acetaldehyde', value: 24.9, unit: 'mg·m⁻³' }
+      ],
+      source: 'strawberryReleasedVocs',
+      caveat: '함량 순위와 향기기여 순위는 다르며, 품종·숙도·저장 조건·분석법에 따라 달라질 수 있습니다.'
+    }
+  };
   const REFERENCE_BY_GROUP = {
     'Fruity|Other Fruit': [['Ethyl butyrate', 'Hexyl acetate'], 'fruitReference'],
     'Fruity|Berry': [['Linalool', 'β-Ionone'], 'fruitReference'],
@@ -534,4 +566,5 @@
 
   window.FLAVOR_EVIDENCE_SOURCES = SOURCES;
   window.getFlavorEvidence = getFlavorEvidence;
+  window.getFlavorMoleculeRanking = key => QUANTITATIVE_RANKINGS[key] || null;
 })();
