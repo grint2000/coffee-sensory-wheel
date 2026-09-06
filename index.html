@@ -237,6 +237,9 @@
       margin: 0;
       cursor: pointer;
       color: inherit;
+      -webkit-user-select: none;
+      user-select: none;
+      touch-action: manipulation;
     }
     .flavor-checkbox-label input {
       position: absolute;
@@ -3504,7 +3507,9 @@ function bindFlavorEvidenceTriggers(outer) {
         longPressed = true;
         const checkbox = label.querySelector('.flavorSelectBox');
         const key = checkbox?.dataset.key;
-        if (key) openFlavorEvidenceModal(key, checkbox);
+        const chip = label.closest('.flavor-chip');
+        const focusTarget = chip?.querySelector('.flavor-evidence-trigger') || label;
+        if (key) openFlavorEvidenceModal(key, focusTarget);
       }, 600);
     });
     label.addEventListener('pointermove', event => {
