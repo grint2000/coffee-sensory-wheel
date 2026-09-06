@@ -3485,6 +3485,7 @@ function openFlavorEvidenceModal(key, trigger = document.activeElement) {
 }
 
 function bindFlavorEvidenceTriggers(outer) {
+  ensureFlavorEvidenceModal();
   outer.querySelectorAll('.flavor-evidence-trigger').forEach(trigger => {
     trigger.addEventListener('click', event => {
       event.preventDefault();
