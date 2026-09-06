@@ -17,6 +17,16 @@ The application runs entirely in the browser, so you can simply double-click `in
 - **Comparison Tools** – Select two or more samples to generate charts comparing SCA scores, flavor notes, and defects.
 - **Export Options** – Save your results as images, SNS-ready images, Excel spreadsheets, or JSON files for backup and sharing. The exported images now include the coffee's origin, processing method, roast date, and roast level so you have full context when sharing.
 
+## Flavor Molecule Evidence
+
+Press and hold a flavor chip, or select its flask button, to inspect the evidence behind its molecule mapping. The displayed numbers are evidence stages, not a universal ranking of concentration, odor activity value (OAV), or sensory contribution:
+
+1. Evidence directly supports the displayed coffee note or defect.
+2. The compound is reported in coffee or supports only the broader aroma family; the exact note is not proven.
+3. The compound is supported in the named reference food, flower, spice, or tea and is not presented as direct coffee evidence.
+
+Each entry links to its supporting paper and identifies the study scope or analytical method. Acids are treated separately as nonvolatile taste compounds. Mappings intentionally remain unassigned when the available evidence does not justify a molecule-level claim.
+
 ## Browser Compatibility
 
 The page is designed with responsive layouts and touch-friendly controls. It works in modern browsers on Windows, macOS, Android, and iOS. For the best experience, keep your browser up to date.

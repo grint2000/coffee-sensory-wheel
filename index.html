@@ -211,21 +211,32 @@
     }
     
     /* 향미 선택 개선 */
+    .flavor-chip {
+      position: relative;
+      display: inline-flex;
+      align-items: center;
+      border-radius: 20px;
+      margin: 3px;
+      color: inherit;
+      overflow: visible;
+      font-size: 13px;
+      line-height: 1.3;
+      transition: all 0.2s;
+    }
+    .flavor-chip:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
     .flavor-checkbox-label {
       position: relative;
       display: inline-flex;
       align-items: center;
-      padding: 4px 12px 4px 30px;
-      border-radius: 20px;
-      margin: 3px;
-      font-size: 13px;
+      align-self: stretch;
+      padding: 4px 4px 4px 30px;
+      border-radius: 20px 0 0 20px;
+      margin: 0;
       cursor: pointer;
-      line-height: 1.3;
-      transition: all 0.2s;
-    }
-    .flavor-checkbox-label:hover {
-      transform: translateY(-1px);
-      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+      color: inherit;
     }
     .flavor-checkbox-label input {
       position: absolute;
@@ -620,7 +631,7 @@
     }
     
     /* 검색 결과 강조 */
-    .flavor-checkbox-label.search-highlight {
+    .flavor-chip.search-highlight {
       box-shadow: 0 0 0 2px #8B5A2B;
     }
     
@@ -665,7 +676,7 @@
     }
     
     /* 선택된 향미 스타일 강화 */
-    .flavor-checkbox-label.selected-flavor {
+    .flavor-chip.selected-flavor {
       box-shadow: 0 0 0 2px rgba(139, 90, 43, 0.8);
       transform: translateY(-1px);
     }
@@ -3101,12 +3112,15 @@ function renderFlavorPhase(force = false) {
       const selectedClass = checked ? 'selected-flavor' : '';
       
       html += `
-        <label class="flavor-checkbox-label ${selectedClass}" style="background:${color};color:${textColor};">
-          <input type="checkbox" class="flavorSelectBox" data-key="${key}" ${checked}>
-          <span class="checkbox-custom"></span>
-          ${displayName}
+        <span class="flavor-chip ${selectedClass}" style="background:${color};color:${textColor};"
+              data-category="${cat}" data-subcategory="${sub}" data-flavor-en="${desc.toLowerCase()}" data-flavor-kr="${(rec[6]||'').toLowerCase()}">
+          <label class="flavor-checkbox-label">
+            <input type="checkbox" class="flavorSelectBox" data-key="${key}" ${checked}>
+            <span class="checkbox-custom"></span>
+            <span class="flavor-label-text">${displayName}</span>
+          </label>
           <button type="button" class="flavor-evidence-trigger" data-evidence-key="${key}" aria-label="${displayName} 향미분자 근거 보기" title="길게 누르거나 이 버튼을 눌러 분자 근거 보기"><i class="fas fa-flask" aria-hidden="true"></i></button>
-        </label>
+        </span>
       `;
     }
   });
@@ -3188,13 +3202,15 @@ function renderFlavorPhase(force = false) {
         const selectedClass = checked ? 'selected-flavor' : '';
         
         html += `
-          <label class="flavor-checkbox-label ${selectedClass}" style="background:${color};color:${textColor};" 
+          <span class="flavor-chip ${selectedClass}" style="background:${color};color:${textColor};"
                 data-category="${cat}" data-subcategory="${sub}" data-flavor-en="${desc.toLowerCase()}" data-flavor-kr="${(descKr||'').toLowerCase()}">
-            <input type="checkbox" class="flavorSelectBox" data-key="${id}" ${checked}>
-            <span class="checkbox-custom"></span>
-            ${displayName}
+            <label class="flavor-checkbox-label">
+              <input type="checkbox" class="flavorSelectBox" data-key="${id}" ${checked}>
+              <span class="checkbox-custom"></span>
+              <span class="flavor-label-text">${displayName}</span>
+            </label>
             <button type="button" class="flavor-evidence-trigger" data-evidence-key="${id}" aria-label="${displayName} 향미분자 근거 보기" title="길게 누르거나 이 버튼을 눌러 분자 근거 보기"><i class="fas fa-flask" aria-hidden="true"></i></button>
-          </label>
+          </span>
         `;
       });
       
@@ -3232,9 +3248,9 @@ function renderFlavorPhase(force = false) {
         const searchTerm = this.value.trim().toLowerCase();
         
         if (searchTerm === '') {
-          document.querySelectorAll('.flavor-checkbox-label').forEach(label => {
-            label.style.display = '';
-            label.classList.remove('search-highlight');
+          document.querySelectorAll('.flavor-chip').forEach(chip => {
+            chip.style.display = '';
+            chip.classList.remove('search-highlight');
           });
           
           document.querySelectorAll('.flavor-category-accordion').forEach(cat => {
@@ -3262,11 +3278,11 @@ function renderFlavorPhase(force = false) {
         
         let visibleCategories = new Set();
         
-        document.querySelectorAll('.flavor-checkbox-label').forEach(label => {
-          const flavorEn = label.dataset.flavorEn?.toLowerCase() || '';
-          const flavorKr = label.dataset.flavorKr?.toLowerCase() || '';
-          const category = label.dataset.category?.toLowerCase() || '';
-          const subcategory = label.dataset.subcategory?.toLowerCase() || '';
+        document.querySelectorAll('.flavor-chip').forEach(chip => {
+          const flavorEn = chip.dataset.flavorEn?.toLowerCase() || '';
+          const flavorKr = chip.dataset.flavorKr?.toLowerCase() || '';
+          const category = chip.dataset.category?.toLowerCase() || '';
+          const subcategory = chip.dataset.subcategory?.toLowerCase() || '';
           
 // 기본 텍스트 매칭
 const basicMatch = flavorEn.includes(searchTerm) || 
@@ -3280,16 +3296,16 @@ const initialMatch = matchKoreanInitials(flavorKr, searchTerm) ||
                     matchKoreanInitials(subcategory, searchTerm);
 
 if (basicMatch || initialMatch) {
-            label.style.display = '';
-            label.classList.add('search-highlight');
+            chip.style.display = '';
+            chip.classList.add('search-highlight');
             
-            const categoryAccordion = label.closest('.flavor-category-accordion');
+            const categoryAccordion = chip.closest('.flavor-category-accordion');
             if (categoryAccordion) {
               visibleCategories.add(categoryAccordion);
             }
           } else {
-            label.style.display = 'none';
-            label.classList.remove('search-highlight');
+            chip.style.display = 'none';
+            chip.classList.remove('search-highlight');
           }
         });
         
@@ -3303,8 +3319,8 @@ if (basicMatch || initialMatch) {
           
           while (current && !current.classList.contains('flavor-subcategory-title')) {
             if (current.classList.contains('flavor-items')) {
-              const visibleLabels = Array.from(current.querySelectorAll('.flavor-checkbox-label'))
-                .filter(label => label.style.display !== 'none');
+              const visibleLabels = Array.from(current.querySelectorAll('.flavor-chip'))
+                .filter(chip => chip.style.display !== 'none');
                 
               if (visibleLabels.length > 0) {
                 hasVisibleFlavor = true;
@@ -3335,7 +3351,7 @@ if (basicMatch || initialMatch) {
         if (sel.indexOf(key) === -1) {
           if (sel.length < 10) {
             sel.push(key);
-            this.closest('label').classList.add('selected-flavor');
+            this.closest('.flavor-chip').classList.add('selected-flavor');
           } else {
             this.checked = false;
             showToast("각 항목당 최대 10개까지만 선택 가능합니다.");
@@ -3346,7 +3362,7 @@ if (basicMatch || initialMatch) {
         let idx = sel.indexOf(key);
         if (idx > -1) {
           sel.splice(idx, 1);
-          this.closest('label').classList.remove('selected-flavor');
+          this.closest('.flavor-chip').classList.remove('selected-flavor');
         }
       }
       
@@ -3356,13 +3372,35 @@ if (basicMatch || initialMatch) {
   });
 }
 
+let lastFlavorEvidenceTrigger = null;
+let flavorEvidencePreviousBodyOverflow = '';
+
+function formatEvidenceSource(source) {
+  if (!source) return '';
+  const url = String(source.url || '');
+  const label = escapeHtml(source.short || url || '출처');
+  const link = /^https:\/\/[^\s]+$/i.test(url)
+    ? `<a href="${escapeHtml(url)}" target="_blank" rel="noopener noreferrer">${label}<span class="sr-only"> (새 창)</span></a>`
+    : label;
+  const method = source.method ? `<em>${escapeHtml(source.method)}</em>` : '';
+  return `<span class="flavor-evidence-source">${link}${method}</span>`;
+}
+
 function formatEvidenceRanks(title, items) {
   if (!items || !items.length) {
     return `<section class="flavor-evidence-rank"><h4>${title}</h4><p class="flavor-evidence-empty">확인된 분자 없음</p></section>`;
   }
   return `<section class="flavor-evidence-rank"><h4>${title}</h4><ul>${items.map(item => {
-    const citations = [...new Set((item.sources || []).map(id => window.FLAVOR_EVIDENCE_SOURCES?.[id]?.short).filter(Boolean))];
-    return `<li><strong>${escapeHtml(item.name)}</strong><span>${escapeHtml(item.reason || '')}</span>${citations.length ? `<small>${escapeHtml(citations.join(' · '))}</small>` : ''}</li>`;
+    const sourceIds = [...new Set(item.sources || [])];
+    const seenUrls = new Set();
+    const citations = sourceIds.map(id => window.FLAVOR_EVIDENCE_SOURCES?.[id]).filter(source => {
+      if (!source) return false;
+      const identity = source.url || source.short;
+      if (seenUrls.has(identity)) return false;
+      seenUrls.add(identity);
+      return true;
+    });
+    return `<li><strong>${escapeHtml(item.name)}</strong><span>${escapeHtml(item.reason || '')}</span>${citations.length ? `<small class="flavor-evidence-sources"><b>근거 원문</b>${citations.map(formatEvidenceSource).join('')}</small>` : ''}</li>`;
   }).join('')}</ul></section>`;
 }
 
@@ -3371,11 +3409,11 @@ function ensureFlavorEvidenceModal() {
   if (modal) return modal;
   const style = document.createElement('style');
   style.textContent = `
-    .flavor-evidence-trigger{display:inline-flex;align-items:center;justify-content:center;width:19px;height:19px;margin-left:5px;border:1px solid currentColor;border-radius:50%;background:rgba(255,255,255,.36);color:inherit;font-size:11px;line-height:1;vertical-align:middle;cursor:pointer}
+    .flavor-evidence-trigger{display:inline-flex;flex:0 0 auto;align-items:center;justify-content:center;width:30px;height:30px;margin:1px 5px 1px 1px;border:1px solid currentColor;border-radius:50%;background:rgba(255,255,255,.36);color:inherit;font-size:11px;line-height:1;vertical-align:middle;cursor:pointer}
     .flavor-evidence-trigger:focus-visible{outline:2px solid #1f2937;outline-offset:2px}
     .flavor-evidence-modal{position:fixed;inset:0;z-index:10000;display:none;align-items:flex-end;justify-content:center;background:rgba(17,24,39,.52);padding:16px}
     .flavor-evidence-modal.is-open{display:flex}.flavor-evidence-panel{width:min(760px,100%);max-height:min(82vh,780px);overflow:auto;background:#fff;border-radius:16px 16px 12px 12px;box-shadow:0 18px 60px rgba(0,0,0,.28);padding:22px;color:#1f2937}
-    .flavor-evidence-head{display:flex;gap:14px;align-items:flex-start;justify-content:space-between;border-bottom:1px solid #e5e7eb;padding-bottom:12px}.flavor-evidence-head h3{margin:0;font-size:18px;font-weight:800}.flavor-evidence-close{width:36px;height:36px;border:0;border-radius:8px;background:#f3f4f6;color:#374151;font-size:24px;line-height:1;cursor:pointer}.flavor-evidence-note{margin:14px 0;color:#4b5563;font-size:13px;line-height:1.55}.flavor-evidence-legend{margin:0 0 12px;padding:10px 12px;border-radius:8px;background:#fffbeb;color:#92400e;font-size:12px;line-height:1.5}.flavor-evidence-rank{margin-top:12px;border:1px solid #e5e7eb;border-radius:10px;padding:12px}.flavor-evidence-rank h4{margin:0 0 8px;font-size:14px}.flavor-evidence-rank ul{margin:0;padding:0;list-style:none}.flavor-evidence-rank li+li{border-top:1px solid #f1f5f9;margin-top:10px;padding-top:10px}.flavor-evidence-rank strong{display:block;font-size:13px}.flavor-evidence-rank span,.flavor-evidence-rank small{display:block;margin-top:3px;font-size:12px;line-height:1.45}.flavor-evidence-rank span{color:#4b5563}.flavor-evidence-rank small{color:#9a3412}.flavor-evidence-empty{margin:0;color:#6b7280;font-size:13px}@media(min-width:700px){.flavor-evidence-modal{align-items:center}.flavor-evidence-panel{border-radius:16px}}
+    .flavor-evidence-head{display:flex;gap:14px;align-items:flex-start;justify-content:space-between;border-bottom:1px solid #e5e7eb;padding-bottom:12px}.flavor-evidence-head h3{margin:0;font-size:18px;font-weight:800}.flavor-evidence-close{width:36px;height:36px;flex:0 0 auto;border:0;border-radius:8px;background:#f3f4f6;color:#374151;font-size:24px;line-height:1;cursor:pointer}.flavor-evidence-note{margin:14px 0;color:#4b5563;font-size:13px;line-height:1.55}.flavor-evidence-legend{margin:0 0 12px;padding:10px 12px;border-radius:8px;background:#fffbeb;color:#92400e;font-size:12px;line-height:1.55}.flavor-evidence-rank{margin-top:12px;border:1px solid #e5e7eb;border-radius:10px;padding:12px}.flavor-evidence-rank h4{margin:0 0 8px;font-size:14px}.flavor-evidence-rank ul{margin:0;padding:0;list-style:none}.flavor-evidence-rank li+li{border-top:1px solid #f1f5f9;margin-top:10px;padding-top:10px}.flavor-evidence-rank strong{display:block;font-size:13px}.flavor-evidence-rank li>span,.flavor-evidence-rank small{display:block;margin-top:3px;font-size:12px;line-height:1.45}.flavor-evidence-rank li>span{color:#4b5563}.flavor-evidence-sources{margin-top:7px!important;color:#7c2d12!important}.flavor-evidence-sources>b{display:block;margin-bottom:3px}.flavor-evidence-source{display:block!important;margin-top:4px!important}.flavor-evidence-source a{color:#9a3412;text-decoration:underline;text-underline-offset:2px}.flavor-evidence-source a:hover{color:#7c2d12}.flavor-evidence-source em{display:block;color:#6b7280;font-style:normal}.flavor-evidence-empty{margin:0;color:#6b7280;font-size:13px}@media(max-width:699px){.flavor-evidence-trigger{width:36px;height:36px}.flavor-evidence-panel{padding:18px}}@media(min-width:700px){.flavor-evidence-modal{align-items:center}.flavor-evidence-panel{border-radius:16px}}
   `;
   document.head.appendChild(style);
   modal = document.createElement('div');
@@ -3383,29 +3421,62 @@ function ensureFlavorEvidenceModal() {
   modal.className = 'flavor-evidence-modal';
   modal.setAttribute('role', 'dialog');
   modal.setAttribute('aria-modal', 'true');
+  modal.setAttribute('aria-labelledby', 'flavorEvidenceTitle');
+  modal.setAttribute('aria-hidden', 'true');
   modal.addEventListener('click', event => { if (event.target === modal) closeFlavorEvidenceModal(); });
+  modal.addEventListener('keydown', event => {
+    if (!modal.classList.contains('is-open')) return;
+    if (event.key === 'Escape') {
+      event.preventDefault();
+      closeFlavorEvidenceModal();
+      return;
+    }
+    if (event.key !== 'Tab') return;
+    const focusable = [...modal.querySelectorAll('a[href], button:not([disabled]), [tabindex]:not([tabindex="-1"])')];
+    if (!focusable.length) return;
+    const first = focusable[0];
+    const last = focusable[focusable.length - 1];
+    if (event.shiftKey && document.activeElement === first) {
+      event.preventDefault();
+      last.focus();
+    } else if (!event.shiftKey && document.activeElement === last) {
+      event.preventDefault();
+      first.focus();
+    }
+  });
   document.body.appendChild(modal);
   return modal;
 }
 
 function closeFlavorEvidenceModal() {
-  document.getElementById('flavorEvidenceModal')?.classList.remove('is-open');
+  const modal = document.getElementById('flavorEvidenceModal');
+  if (!modal || !modal.classList.contains('is-open')) return;
+  modal.classList.remove('is-open');
+  modal.setAttribute('aria-hidden', 'true');
+  document.body.style.overflow = flavorEvidencePreviousBodyOverflow;
+  const focusTarget = lastFlavorEvidenceTrigger;
+  lastFlavorEvidenceTrigger = null;
+  if (focusTarget?.isConnected) focusTarget.focus({ preventScroll: true });
 }
 
-function openFlavorEvidenceModal(key) {
+function openFlavorEvidenceModal(key, trigger = document.activeElement) {
   const rec = FLAVOR_DATA.find(f => `${f[0]}|${f[1]}|${f[2]}` === key);
   if (!rec || typeof window.getFlavorEvidence !== 'function') return;
   const evidence = window.getFlavorEvidence(key);
   const label = currentLanguage === 'ko' ? (rec[6] || rec[2]) : rec[2];
   const statusText = {
-    'key-coffee-evidence': '커피 핵심 기여 근거',
-    'limited-coffee-evidence': '커피 직접 인과 미확정',
-    'reference-only': '레퍼런스 식품 근거',
+    'key-coffee-evidence': '1단계 · 해당 노트/결점 직접 근거',
+    'limited-coffee-evidence': '2단계 · 커피 계열/연관 근거',
+    'reference-only': '3단계 · 레퍼런스 식품 근거',
     'not-established': '분자 배정 보류'
   }[evidence.status] || '근거 상태 확인 필요';
   const modal = ensureFlavorEvidenceModal();
-  modal.innerHTML = `<article class="flavor-evidence-panel" aria-labelledby="flavorEvidenceTitle"><div class="flavor-evidence-head"><div><h3 id="flavorEvidenceTitle">${escapeHtml(label)} · 향미분자 근거</h3><p class="text-xs text-gray-500 mt-1">${escapeHtml(rec[0])} › ${escapeHtml(rec[1])} › ${escapeHtml(rec[2])}</p><p class="text-xs font-semibold mt-2 ${escapeHtml(evidence.status || '')}">${escapeHtml(statusText)}</p></div><button type="button" class="flavor-evidence-close" aria-label="닫기">×</button></div><p class="flavor-evidence-legend">1순위: 커피 향기활성·핵심 기여 근거 / 2순위: 커피 검출 또는 감각 상관 근거 / 3순위: 레퍼런스 식품 근거만 존재</p><p class="flavor-evidence-note">${escapeHtml(evidence.note || '')}</p>${formatEvidenceRanks('1순위 · 커피 핵심 기여', evidence.primary)}${formatEvidenceRanks('2순위 · 커피 보조 근거', evidence.secondary)}${formatEvidenceRanks('3순위 · 레퍼런스 식품 근거', evidence.tertiary)}</article>`;
+  modal.innerHTML = `<article class="flavor-evidence-panel" aria-labelledby="flavorEvidenceTitle" tabindex="-1"><div class="flavor-evidence-head"><div><h3 id="flavorEvidenceTitle">${escapeHtml(label)} · 향미분자 근거</h3><p class="text-xs text-gray-500 mt-1">${escapeHtml(rec[0])} › ${escapeHtml(rec[1])} › ${escapeHtml(rec[2])}</p><p class="text-xs font-semibold mt-2 ${escapeHtml(evidence.status || '')}">${escapeHtml(statusText)}</p></div><button type="button" class="flavor-evidence-close" aria-label="근거 창 닫기">×</button></div><p class="flavor-evidence-legend"><strong>근거 단계이며, 분자의 농도·OAV·실제 기여도 순위가 아닙니다.</strong><br>1단계: 표시 노트/결점에 대한 직접 근거 · 2단계: 커피 내 계열·검출·상관 근거 · 3단계: 레퍼런스 식품의 향기 근거</p><p class="flavor-evidence-note">${escapeHtml(evidence.note || '')}</p>${formatEvidenceRanks('1단계 · 표시 노트 직접 근거', evidence.primary)}${formatEvidenceRanks('2단계 · 커피 계열/연관 근거', evidence.secondary)}${formatEvidenceRanks('3단계 · 레퍼런스 식품 근거', evidence.tertiary)}</article>`;
   modal.querySelector('.flavor-evidence-close').addEventListener('click', closeFlavorEvidenceModal);
+  lastFlavorEvidenceTrigger = trigger instanceof HTMLElement ? trigger : null;
+  flavorEvidencePreviousBodyOverflow = document.body.style.overflow;
+  document.body.style.overflow = 'hidden';
+  modal.setAttribute('aria-hidden', 'false');
   modal.classList.add('is-open');
   modal.querySelector('.flavor-evidence-close').focus();
 }
@@ -3415,21 +3486,29 @@ function bindFlavorEvidenceTriggers(outer) {
     trigger.addEventListener('click', event => {
       event.preventDefault();
       event.stopPropagation();
-      openFlavorEvidenceModal(trigger.dataset.evidenceKey);
+      openFlavorEvidenceModal(trigger.dataset.evidenceKey, trigger);
     });
   });
   outer.querySelectorAll('.flavor-checkbox-label').forEach(label => {
     let timer = null;
     let longPressed = false;
+    let startX = 0;
+    let startY = 0;
     const clearPress = () => { if (timer) clearTimeout(timer); timer = null; };
     label.addEventListener('pointerdown', event => {
-      if (event.target.closest('.flavor-evidence-trigger')) return;
+      if (event.pointerType === 'mouse' && event.button !== 0) return;
       longPressed = false;
+      startX = event.clientX;
+      startY = event.clientY;
       timer = setTimeout(() => {
         longPressed = true;
-        const key = label.querySelector('.flavorSelectBox')?.dataset.key;
-        if (key) openFlavorEvidenceModal(key);
+        const checkbox = label.querySelector('.flavorSelectBox');
+        const key = checkbox?.dataset.key;
+        if (key) openFlavorEvidenceModal(key, checkbox);
       }, 600);
+    });
+    label.addEventListener('pointermove', event => {
+      if (Math.hypot(event.clientX - startX, event.clientY - startY) > 10) clearPress();
     });
     label.addEventListener('pointerup', clearPress);
     label.addEventListener('pointercancel', clearPress);
