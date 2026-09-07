@@ -1,5 +1,5 @@
-const APP_CACHE = 'noel-sca-app-v7';
-const RUNTIME_CACHE = 'noel-sca-runtime-v7';
+const APP_CACHE = 'noel-sca-app-v8';
+const RUNTIME_CACHE = 'noel-sca-runtime-v8';
 
 const APP_SHELL_FILES = [
   './',
