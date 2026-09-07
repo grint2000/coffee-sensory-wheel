@@ -3408,13 +3408,13 @@ function formatEvidenceRanks(title, items) {
 }
 
 function formatMoleculeRankingItems(items) {
-  const numberFormat = new Intl.NumberFormat('en-US', { maximumFractionDigits: 1 });
+  const numberFormat = new Intl.NumberFormat('en-US', { maximumFractionDigits: 2 });
   return `<ol class="molecule-ranking-list">${items.map(item => `<li class="molecule-ranking-item"><span class="molecule-rank-badge" aria-label="${item.rank}위">${item.rank}</span><span class="molecule-ranking-name">${escapeHtml(item.name)}</span><strong class="molecule-ranking-value">${escapeHtml(numberFormat.format(item.value))} <small>${escapeHtml(item.unit)}</small></strong></li>`).join('')}</ol>`;
 }
 
 function formatQuantitativeMoleculeRanking(ranking) {
   const source = window.FLAVOR_EVIDENCE_SOURCES?.[ranking.source];
-  return `<p class="flavor-evidence-legend"><strong>두 순위는 서로 다른 지표입니다.</strong><br>OAV는 검출량을 후각 역치로 나눈 향기기여 지표이고, 함량은 시료에서 방출되어 측정된 양입니다.</p><div class="molecule-ranking-grid"><section class="molecule-ranking-section molecule-ranking-primary"><h4>향기기여 TOP 3 <span>OAV</span></h4>${formatMoleculeRankingItems(ranking.oav)}</section><section class="molecule-ranking-section"><h4>검출 함량 TOP 3 <span>방출 VOC</span></h4>${formatMoleculeRankingItems(ranking.abundance)}</section></div><dl class="molecule-ranking-meta"><div><dt>시료</dt><dd>${escapeHtml(ranking.sample)}</dd></div><div><dt>측정 대상</dt><dd>${escapeHtml(ranking.matrix)}</dd></div><div><dt>산정 방식</dt><dd>${escapeHtml(ranking.method)}</dd></div></dl><p class="flavor-evidence-note"><strong>적용 범위:</strong> ${escapeHtml(ranking.scope)}</p><p class="flavor-evidence-note"><strong>주의:</strong> ${escapeHtml(ranking.caveat)}</p>${source ? `<div class="molecule-ranking-source"><strong>근거 원문</strong>${formatEvidenceSource(source)}</div>` : ''}`;
+  return `<p class="flavor-evidence-legend"><strong>두 순위는 서로 다른 지표입니다.</strong><br>OAV는 정량값을 후각 역치로 나눈 향기기여 지표이고, 함량은 해당 연구의 분석법으로 정량된 양입니다.</p><div class="molecule-ranking-grid"><section class="molecule-ranking-section molecule-ranking-primary"><h4>향기기여 TOP 3 <span>OAV</span></h4>${formatMoleculeRankingItems(ranking.oav)}</section><section class="molecule-ranking-section"><h4>검출 함량 TOP 3 <span>${escapeHtml(ranking.abundanceLabel || '정량값')}</span></h4>${formatMoleculeRankingItems(ranking.abundance)}</section></div><dl class="molecule-ranking-meta"><div><dt>시료</dt><dd>${escapeHtml(ranking.sample)}</dd></div><div><dt>측정 대상</dt><dd>${escapeHtml(ranking.matrix)}</dd></div><div><dt>산정 방식</dt><dd>${escapeHtml(ranking.method)}</dd></div></dl><p class="flavor-evidence-note"><strong>적용 범위:</strong> ${escapeHtml(ranking.scope)}</p><p class="flavor-evidence-note"><strong>주의:</strong> ${escapeHtml(ranking.caveat)}</p>${source ? `<div class="molecule-ranking-source"><strong>근거 원문</strong>${formatEvidenceSource(source)}</div>` : ''}`;
 }
 
 function ensureFlavorEvidenceModal() {
