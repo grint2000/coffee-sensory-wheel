@@ -82,6 +82,11 @@
       url: 'https://doi.org/10.3390/s130607939',
       method: 'Fresh strawberry, storage day 0 (SRD-0) · emitted headspace VOC quantification and OAV'
     },
+    pineappleFreshQuant: {
+      short: 'Tokitomo et al., Biosci. Biotechnol. Biochem. 2005; 69:1323–1330',
+      url: 'https://doi.org/10.1271/bbb.69.1323',
+      method: 'Fresh pineapple · SAFE/AEDA, stable-isotope dilution quantification, OAV, recombination and omission tests'
+    },
     peachKey: {
       short: 'Zhu & Xiao, Eur. Food Res. Technol. 2019; 245:129–141',
       url: 'https://doi.org/10.1007/s00217-018-3145-x',
@@ -91,6 +96,11 @@
       short: 'Zhao et al., J. Food Drug Anal. 2016; 24:471–476',
       url: 'https://doi.org/10.1016/j.jfda.2016.02.013',
       method: 'Rose products · HS-SPME-GC-MS, GC-O and OAV'
+    },
+    roseLteQuant: {
+      short: 'Zhao et al., J. Food Drug Anal. 2016; 24:471–476',
+      url: 'https://doi.org/10.1016/j.jfda.2016.02.013',
+      method: 'Low-temperature rose extract (25 °C) · HS-SPME-GC-MS quantification, GC-O and water-threshold OAV'
     },
     floralReference: {
       short: 'Mostafa et al., Frontiers in Plant Science 2022; 13:860157',
@@ -311,6 +321,28 @@
    * Each ranking is tied to one paper, sample state, matrix and metric. It is
    * not a universal ranking for the note and is not direct evidence in coffee.
    */
+  const FRESH_PINEAPPLE_RANKING = {
+    status: 'quantified-reference',
+    title: '신선한 파인애플',
+    sample: '신선한 파인애플 과육',
+    matrix: 'SIDA로 정량한 선별 향기활성 성분 12종',
+    method: '안정동위원소 희석 정량(SIDA) 및 물의 후각 역치 기반 OAV',
+    scope: '신선 파인애플 한 시료의 선별 향기활성 성분 12종 내 순위이며, 커피 속 파인애플 노트의 분자 순위가 아닙니다.',
+    oav: [
+      { rank: 1, name: '4-Hydroxy-2,5-dimethyl-3(2H)-furanone (Furaneol/HDF)', value: 2680, unit: 'OAV' },
+      { rank: 2, name: 'Ethyl 2-methylpropanoate', value: 2400, unit: 'OAV' },
+      { rank: 3, name: 'Ethyl 2-methylbutanoate', value: 1050, unit: 'OAV' }
+    ],
+    abundance: [
+      { rank: 1, name: '4-Hydroxy-2,5-dimethyl-3(2H)-furanone (Furaneol/HDF)', value: 26800, unit: 'µg·kg⁻¹' },
+      { rank: 2, name: 'Methyl 2-methylbutanoate', value: 1190, unit: 'µg·kg⁻¹' },
+      { rank: 3, name: 'Ethyl 2-methylbutanoate', value: 157, unit: 'µg·kg⁻¹' }
+    ],
+    abundanceLabel: 'SIDA 정량 12종',
+    source: 'pineappleFreshQuant',
+    caveat: 'OAV는 물에서 측정된 후각 역치를 사용했습니다. 품종·숙도·매트릭스·분석법이 달라지면 순위가 달라질 수 있습니다.'
+  };
+
   const QUANTITATIVE_RANKINGS = {
     'Fruity|Berry|Strawberry': {
       status: 'quantified-reference',
@@ -329,8 +361,32 @@
         { rank: 2, name: 'Methyl acetate', value: 239, unit: 'mg·m⁻³' },
         { rank: 3, name: 'Acetaldehyde', value: 24.9, unit: 'mg·m⁻³' }
       ],
+      abundanceLabel: '방출 VOC',
       source: 'strawberryReleasedVocs',
       caveat: '함량 순위와 향기기여 순위는 다르며, 품종·숙도·저장 조건·분석법에 따라 달라질 수 있습니다.'
+    },
+    'Fruity|Tropical Fruit|Pineapple': FRESH_PINEAPPLE_RANKING,
+    'Fruity|Tropical Fruit|Fresh Pineapple': FRESH_PINEAPPLE_RANKING,
+    'Floral|Colored Flowers|Rose': {
+      status: 'quantified-reference',
+      title: '장미',
+      sample: '장미 저온 추출물(LTE, 25 °C)',
+      matrix: 'LTE에서 정량한 주요 향기성분 8종',
+      method: 'HS-SPME-GC-MS 정량 및 문헌의 물 역치 기반 OAV',
+      scope: '장미 저온 추출물 한 시료의 주요 성분 8종 내 순위이며, 생화 전체나 커피 속 장미 노트의 보편적 분자 순위가 아닙니다.',
+      oav: [
+        { rank: 1, name: 'Eugenol', value: 779.14, unit: 'OAV' },
+        { rank: 2, name: 'Rose oxide', value: 530.40, unit: 'OAV' },
+        { rank: 3, name: '2-Phenylethanol (β-Phenyl ethyl alcohol)', value: 332.47, unit: 'OAV' }
+      ],
+      abundance: [
+        { rank: 1, name: '2-Phenylethanol (β-Phenyl ethyl alcohol)', value: 332467.62, unit: 'µg·L⁻¹' },
+        { rank: 2, name: 'Citronellol', value: 8399.64, unit: 'µg·L⁻¹' },
+        { rank: 3, name: 'Eugenol', value: 4674.86, unit: 'µg·L⁻¹' }
+      ],
+      abundanceLabel: 'LTE 정량 8종',
+      source: 'roseLteQuant',
+      caveat: 'OAV 역치는 물 기준이며 장미 추출물 자체의 역치가 아닙니다. 추출 온도·품종·매트릭스에 따라 함량과 기여도 순위가 달라질 수 있습니다.'
     }
   };
   const REFERENCE_BY_GROUP = {
