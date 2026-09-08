@@ -16,6 +16,7 @@ console.log('PASS: failed undo retained for retry, account isolation, missing au
 
 let keyHandler; c.currentSampleId='sample';c.saveCurrentSample=()=>false;
 c.document.addEventListener=(_,fn)=>keyHandler=fn;
+c.document.querySelector=()=>null;
 vm.runInContext(html.slice(html.indexOf('function setupKeyboardShortcuts()'),html.indexOf('// 차트 객체 정리')),c);
 c.setupKeyboardShortcuts();messages.length=0;keyHandler({ctrlKey:true,key:'s',preventDefault(){}});assert.equal(messages.length,0,'failed keyboard save must not report success');
 console.log('PASS: keyboard save failure does not claim success.');
