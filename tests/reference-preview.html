@@ -1,0 +1,5 @@
+<!doctype html><html lang="ko"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>분자 창 화면폭 검증</title>
+<style>body{font:16px system-ui;margin:16px;background:#eef2f6}select{padding:12px}iframe{display:block;margin-top:16px;border:1px solid #9ca3af;height:760px;max-width:100%;background:white}</style>
+<label>화면 너비 <select id="width"><option value="375">375px 모바일</option><option value="320">320px 모바일</option><option value="768">768px 태블릿</option><option value="1100">1100px 데스크톱</option></select></label>
+<iframe id="preview" title="향기분자 검증 화면" src="reference-frame.html" width="375"></iframe>
+<script>document.getElementById('width').addEventListener('change',event=>document.getElementById('preview').width=event.target.value);</script></html>
