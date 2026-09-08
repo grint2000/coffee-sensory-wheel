@@ -4353,6 +4353,7 @@ function exportStoredOriginal() {
 
 // 샘플 복제
 function cloneSample(sampleId) {
+  if (sampleId === currentSampleId) window.getLocalCuppingState();
   const originalSample = samples.find(s => s.id === sampleId);
   if (!originalSample) return;
   
@@ -4518,12 +4519,12 @@ function exportSnsImage() {
   // SNS용 간결한 HTML 구성 (커피명 + 향미특성/속성만)
   tempRoot.innerHTML = `
   <div style="text-align: center; margin-bottom: 30px;">
-    <h2 style="margin: 0; font-size: 24px; font-weight: bold; color: #8B5A2B;">${s.title || s.coffeeName || '커피 테이스팅'}</h2>
-    ${s.coffeeName && s.title !== s.coffeeName ? `<div style="font-size: 16px; color: #666; margin-top: 5px;">${s.coffeeName}</div>` : ''}
+    <h2 style="margin: 0; font-size: 24px; font-weight: bold; color: #8B5A2B;">${escapeHtml(s.title || s.coffeeName || '커피 테이스팅')}</h2>
+    ${s.coffeeName && s.title !== s.coffeeName ? `<div style="font-size: 16px; color: #666; margin-top: 5px;">${escapeHtml(s.coffeeName)}</div>` : ''}
     <div style="font-size: 14px; color: #555; margin-top: 10px; line-height: 1.4;">
-      <div>원산지: ${s.origin || '-'}</div>
-      <div>가공법: ${s.process || '-'}</div>
-      <div>로스팅: ${s.roastDate || '-'} / ${s.roastLevel || '-'}</div>
+      <div>원산지: ${escapeHtml(s.origin || '-')}</div>
+      <div>가공법: ${escapeHtml(s.process || '-')}</div>
+      <div>로스팅: ${escapeHtml(s.roastDate || '-')} / ${escapeHtml(s.roastLevel || '-')}</div>
     </div>
   </div>
   
@@ -4539,7 +4540,7 @@ function exportSnsImage() {
           const displayName = currentLanguage === 'ko' && rec && rec.length > 6 ? rec[6] : desc;
           const color = rec ? rec[3] : '#B8B2A5';
           const textColor = getContrastColor(color);
-          return `<span style="display: inline-block; padding: 4px 10px; border-radius: 12px; margin: 2px; font-size: 12px; color: ${textColor}; background: ${color}; font-weight: 500;">${displayName}</span>`;
+          return `<span style="display: inline-block; padding: 4px 10px; border-radius: 12px; margin: 2px; font-size: 12px; color: ${textColor}; background: ${color}; font-weight: 500;">${escapeHtml(displayName)}</span>`;
         }).join('');
         
         return `<div style="margin-bottom: 12px;">
@@ -4821,8 +4822,7 @@ function setupKeyboardShortcuts() {
     if (e.ctrlKey && e.key === 's') {
       e.preventDefault();
       if (currentSampleId) {
-        saveCurrentSample();
-        showToast("샘플이 저장되었습니다.");
+        if (saveCurrentSample()) showToast("샘플이 저장되었습니다.");
       }
     }
     
@@ -4847,7 +4847,7 @@ function setupKeyboardShortcuts() {
     if (e.ctrlKey && e.key === 'd') {
       e.preventDefault();
       if (currentSampleId) {
-        cloneSample(currentSampleId);
+        document.getElementById('cloneSampleBtn').click();
       }
     }
     
@@ -5299,16 +5299,19 @@ function setupEventHandlers() {
   const createTeamBtn = document.getElementById('createTeamBtn');
   if (createTeamBtn) createTeamBtn.addEventListener('click', function() {
     const name = document.getElementById('teamNameInput').value.trim();
-    if (name) createTeam(name);
+    if (name && typeof window.createTeam==='function') window.createTeam(name);
+    else showToast(name ? '팀 서비스를 불러오지 못했습니다. 연결 후 새로고침하세요.' : '팀 이름을 입력하세요.');
   });
   const joinTeamBtn = document.getElementById('joinTeamBtn');
   if (joinTeamBtn) joinTeamBtn.addEventListener('click', function() {
     const name = document.getElementById('teamNameInput').value.trim();
-    if (name) joinTeam(name);
+    if (name && typeof window.joinTeam==='function') window.joinTeam(name);
+    else showToast(name ? '팀 서비스를 불러오지 못했습니다. 연결 후 새로고침하세요.' : '팀 이름을 입력하세요.');
   });
   const teamReportBtn = document.getElementById('teamReportBtn');
   if (teamReportBtn) teamReportBtn.addEventListener('click', function() {
     if (typeof showTeamReport === 'function') showTeamReport();
+    else showToast('팀 서비스를 불러오지 못했습니다. 연결 후 새로고침하세요.');
   });
   const closeTeamReportModal = document.getElementById('closeTeamReportModal');
   if (closeTeamReportModal) closeTeamReportModal.addEventListener('click', function() {
