@@ -3,7 +3,8 @@ const source=fs.readFileSync('team.js','utf8').replace(/^import .*;$/gm,'');
 let callback,record=null,writes=[],confirmResult=true,conflict=false;
 const auth={currentUser:{uid:'u1',displayName:'Same name'}};
 const storage=new Map();const elements=new Map();
-function element(){return {textContent:'',classList:{toggle(){},add(){},remove(){}},appendChild(){},setAttribute(){},addEventListener(){},parentElement:{appendChild(){}}};}
+const createdNodes=[];
+function element(){const node={textContent:'',children:[],classList:{toggle(){},add(){},remove(){}},appendChild(child){this.children.push(child);},insertAdjacentHTML(){},setAttribute(){},addEventListener(){},parentElement:{appendChild(){}}};createdNodes.push(node);return node;}
 const box={console,JSON,Date,Error,Array,Promise,initializeApp:()=>({}),getAuth:()=>auth,getFirestore:()=>({}),GoogleAuthProvider:function(){},signInWithPopup:async()=>{},signOut:async()=>{auth.currentUser=null;await callback(null)},onAuthStateChanged:(_,cb)=>callback=cb,
  doc:(_,collection,name)=>name,localStorage:{getItem:k=>storage.get(k)??null,setItem:(k,v)=>storage.set(k,v),removeItem:k=>storage.delete(k)},
  document:{readyState:'complete',getElementById:id=>{if(!elements.has(id))elements.set(id,element());return elements.get(id)},createElement:element,addEventListener(){}},
@@ -22,8 +23,11 @@ vm.createContext(box);vm.runInContext(source,box);
  confirmResult=false;await box.publishTeamSamples();assert.equal(writes.length,count);
  confirmResult=true;conflict=true;await box.publishTeamSamples();assert.equal(writes.length,count,'concurrent change must reject');
  await box.publishTeamSamples();assert.equal(writes.length,count+1);assert.ok(writes.at(-1)['memberSamples.u1']);
+ record.memberSamples.u1=[{title:'시험 샘플',sampleData:{tastingNotes:'시험 메모'}}];
+ box.NOEL_WORKFLOW_API={score:()=> '85.00'};box.buildFlavorSummaryHtml=()=> '<p>향미</p>';
+ await box.showTeamReport();assert(createdNodes.some(n=>n.textContent==='기록 총점: 85.00'));assert(createdNodes.some(n=>n.textContent==='시험 메모'));
  auth.currentUser={uid:'u2',displayName:'Same name'};await callback(auth.currentUser);assert.equal(box.currentUser,'firebase_u2');
  await box.publishTeamSamples();assert.equal(writes.length,count+1,'other user must not inherit team');
  await box.logoutFirebase();assert.equal(box.currentUser,'default');
- console.log('PASS: UID profile isolation, create collision, rejoin preservation, no automatic upload, cancellation, concurrent conflict, explicit publish and logout. Mock Firebase only.');
+ console.log('PASS: UID profile isolation, create collision, rejoin preservation, no automatic upload, cancellation, concurrent conflict, explicit publish, report scores/notes and logout. Mock Firebase only.');
 })().catch(err=>{console.error(err);process.exitCode=1});
