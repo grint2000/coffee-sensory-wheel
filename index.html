@@ -2707,6 +2707,8 @@ function exportCurrentSessionJson() {
 
 
 function exportCurrentSessionExcel() {
+  saveCurrentSample();
+  syncCurrentSessionSamples();
   const session = getCurrentSessionObj();
   if (!session) {
     showToast('내보낼 세션이 없습니다.');
@@ -3657,6 +3659,7 @@ function renderSelectedFlavorsArea(_data) {
 
 // 레이더 차트 업데이트
 function updateRadar(data) {
+  if (typeof Chart !== "function") return;
   const ctx = document.getElementById('cuppingRadar');
   if (!ctx) return;
   
@@ -3952,7 +3955,7 @@ function renderSampleList() {
     sortableInstance.destroy();
   }
 
-  if (filteredSamples.length > 1) {
+  if (filteredSamples.length > 1 && typeof Sortable === "function") {
     sortableInstance = new Sortable(listDiv, {
       animation: 150,
       handle: '.sample-drag-handle',
@@ -4304,6 +4307,16 @@ function replaceSessionData(value, label, selection = {}) {
 // Explicit bridge for the existing extra/team scripts (top-level let is not window.samples).
 Object.defineProperty(window,'samples',{get:()=>samples,configurable:true});
 Object.defineProperty(window,'currentSampleId',{get:()=>currentSampleId,configurable:true});
+window.activateLocalUser = function(name) {
+  const nextUser = String(name || 'default');
+  if (loadedStorageUser === nextUser && window.currentUser === nextUser) return true;
+  if (loadedStorageUser && currentSampleId && !saveCurrentSample()) return false;
+  window.currentUser = nextUser;
+  APP_STORAGE.set('noel_sca_current_user',nextUser);
+  loadSamplesFromStorage();
+  return true;
+};
+window.canSyncLocalRecords = () => !storageWriteBlocked && loadedStorageUser === (window.currentUser || 'default');
 window.getLocalCuppingState = function() {
   const current = getCurrentSampleObj();
   if (current) {
@@ -4466,6 +4479,7 @@ function restoreBackup(backup) {
 
 // SNS형 이미지 내보내기 함수
 function exportSnsImage() {
+  if (typeof html2canvas !== "function") { showToast("이미지 기능을 불러오지 못했습니다. JSON 내보내기는 사용할 수 있습니다."); return; }
   saveCurrentSample();
   
   const currentSample = getCurrentSampleObj();
@@ -4666,6 +4680,7 @@ function buildSessionExcelRows(session) {
 }
 
 function exportSessionToExcel(session, useSessionFileName = false) {
+  if (typeof XLSX === "undefined") { showToast("엑셀 기능을 불러오지 못했습니다. JSON으로 내보낸 뒤 다시 연결해 주세요."); return; }
   if (!session || !Array.isArray(session.samples) || session.samples.length === 0) {
     showToast('내보낼 데이터가 없습니다.');
     return;
@@ -4674,7 +4689,8 @@ function exportSessionToExcel(session, useSessionFileName = false) {
   const rows = buildSessionExcelRows(session);
   const ws = XLSX.utils.aoa_to_sheet(rows);
   const wb = XLSX.utils.book_new();
-  const safeSheetTitle = (session.title || 'Cupping').slice(0, 31);
+  let safeSheetTitle = (session.title || 'Cupping').replace(/[\\/?*\[\]:]/g, '_').slice(0, 31).replace(/^'+|'+$/g, '').trim() || 'Cupping';
+  if (safeSheetTitle.toLowerCase() === 'history') safeSheetTitle = 'Cupping_History';
   XLSX.utils.book_append_sheet(wb, ws, safeSheetTitle);
 
   const safeFileTitle = (session.title || 'session').replace(/[^\w가-힣-]+/g, '_');
@@ -5064,10 +5080,8 @@ function setupEventHandlers() {
   // 데이터 관리 버튼들
   const saveSamplesBtn = document.getElementById('saveSamplesBtn');
   if (saveSamplesBtn) saveSamplesBtn.addEventListener('click', function() {
-    if (currentSampleId) {
-      saveCurrentSample();
-    }
-    if (saveSamplesToStorage()) showToast("모든 세션과 샘플이 이 기기에 저장되었습니다.");
+    const saved = currentSampleId ? saveCurrentSample() : saveSamplesToStorage();
+    if (saved) showToast("모든 세션과 샘플이 이 기기에 저장되었습니다.");
   });
   
   const loadSamplesWebBtn = document.getElementById('loadSamplesWebBtn');
