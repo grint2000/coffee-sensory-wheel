@@ -5,7 +5,7 @@ const auth={currentUser:{uid:'u1',displayName:'Same name'}};
 const storage=new Map();const elements=new Map();
 const createdNodes=[];
 function element(){const node={textContent:'',children:[],classList:{toggle(){},add(){},remove(){}},appendChild(child){this.children.push(child);},insertAdjacentHTML(){},setAttribute(){},addEventListener(){},parentElement:{appendChild(){}}};createdNodes.push(node);return node;}
-const box={console,JSON,Date,Error,Array,Promise,initializeApp:()=>({}),getAuth:()=>auth,getFirestore:()=>({}),GoogleAuthProvider:function(){},signInWithPopup:async()=>{},signOut:async()=>{auth.currentUser=null;await callback(null)},onAuthStateChanged:(_,cb)=>callback=cb,
+const box={console,JSON,Date,Error,Array,Promise,setTimeout,clearTimeout,initializeApp:()=>({}),getAuth:()=>auth,getFirestore:()=>({}),GoogleAuthProvider:function(){},signInWithPopup:async()=>{},signOut:async()=>{auth.currentUser=null;await callback(null)},onAuthStateChanged:(_,cb)=>callback=cb,
  doc:(_,collection,name)=>name,localStorage:{getItem:k=>storage.get(k)??null,setItem:(k,v)=>storage.set(k,v),removeItem:k=>storage.delete(k)},
  document:{readyState:'complete',getElementById:id=>{if(!elements.has(id))elements.set(id,element());return elements.get(id)},createElement:element,addEventListener(){}},
  alert(){},confirm:()=>confirmResult,arrayUnion:x=>[x],deleteField:()=>null,
@@ -29,5 +29,11 @@ vm.createContext(box);vm.runInContext(source,box);
  auth.currentUser={uid:'u2',displayName:'Same name'};await callback(auth.currentUser);assert.equal(box.currentUser,'firebase_u2');
  await box.publishTeamSamples();assert.equal(writes.length,count+1,'other user must not inherit team');
  await box.logoutFirebase();assert.equal(box.currentUser,'default');
+ const errorsToCheck=[['auth/unauthorized-domain','허용 목록'],['auth/popup-blocked','팝업'],['permission-denied','접근이 거부'],['unavailable','연결하지 못했습니다']];
+ for(const [code,text] of errorsToCheck)assert(box.explainTeamError({code}).includes(text));
+ let popupResolve,calls=0;box.signInWithPopup=()=>{calls++;return new Promise(resolve=>popupResolve=resolve)};
+ const login=box.firebaseLogin();await box.firebaseLogin();assert.equal(calls,1,'one popup at a time');popupResolve();await login;
+ box.getDoc=()=>new Promise(()=>{});box.setTimeout=fn=>setTimeout(fn,1);
+ await assert.rejects(box.readTeam('Test'),e=>e.code==='deadline-exceeded');
  console.log('PASS: UID profile isolation, create collision, rejoin preservation, no automatic upload, cancellation, concurrent conflict, explicit publish, report scores/notes and logout. Mock Firebase only.');
 })().catch(err=>{console.error(err);process.exitCode=1});

@@ -79,7 +79,30 @@ function cloudStatus(message) {
 }
 function stopListener() { generation++; if(window._teamSamplesUnsub) window._teamSamplesUnsub(); window._teamSamplesUnsub=null; }
 function member(data,uid) { return Array.isArray(data.members) && data.members.some(m=>m.uid===uid); }
-function fail(err) { console.error(err); cloudStatus('팀 작업 실패 · 기기 기록은 유지됩니다.'); notifyMessage(err.message || '팀 작업에 실패했습니다.'); }
+function explainTeamError(err) {
+  const code=err?.code || '';
+  const messages={
+    'auth/unauthorized-domain':'이 주소는 Firebase 로그인 허용 목록에 없습니다. 프로젝트 관리자가 현재 웹 주소를 등록해야 합니다.',
+    'auth/popup-blocked':'로그인 팝업이 차단됐습니다. 이 사이트의 팝업을 허용한 뒤 로그인 버튼을 다시 눌러 주세요.',
+    'auth/popup-closed-by-user':'로그인 창이 닫혔습니다. 로그인 버튼으로 다시 시작할 수 있습니다.',
+    'auth/cancelled-popup-request':'이미 로그인 창이 열려 있습니다. 해당 창에서 진행해 주세요.',
+    'auth/operation-not-allowed':'Firebase에서 Google 로그인이 활성화되지 않았습니다. 프로젝트 인증 설정을 확인해야 합니다.',
+    'auth/network-request-failed':'로그인 서버에 연결하지 못했습니다. 네트워크 연결 후 다시 시도해 주세요.',
+    'permission-denied':'팀 접근이 거부됐습니다. 로그인 계정의 팀 가입 상태와 Firestore 보안 규칙을 확인해야 합니다.',
+    'unavailable':'팀 서버에 연결하지 못했습니다. 기기 기록은 저장할 수 있으며 팀 작업은 연결 후 다시 시도해 주세요.',
+    'deadline-exceeded':'팀 조회 응답이 지연됩니다. 연결 상태를 확인한 뒤 다시 조회해 주세요.'
+  };
+  return messages[code] || err?.message || '팀 작업에 실패했습니다.';
+}
+function fail(err) { console.error(err); const message=explainTeamError(err); cloudStatus(message); notifyMessage(message); }
+async function readTeam(ref) {
+  let timer;
+  try { return await Promise.race([getDoc(ref),new Promise((_,reject)=>{
+    timer=setTimeout(()=>reject(Object.assign(Error('팀 조회 시간 초과'),{code:'deadline-exceeded'})),12000);
+  })]); } finally { clearTimeout(timer); }
+}
+window.getTeamConnectionState=()=>({serviceLoaded:true,signedIn:authReady});
+let loginPending=false;
 
 function normalizeTeamName(rawName) {
   const teamName = (rawName || '').trim();
@@ -91,7 +114,9 @@ function normalizeTeamName(rawName) {
 }
 
 window.firebaseLogin = async function() {
-  try { await signInWithPopup(auth,new GoogleAuthProvider()); } catch(err) { fail(err); }
+  if(loginPending)return;
+  loginPending=true;
+  try { await signInWithPopup(auth,new GoogleAuthProvider()); } catch(err) { fail(err); } finally { loginPending=false; }
 };
 window.logoutFirebase = async function() {
   try {
@@ -152,7 +177,7 @@ window.loadTeamInfoToModal = async function() {
   if (!teamName || !listEl) return;
   listEl.innerHTML = '';
 
-  const snap = await getDoc(doc(db, 'teams', teamName));
+  const snap = await readTeam(doc(db, 'teams', teamName));
   assertContext(c);
   if (!snap.exists() || !member(snap.data(),c.uid)) return;
 
@@ -206,7 +231,7 @@ window.publishTeamSamples = async function() {
   try {
     const c=context(); if(!c.team) throw new Error('먼저 팀을 선택하세요.');
     const payload=window.getTeamShareSamples();
-    const ref=doc(db,'teams',c.team), before=await getDoc(ref); assertContext(c);
+    const ref=doc(db,'teams',c.team), before=await readTeam(ref); assertContext(c);
     if(!before.exists() || !member(before.data(),c.uid)) throw new Error('팀 가입 상태를 확인하세요.');
     const previous=JSON.stringify(before.data().memberSamples?.[c.uid] ?? null);
     if(!confirm('현재 세션의 샘플 '+payload.length+'개를 팀에 공유합니다. 기존에 공유한 내 샘플을 교체할까요?')) return;
@@ -224,7 +249,7 @@ window.publishTeamSamples = async function() {
 window.fetchTeamSamples = async function() {
   try {
     const c=context(); if(!c.team) throw new Error('먼저 팀을 선택하세요.');
-    const snap=await getDoc(doc(db,'teams',c.team)); assertContext(c);
+    const snap=await readTeam(doc(db,'teams',c.team)); assertContext(c);
     if(!snap.exists() || !member(snap.data(),c.uid)) throw new Error('팀 가입 상태를 확인하세요.');
     const value=snap.data().memberSamples?.[c.uid];
     if(!Array.isArray(value) || !value.length) throw new Error('내가 공유한 팀 기록이 없습니다.');
@@ -253,7 +278,7 @@ window.showTeamReport = async function() {
   const teamName = getCurrentTeamName();
   if (!teamName) return;
 
-  const snap = await getDoc(doc(db, 'teams', teamName));
+  const snap = await readTeam(doc(db, 'teams', teamName));
   assertContext(c);
   if (!snap.exists() || !member(snap.data(),c.uid)) return;
 

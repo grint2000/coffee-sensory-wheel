@@ -1,5 +1,7 @@
 # Coffee Sensory Wheel
 
+Current draft status: [미완료 항목 원인·수정·검증](RELEASE_READINESS.md). Run `npm ci --ignore-scripts --no-audit --no-fund` then `npm test` for reproducible automated checks. Real Google/Firestore, device layout and installed-PWA validation remain open; these checks do not certify the entire project.
+
 ## Overview
 
 This project provides a web-based interface for managing and evaluating coffee cupping sessions. It offers features for organizing multiple samples, comparing tasting results, and exporting data in several formats. The page is optimized for both desktop and mobile browsers so you can comfortably record and review cupping notes on any device.
@@ -33,7 +35,7 @@ Run `node tests/data-store.cjs` for storage/recovery regression checks. `tests/o
 
 ## Browser Compatibility
 
-The page is designed with responsive layouts and touch-friendly controls. It works in modern browsers on Windows, macOS, Android, and iOS. For the best experience, keep your browser up to date.
+The page is designed with responsive layouts and touch-friendly controls for modern browsers. Physical Android/iOS and current desktop layout validation are still pending; see the current draft status above.
 
 ## Dark Mode
 
@@ -41,7 +43,7 @@ Click the moon icon in the header to switch between light and dark themes. Your 
 
 ## Offline and PWA Installation
 
-This app is a Progressive Web App. When you visit on a mobile device or supported desktop browser, you can install it like a native app. Click the **앱설치** button that appears in the header to add it to your home screen. When offline, the app shows a simple page letting you know the connection is lost.
+This app includes a web manifest and service worker. Supporting browsers may offer installation through **앱설치**. After successful caching of the app and required libraries, local recording can use the installed shell offline. Firebase login and team operations require a connection. Unknown uncached pages fall back to the offline notice. Actual installation, browser-specific install prompts and upgrades from an existing PWA still need live validation.
 
 ## Managing Users
 
@@ -58,7 +60,7 @@ After Google login, use **팀관리** to create or join a team. **현재 세션 
 - **세션 타이머**: elapsed time with start/pause/reset; state is local and separated by user/session. Reload resumes from wall-clock timestamps. Changing the device clock can affect elapsed time; no mandatory cupping protocol or alarm is implied.
 - Existing stored session selection is restored correctly. Save failure prevents session switching. New session creation keeps the prior data when storage fails.
 
-See [다른 앱 조사·반영·검증](APP_WORKFLOW_REVIEW.md). `workflow-tools.js` and `workflow-tools.css` contain the added logic/UI, with an explicit bridge in the page. `node tests/workflow-tools.cjs` checks model behavior. `tests/workflow-integration.cjs` uses jsdom 26.1.0 with synthetic records and no live network; its header documents the temporary test dependency setup. It tests application DOM events, not real mobile layout, native dialogs, downloads or Firebase.
+See [다른 앱 조사·반영·검증](APP_WORKFLOW_REVIEW.md). `workflow-tools.js` and `workflow-tools.css` contain the added logic/UI, with an explicit bridge in the page. `npm test` runs model, DOM, storage, export and mock service checks. `tests/workflow-integration.cjs` uses jsdom with synthetic records and the actual XLSX codec; native downloads, image rasterization, real mobile layout and Firebase remain separate live checks.
 
 ## Customizing the Header Logo
 

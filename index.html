@@ -4514,7 +4514,9 @@ function restoreBackup(backup) {
 }
 
 // SNS형 이미지 내보내기 함수
-function exportSnsImage() {
+async function exportSnsImage() {
+  const exportButton = document.getElementById('exportSnsImgBtn');
+  if (exportButton?.disabled) return;
   if (typeof html2canvas !== "function") { showToast("이미지 기능을 불러오지 못했습니다. JSON 내보내기는 사용할 수 있습니다."); return; }
   saveCurrentSample();
   
@@ -4624,35 +4626,32 @@ function exportSnsImage() {
   `;
   
   document.body.appendChild(tempRoot);
-  
-  html2canvas(tempRoot, {
+  if (exportButton) exportButton.disabled = true;
+  let downloadLink;
+  try {
+    const canvas = await html2canvas(tempRoot, {
     backgroundColor: "white",
     scale: 2,
     logging: false,
     useCORS: true
-  }).then(canvas => {
-    try {
+    });
       const a = document.createElement('a');
+      downloadLink = a;
       a.href = canvas.toDataURL("image/png");
       const fname = (s.title || s.coffeeName || 'coffee_sns') + '_sns.png';
       a.download = fname;
       document.body.appendChild(a);
       a.click();
       
-      document.body.removeChild(a);
-      document.body.removeChild(tempRoot);
-      showToast("SNS용 이미지가 저장되었습니다!");
-    } catch (e) {
-      console.error("SNS 이미지 생성 중 오류:", e);
-      showToast("SNS 이미지 생성 중 오류가 발생했습니다.");
-    }
-  }).catch(e => {
-    console.error("Canvas 생성 중 오류:", e);
-    showToast("이미지 변환 중 오류가 발생했습니다.");
-    if (document.body.contains(tempRoot)) {
-      document.body.removeChild(tempRoot);
-    }
-  });
+      showToast("SNS 이미지 다운로드를 요청했습니다. 브라우저의 다운로드 목록을 확인하세요.");
+  } catch (e) {
+    console.error("SNS 이미지 생성 중 오류:", e);
+    showToast("이미지 변환 중 오류가 발생했습니다. 다시 시도해 주세요.");
+  } finally {
+    downloadLink?.remove();
+    tempRoot.remove();
+    if (exportButton) exportButton.disabled = false;
+  }
 }
 
 // Excel 내보내기
@@ -4694,7 +4693,7 @@ function buildSessionExcelRows(session) {
       d.cropStatus || '',
       d.moistureContent || '',
       d.screenSize || '',
-      d.defectCount || '',
+      d.defectCount ?? '',
       d.lotNumber || '',
       d.supplierName || '',
       d.greenBagWeight || '',
@@ -4707,7 +4706,7 @@ function buildSessionExcelRows(session) {
       flavors[2] || '',
       flavors[3] || '',
       d.tastingNotes || '',
-      Number.isNaN(totalScore) ? '' : totalScore.toFixed(2),
+      Number.isNaN(totalScore) ? '' : totalScore,
       grade
     ]);
   });
@@ -4724,6 +4723,10 @@ function exportSessionToExcel(session, useSessionFileName = false) {
 
   const rows = buildSessionExcelRows(session);
   const ws = XLSX.utils.aoa_to_sheet(rows);
+  for(let row=3;row<rows.length;row++) {
+    const cell=ws['AA'+(row+1)];
+    if(cell && cell.t==='n')cell.z='0.00';
+  }
   const wb = XLSX.utils.book_new();
   let safeSheetTitle = (session.title || 'Cupping').replace(/[\\/?*\[\]:]/g, '_').slice(0, 31).replace(/^'+|'+$/g, '').trim() || 'Cupping';
   if (safeSheetTitle.toLowerCase() === 'history') safeSheetTitle = 'Cupping_History';

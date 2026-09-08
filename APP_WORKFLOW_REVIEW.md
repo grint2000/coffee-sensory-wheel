@@ -1,5 +1,7 @@
 # 커피 평가 앱 조사와 가안 반영
 
+이후 수정과 최신 검증 범위는 [미완료 항목 재점검](RELEASE_READINESS.md)을 참조한다.
+
 확인일: 2026-09-08. 대상: `grint2000/coffee-sensory-wheel`, 가안 `codex/flavor-molecule-rank-v2`.
 기준 커밋: `741439b58536468a8dc82a8ba07fd722e19dbea6`.
 수정 전 백업: `backup/before-app-workflow-20260908`.

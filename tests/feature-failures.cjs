@@ -9,8 +9,8 @@ c.loginUser();assert.match(messages.at(-1),/불러오지 못했습니다/);asser
 c.logoutUser();assert.equal(c.window.currentUser,'B');
 const html=fs.readFileSync('index.html','utf8');let captured='';
 const evil='<img src=x onerror=alert(1)>';
-Object.assign(c,{console,Date,FLAVOR_PHASES:[],ATTR_TO_BADGE:{},currentLanguage:'ko',saveCurrentSample(){},getCurrentSampleObj:()=>({sampleData:{title:evil,origin:evil,process:evil,roastDate:evil,roastLevel:evil}}),escapeHtml:s=>String(s).replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;'),showToast:m=>messages.push(m),document:{createElement:()=>({style:{},click(){}}),body:{appendChild(){},removeChild(){},contains:()=>true}},html2canvas:el=>{captured=el.innerHTML;return Promise.resolve({toDataURL:()=>''})}});
-vm.runInContext(html.slice(html.indexOf('function exportSnsImage()'),html.indexOf('// Excel 내보내기')),c);
+Object.assign(c,{console,Date,FLAVOR_PHASES:[],ATTR_TO_BADGE:{},currentLanguage:'ko',saveCurrentSample(){},getCurrentSampleObj:()=>({sampleData:{title:evil,origin:evil,process:evil,roastDate:evil,roastLevel:evil}}),escapeHtml:s=>String(s).replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;'),showToast:m=>messages.push(m),document:{getElementById:()=>null,createElement:()=>({style:{},click(){},remove(){}}),body:{appendChild(){},removeChild(){},contains:()=>true}},html2canvas:el=>{captured=el.innerHTML;return Promise.resolve({toDataURL:()=>''})}});
+vm.runInContext(html.slice(html.indexOf('async function exportSnsImage()'),html.indexOf('// Excel 내보내기')),c);
 c.exportSnsImage();assert(!captured.includes(evil));assert(captured.includes('&lt;img'));
 console.log('PASS: failed undo retained for retry, account isolation, missing auth service, SNS input escaping. Mock DOM only.');
 

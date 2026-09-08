@@ -1,0 +1,8 @@
+{
+  "name": "noel-coffee-sensory-wheel",
+  "private": true,
+  "version": "0.0.0",
+  "description": "Development-only regression tests for the static coffee cupping app",
+  "scripts": { "test": "node tests/run-all.cjs" },
+  "devDependencies": { "jsdom": "26.1.0", "xlsx": "0.18.5" }
+}
