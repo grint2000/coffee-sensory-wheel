@@ -775,6 +775,7 @@
       color: #f3f4f6 !important;
     }
   </style>
+<link rel="stylesheet" href="workflow-tools.css">
 </head>
 <body class="min-h-screen bg-[#fcfaf7]">
 <div class="max-w-5xl mx-auto p-1 md:p-4 bg-[#fcfaf7]">
@@ -838,6 +839,7 @@
         </div>
         <button type="button" id="saveSessionMetaBtn" class="w-full px-2 py-1 bg-white border border-amber-300 rounded text-xs mobile-touch-friendly">세션 정보 저장</button>
         <div id="sessionMeta" class="text-xs text-gray-700 leading-5"></div>
+        <div id="workflowTools"></div>
       </div>
       <div class="flex items-center gap-1 mb-2">
         <button class="px-2 py-1 export-btn rounded text-xs flex items-center mobile-touch-friendly" id="addSampleBtn"><i class="fa fa-plus mr-2"></i>샘플 추가</button>
@@ -2622,13 +2624,14 @@ function isAutoSessionTitle(title) {
 function switchSession(sessionId) {
   if (!sessionId) return;
   if (currentSessionId && currentSampleId) {
-    saveCurrentSample();
+    if (!saveCurrentSample()) { renderSessionSelect(); return false; }
     syncCurrentSessionSamples();
   }
 
   const session = sessions.find((item) => item.id === sessionId);
   if (!session) return;
   currentSessionId = session.id;
+  APP_STORAGE.set('noel_sca_current_session_'+(window.currentUser || 'default'),currentSessionId);
   samples = Array.isArray(session.samples) ? session.samples : [];
   if (!samples.length) {
     samples = [createNewSampleObj('샘플 #1')];
@@ -2644,6 +2647,7 @@ function switchSession(sessionId) {
   setUIFromSample(selectedSample.sampleData);
   renderSessionSelect();
   renderSampleList();
+  return true;
 }
 
 function openSessionModal() {
@@ -2666,6 +2670,7 @@ function openSessionModal() {
 }
 
 function createSessionFromModal() {
+  try {
   const dateValue = document.getElementById('sessionDateInput')?.value || new Date().toISOString().slice(0, 10);
   const timeValue = document.getElementById('sessionTimeInput')?.value || new Date().toTimeString().slice(0, 5);
   const locationValue = document.getElementById('sessionLocationInput')?.value.trim() || '';
@@ -2680,11 +2685,11 @@ function createSessionFromModal() {
     grindSize: document.getElementById('sessionGrindSizeInput')?.value.trim() || '',
     location: locationValue
   });
-  sessions.unshift(session);
-  saveSessionsToStorage();
+  const state=window.getLocalCuppingState();
+  if (!replaceSessionData([session,...state.sessions],'새 세션 생성',{currentSessionId:session.id})) return;
   document.getElementById('sessionModal')?.classList.remove('show');
-  switchSession(session.id);
   showToast('새 세션이 생성되었습니다.');
+  } catch(error) { showToast('새 세션을 만들지 못했습니다: '+error.message); }
 }
 
 function exportCurrentSessionJson() {
@@ -4054,8 +4059,8 @@ function getDefectSummary(sampleData) {
   return picked.length ? picked.join(' / ') : '없음';
 }
 
-function createComparisonChart(selectedSamples) {
-  const compareArea = document.getElementById('compareArea');
+function createComparisonChart(selectedSamples, target = null) {
+  const compareArea = target || document.getElementById('compareArea');
   if (!compareArea) return;
 
   if (!Array.isArray(selectedSamples) || selectedSamples.length < 2) {
@@ -4185,9 +4190,7 @@ function saveCurrentSample(applyInput=true) {
 
 // 샘플 로드
 function loadSample(sampleId) {
-  if (currentSampleId) {
-    saveCurrentSample();
-  }
+  if (currentSampleId && !saveCurrentSample()) return false;
   
   let sampleObj = samples.find(s => s.id === sampleId);
   if (sampleObj) {
@@ -4195,7 +4198,9 @@ function loadSample(sampleId) {
     APP_STORAGE.set(`noel_sca_current_sample_${window.currentUser || 'default'}`, currentSampleId);
     setUIFromSample(sampleObj.sampleData);
     renderSampleList();
+    return true;
   }
+  return false;
 }
 
 // Local persistence: validate before replacement; never overwrite an unreadable original.
@@ -4337,6 +4342,26 @@ window.importTeamSamples = function(value,teamName) {
   session.samples=imported.flatMap(item=>item.samples).map(item=>({ ...item,id:createNewSampleObj().id }));
   return replaceSessionData([...state.sessions,session],'팀 기록 불러오기',{currentSessionId:session.id});
 };
+window.NOEL_WORKFLOW_API = {
+  context:()=>loadedStorageUser===(window.currentUser || 'default') && currentSessionId ? {user:loadedStorageUser,sessionId:currentSessionId} : null,
+  snapshot:()=>window.getLocalCuppingState(),
+  flavorLabel:key=>getFlavorTextByKey(key),
+  score:sampleData=>formatScoreTotal(sampleData),
+  compare:(items,target)=>createComparisonChart(items,target),
+  open:(sessionId,sampleId)=>{
+    const target=sessions.find(item=>item.id===sessionId);
+    if(!target?.samples.some(item=>item.id===sampleId)) return false;
+    if(!switchSession(sessionId)) return false;
+    return loadSample(sampleId);
+  },
+  repeat:()=>{
+    const state=window.getLocalCuppingState();
+    const original=state.sessions.find(item=>item.id===state.currentSessionId);
+    if(!original)return false;
+    const next=createNewSessionObj(Object.fromEntries(['purpose','location','cupper','waterTemp','grindSize'].map(key=>[key,original[key]])));
+    return replaceSessionData([next,...state.sessions],'같은 조건 새 세션',{currentSessionId:next.id});
+  }
+};
 function downloadJsonText(text, name) {
   const url = URL.createObjectURL(new Blob([text],{type:'application/json;charset=utf-8'}));
   const a = document.createElement('a'); a.href=url; a.download=name; document.body.appendChild(a); a.click(); a.remove();
@@ -4358,6 +4383,7 @@ function cloneSample(sampleId) {
   if (!originalSample) return;
   
   const clonedData = JSON.parse(JSON.stringify(originalSample.sampleData));
+  clonedData.title = originalSample.title + " (복사본)";
   const newId = "sample_" + Date.now() + "_" + Math.floor(Math.random() * 10000);
   const clonedSample = {
     id: newId,
@@ -4818,6 +4844,8 @@ function enhanceMobileExperience() {
 // 키보드 단축키 지원
 function setupKeyboardShortcuts() {
   document.addEventListener('keydown', function(e) {
+    // Native dialogs own keyboard interaction while open.
+    if (document.querySelector('dialog[open]')) return;
     // Ctrl+S: 현재 샘플 저장
     if (e.ctrlKey && e.key === 's') {
       e.preventDefault();
@@ -5367,6 +5395,7 @@ window.addEventListener('beforeunload', function(e) {
 </script>
 <script type="module" src="team.js"></script>
 <script src="extras.js"></script>
+<script src="workflow-tools.js"></script>
 <script src="theme.js"></script>
 </body>
 </html>
