@@ -810,7 +810,7 @@
           <span class="font-semibold">샘플 관리 방법 안내:</span><br>
           - <b>샘플 추가</b>로 새로운 커피 평가를 기록/관리할 수 있습니다.<br>
           - <b>샘플 선택</b>시 해당 샘플 내용을 상세 편집/저장하며, 자동저장이 지원됩니다.<br>
-          - <b>웹에 전체 저장</b> 또는 <b>웹에서 불러오기</b> 버튼을 통해 LocalStorage에 전체 평가 내역을 관리할 수 있습니다.<br>
+          - <b>이 기기에 전체 저장</b> 또는 <b>이 기기에서 불러오기</b> 버튼을 통해 LocalStorage에 전체 평가 내역을 관리할 수 있습니다.<br>
           - <b>JSON 내보내기</b> 및 <b>불러오기</b> 기능을 통해 데이터를 파일로 보관/복원할 수 있습니다.
         </div>
       </div>
@@ -857,8 +857,8 @@
         </div>
       </div>
       <div class="flex flex-wrap gap-1 mt-2">
-        <button class="px-3 py-1 bg-blue-100 hover:bg-blue-200 text-blue-800 rounded text-xs flex items-center mobile-touch-friendly" id="saveSamplesBtn"><i class="fa fa-save mr-1"></i>웹에 전체 저장</button>
-        <button class="px-3 py-1 bg-blue-200 hover:bg-blue-300 text-blue-900 rounded text-xs flex items-center mobile-touch-friendly" id="loadSamplesWebBtn"><i class="fa fa-cloud-download-alt mr-1"></i>웹에서 불러오기</button>
+        <button class="px-3 py-1 bg-blue-100 hover:bg-blue-200 text-blue-800 rounded text-xs flex items-center mobile-touch-friendly" id="saveSamplesBtn"><i class="fa fa-save mr-1"></i>이 기기에 전체 저장</button>
+        <button class="px-3 py-1 bg-blue-200 hover:bg-blue-300 text-blue-900 rounded text-xs flex items-center mobile-touch-friendly" id="loadSamplesWebBtn"><i class="fa fa-cloud-download-alt mr-1"></i>이 기기에서 불러오기</button>
         <button class="px-3 py-1 bg-green-100 hover:bg-green-200 text-green-800 rounded text-xs flex items-center mobile-touch-friendly" id="exportSamplesBtn"><i class="fa fa-download mr-1"></i>JSON 내보내기</button>
         <button class="px-3 py-1 bg-emerald-100 hover:bg-emerald-200 text-emerald-800 rounded text-xs flex items-center mobile-touch-friendly" id="exportCurrentSessionBtn"><i class="fa fa-box-archive mr-1"></i>현재 세션 내보내기</button>
         <button class="px-3 py-1 bg-teal-100 hover:bg-teal-200 text-teal-800 rounded text-xs flex items-center mobile-touch-friendly" id="exportCurrentSessionXlsxBtn"><i class="fa fa-file-excel mr-1"></i>현재 세션 엑셀</button>
@@ -910,6 +910,8 @@
       <div class="font-bold text-lg mr-2 mb-1">현재 샘플명:</div>
       <input id="sampleTitleInput" type="text" maxlength="60" class="p-1.5 border rounded min-w-[140px] text-base font-semibold" placeholder="샘플명">
       <span id="sampleSavedState" class="ml-2 text-green-700 font-bold text-xs hidden">저장됨</span>
+      <div class="w-full text-sm rounded border p-2 mt-2" id="storageStatus" role="status" aria-live="polite">이 브라우저에 저장합니다. 다른 기기에서 사용하려면 JSON 파일로 옮겨 주세요.</div>
+      <button type="button" id="exportStoredDataBtn" class="text-xs underline mt-2 mobile-touch-friendly">저장된 원본 파일 백업</button>
     </div>
     
     <!-- 커피 정보 -->
@@ -1427,6 +1429,7 @@
 </div>
 
 <script src="flavor-reference.js"></script>
+<script src="data-store.js"></script>
 <script>
 /* === 1단계: 기본 데이터 구조 및 상수 정의 === */
 
@@ -2685,6 +2688,8 @@ function createSessionFromModal() {
 }
 
 function exportCurrentSessionJson() {
+  saveCurrentSample();
+  syncCurrentSessionSamples();
   const session = getCurrentSessionObj();
   if (!session) return;
   const blob = new Blob([JSON.stringify(session, null, 2)], { type: 'application/json;charset=utf-8' });
@@ -3760,6 +3765,8 @@ function syncScoreRealtime(fieldKey, rawValue) {
 
 // 자동 저장
 function scheduleAutoSave() {
+  pendingLocalSave = true;
+  setStorageStatus("저장 대기 중…");
   if (sampleSaveTimeout) {
     clearTimeout(sampleSaveTimeout);
   }
@@ -3767,12 +3774,6 @@ function scheduleAutoSave() {
   sampleSaveTimeout = setTimeout(() => {
     try {
       saveCurrentSample();
-      
-      const saveState = document.getElementById('sampleSavedState');
-      if (saveState) {
-        saveState.classList.remove("hidden");
-        setTimeout(() => saveState.classList.add("hidden"), 1500);
-      }
     } catch(e) {
       console.error("자동 저장 중 오류:", e);
       showToast("자동 저장 중 오류가 발생했습니다.");
@@ -4176,8 +4177,7 @@ function saveCurrentSample(applyInput=true) {
   samples[sampleIdx].sampleData.title = samples[sampleIdx].title;
   samples[sampleIdx].lastEdit = +(new Date());
   renderSampleList();
-  saveSamplesToStorage();
-  return true;
+  return saveSamplesToStorage();
 }
 
 // 샘플 로드
@@ -4195,105 +4195,138 @@ function loadSample(sampleId) {
   }
 }
 
-// 스토리지에서 샘플 로드
-function loadSamplesFromStorage() {
-  const userKey = window.currentUser || 'default';
-  const sessionsKey = `noel_sca_sessions_${userKey}`;
-  const legacyKey = `noel_sca_samples2_${userKey}`;
-  try {
-    const rawSessions = APP_STORAGE.get(sessionsKey);
-    if (rawSessions) {
-      sessions = JSON.parse(rawSessions);
-    } else {
-      const legacyRaw = APP_STORAGE.get(legacyKey);
-      if (legacyRaw) {
-        const legacySamples = JSON.parse(legacyRaw);
-        if (Array.isArray(legacySamples) && legacySamples.length) {
-          sessions = [createNewSessionObj({
-            id: `session_migrated_${Date.now()}`,
-            title: '기존 데이터',
-            date: new Date().toISOString().slice(0, 10),
-            purpose: '기타',
-            samples: legacySamples
-          })];
-          APP_STORAGE.set(sessionsKey, JSON.stringify(sessions));
-          APP_STORAGE.remove(legacyKey);
-        }
-      }
-    }
-  } catch(e) {
-    console.error("저장된 샘플 로딩 중 오류:", e);
-    sessions = [];
-  }
-
-  if (!Array.isArray(sessions) || !sessions.length) {
-    sessions = [createNewSessionObj()];
-  }
-  sessions = sessions.map((session) => {
-    const normalized = {
-      ...createNewSessionObj(),
-      ...session,
-      samples: Array.isArray(session.samples) ? session.samples : []
-    };
-    if (!Object.prototype.hasOwnProperty.call(session, 'time')) {
-      normalized.time = '';
-    }
-    return normalized;
-  });
-  sessions.forEach((session) => {
-    session.samples = session.samples.map((sample, index) => {
-      const normalized = {
-        ...createNewSampleObj(`샘플 #${index + 1}`),
-        ...sample
-      };
-      validateSampleData(normalized.sampleData);
-      return normalized;
-    });
-  });
-
-  currentSessionId = sessions[0].id;
-  const activeSession = getCurrentSessionObj();
-  samples = activeSession?.samples || [];
-  if (!samples.length) {
-    samples = [createNewSampleObj("샘플 #1")];
-    if (activeSession) activeSession.samples = samples;
-  }
-
-  const savedSampleId = APP_STORAGE.get(`noel_sca_current_sample_${window.currentUser || 'default'}`);
-  const restoredSample = samples.find(sample => sample.id === savedSampleId);
-  const selectedSample = restoredSample || samples[0];
-
-  currentSampleId = selectedSample.id;
+// Local persistence: validate before replacement; never overwrite an unreadable original.
+let storageWriteBlocked = false;
+let loadedStorageUser = null;
+let pendingLocalSave = false;
+function setStorageStatus(message, error = false) {
+  const el = document.getElementById('storageStatus');
+  if (el) { el.textContent = message; el.style.color = error ? '#b91c1c' : '#374151'; }
+  if (error) document.getElementById('sampleSavedState')?.classList.add('hidden');
+}
+function normalizeSessionData(value) {
+  return NOEL_DATA.normalize(value, {session:createNewSessionObj, sample:createNewSampleObj, validate:validateSampleData});
+}
+function applyLoadedSessions(next, sessionId, sampleId) {
+  if (sampleSaveTimeout) { clearTimeout(sampleSaveTimeout); sampleSaveTimeout = null; }
+  sessions = next;
+  const active = sessions.find(item => item.id === sessionId) || sessions[0];
+  currentSessionId = active.id;
+  samples = active.samples;
+  const selected = samples.find(item => item.id === sampleId) || samples[0];
+  currentSampleId = selected.id;
+  // Do not call switchSession here: it saves the old editor into the new record set.
+  setUIFromSample(selected.sampleData);
   renderSessionSelect();
-  if (selectedSample) setUIFromSample(selectedSample.sampleData);
   renderSampleList();
 }
-
-// 스토리지에 샘플 저장
+function loadSamplesFromStorage() {
+  const user = window.currentUser || 'default';
+  const previousUser = loadedStorageUser;
+  loadedStorageUser = user;
+  try {
+    const raw = localStorage.getItem('noel_sca_sessions_'+user);
+    const legacy = raw === null ? localStorage.getItem('noel_sca_samples2_'+user) : null;
+    const next = raw !== null ? normalizeSessionData(JSON.parse(raw)) : legacy !== null ? normalizeSessionData(JSON.parse(legacy)) : [createNewSessionObj()];
+    const selectedSession = localStorage.getItem('noel_sca_current_session_'+user);
+    const selectedSample = localStorage.getItem('noel_sca_current_sample_'+user);
+    applyLoadedSessions(next, selectedSession, selectedSample);
+    storageWriteBlocked = false;
+    pendingLocalSave = false;
+    setStorageStatus('기기 저장소의 기록을 불러왔습니다. JSON 파일로 별도 백업할 수 있습니다.');
+    // Legacy input is retained. A later successful save writes the canonical sessions key.
+    return true;
+  } catch (error) {
+    storageWriteBlocked = true;
+    if (!sessions.length || previousUser !== user) applyLoadedSessions([createNewSessionObj()]);
+    setStorageStatus('저장된 기록을 읽지 못해 덮어쓰기를 막았습니다. 저장된 원본 파일을 백업한 뒤 올바른 JSON을 불러와 주세요.', true);
+    console.error('기록 불러오기 실패:', error);
+    return false;
+  }
+}
 function saveSamplesToStorage() {
   syncCurrentSessionSamples();
-  saveSessionsToStorage();
+  return saveSessionsToStorage();
 }
-
 function saveSessionsToStorage() {
-  try {
-    const userKey = window.currentUser || 'default';
-    const didSaveSessions = APP_STORAGE.set(`noel_sca_sessions_${userKey}`, JSON.stringify(sessions));
-    const didSaveSamples = APP_STORAGE.set(`noel_sca_samples2_${userKey}`, JSON.stringify(samples));
-    const didSaveCurrentSample = APP_STORAGE.set(`noel_sca_current_sample_${userKey}`, currentSampleId || '');
-    if (!didSaveSessions || !didSaveSamples || !didSaveCurrentSample) throw new Error('localStorage write failed');
-    if (typeof syncSamplesToTeam === 'function') {
-      try { syncSamplesToTeam(samples); } catch(e) { console.error(e); }
-    }
-    const saveState = document.getElementById('sampleSavedState');
-    if (saveState) {
-      saveState.classList.remove("hidden");
-      setTimeout(() => saveState.classList.add("hidden"), 900);
-    }
-  } catch(e) {
-    console.error("샘플 저장 중 오류:", e);
-    showToast("저장 중 오류가 발생했습니다. 데이터를 백업해 주세요.");
+  const user = window.currentUser || 'default';
+  if (storageWriteBlocked || user !== loadedStorageUser) {
+    pendingLocalSave = true;
+    setStorageStatus('현재 기록이 저장되지 않았습니다. JSON으로 내보낸 뒤 사용자와 저장된 원본을 확인해 주세요.', true);
+    return false;
   }
+  try {
+    NOEL_DATA.commit(localStorage, user, sessions);
+    // Selection metadata and the old compatibility cache are not the source of truth.
+    APP_STORAGE.set('noel_sca_current_session_'+user, currentSessionId || '');
+    APP_STORAGE.set('noel_sca_current_sample_'+user, currentSampleId || '');
+    APP_STORAGE.set('noel_sca_samples2_'+user, JSON.stringify(samples));
+    pendingLocalSave = false;
+    setStorageStatus('이 기기에 저장됨 · '+new Date().toLocaleTimeString());
+    if (typeof syncSamplesToTeam === 'function') {
+      Promise.resolve(syncSamplesToTeam(samples)).catch(error => console.error('팀 동기화 실패:',error));
+    }
+    const state = document.getElementById('sampleSavedState');
+    if (state) {state.classList.remove('hidden'); setTimeout(()=>state.classList.add('hidden'),1500);}
+    return true;
+  } catch (error) {
+    pendingLocalSave = true;
+    setStorageStatus('저장 실패: 화면의 기록은 남아 있습니다. 창을 닫기 전에 JSON으로 내보내 주세요.', true);
+    console.error('기록 저장 실패:',error);
+    return false;
+  }
+}
+function replaceSessionData(value, label, selection = {}) {
+  const next = normalizeSessionData(value);
+  const user = window.currentUser || 'default';
+  if (user !== loadedStorageUser) throw Error('사용자가 변경됐습니다. 현재 기록을 내보낸 뒤 새로고침해 주세요.');
+  if (currentSampleId) {
+    const current = getCurrentSampleObj();
+    if (current) {
+      saveUIToSample(current.sampleData);
+      current.title = document.getElementById('sampleTitleInput').value.trim() || '샘플';
+      current.sampleData.title = current.title;
+    }
+  }
+  syncCurrentSessionSamples();
+  const previousRaw = localStorage.getItem('noel_sca_sessions_'+user);
+  NOEL_DATA.backup(localStorage,user,sessions,label+' 전',previousRaw);
+  // If either backup or commit fails, the in-memory record set remains unchanged.
+  NOEL_DATA.commit(localStorage,user,next);
+  storageWriteBlocked = false;
+  pendingLocalSave = false;
+  applyLoadedSessions(next,selection.currentSessionId,selection.currentSampleId);
+  APP_STORAGE.set('noel_sca_current_session_'+user,currentSessionId);
+  APP_STORAGE.set('noel_sca_current_sample_'+user,currentSampleId);
+  setStorageStatus(label+' 완료 · 이전 기록은 백업 복원에서 확인할 수 있습니다.');
+  return true;
+}
+// Explicit bridge for the existing extra/team scripts (top-level let is not window.samples).
+Object.defineProperty(window,'samples',{get:()=>samples,configurable:true});
+Object.defineProperty(window,'currentSampleId',{get:()=>currentSampleId,configurable:true});
+window.getLocalCuppingState = function() {
+  const current = getCurrentSampleObj();
+  if (current) {
+    saveUIToSample(current.sampleData);
+    current.title = document.getElementById('sampleTitleInput').value.trim() || '샘플';
+    current.sampleData.title = current.title;
+  }
+  syncCurrentSessionSamples();
+  return JSON.parse(JSON.stringify({sessions,currentSessionId,currentSampleId}));
+};
+window.restoreLocalCuppingState = state => replaceSessionData(state.sessions,'실행 취소',state);
+function downloadJsonText(text, name) {
+  const url = URL.createObjectURL(new Blob([text],{type:'application/json;charset=utf-8'}));
+  const a = document.createElement('a'); a.href=url; a.download=name; document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(()=>URL.revokeObjectURL(url),1000);
+}
+function exportStoredOriginal() {
+  try {
+    const user = loadedStorageUser || window.currentUser || 'default';
+    const raw = localStorage.getItem('noel_sca_sessions_'+user) ?? localStorage.getItem('noel_sca_samples2_'+user);
+    if (raw === null) { showToast('저장된 원본이 없습니다. 현재 기록은 JSON 내보내기를 이용해 주세요.'); return; }
+    downloadJsonText(raw,'noel_original_'+new Date().toISOString().slice(0,10)+'.json');
+  } catch (_) { setStorageStatus('저장소를 읽지 못했습니다. 현재 화면의 기록을 JSON으로 내보내 주세요.',true); }
 }
 
 // 샘플 복제
@@ -4356,52 +4389,29 @@ function setupSwipeNavigation() {
 
 // 자동 백업 기능
 function setupAutoBackup() {
-  const lastBackup = APP_STORAGE.get('noel_sca_last_backup');
+  if (storageWriteBlocked || loadedStorageUser !== (window.currentUser || 'default')) return;
+  const user = loadedStorageUser;
+  const stampKey = 'noel_sca_last_backup_'+encodeURIComponent(user);
   const now = Date.now();
-  
-  if (!lastBackup || (now - parseInt(lastBackup)) > 86400000) {
-    try {
-      syncCurrentSessionSamples();
-      const backupData = JSON.stringify(sessions);
-      const backupKey = `noel_sca_backup_${new Date().toISOString().slice(0, 10)}`;
-      
-      if (!APP_STORAGE.set(backupKey, backupData)) {
-        const keys = APP_STORAGE.keys().filter((k) => k.startsWith('noel_sca_backup_')).sort();
-        while (keys.length) {
-          APP_STORAGE.remove(keys.shift());
-          if (APP_STORAGE.set(backupKey, backupData)) break;
-        }
-      }
-      APP_STORAGE.set('noel_sca_last_backup', now.toString());
-      
-      const keys = [];
-      for (const key of APP_STORAGE.keys()) {
-        if (key && key.startsWith('noel_sca_backup_')) {
-          keys.push(key);
-        }
-      }
-      
-      if (keys.length > 7) {
-        keys.sort();
-        while (keys.length > 7) {
-          APP_STORAGE.remove(keys.shift());
-        }
-      }
-    } catch (e) {
-      console.error('자동 백업 중 오류:', e);
-    }
+  if (now - Number(APP_STORAGE.get(stampKey, 0)) < 86400000) return;
+  try {
+    syncCurrentSessionSamples();
+    NOEL_DATA.backup(localStorage,user,sessions,'자동 백업');
+    APP_STORAGE.set(stampKey,String(now));
+    // Prune only this user's oldest automatic backups after a successful new write.
+    const own = NOEL_DATA.listBackups(localStorage,user).filter(row=>row.key.startsWith(NOEL_DATA.backupPrefix(user)) && row.reason === '자동 백업');
+    own.slice(7).forEach(row=>APP_STORAGE.remove(row.key));
+  } catch (error) {
+    console.error('자동 백업 실패:',error);
+    setStorageStatus('자동 백업을 만들지 못했습니다. JSON 파일로 별도 백업해 주세요.',true);
   }
 }
 
 // 백업 목록 표시 및 복원
 function showBackupList() {
-  const backups = [];
-  for (const key of APP_STORAGE.keys()) {
-    if (key && key.startsWith('noel_sca_backup_')) {
-      const date = key.replace('noel_sca_backup_', '');
-      backups.push({ key, date });
-    }
-  }
+  let backups;
+  try { backups = NOEL_DATA.listBackups(localStorage,loadedStorageUser || 'default'); }
+  catch (_) { showToast('백업 목록을 읽지 못했습니다.'); return; }
 
   if (backups.length === 0) {
     showToast("저장된 백업이 없습니다.");
@@ -4424,7 +4434,7 @@ function showBackupList() {
 
     const label = document.createElement('span');
     label.className = 'text-sm';
-    label.textContent = `${index + 1}. ${backup.date}`;
+    label.textContent = `${index + 1}. ${backup.date} · ${backup.reason}`;
 
     const btn = document.createElement('button');
     btn.type = 'button';
@@ -4441,24 +4451,16 @@ function showBackupList() {
 }
 
 function restoreBackup(backup) {
-  if (!backup || !backup.key) return;
+  if (!backup?.key) return;
   try {
-    const backupData = APP_STORAGE.get(backup.key);
-    if (!backupData) throw new Error('backup missing');
-    const parsedData = JSON.parse(backupData);
-
-    if (Array.isArray(parsedData) && parsedData.length > 0) {
-      sessions = parsedData;
-      switchSession(sessions[0].id);
-      saveSessionsToStorage();
-      document.getElementById('backupRestoreModal')?.classList.remove('show');
-      showToast(`${backup.date} 백업을 성공적으로 복원했습니다.`);
-    } else {
-      showToast("백업 데이터 형식이 올바르지 않습니다.");
-    }
-  } catch (e) {
-    console.error("백업 복원 중 오류:", e);
-    showToast("백업 복원 중 오류가 발생했습니다.");
+    const value = JSON.parse(localStorage.getItem(backup.key));
+    normalizeSessionData(value);
+    if (!confirm(backup.reason+'을 복원하시겠습니까? 현재 기록은 별도 백업 후 대체합니다.')) return;
+    replaceSessionData(value,'백업 복원');
+    document.getElementById('backupRestoreModal')?.classList.remove('show');
+    showToast('백업을 복원했습니다.');
+  } catch (error) {
+    showToast('복원하지 못했습니다. '+error.message);
   }
 }
 
@@ -4733,50 +4735,9 @@ function validateSampleData(sampleData) {
 
 // 오류 모니터링 및 자동 복구 기능
 function setupErrorMonitoring() {
-  window.addEventListener('error', function(e) {
-    console.error('오류 감지됨:', e.error);
-    
-    lastErrorCount++;
-    
-    if (lastErrorCount > 5) {
-      try {
-        let lastBackupKey = null;
-        let lastBackupDate = '';
-        
-        for (let i = 0; i < localStorage.length; i++) {
-          const key = localStorage.key(i);
-          if (key && key.startsWith('noel_sca_backup_')) {
-            const date = key.replace('noel_sca_backup_', '');
-            if (!lastBackupKey || date > lastBackupDate) {
-              lastBackupKey = key;
-              lastBackupDate = date;
-            }
-          }
-        }
-        
-        if (lastBackupKey) {
-          const emergency_copy = JSON.parse(JSON.stringify(sessions));
-          const backupData = JSON.parse(localStorage.getItem(lastBackupKey));
-          
-          if (Array.isArray(backupData) && backupData.length > 0) {
-            localStorage.setItem('noel_sca_emergency_backup', JSON.stringify(emergency_copy));
-            showToast("오류로 인해 마지막 백업 상태로 복원합니다...");
-            
-            sessions = backupData;
-            if (sessions.length > 0) {
-              switchSession(sessions[0].id);
-              saveSessionsToStorage();
-            }
-          }
-        }
-        
-        lastErrorCount = 0;
-      } catch (err) {
-        console.error("자동 복구 중 오류:", err);
-      }
-    }
-    
-    setTimeout(() => { lastErrorCount = 0; }, 10000);
+  window.addEventListener('error', event => {
+    console.error('오류 감지:',event.error);
+    setStorageStatus('화면 오류가 발생했습니다. 현재 기록을 JSON으로 백업해 주세요. 과거 기록으로 자동 대체하지 않습니다.',true);
   });
 }
 
@@ -5098,21 +5059,21 @@ function setupEventHandlers() {
     });
   }
   
+  document.getElementById('exportStoredDataBtn')?.addEventListener('click',exportStoredOriginal);
+
   // 데이터 관리 버튼들
   const saveSamplesBtn = document.getElementById('saveSamplesBtn');
   if (saveSamplesBtn) saveSamplesBtn.addEventListener('click', function() {
     if (currentSampleId) {
       saveCurrentSample();
     }
-    saveSamplesToStorage();
-    showToast("모든 샘플이 웹 스토리지에 저장되었습니다.");
+    if (saveSamplesToStorage()) showToast("모든 세션과 샘플이 이 기기에 저장되었습니다.");
   });
   
   const loadSamplesWebBtn = document.getElementById('loadSamplesWebBtn');
   if (loadSamplesWebBtn) loadSamplesWebBtn.addEventListener('click', function() {
     if (confirm("웹 스토리지에서 샘플을 불러오시겠습니까? 저장되지 않은 변경사항은 사라집니다.")) {
-      loadSamplesFromStorage();
-      showToast("웹 스토리지에서 샘플을 불러왔습니다.");
+      if (loadSamplesFromStorage()) showToast("이 기기에서 기록을 불러왔습니다.");
     }
   });
 
@@ -5165,38 +5126,19 @@ function setupEventHandlers() {
     reader.onload = function(event) {
       try {
         const importedData = JSON.parse(event.target.result);
-        
-        if (Array.isArray(importedData) && importedData.length > 0) {
-          if (confirm("불러온 데이터로 기존 데이터를 대체하시겠습니까?")) {
-            const first = importedData[0];
-            if (first && Array.isArray(first.samples)) {
-              sessions = importedData.map((session) => ({
-                ...createNewSessionObj(),
-                ...session,
-                samples: (session.samples || []).map((sample) => ({
-                  ...createNewSampleObj('샘플'),
-                  ...sample
-                }))
-              }));
-            } else {
-              samples = importedData;
-              sessions = [createNewSessionObj({ title: '가져온 데이터', samples })];
-            }
-            sessions.forEach((session) => (session.samples || []).forEach((sample) => validateSampleData(sample.sampleData)));
-            currentSessionId = sessions[0].id;
-            switchSession(currentSessionId);
-            saveSessionsToStorage();
-            showToast("샘플 데이터를 성공적으로 불러왔습니다.");
-          }
-        } else {
-          showToast("유효한 샘플 데이터가 아닙니다.");
+        const checked = normalizeSessionData(importedData);
+        const count = checked.reduce((sum,session)=>sum+session.samples.length,0);
+        if (confirm(`${checked.length}개 세션 · ${count}개 샘플을 불러오시겠습니까? 현재 기록은 백업 후 대체합니다.`)) {
+          replaceSessionData(checked,'JSON 불러오기');
+          showToast('JSON 기록을 불러왔습니다.');
         }
       } catch (e) {
         console.error("JSON 파싱 오류:", e);
-        showToast("JSON 파일 형식이 올바르지 않습니다.");
+        showToast("불러오지 못했습니다. "+e.message);
       }
     };
     
+    reader.onerror = () => showToast('파일을 읽지 못했습니다. 다시 선택해 주세요.');
     reader.readAsText(file);
     e.target.value = '';
   });
@@ -5389,8 +5331,8 @@ if (document.readyState !== 'loading') {
 // 페이지 종료 시 정리 작업 
 window.addEventListener('beforeunload', function(e) {
   try {
-    saveCurrentSample();
-    cleanupCharts();
+    const saved = saveCurrentSample();
+    if (!saved && pendingLocalSave) { e.preventDefault(); e.returnValue = ''; }
   } catch (err) {
     console.error("페이지 종료 시 정리 작업 중 오류:", err);
   }
