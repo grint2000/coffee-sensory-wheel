@@ -1,0 +1,56 @@
+<!doctype html><html lang="ko"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>향기분자 독립 검증</title>
+<style>body{font:15px system-ui;margin:16px}button,select{min-height:44px;margin:4px;max-width:100%}label{display:inline-flex;align-items:center;min-height:44px;padding:8px;border:1px solid #aaa;border-radius:8px}#result{white-space:pre-wrap;overflow-wrap:anywhere}ol,ul{list-style:none}*{box-sizing:border-box}</style>
+<h1 style="font-size:18px">향기분자 독립 검증</h1><p>실제 페이지의 분자 창·포인터 함수를 사용합니다. 로그인·저장 기능은 실행하지 않습니다.</p>
+<label>검증 노트 <select id="note"></select></label><div id="fixture"></div>
+<button id="run" disabled>포인터 모의 테스트 실행</button><pre id="result">불러오는 중</pre>
+<script src="../flavor-reference.js"></script>
+<script>
+(async () => {
+  const html = await (await fetch('../index.html')).text();
+  const data = html.match(/const FLAVOR_DATA = (\[[\s\S]*?\n\]);/);
+  const start = html.indexOf('let lastFlavorEvidenceTrigger =');
+  const end = html.indexOf('// 향미 특성/속성 실시간 반영 개선', start);
+  if (!data || start < 0 || end < start) throw Error('Source boundaries changed');
+  const script = document.createElement('script');
+  script.textContent = 'const FLAVOR_DATA = ' + data[1] + ';let currentLanguage="ko";function escapeHtml(v){return String(v??"").replace(/[&<>"\x27]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;","\\\"":"&quot;","\x27":"&#39;"}[c]||c));}\n' + html.slice(start, end);
+  document.head.appendChild(script);
+  const rows = Function('return ' + data[1])();
+  const select = document.getElementById('note');
+  rows.forEach(row => { const option = new Option(row[6]+' / '+row[2],row.slice(0,3).join('|')); select.add(option); });
+  select.value = 'Fruity|Berry|Strawberry';
+  function render() {
+    const fixture = document.getElementById('fixture');
+    fixture.replaceChildren();
+    const chip = document.createElement('div'); chip.className = 'flavor-chip';
+    const label = document.createElement('label'); label.className = 'flavor-checkbox-label';
+    const box = document.createElement('input'); box.type = 'checkbox'; box.className = 'flavorSelectBox'; box.dataset.key = select.value;
+    label.append(box, document.createTextNode('향미 선택'));
+    const button = document.createElement('button'); button.type = 'button'; button.className = 'flavor-evidence-trigger'; button.dataset.evidenceKey = select.value; button.textContent = '분자'; button.setAttribute('aria-label','주요 향기분자 보기');
+    chip.append(label,button); fixture.append(chip); bindFlavorEvidenceTriggers(fixture);
+  }
+  select.addEventListener('change',render); render();
+  const result = document.getElementById('result'); result.textContent = '준비 완료 · 전체 '+rows.length+'개 노트';
+  const run = document.getElementById('run'); run.disabled = false;
+  run.addEventListener('click',async()=>{
+    run.disabled = true; const checks = [];
+    const assert = (label, ok) => {checks.push((ok?'PASS ':'FAIL ')+label);result.textContent=checks.join('\n');};
+    const pause = () => new Promise(resolve=>setTimeout(resolve,680));
+    const opened = () => document.getElementById('flavorEvidenceModal').classList.contains('is-open');
+    const event = (type,x=0) => new PointerEvent(type,{bubbles:true,pointerType:'touch',clientX:x,clientY:0,isPrimary:true});
+    try {
+      render(); let label=document.querySelector('.flavor-checkbox-label'); let box=label.querySelector('input');
+      label.dispatchEvent(event('pointerdown')); label.dispatchEvent(event('pointerup')); label.click();
+      assert('짧은 탭으로 선택',box.checked&&!opened()); label.click(); assert('다시 탭으로 해제',!box.checked);
+      document.querySelector('.flavor-evidence-trigger').click(); assert('분자 버튼 비간섭',opened()&&!box.checked); closeFlavorEvidenceModal();
+      label.dispatchEvent(event('pointerdown')); await pause(); label.dispatchEvent(event('pointerup')); label.click();
+      assert('600ms 롱프레스 열기·선택 억제',opened()&&!box.checked); closeFlavorEvidenceModal();
+      label.dispatchEvent(event('pointerdown')); label.dispatchEvent(event('pointermove',30)); await pause(); label.dispatchEvent(event('pointerup',30)); label.click();
+      assert('스크롤 이동 시 열기·선택 억제',!opened()&&!box.checked);
+      label.dispatchEvent(event('pointerdown')); label.dispatchEvent(event('pointercancel')); await pause(); assert('포인터 취소 시 열지 않음',!opened());
+      label.dispatchEvent(event('pointerdown')); label.dispatchEvent(event('pointerleave')); await pause(); assert('영역 이탈 시 열지 않음',!opened());
+      assert('전체 노트 분자 최대3·원문 연결',rows.every(row=>{const p=getFlavorReference(row.slice(0,3).join('|'));return p.molecules.length<=3&&(!p.molecules.length||/^https:\/\//.test(p.study.url));}));
+    } catch(error) {result.textContent += '\nERROR '+error.message;} finally {run.disabled=false;}
+  });
+})().catch(error=>{document.getElementById('result').textContent='ERROR '+error.message;});
+</script></html>
