@@ -13,12 +13,13 @@
  const result=document.getElementById('result'),frame=document.getElementById('app');
  const prefix='noel_qa_operations_';
  const scoped=s=>s.replaceAll('noel_sca_',prefix).replaceAll('mollis_sca_','mollis_qa_operations_');
- const files=await Promise.all(['index.html','flavor-reference.js','data-store.js','extras.js'].map(async p=>{const r=await fetch('../'+p);if(!r.ok)throw Error(p);return r.text();}));
+ const files=await Promise.all(['index.html','flavor-reference.js','data-store.js','extras.js','workflow-tools.js'].map(async p=>{const r=await fetch('../'+p);if(!r.ok)throw Error(p);return r.text();}));
  const inline=s=>'<script>'+s.replaceAll('</script','<\\/script')+'<'+ '/script>';
  let html=scoped(files[0]).replace('<head>','<head><base href="'+new URL('../',location.href).href+'">');
  html=html.replace('<script src="flavor-reference.js"><'+ '/script>',()=>inline(files[1]));
  html=html.replace('<script src="data-store.js"><'+ '/script>',()=>inline(scoped(files[2])));
  html=html.replace('<script src="extras.js"><'+ '/script>',()=>inline(scoped(files[3]).replace("if ('serviceWorker' in navigator)",'if (false)')));
+ html=html.replace('<script src="workflow-tools.js"><'+ '/script>',()=>inline(scoped(files[4])));
  html=html.replace('<script type="module" src="team.js"><'+ '/script>','').replace('<script src="theme.js"><'+ '/script>','');
  const open=()=>{frame.srcdoc=html;};
  frame.addEventListener('load',()=>{result.textContent='준비 완료 · 시험 저장소만 사용';});open();
