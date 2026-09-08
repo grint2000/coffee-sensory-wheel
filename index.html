@@ -1426,7 +1426,7 @@
   </div>
 </div>
 
-<script src="flavor-evidence.js"></script>
+<script src="flavor-reference.js"></script>
 <script>
 /* === 1단계: 기본 데이터 구조 및 상수 정의 === */
 
@@ -3122,7 +3122,7 @@ function renderFlavorPhase(force = false) {
             <span class="checkbox-custom"></span>
             <span class="flavor-label-text">${displayName}</span>
           </label>
-          <button type="button" class="flavor-evidence-trigger" data-evidence-key="${key}" aria-label="${displayName} 향미분자 근거 보기" title="길게 누르거나 이 버튼을 눌러 분자 근거 보기"><i class="fas fa-flask" aria-hidden="true"></i></button>
+          <button type="button" class="flavor-evidence-trigger" data-evidence-key="${key}" aria-label="${displayName} 주요 향기분자 보기" title="길게 누르거나 이 버튼을 눌러 주요 향기분자 보기"><i class="fas fa-flask" aria-hidden="true"></i></button>
         </span>
       `;
     }
@@ -3212,7 +3212,7 @@ function renderFlavorPhase(force = false) {
               <span class="checkbox-custom"></span>
               <span class="flavor-label-text">${displayName}</span>
             </label>
-            <button type="button" class="flavor-evidence-trigger" data-evidence-key="${id}" aria-label="${displayName} 향미분자 근거 보기" title="길게 누르거나 이 버튼을 눌러 분자 근거 보기"><i class="fas fa-flask" aria-hidden="true"></i></button>
+            <button type="button" class="flavor-evidence-trigger" data-evidence-key="${id}" aria-label="${displayName} 주요 향기분자 보기" title="길게 누르거나 이 버튼을 눌러 주요 향기분자 보기"><i class="fas fa-flask" aria-hidden="true"></i></button>
           </span>
         `;
       });
@@ -3389,32 +3389,13 @@ function formatEvidenceSource(source) {
   return `<span class="flavor-evidence-source">${link}${method}</span>`;
 }
 
-function formatEvidenceRanks(title, items) {
-  if (!items || !items.length) {
-    return `<section class="flavor-evidence-rank"><h4>${title}</h4><p class="flavor-evidence-empty">확인된 분자 없음</p></section>`;
-  }
-  return `<section class="flavor-evidence-rank"><h4>${title}</h4><ul>${items.map(item => {
-    const sourceIds = [...new Set(item.sources || [])];
-    const seenUrls = new Set();
-    const citations = sourceIds.map(id => window.FLAVOR_EVIDENCE_SOURCES?.[id]).filter(source => {
-      if (!source) return false;
-      const identity = source.url || source.short;
-      if (seenUrls.has(identity)) return false;
-      seenUrls.add(identity);
-      return true;
-    });
-    return `<li><strong>${escapeHtml(item.name)}</strong><span>${escapeHtml(item.reason || '')}</span>${citations.length ? `<small class="flavor-evidence-sources"><b>근거 원문</b>${citations.map(formatEvidenceSource).join('')}</small>` : ''}</li>`;
-  }).join('')}</ul></section>`;
-}
-
-function formatMoleculeRankingItems(items) {
-  const numberFormat = new Intl.NumberFormat('en-US', { maximumFractionDigits: 2 });
-  return `<ol class="molecule-ranking-list">${items.map(item => `<li class="molecule-ranking-item"><span class="molecule-rank-badge" aria-label="${item.rank}위">${item.rank}</span><span class="molecule-ranking-name">${escapeHtml(item.name)}</span><strong class="molecule-ranking-value">${escapeHtml(numberFormat.format(item.value))} <small>${escapeHtml(item.unit)}</small></strong></li>`).join('')}</ol>`;
-}
-
-function formatQuantitativeMoleculeRanking(ranking) {
-  const source = window.FLAVOR_EVIDENCE_SOURCES?.[ranking.source];
-  return `<p class="flavor-evidence-legend"><strong>두 순위는 서로 다른 지표입니다.</strong><br>OAV는 정량값을 후각 역치로 나눈 향기기여 지표이고, 함량은 해당 연구의 분석법으로 정량된 양입니다.</p><div class="molecule-ranking-grid"><section class="molecule-ranking-section molecule-ranking-primary"><h4>향기기여 TOP 3 <span>OAV</span></h4>${formatMoleculeRankingItems(ranking.oav)}</section><section class="molecule-ranking-section"><h4>검출 함량 TOP 3 <span>${escapeHtml(ranking.abundanceLabel || '정량값')}</span></h4>${formatMoleculeRankingItems(ranking.abundance)}</section></div><dl class="molecule-ranking-meta"><div><dt>시료</dt><dd>${escapeHtml(ranking.sample)}</dd></div><div><dt>측정 대상</dt><dd>${escapeHtml(ranking.matrix)}</dd></div><div><dt>산정 방식</dt><dd>${escapeHtml(ranking.method)}</dd></div></dl><p class="flavor-evidence-note"><strong>적용 범위:</strong> ${escapeHtml(ranking.scope)}</p><p class="flavor-evidence-note"><strong>주의:</strong> ${escapeHtml(ranking.caveat)}</p>${source ? `<div class="molecule-ranking-source"><strong>근거 원문</strong>${formatEvidenceSource(source)}</div>` : ''}`;
+function formatFlavorReference(reference) {
+  const items = reference.molecules || [];
+  const tag = reference.status === 'ranked' ? 'ol' : 'ul';
+  const list = items.length ? `<${tag} class="reference-molecules">${items.map(item => `<li><strong>${escapeHtml(item.name)}</strong><span>${escapeHtml(item.odor)}</span></li>`).join('')}</${tag}>` : `<p class="flavor-evidence-note">${escapeHtml(reference.reason)}</p>`;
+  const study = reference.study;
+  const details = study ? `<details class="reference-details"><summary>자세히 보기</summary><dl class="molecule-ranking-meta">${[['연구 시료', reference.sample], ['적용 조건', reference.conditions], ['분석법', reference.method], ['확인 결과', reference.findings], ['수치·단위', items.map(item => item.measurement ? `${item.name}: ${item.measurement}` : '').filter(Boolean).join(' / ') || '이 요약에는 정량값을 제시하지 않습니다.'], ['적용 한계', reference.limit], ['확인 범위', study.access]].map(([label, value]) => `<div><dt>${label}</dt><dd>${escapeHtml(value)}</dd></div>`).join('')}</dl><div class="molecule-ranking-source">${formatEvidenceSource({url: study.url, short: study.title})}<p>${escapeHtml(study.authors)} · ${study.year}</p></div></details>` : '';
+  return `${list}${details}<p class="flavor-evidence-note">해당 대상 자체의 향기 연구를 바탕으로 한 참고 정보입니다. 커피에서 동일 분자가 해당 노트를 만든다는 의미는 아닙니다.</p>`;
 }
 
 function ensureFlavorEvidenceModal() {
@@ -3435,6 +3416,7 @@ function ensureFlavorEvidenceModal() {
     .molecule-ranking-meta{display:grid;gap:7px;margin:14px 0 0}.molecule-ranking-meta div{display:grid;grid-template-columns:78px minmax(0,1fr);gap:8px;font-size:12px}.molecule-ranking-meta dt{font-weight:700;color:#374151}.molecule-ranking-meta dd{margin:0;color:#4b5563}.molecule-ranking-source{margin-top:12px;padding-top:10px;border-top:1px solid #e5e7eb;font-size:12px}.molecule-ranking-source>strong{display:block}.quantified-reference{color:#b45309}
     @media(max-width:699px){.molecule-ranking-grid{grid-template-columns:1fr}.molecule-ranking-item{grid-template-columns:30px minmax(0,1fr)}.molecule-ranking-value{grid-column:2}}
   `;
+  style.textContent += `.reference-molecules{margin:18px 0;padding-left:24px}.reference-molecules li{padding:10px 4px;overflow-wrap:anywhere}.reference-molecules strong{display:block;font-size:16px}.reference-molecules span{display:block;margin-top:4px;color:#4b5563;font-size:13px}.reference-details{border-top:1px solid #e5e7eb;padding-top:12px}.reference-details summary{cursor:pointer;font-weight:700;padding:10px 0;min-height:44px}.reference-details summary:focus-visible{outline:2px solid #92400e}.flavor-evidence-panel{box-sizing:border-box;overflow-wrap:anywhere}.flavor-evidence-modal{box-sizing:border-box}.molecule-ranking-meta dd{min-width:0}`;
   document.head.appendChild(style);
   modal = document.createElement('div');
   modal.id = 'flavorEvidenceModal';
@@ -3452,7 +3434,7 @@ function ensureFlavorEvidenceModal() {
       return;
     }
     if (event.key !== 'Tab') return;
-    const focusable = [...modal.querySelectorAll('a[href], button:not([disabled]), [tabindex]:not([tabindex="-1"])')];
+    const focusable = [...modal.querySelectorAll('summary, a[href], button:not([disabled]), [tabindex]:not([tabindex="-1"])')].filter(el => el.getClientRects().length > 0);
     if (!focusable.length) return;
     const first = focusable[0];
     const last = focusable[focusable.length - 1];
@@ -3481,24 +3463,12 @@ function closeFlavorEvidenceModal() {
 
 function openFlavorEvidenceModal(key, trigger = document.activeElement) {
   const rec = FLAVOR_DATA.find(f => `${f[0]}|${f[1]}|${f[2]}` === key);
-  if (!rec || typeof window.getFlavorEvidence !== 'function') return;
-  const evidence = window.getFlavorEvidence(key);
-  const ranking = typeof window.getFlavorMoleculeRanking === 'function' ? window.getFlavorMoleculeRanking(key) : null;
+  if (!rec || typeof window.getFlavorReference !== 'function') return;
+  const reference = window.getFlavorReference(key);
   const label = currentLanguage === 'ko' ? (rec[6] || rec[2]) : rec[2];
-  const statusText = {
-    'key-coffee-evidence': '1단계 · 해당 노트/결점 직접 근거',
-    'limited-coffee-evidence': '2단계 · 커피 계열/연관 근거',
-    'reference-only': '3단계 · 레퍼런스 식품 근거',
-    'not-established': '분자 배정 보류'
-  }[evidence.status] || '근거 상태 확인 필요';
   const modal = ensureFlavorEvidenceModal();
-  const body = ranking
-    ? formatQuantitativeMoleculeRanking(ranking)
-    : `<p class="flavor-evidence-legend"><strong>근거 단계이며, 분자의 농도·OAV·실제 기여도 순위가 아닙니다.</strong><br>1단계: 표시 노트/결점에 대한 직접 근거 · 2단계: 커피 내 계열·검출·상관 근거 · 3단계: 레퍼런스 식품의 향기 근거</p><p class="flavor-evidence-note">${escapeHtml(evidence.note || '')}</p>${formatEvidenceRanks('1단계 · 표시 노트 직접 근거', evidence.primary)}${formatEvidenceRanks('2단계 · 커피 계열/연관 근거', evidence.secondary)}${formatEvidenceRanks('3단계 · 레퍼런스 식품 근거', evidence.tertiary)}`;
-  const heading = ranking ? `${label} · 향기분자 TOP 3` : `${label} · 향미분자 근거`;
-  const substatus = ranking ? '정량 연구 기반 · 레퍼런스 식품' : statusText;
-  const statusClass = ranking ? ranking.status : evidence.status;
-  modal.innerHTML = `<article class="flavor-evidence-panel" aria-labelledby="flavorEvidenceTitle" tabindex="-1"><div class="flavor-evidence-head"><div><h3 id="flavorEvidenceTitle">${escapeHtml(heading)}</h3><p class="text-xs text-gray-500 mt-1">${escapeHtml(rec[0])} › ${escapeHtml(rec[1])} › ${escapeHtml(rec[2])}</p><p class="text-xs font-semibold mt-2 ${escapeHtml(statusClass || '')}">${escapeHtml(substatus)}</p></div><button type="button" class="flavor-evidence-close" aria-label="근거 창 닫기">×</button></div>${body}</article>`;
+  const status = reference.status === 'ranked' ? reference.rankBasis : ({identified: '주요 향기분자 — 순위 미확정', pending: '추가 조사 필요', excluded: '향기분자 적용 제외'}[reference.status]);
+  modal.innerHTML = `<article class="flavor-evidence-panel" aria-labelledby="flavorEvidenceTitle" tabindex="-1"><div class="flavor-evidence-head"><div><h3 id="flavorEvidenceTitle">${escapeHtml(label)}의 주요 향기분자</h3><p class="text-xs text-gray-500 mt-1">${escapeHtml(rec[0])} › ${escapeHtml(rec[1])} › ${escapeHtml(rec[2])}</p><p class="text-xs font-semibold mt-2">${escapeHtml(status)}</p></div><button type="button" class="flavor-evidence-close" aria-label="향기분자 창 닫기">×</button></div>${formatFlavorReference(reference)}</article>`;
   modal.querySelector('.flavor-evidence-close').addEventListener('click', closeFlavorEvidenceModal);
   lastFlavorEvidenceTrigger = trigger instanceof HTMLElement ? trigger : null;
   flavorEvidencePreviousBodyOverflow = document.body.style.overflow;
@@ -4841,7 +4811,8 @@ function enhanceMobileExperience() {
         min-height: 48px;
       }
     `;
-    document.head.appendChild(style);
+    style.textContent += `.reference-molecules{margin:18px 0;padding-left:24px}.reference-molecules li{padding:10px 4px;overflow-wrap:anywhere}.reference-molecules strong{display:block;font-size:16px}.reference-molecules span{display:block;margin-top:4px;color:#4b5563;font-size:13px}.reference-details{border-top:1px solid #e5e7eb;padding-top:12px}.reference-details summary{cursor:pointer;font-weight:700;padding:10px 0;min-height:44px}.reference-details summary:focus-visible{outline:2px solid #92400e}.flavor-evidence-panel{box-sizing:border-box;overflow-wrap:anywhere}.flavor-evidence-modal{box-sizing:border-box}.molecule-ranking-meta dd{min-width:0}`;
+  document.head.appendChild(style);
     
     // 모바일 전용 터치 이벤트 추가
     document.body.classList.add('mobile-optimized');
