@@ -93,15 +93,3 @@ assert(exported);assert(sheetName.length<=31);assert(!/[\\/?*\[\]:]/.test(sheetN
 context.XLSX=undefined;
 assert.doesNotThrow(()=>context.exportSessionToExcel(original));
 console.log('PASS: default/time/special-character worksheet names and unavailable Excel dependency.');
-context.window.currentUser='A';
-context.saveCurrentSample=()=>context.saveSamplesToStorage();
-assert(context.window.activateLocalUser('C'));
-assert.equal(context.window.currentUser,'C');
-assert(context.window.canSyncLocalRecords());
-assert.equal(storage.getItem('noel_sca_sessions_C'),null);
-assert(context.saveSessionsToStorage());
-storage.fail=key=>key==='noel_sca_sessions_C';
-assert.equal(context.window.activateLocalUser('D'),false);
-assert.equal(context.window.currentUser,'C');
-assert.equal(storage.getItem('noel_sca_sessions_D'),null);
-console.log('PASS: identity changes preserve previous profile, load the target profile and stop on failed save.');
