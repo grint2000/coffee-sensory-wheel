@@ -1,12 +1,12 @@
-const APP_CACHE = 'noel-sca-app-v8';
-const RUNTIME_CACHE = 'noel-sca-runtime-v8';
+const APP_CACHE = 'noel-sca-app-v9';
+const RUNTIME_CACHE = 'noel-sca-runtime-v9';
 
 const APP_SHELL_FILES = [
   './',
   './index.html',
   './offline.html',
   './manifest.json',
-  './flavor-evidence.js',
+  './flavor-reference.js',
   './extras.js',
   './theme.js',
   './team.js',
