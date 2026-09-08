@@ -1,0 +1,21 @@
+const fs=require('fs'),vm=require('vm'),assert=require('assert/strict');
+const extra=fs.readFileSync('extras.js','utf8');const messages=[];let restored=0,success=false;
+const c={window:{currentUser:'A',getLocalCuppingState:()=>({sessions:['A']}),restoreLocalCuppingState:()=>{restored++;return success;}},notifyMessage:m=>messages.push(m)};
+vm.createContext(c);vm.runInContext('let undoStack=[];'+extra.slice(extra.indexOf('function pushUndoState'),extra.indexOf("if ('serviceWorker'")),c);
+c.pushUndoState();c.undoLastAction();assert.equal(restored,1);assert.match(messages.at(-1),/실패/);
+success=true;c.undoLastAction();assert.equal(restored,2);assert.match(messages.at(-1),/취소했습니다/);
+c.pushUndoState();c.window.currentUser='B';c.undoLastAction();assert.equal(restored,2);assert.match(messages.at(-1),/계정/);
+c.loginUser();assert.match(messages.at(-1),/불러오지 못했습니다/);assert.equal(c.window.currentUser,'B');
+c.logoutUser();assert.equal(c.window.currentUser,'B');
+const html=fs.readFileSync('index.html','utf8');let captured='';
+const evil='<img src=x onerror=alert(1)>';
+Object.assign(c,{console,Date,FLAVOR_PHASES:[],ATTR_TO_BADGE:{},currentLanguage:'ko',saveCurrentSample(){},getCurrentSampleObj:()=>({sampleData:{title:evil,origin:evil,process:evil,roastDate:evil,roastLevel:evil}}),escapeHtml:s=>String(s).replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;'),showToast:m=>messages.push(m),document:{createElement:()=>({style:{},click(){}}),body:{appendChild(){},removeChild(){},contains:()=>true}},html2canvas:el=>{captured=el.innerHTML;return Promise.resolve({toDataURL:()=>''})}});
+vm.runInContext(html.slice(html.indexOf('function exportSnsImage()'),html.indexOf('// Excel 내보내기')),c);
+c.exportSnsImage();assert(!captured.includes(evil));assert(captured.includes('&lt;img'));
+console.log('PASS: failed undo retained for retry, account isolation, missing auth service, SNS input escaping. Mock DOM only.');
+
+let keyHandler; c.currentSampleId='sample';c.saveCurrentSample=()=>false;
+c.document.addEventListener=(_,fn)=>keyHandler=fn;
+vm.runInContext(html.slice(html.indexOf('function setupKeyboardShortcuts()'),html.indexOf('// 차트 객체 정리')),c);
+c.setupKeyboardShortcuts();messages.length=0;keyHandler({ctrlKey:true,key:'s',preventDefault(){}});assert.equal(messages.length,0,'failed keyboard save must not report success');
+console.log('PASS: keyboard save failure does not claim success.');
