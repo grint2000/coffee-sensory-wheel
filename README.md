@@ -7,9 +7,7 @@ This project provides a web-based interface for managing and evaluating coffee c
 ## Getting Started
 
 1. Clone or download this repository.
-2. Open the `index.html` file in your preferred web browser. No additional setup is required.
-
-The application runs entirely in the browser, so you can simply double-click `index.html` on your computer or open it from your mobile device.
+2. Serve the files from an HTTPS static host. Google login requires an origin authorized in Firebase; service workers require a secure context. Opening `index.html` directly as a local file does not verify those features.
 
 ## Major Features
 
@@ -47,13 +45,20 @@ This app is a Progressive Web App. When you visit on a mobile device or supporte
 
 ## Managing Users
 
-Click the **로그인** button at the top of the page to set a user name. Data is saved separately for each name, so multiple people can use the same device without mixing their cupping records. Use the **로그아웃** button to switch back to the default profile. Each profile maintains its own samples.
+Click **로그인** to use Google authentication. Local records and selected teams are scoped by Firebase UID. Historical display-name records are preserved; export them before login and import the JSON into the signed-in profile when needed. Device-local records are not shared by simply signing in.
 
 ## Team Features
 
-To collaborate with others, click **팀관리** and sign in with a Google account. You can create a new team or join an existing one. Once a team is selected the name appears in the header so you always know which team you belong to.
+After Google login, use **팀관리** to create or join a team. **현재 세션 공유** explicitly replaces only your shared sample list after confirmation; concurrent changes abort the write. **내 팀 기록 불러오기** adds your shared records as a new local session, with backup and validation. Automatic local saving does not upload; offline team operations fail visibly and need retry. **팀 결과 보기** groups records by evaluator and includes recorded totals, descriptors and notes. It does not infer that matching sample names represent the same coffee or compute unverified team averages. Firebase domain authorization, security rules and real device-to-device behavior still need live validation.
 
-When the team owner (or any member) adds or edits samples, the changes are saved to Firestore and automatically synced to everyone in the team. If you are online you will see new samples appear instantly. Offline mode still works, and any changes will sync the next time you connect.
+## Cupping workflow additions (draft)
+
+- **전체 기록 검색·비교**: search this profile's sessions by sample, lot, producer, coffee information or selected flavor; filter by evaluation date; select 2–4 historical samples for comparison. Open returns to the exact session/sample without copying it.
+- **같은 조건 새 세션**: reuse saved purpose, location, evaluator, water temperature and grind. Date/time and sample identity are new; scores and descriptors use the app's blank defaults. A default score is not proof the sample was evaluated.
+- **세션 타이머**: elapsed time with start/pause/reset; state is local and separated by user/session. Reload resumes from wall-clock timestamps. Changing the device clock can affect elapsed time; no mandatory cupping protocol or alarm is implied.
+- Existing stored session selection is restored correctly. Save failure prevents session switching. New session creation keeps the prior data when storage fails.
+
+See [다른 앱 조사·반영·검증](APP_WORKFLOW_REVIEW.md). `workflow-tools.js` and `workflow-tools.css` contain the added logic/UI, with an explicit bridge in the page. `node tests/workflow-tools.cjs` checks model behavior. `tests/workflow-integration.cjs` uses jsdom 26.1.0 with synthetic records and no live network; its header documents the temporary test dependency setup. It tests application DOM events, not real mobile layout, native dialogs, downloads or Firebase.
 
 ## Customizing the Header Logo
 
@@ -65,6 +70,5 @@ This update applies both on desktop and mobile views and is cached for offline u
 ### Exporting Images
 
 1. Fill in the sample details including **원산지**, **가공 방식**, **로스팅 날짜**, and **로스팅 정도**.
-2. Click **이미지로 내보내기** to download a full report with the radar chart and tasting notes.
-3. Click **SNS형 이미지** for a compact version that is easy to share on social networks.
-4. Both image types will display the coffee's origin and roasting information in the header.
+2. Click **SNS형 이미지** for the compact image export.
+3. The image includes the coffee's origin and roasting information. The current page has no separate full-report image button.
