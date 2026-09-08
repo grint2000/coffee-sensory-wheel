@@ -23,9 +23,9 @@ async function scenario(failInstall = false) {
   const wait = type => new Promise((resolve,reject)=>handlers[type]({waitUntil:p=>p.then(resolve,reject)}));
   const request = async (url,mode='cors') => {let response;handlers.fetch({request:{url:normalize(url),method:'GET',mode},respondWith:p=>response=p});return response;};
   if(failInstall){await assert.rejects(wait('install'));assert(!skip);return;}
-  await caches.open('noel-sca-app-v8'); await caches.open('noel-sca-runtime-v9'); await caches.open('unrelated-user-cache');
+  await caches.open('noel-sca-app-v8'); await caches.open('noel-sca-runtime-v9'); await caches.open('noel-sca-app-v10'); await caches.open('unrelated-user-cache');
   await wait('install'); assert(skip); await wait('activate'); assert(claim);
-  assert.deepEqual((await caches.keys()).sort(),['noel-sca-app-v10','unrelated-user-cache'].sort());
+  assert.deepEqual((await caches.keys()).sort(),['noel-sca-app-v11','unrelated-user-cache'].sort());
   assert.equal(await (await request('./flavor-reference.js')).text(),'installed:./flavor-reference.js');
   assert.equal(await (await request('./index.html','navigate')).text(),'installed:./index.html');
   assert.equal(await (await request('./missing-page','navigate')).text(),'installed:./offline.html');
@@ -33,4 +33,4 @@ async function scenario(failInstall = false) {
   network=true;assert.equal(await (await request('./flavor-reference.js')).text(),'network');
   network=false;assert.equal(await (await request('./flavor-reference.js')).text(),'network');
 }
-(async()=>{await scenario();await scenario(true);console.log('PASS: install, scoped v8/v9 cleanup, offline dictionary/page, runtime fallback, failed-update protection. Mock Cache API; physical browser migration remains separate.');})().catch(error=>{console.error(error);process.exitCode=1;});
+(async()=>{await scenario();await scenario(true);console.log('PASS: install, scoped v8/v9/v10 cleanup, offline dictionary/page, runtime fallback, failed-update protection. Mock Cache API; physical browser migration remains separate.');})().catch(error=>{console.error(error);process.exitCode=1;});
