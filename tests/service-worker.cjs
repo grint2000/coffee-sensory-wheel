@@ -25,7 +25,7 @@ async function scenario(failInstall = false) {
   if(failInstall){await assert.rejects(wait('install'));assert(!skip);return;}
   await caches.open('noel-sca-app-v8'); await caches.open('noel-sca-runtime-v9'); await caches.open('noel-sca-app-v10'); await caches.open('noel-sca-app-v11'); await caches.open('noel-sca-app-v12'); await caches.open('noel-sca-app-v13'); await caches.open('unrelated-user-cache');
   await wait('install'); assert(skip); await wait('activate'); assert(claim);
-  assert.deepEqual((await caches.keys()).sort(),['noel-sca-app-v16','unrelated-user-cache'].sort());
+  assert.deepEqual((await caches.keys()).sort(),['noel-sca-app-v17','unrelated-user-cache'].sort());
   assert.equal(await (await request('./flavor-reference.js')).text(),'installed:./flavor-reference.js');
   assert.equal(await (await request('./index.html','navigate')).text(),'installed:./index.html');
   assert.equal(await (await request('./missing-page','navigate')).text(),'installed:./offline.html');
