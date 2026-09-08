@@ -4316,6 +4316,27 @@ window.getLocalCuppingState = function() {
   return JSON.parse(JSON.stringify({sessions,currentSessionId,currentSampleId}));
 };
 window.restoreLocalCuppingState = state => replaceSessionData(state.sessions,'실행 취소',state);
+// Explicit, local-first boundary for authenticated team operations.
+window.activateLocalUser = function(user) {
+  if (loadedStorageUser === user) return true;
+  if (loadedStorageUser && !saveCurrentSample()) return false;
+  try { localStorage.setItem('noel_sca_current_user',user); }
+  catch (_) { return false; }
+  window.currentUser=user;
+  return loadSamplesFromStorage();
+};
+window.getTeamShareSamples = function() {
+  if (!saveCurrentSample()) throw new Error('기기 저장 실패: 공유를 중단했습니다.');
+  return JSON.parse(JSON.stringify(samples));
+};
+window.importTeamSamples = function(value,teamName) {
+  const imported=normalizeSessionData(value);
+  const state=window.getLocalCuppingState();
+  const session=createNewSessionObj();
+  session.title=teamName+' · 팀에서 불러온 기록';
+  session.samples=imported.flatMap(item=>item.samples).map(item=>({ ...item,id:createNewSampleObj().id }));
+  return replaceSessionData([...state.sessions,session],'팀 기록 불러오기',{currentSessionId:session.id});
+};
 function downloadJsonText(text, name) {
   const url = URL.createObjectURL(new Blob([text],{type:'application/json;charset=utf-8'}));
   const a = document.createElement('a'); a.href=url; a.download=name; document.body.appendChild(a); a.click(); a.remove();
