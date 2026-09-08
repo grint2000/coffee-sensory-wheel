@@ -1,0 +1,18 @@
+const assert=require('node:assert/strict'),fs=require('node:fs'),vm=require('node:vm');
+const c={};vm.createContext(c);vm.runInContext(fs.readFileSync('workflow-tools.js','utf8'),c);const W=c.NOEL_WORKFLOW;
+const sessions=[{id:'a',date:'2026-01-01',title:'입고 QC',samples:[{id:'s1',title:'ALO',sampleData:{lotNumber:'LOT-20',origin:'에티오피아',flavorSelections:{aroma:['berry|strawberry']}}}]},{id:'b',date:'2026-09-08',title:'로스팅 QC',samples:[{id:'s1',title:'ALO',sampleData:{farmName:'Bursa',process:'Washed',tastingNotes:'단맛'}}]}];
+const before=JSON.stringify(sessions), rows=W.flatten(sessions,()=> '딸기');
+assert.equal(new Set(rows.map(x=>x.key)).size,2,'same sample ID in distinct sessions is unambiguous');
+assert.equal(W.search(rows,'LOT-20 딸기').length,1);assert.equal(W.search(rows,'bursa washed')[0].sessionId,'b');
+assert.equal(W.search(rows,'','recent')[0].sessionId,'b');assert.equal(W.search(rows,'','recent','2026-09-01','2026-09-30').length,1);
+assert.equal(W.search(rows,'없음').length,0);assert.equal(JSON.stringify(sessions),before,'search does not mutate records');
+let timer=W.parseTimer(null);timer=W.timerAction(timer,'start',1000);assert.equal(W.timerValue(timer,181000),180000);
+timer=W.parseTimer(JSON.stringify(timer));assert.equal(W.timerValue(timer,301000),300000,'reload accounts for background time');
+timer=W.timerAction(timer,'pause',301000);assert.equal(W.timerValue(timer,999000),300000);
+timer=W.timerAction(timer,'start',999000);assert.equal(W.timerValue(timer,1000000),301000);
+assert.equal(W.formatTime(3661000),'01:01:01');assert.equal(W.timerAction(timer,'reset',0).elapsed,0);
+assert.notEqual(W.timerKey({user:'A',sessionId:'s'}),W.timerKey({user:'B',sessionId:'s'}));
+assert.notEqual(W.timerKey({user:'A',sessionId:'s'}),W.timerKey({user:'A',sessionId:'s2'}));
+assert.throws(()=>W.parseTimer('{"elapsed":-1,"startedAt":null}'));assert.throws(()=>W.parseTimer('broken'));
+assert.equal(W.timerValue({elapsed:0,startedAt:2000},1000),0,'clock rollback cannot produce negative elapsed time');
+console.log('PASS: cross-session search, source metadata, multi-term/flavor/date filters, nonmutation, timer restart/pause/reset, profile/session isolation.');
