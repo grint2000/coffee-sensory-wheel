@@ -56,23 +56,18 @@ window.currentUser = migrateLegacyCurrentUser();
 let deferredPrompt;
 
 function pushUndoState() {
-  if (window.samples) {
-    undoStack.push({ samples: JSON.stringify(window.samples), currentSampleId: window.currentSampleId });
-    if (undoStack.length > 20) undoStack.shift();
-  }
+  if (typeof window.getLocalCuppingState !== 'function') return;
+  undoStack.push(window.getLocalCuppingState());
+  if (undoStack.length > 20) undoStack.shift();
 }
 
 function undoLastAction() {
-  if (!undoStack.length) {
-    notifyMessage('실행 취소할 내용이 없습니다.');
-    return;
-  }
-  const state = undoStack.pop();
-  safeSetStorage(`noel_sca_samples2_${window.currentUser}`, state.samples);
-  if (state.currentSampleId) {
-    safeSetStorage(`noel_sca_current_sample_${window.currentUser}`, state.currentSampleId);
-  }
-  location.reload();
+  if (!undoStack.length) { notifyMessage('실행 취소할 내용이 없습니다.'); return; }
+  try {
+    window.restoreLocalCuppingState(undoStack[undoStack.length-1]);
+    undoStack.pop();
+    notifyMessage('직전 샘플 작업을 취소했습니다.');
+  } catch (error) { notifyMessage('실행 취소 실패: '+error.message); }
 }
 
 function loginUser() {
