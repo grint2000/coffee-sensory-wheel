@@ -27,6 +27,12 @@ The historical `flavor-evidence.js` is retained for recovery but is not loaded o
 
 Run `node tests/service-worker.cjs` for mocked offline-cache checks. `tests/reference-preview.html` provides isolated responsive/pointer checks using the actual modal code. Physical mobile and installed-PWA migration remain unverified.
 
+## Local operation and recovery (draft)
+
+See [운영 수정·검증 기록](OPERATIONAL_REVIEW.md) for the exact changes and limitations. Local saves now report failure honestly; current-session JSON can be imported; replacement first creates a user-scoped backup; unreadable originals are protected. Undo restores the complete session structure. Records remain browser-specific: export JSON before moving devices or clearing browser storage.
+
+Run `node tests/data-store.cjs` for storage/recovery regression checks. `tests/operations-preview.html` runs the real app with a separate test storage prefix and excludes live team connections and PWA registration. Google/Firestore round-trip and physical mobile/PWA behavior are not certified by these tests. No production data was edited.
+
 ## Browser Compatibility
 
 The page is designed with responsive layouts and touch-friendly controls. It works in modern browsers on Windows, macOS, Android, and iOS. For the best experience, keep your browser up to date.
