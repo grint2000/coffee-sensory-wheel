@@ -17,17 +17,13 @@ The application runs entirely in the browser, so you can simply double-click `in
 - **Comparison Tools** – Select two or more samples to generate charts comparing SCA scores, flavor notes, and defects.
 - **Export Options** – Save your results as images, SNS-ready images, Excel spreadsheets, or JSON files for backup and sharing. The exported images now include the coffee's origin, processing method, roast date, and roast level so you have full context when sharing.
 
-## Flavor Molecule Evidence
+## Reference aroma dictionary (draft)
 
-Press and hold a flavor chip, or select its flask button, to inspect the evidence behind its molecule mapping. The displayed numbers are evidence stages, not a universal ranking of concentration, odor activity value (OAV), or sensory contribution:
+Select the flask button or hold a flavor label to see up to three key odorants of the named reference itself. The default view contains names and short odor descriptions. Study conditions, analytical methods, measurements, limitations and primary-paper citations are collapsed under “자세히 보기”.
 
-1. Evidence directly supports the displayed coffee note or defect.
-2. The compound is reported in coffee or supports only the broader aroma family; the exact note is not proven.
-3. The compound is supported in the named reference food, flower, spice, or tea and is not presented as direct coffee evidence.
+`flavor-reference.js` keeps sources, sample-specific profiles and exact note mappings separate from the renderer. No parent-category inheritance is used. Unranked key odorants remain useful and are displayed without numbers. Only the fresh-pineapple sample has an OAV ranking, limited to the 12 quantified compounds of that study. Concentration, OAV and sensory contribution are distinct. Some profiles currently rely on primary abstracts and explicitly say so.
 
-Each entry links to its supporting paper and identifies the study scope or analytical method. Acids are treated separately as nonvolatile taste compounds. Mappings intentionally remain unassigned when the available evidence does not justify a molecule-level claim.
-
-Quantitative-ranking dialogs are available for strawberry, fresh pineapple (also used by the generic pineapple note), and rose. Each dialog separates the top three measured concentrations from the top three odor activity values (OAVs), because the most abundant molecule is not necessarily the largest sensory contributor. Every ranking states the exact sample, quantified subset, method, unit, and limitation from its primary paper. These ranks apply only to the cited reference sample and are not presented as molecule ranks for the corresponding note in coffee. Notes without a reproducible within-sample quantitative ranking continue to use the evidence-stage dialog instead of receiving an inferred ranking.
+The historical `flavor-evidence.js` is retained for recovery but is not loaded or used as a UI fallback. Notes awaiting a reference-specific literature review show no guessed compounds. See `REFERENCE_REVIEW.md` and `flavor-reference-audit.csv` for coverage and limitations. Run `node scripts/audit-reference.cjs` to regenerate the inventory from the actual flavor list.
 
 ## Browser Compatibility
 
