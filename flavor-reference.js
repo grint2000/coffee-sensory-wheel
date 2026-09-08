@@ -75,6 +75,75 @@
     'Floral|Colored Flowers|Rose': 'rose',
     'Spices|Warm Spices|Cinnamon': 'cinnamon'
   };
+  // Expansion records are explicit reference samples, never category defaults.
+  function add(id, keys, study, sample, conditions, method, findings, limit, molecules, ranking) {
+    sources[id] = { ...study, access: study.access || '논문 초록 확인; 원문 세부조건 추가 확인 필요' };
+    profiles[id] = { status: ranking ? 'ranked' : 'identified', source: id, sample, conditions, method, findings, limit, molecules, ...ranking };
+    keys.forEach(key => { if (mapping[key]) throw new Error('Duplicate reference: ' + key); mapping[key] = id; });
+  }
+  const study = (title, authors, year, doi, access) => ({title, authors, year, url: 'https://doi.org/' + doi, access});
+  add('vanilla', ['Sweet|Vanilla|Vanilla', 'Sweet|Vanilla|Vanilla Bean'],
+    study('Key Odorants in Cured Madagascar Vanilla Beans (Vanilla planiforia) of Differing Bean Quality', 'Makoto Takahashi, Yoko Inai, Norio Miyazawa, Yoshiko Kurobayashi, Akira Fujita', 2013, '10.1271/bbb.120842'),
+    '마다가스카르 큐어링 바닐라빈: red whole과 cuts 등급 비교', '큐어링된 빈의 연구이며 생꼬투리·바닐라향 제품에 일반화하지 않습니다.',
+    '향기성분 정량·관능 비교·향 재구성', 'Vanillin과 β-damascenone은 달콤함·건과일 향의 등급 간 차이에 기여했습니다. 전체 재구성 향과 원시료도 비교했습니다.',
+    '두 주요 성분을 제시합니다. 세 번째 성분이나 보편적 순위를 추정하지 않습니다.',
+    [molecule('Vanillin', '달콤한 바닐라 향'), molecule('β-Damascenone', '건과일 같은 향')]);
+  add('hazelnutRaw', ['Nutty/Cocoa|Tree Nuts|Hazelnut'],
+    study('Characterization of the Key Odorants in Raw Italian Hazelnuts (Corylus avellana L. var. Tonda Romana) and Roasted Hazelnut Paste by Means of Molecular Sensory Science', 'Andrea Burdack-Freitag, Peter Schieberle', 2012, '10.1021/jf300908d'),
+    '이탈리아 Tonda Romana 생헤이즐넛', '구운 페이스트와 별도로 분석한 생견과 시료입니다.',
+    'GC-O·AEDA 선별, 19성분 SIDA 정량, 기름 역치 기반 OAV, 해바라기유 모델 재구성',
+    '높은 OAV로 보고된 성분 중 3개입니다. OAV > 1인 13성분 재구성 향이 생견과의 향과 유사했습니다.',
+    '한 품종의 생견과 결과로 로스팅 헤이즐넛에 적용하지 않습니다. 개별 OAV 순서는 미확정입니다.',
+    [molecule('Linalool', '꽃 향'), molecule('5-Methyl-4-heptanone', '견과·과일 계열 향'), molecule('2-Methoxy-3,5-dimethylpyrazine', '흙·구운 계열 향')]);
+  add('hazelnutRoasted', ['Nutty/Cocoa|Tree Nuts|Roasted Hazelnut'], sources.hazelnutRaw,
+    '이탈리아 헤이즐넛의 구운 페이스트', '로스팅 시간·온도는 확인한 초록에서 확인되지 않았습니다.',
+    '25성분 SIDA 정량, OAV, 19성분 향 재구성',
+    '높은 OAV로 보고된 성분 중 맥아·버터·팝콘 향을 대표하는 3개입니다. 재구성 향은 페이스트와 매우 유사했습니다.',
+    '페이스트 시료의 결과이며 모든 로스팅 강도를 대표하지 않습니다. 순위는 미확정입니다.',
+    [molecule('3-Methylbutanal', '맥아 향'), molecule('2,3-Pentanedione', '버터 향'), molecule('2-Acetyl-1-pyrroline', '팝콘 향')]);
+  add('oolong', ['Tea|Oolong|Oolong', 'Tea|Oolong|Ti Kuan Yin', 'Tea|Oolong|Da Hong Pao'],
+    study('Comparison of Aroma-Active Volatiles in Oolong Tea Infusions Using GC-Olfactometry, GC-FPD, and GC-MS', 'JianCai Zhu, Feng Chen, LingYing Wang, YunWei Niu, Dan Yu, Chang Shu, HeXing Chen, HongLin Wang, ZuoBing Xiao', 2015, '10.1021/acs.jafc.5b02358'),
+    'Dongdingwulong·Tieguanyin·Dahongpao 우롱차 침출액 비교', '세 차종의 범위값입니다. 개별 상품·수확·우림 조건별 값은 원문 추가 확인이 필요합니다.',
+    'GC-O 향강도, SPME GC-MS·GC-FPD 정량, OAV',
+    '높은 OAV 성분 중 꽃·과일 계열 3개의 예시입니다. 다른 알데하이드·황 성분도 중요하며 이 세 가지가 전체 TOP3라는 뜻은 아닙니다.',
+    '철관음·대홍포는 연구에 실제 포함된 대상입니다. 아래 값은 세 시료 범위로, 해당 차종 단독 수치나 순위가 아닙니다. 밀크우롱에는 적용하지 않습니다.',
+    [molecule('Nerolidol', '꽃·우디 계열 향', '세 시료 OAV 108–184'), molecule('(R)-(−)-Linalool', '꽃 향', '세 시료 OAV 63–87'), molecule('β-Damascenone', '달콤한 과일 향', '세 시료 OAV 29–59')]);
+  add('blueberry', ['Fruity|Berry|Blueberry'],
+    study('Characterization of Changes in Key Odorants in Blueberries During Simulated Commercial Storage and Marketing by Sensory-Directed Flavor Analysis and Determination of Differences in Overall Perceived Aroma', 'Fareeya Kulapichitr, Keith Cadwallader, David Obenland', 2025, '10.3390/foods14071244', '저자 소속 USDA의 기술 초록 확인; 출판사 원문 접근 제한'),
+    '유통 보관을 모사한 블루베리 시료', '1°C 3주 → 10°C 1주 → 20°C 2일. 품종은 확인한 기술 초록에 제시되지 않았습니다.',
+    'GC-O·AEDA, 동위원소 희석 GC-MS 정량, OAV와 관능 평가',
+    '보관에 따라 달라진 주요 향기성분 중 꽃·풋풀·버섯 계열의 예시입니다.',
+    '보관 단계별 함량 변화 연구입니다. 세 성분의 보편적 순위나 건조 블루베리의 조성을 뜻하지 않습니다.',
+    [molecule('Linalool', '꽃 향'), molecule('(Z)-3-Hexenal', '풋풀 향'), molecule('1-Octen-3-ol', '버섯 같은 향')]);
+  add('blackPepper', ['Spices|Hot Spices|Black Pepper'],
+    study('Flavour and off-flavour compounds of black and white pepper (Piper nigrum L.) II. Odour activity values of desirable and undesirable odorants of black pepper', 'T. Jagella, W. Grosch', 1999, '10.1007/s002170050450'),
+    '흑후추 및 분쇄 흑후추의 저장 비교', '실온 30일 저장 비교 포함. 산지·품종은 초록에 충분히 제시되지 않았습니다.',
+    '14성분 정량·OAV, 향 재구성·생략 시험',
+    '생략 시험에서 확인된 주요 성분 중 저장 중 손실과 향 변화가 연결된 3개입니다.',
+    '향기 정보입니다. 매운 자극의 강도·피페린 함량 순위가 아니며 백후추에 자동 적용하지 않습니다.',
+    [molecule('α-Pinene', '테르펜·솔 계열 향'), molecule('Limonene', '시트러스 향'), molecule('3-Methylbutanal', '맥아 향')]);
+  add('pinkGuava', ['Fruity|Tropical Fruit|Guava', 'Fruity|Tropical Fruit|Pink Guava'],
+    study('Characterization of the Key Aroma Compounds in Pink Guava (Psidium guajava L.) by Means of Aroma Re-engineering Experiments and Omission Tests', 'Martin Steinhaus, Diana Sinuco, Johannes Polster, Coralia Osorio, Peter Schieberle', 2009, '10.1021/jf803728n', '저자 소속 Leibniz-LSB의 논문 초록 확인'),
+    '콜롬비아 생 핑크 구아바의 큐브·퓌레', '절단·분쇄 후 (Z)-3-hexenal이 빠르게 생성됩니다. 온전한 과일의 방출 향과 구분해야 합니다.',
+    '17성분 SIDA 정량, 물 역치 기반 OAV, 13성분 재구성·생략 시험',
+    '생략 시험에서 핵심으로 확인된 여러 성분 중 3개입니다.',
+    '일반 Guava 노트에는 핑크 구아바 연구 시료를 명시해 참고 예시로 사용합니다. White Guava에는 적용하지 않습니다.',
+    [molecule('(Z)-3-Hexenal', '풋풀 향'), molecule('3-Sulfanyl-1-hexanol', '자몽 같은 향'), molecule('Furaneol', '달콤한 캐러멜 향')]);
+  add('apricot', ['Fruity|Stone Fruit|Apricot'],
+    study('Characterization of the Key Aroma Compounds in Apricots (Prunus armeniaca) by Application of the Molecular Sensory Science Concept', 'Veronika Greger, Peter Schieberle', 2007, '10.1021/jf0705015'),
+    '생살구의 향 증류물 및 향 재구성 모델', '품종·숙도·추출 세부조건은 초록만으로 확정하지 않았습니다.',
+    'AEDA, SIDA 정량·OAV, 18성분 재구성·생략 시험',
+    '높은 OAV 및 향기활성을 보인 성분의 예시입니다. 일부 다른 락톤은 OAV < 5로, 락톤 계열 전체를 동일하게 취급할 수 없습니다.',
+    '향 재구성 전체와 개별 성분 간 순위는 구분합니다. 건살구에는 적용하지 않습니다.',
+    [molecule('γ-Decalactone', '달콤한 핵과류 향', 'OAV > 100'), molecule('Linalool', '꽃 향', 'OAV > 100'), molecule('β-Ionone', '제비꽃 같은 꽃 향', 'OAV > 100')]);
+  add('mangoHaden', ['Fruity|Tropical Fruit|Mango', 'Fruity|Tropical Fruit|Ripe Mango'],
+    study('Insights into the Key Aroma Compounds in Mango (Mangifera indica L. Haden) Fruits by Stable Isotope Dilution Quantitation and Aroma Simulation Experiments', 'John P. Munafo Jr., John Didzbalis, Raymond J. Schnell, Martin Steinhaus', 2016, '10.1021/acs.jafc.6b00822', '저자 소속 Leibniz-LSB의 논문 초록에서 시료·OAV 상위값 확인; 원문 표 추가 확인 필요'),
+    '나무에서 익힌 Haden 망고', '수상 완숙 과실입니다. Green Mango에는 적용하지 않습니다.',
+    'AEDA 선별 34성분 정량, 물의 후각 역치 기준 OAV, 향 재현 실험',
+    '연구 초록에 제시된 같은 Haden 시료의 OAV 상위 3개입니다. 함량이나 실제 감각 기여도 순위는 아닙니다.',
+    '정량한 34성분 내 OAV 순서이며 다른 망고 품종·숙도에 보편화하지 않습니다.',
+    [molecule('Ethyl 2-methylbutanoate', '과일 향', 'OAV 2100'), molecule('(3E,5Z)-Undeca-1,3,5-triene', '파인애플 같은 향', 'OAV 1900'), molecule('Ethyl 3-methylbutanoate', '과일 향', 'OAV 1600')],
+    {rankBasis:'OAV 기준 · 완숙 Haden 시료의 정량 34성분 중', rankValues:[2100,1900,1600]});
   // Exact reference equivalence only: generic Pineapple uses the explicitly labelled fresh sample.
   const excludedNames = new Set(['Citric Acid', 'Malic Acid', 'Tartaric Acid', 'Phosphoric Acid', 'Lactic Acid']);
   function getFlavorReference(key) {
