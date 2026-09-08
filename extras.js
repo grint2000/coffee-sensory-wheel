@@ -77,8 +77,10 @@ function loginUser() {
   }
   const name = prompt('사용자 이름을 입력하세요', window.currentUser);
   if (!name) return;
-  window.currentUser = name.trim();
-  if (!window.currentUser) return;
+  const nextUser = name.trim();
+  if (!nextUser) return;
+  if (window.activateLocalUser && !window.activateLocalUser(nextUser)) { notifyMessage('기존 기록을 저장하지 못했습니다. JSON으로 내보낸 뒤 사용자를 바꿔 주세요.'); return; }
+  window.currentUser = nextUser;
   safeSetStorage(STORAGE_KEYS.currentUser, window.currentUser);
   location.reload();
 }
@@ -90,6 +92,7 @@ function logoutUser() {
   }
 
   if (confirm('로그아웃하시겠습니까?')) {
+    if (window.activateLocalUser && !window.activateLocalUser('default')) { notifyMessage('기존 기록을 저장하지 못했습니다. 먼저 JSON으로 내보내 주세요.'); return; }
     window.currentUser = 'default';
     safeSetStorage(STORAGE_KEYS.currentUser, window.currentUser);
     safeRemoveStorage(STORAGE_KEYS.currentTeam);
