@@ -13,7 +13,8 @@
   const end = html.indexOf('// 향미 특성/속성 실시간 반영 개선', start);
   if (!data || start < 0 || end < start) throw Error('Source boundaries changed');
   const script = document.createElement('script');
-  script.textContent = 'const FLAVOR_DATA = ' + data[1] + ';let currentLanguage="ko";function escapeHtml(v){return String(v??"").replace(/[&<>"\x27]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;","\\\"":"&quot;","\x27":"&#39;"}[c]||c));}\n' + html.slice(start, end);
+  const escapeSource = function escapeHtml(v) { return String(v ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); };
+  script.textContent = 'const FLAVOR_DATA = ' + data[1] + ';let currentLanguage="ko";' + escapeSource.toString() + '\n' + html.slice(start, end);
   document.head.appendChild(script);
   const rows = Function('return ' + data[1])();
   const select = document.getElementById('note');
@@ -50,6 +51,23 @@
       label.dispatchEvent(event('pointerdown')); label.dispatchEvent(event('pointercancel')); await pause(); assert('포인터 취소 시 열지 않음',!opened());
       label.dispatchEvent(event('pointerdown')); label.dispatchEvent(event('pointerleave')); await pause(); assert('영역 이탈 시 열지 않음',!opened());
       assert('전체 노트 분자 최대3·원문 연결',rows.every(row=>{const p=getFlavorReference(row.slice(0,3).join('|'));return p.molecules.length<=3&&(!p.molecules.length||/^https:\/\//.test(p.study.url));}));
+      const rendered = rows.every(row => {
+        const key = row.slice(0,3).join('|'); const reference = getFlavorReference(key);
+        const trigger = document.querySelector('.flavor-evidence-trigger');
+        openFlavorEvidenceModal(key,trigger);
+        const modal = document.getElementById('flavorEvidenceModal');
+        const list = modal.querySelector('.reference-molecules');
+        const details = modal.querySelector('details');
+        const valid = opened() && modal.querySelector('h3').textContent === row[6]+'의 주요 향기분자'
+          && modal.querySelectorAll('.reference-molecules li').length === reference.molecules.length
+          && (!list || (list.tagName === 'OL') === (reference.status === 'ranked'))
+          && (!details || !details.open)
+          && (!reference.study || modal.querySelector('a').href === reference.study.url)
+          && !/1단계|2단계|3단계|커피 직접 근거|커피 검출/.test(modal.textContent);
+        closeFlavorEvidenceModal();
+        return valid && !opened() && document.activeElement === trigger && document.body.style.overflow !== 'hidden';
+      });
+      assert('420개 실제 모달 렌더·순위·상세·출처·초점 복원',rendered);
     } catch(error) {result.textContent += '\nERROR '+error.message;} finally {run.disabled=false;}
   });
 })().catch(error=>{document.getElementById('result').textContent='ERROR '+error.message;});
