@@ -282,6 +282,16 @@ window.showTeamReport = async function() {
       title.textContent = sample.title || '제목 없는 샘플';
       div.appendChild(title);
 
+      const score = document.createElement('p');
+      score.className = 'font-semibold my-1';
+      score.textContent = '기록 총점: ' + (window.NOEL_WORKFLOW_API?.score(sample.sampleData) || '계산 불가');
+      div.appendChild(score);
+      if (sample.sampleData.tastingNotes) {
+        const memo = document.createElement('p');
+        memo.className = 'text-sm whitespace-pre-wrap my-2';
+        memo.textContent = String(sample.sampleData.tastingNotes);
+        div.appendChild(memo);
+      }
       const summary = buildFlavorSummaryHtml(sample.sampleData);
       div.insertAdjacentHTML('beforeend', summary);
       wrapper.appendChild(div);
