@@ -1,5 +1,5 @@
-const APP_CACHE = 'noel-sca-app-v11';
-const RUNTIME_CACHE = 'noel-sca-runtime-v11';
+const APP_CACHE = 'noel-sca-app-v12';
+const RUNTIME_CACHE = 'noel-sca-runtime-v12';
 
 const APP_SHELL_FILES = [
   './',
@@ -7,6 +7,7 @@ const APP_SHELL_FILES = [
   './offline.html',
   './manifest.json',
   './flavor-reference.js',
+  './data-store.js',
   './extras.js',
   './theme.js',
   './team.js',
@@ -19,7 +20,7 @@ self.addEventListener('install', event => {
   event.waitUntil((async () => {
     const cache = await caches.open(APP_CACHE);
     // Do not activate an incomplete dictionary/UI pair after a failed update.
-    await cache.addAll(['./index.html', './flavor-reference.js']);
+    await cache.addAll(['./index.html', './flavor-reference.js', './data-store.js', './extras.js']);
     await Promise.allSettled(APP_SHELL_FILES.map(file => cache.add(file)));
     await self.skipWaiting();
   })());
