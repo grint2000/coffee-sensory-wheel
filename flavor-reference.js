@@ -94,7 +94,7 @@
     'GC-O·AEDA 선별, 19성분 SIDA 정량, 기름 역치 기반 OAV, 해바라기유 모델 재구성',
     '높은 OAV로 보고된 성분 중 3개입니다. OAV > 1인 13성분 재구성 향이 생견과의 향과 유사했습니다.',
     '한 품종의 생견과 결과로 로스팅 헤이즐넛에 적용하지 않습니다. 개별 OAV 순서는 미확정입니다.',
-    [molecule('Linalool', '꽃 향'), molecule('5-Methyl-4-heptanone', '견과·과일 계열 향'), molecule('2-Methoxy-3,5-dimethylpyrazine', '흙·구운 계열 향')]);
+    [molecule('Linalool', '꽃 향'), molecule('5-Methyl-4-heptanone', '견과·과일 계열 향'), molecule('2-Methoxy-3,5-dimethylpyrazine', '흙 계열 향')]);
   add('hazelnutRoasted', ['Nutty/Cocoa|Tree Nuts|Roasted Hazelnut'], sources.hazelnutRaw,
     '이탈리아 헤이즐넛의 구운 페이스트', '로스팅 시간·온도는 확인한 초록에서 확인되지 않았습니다.',
     '25성분 SIDA 정량, OAV, 19성분 향 재구성',
@@ -144,6 +144,55 @@
     '정량한 34성분 내 OAV 순서이며 다른 망고 품종·숙도에 보편화하지 않습니다.',
     [molecule('Ethyl 2-methylbutanoate', '과일 향', 'OAV 2100'), molecule('(3E,5Z)-Undeca-1,3,5-triene', '파인애플 같은 향', 'OAV 1900'), molecule('Ethyl 3-methylbutanoate', '과일 향', 'OAV 1600')],
     {rankBasis:'OAV 기준 · 완숙 Haden 시료의 정량 34성분 중', rankValues:[2100,1900,1600]});
+  add('basilDried', ['Green/Vegetative|Herbaceous|Basil'],
+    study('The most aroma-active compounds in shade-dried aerial parts of basil obtained from Iran and Turkey', 'Ahmet Salih Sonmezdag, Asghar Amanpour, Hasim Kelebek, Serkan Selli', 2018, '10.1016/j.indcrop.2018.08.053', '저자 연구정보 시스템의 논문 초록 확인'),
+    '이란·튀르키예산 Ocimum basilicum의 그늘 건조 지상부', '생잎이 아닌 건조 시료 두 종류입니다. Sweet Basil·Thai Basil 품종에 자동 적용하지 않습니다.',
+    'Purge-and-trap 추출, GC-O, AEDA',
+    '두 시료 모두 향기활성 18성분 중 linalool과 methyl chavicol의 FD가 가장 높았습니다. 확인된 두 성분만 표시합니다.',
+    'FD는 추출물을 희석해 냄새를 감지한 지표입니다. 함량·OAV·감각 기여도 순위와 다르며 생바질 전체의 보편적 순위가 아닙니다.',
+    [molecule('Linalool', '꽃·시트러스 계열 향', 'FD 2048'), molecule('Methyl chavicol (Estragole)', '달콤한 아니스 계열 향', 'FD 1024')],
+    {rankBasis:'AEDA FD 기준 · 두 건조 바질 시료에서 같은 순서', rankValues:[2048,1024]});
+  add('bayLeaf', ['Green/Vegetative|Herbaceous|Bay Leaf'],
+    study('Volatile Constituents and Key Odorants in Leaves, Buds, Flowers, and Fruits of Laurus nobilis L.', 'Ayben Kilic, Harzemsah Hafizoglu, Hubert Kollmannsberger, Siegfried Nitz', 2004, '10.1021/jf0306237'),
+    'Laurus nobilis의 신선한 잎 용매 추출물', '같은 논문이 분석한 꽃·열매·눈의 결과와 구분한 잎의 결과입니다.',
+    'GC-MS, HRGC-O-MS, AEDA',
+    '잎에서 냄새가 확인된 21성분 중 높은 FD로 보고된 성분의 예시입니다. 함량이 많은 성분 목록과 별도로 선정했습니다.',
+    '높은 FD 성분은 이 세 가지 외에도 있습니다. 순위는 확정하지 않았으며 건조 월계수잎과 동일하다고 단정하지 않습니다.',
+    [molecule('(Z)-3-Hexenal', '신선한 풋풀 향'), molecule('1,8-Cineole', '유칼립투스 같은 향'), molecule('Linalool', '꽃 향')]);
+  add('lemonOil', ['Fruity|Citrus Fruit|Lemon'],
+    study('Potent odorants resulting from the peroxidation of lemon oil', 'Peter Schieberle, Werner Grosch', 1989, '10.1007/BF01120443'),
+    '신선한 레몬 오일과 빛·실온에서 120시간 산화한 오일 비교', '표시 성분은 논문에서 신선한 오일의 향기성분으로 명시한 성분입니다. 산화 시료의 주요 결점 성분과 구분합니다.',
+    'AEDA, 저장 시간별 정량, odour unit 계산',
+    'Neral·geranial·linalool을 신선한 레몬 오일의 향기성분으로 확인했습니다. 초록만으로 수치와 순위를 확정하지 않았습니다.',
+    '레몬 오일 연구에 한정됩니다. 과육·주스의 대표 3위 또는 모든 레몬 품종의 공통 순위를 뜻하지 않습니다.',
+    [molecule('Neral', '레몬 같은 향'), molecule('Geranial', '레몬 같은 향'), molecule('Linalool', '꽃·시트러스 계열 향')]);
+  add('peanutRaw', ['Nutty/Cocoa|Other Nuts|Peanut'],
+    study('Quantitation of Key Peanut Aroma Compounds in Raw Peanuts and Pan-Roasted Peanut Meal. Aroma Reconstitution and Comparison with Commercial Peanut Products', 'Irene Chetschik, Michael Granvogl, Peter Schieberle', 2010, '10.1021/jf1026636', '저자 소속 TUM의 논문 초록 확인'),
+    '생땅콩', '같은 연구의 팬 로스팅 분말과 구분합니다. 품종·산지는 초록에서 확정하지 않았습니다.',
+    'GC-O 선별 26성분 SIDA 정량, 식물유 역치 기반 OAV',
+    '생땅콩에서 높은 OAV를 보인 세 성분입니다. 개별 수치를 확인하지 않아 순위는 표시하지 않습니다.',
+    '생땅콩 연구의 참고 성분이며 볶은 땅콩·땅콩버터의 순위로 사용하지 않습니다.',
+    [molecule('3-Isopropyl-2-methoxypyrazine', '흙·콩 계열 향'), molecule('Acetic acid', '식초 같은 향'), molecule('Methional', '익힌 감자 같은 향')]);
+  add('peanutRoasted', ['Nutty/Cocoa|Other Nuts|Roasted Peanut'], sources.peanutRaw,
+    '팬에서 볶은 땅콩 분말', '통땅콩이 아닌 분말 연구입니다. 로스팅 온도·시간은 초록에서 확정하지 않았습니다.',
+    '38성분 SIDA 정량, 식물유 역치 기반 OAV, 향 재구성·첨가 비교',
+    '높은 OAV 성분 중 세 가지 예시입니다. 향 재구성에서는 특히 methanethiol의 중요성이 확인됐습니다.',
+    'GC-O에서 중요하지 않았던 일부 피라진의 첨가는 재구성 향을 바꾸지 않았습니다. 피라진이라는 계열명만으로 대표 성분을 선정하지 않았습니다.',
+    [molecule('Methanethiol', '황·익힌 채소 계열 향'), molecule('2,3-Pentanedione', '버터 향'), molecule('2-Acetyl-1-pyrroline', '팝콘 향')]);
+  add('walnut', ['Nutty/Cocoa|Tree Nuts|Walnut'],
+    study('Sotolon and (2E,4E,6Z)-Nona-2,4,6-trienal Are the Key Compounds in the Aroma of Walnuts', 'Christine A. Stübner, Martin Steinhaus', 2023, '10.1021/acs.jafc.3c01002', '저자 소속 Leibniz-LSB의 논문 초록 확인'),
+    'Juglans regia의 신선한 호두 알맹이', '흑호두 등 다른 종·로스팅 제품에는 자동 적용하지 않습니다.',
+    'AEDA, 정량·역치 비교, 향 재구성·생략 시험',
+    '50개 향기활성 성분을 조사했으며 역치를 넘는 성분은 17개였습니다. 두 분자의 혼합으로 특징적인 호두 향을 가장 잘 재현했습니다.',
+    '함량은 둘 다 약 10 μg/kg로 보고됐으나 두 분자 간 순위는 주장하지 않습니다. 다른 주요 성분을 억지로 추가하지 않습니다.',
+    [molecule('Sotolon', '호로파 같은 향', '약 10 μg/kg'), molecule('(2E,4E,6Z)-Nona-2,4,6-trienal', '오트밀 같은 향', '약 10 μg/kg')]);
+  add('greenBeans', ['Green/Vegetative|Fresh Green|Green Beans'],
+    study('Identification of the key odorants in raw French beans and changes during cooking', 'Andrea Hinterholzer, Teresa Lemos, Peter Schieberle', 1998, '10.1007/s002170050322'),
+    '생 프렌치빈 추출물', '조리한 시료와 비교한 연구 중 생채소의 결과만 연결합니다.',
+    'AEDA·향기활성 성분 동정',
+    '25개 향기활성 성분 중 높은 FD를 보인 성분의 예시입니다. (Z)-3-hexenal 감소 등 조리 변화도 별도로 관찰했습니다.',
+    '세 분자의 수치 순서는 초록에서 확인되지 않았습니다. 볶거나 삶은 콩의 대표 분자로 일반화하지 않습니다.',
+    [molecule('(Z)-3-Hexenal', '초록 잎·풋풀 향'), molecule('1-Octen-3-one', '버섯 향'), molecule('3-Isobutyl-2-methoxypyrazine', '흙·콩 향')]);
   // Exact reference equivalence only: generic Pineapple uses the explicitly labelled fresh sample.
   const excludedNames = new Set(['Citric Acid', 'Malic Acid', 'Tartaric Acid', 'Phosphoric Acid', 'Lactic Acid']);
   function getFlavorReference(key) {
