@@ -8,7 +8,7 @@ function notifyMessage(msg) {
 
 import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-app.js";
 import { getAuth, signInWithPopup, GoogleAuthProvider, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-auth.js";
-import { getFirestore, doc, setDoc, updateDoc, arrayUnion, getDoc, onSnapshot, deleteField } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore.js";
+import { getFirestore, doc, setDoc, updateDoc, arrayUnion, getDoc, onSnapshot, deleteField, runTransaction } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyD-rwtilsBrdQ9JDJYFwXb57ebD6DsSqGg",
@@ -57,11 +57,29 @@ function safeRemoveStorage(key) {
   }
 }
 
-function getCurrentTeamName() {
-  const current = safeGetStorage(TEAM_STORAGE_KEYS.currentTeam);
-  if (current) return current;
-  return safeGetStorage('mollis_sca_current_team', '');
+function teamKey() { return TEAM_STORAGE_KEYS.currentTeam+'_'+(auth.currentUser?.uid || 'guest'); }
+function getCurrentTeamName() { return auth.currentUser ? safeGetStorage(teamKey(),'') : ''; }
+let authReady=false;
+let generation=0;
+function context() {
+  if (!authReady || !auth.currentUser || window.currentUser !== 'firebase_'+auth.currentUser.uid)
+    throw new Error('로그인 상태와 기기 기록을 먼저 확인해 주세요.');
+  return {uid:auth.currentUser.uid,team:getCurrentTeamName(),generation};
 }
+function assertContext(c) {
+  const now=context();
+  if (now.uid!==c.uid || now.team!==c.team || now.generation!==c.generation)
+    throw new Error('사용자 또는 팀이 변경되어 작업을 중단했습니다.');
+}
+function cloudStatus(message) {
+  let el=document.getElementById('teamSyncStatus');
+  if (!el) { el=document.createElement('p'); el.id='teamSyncStatus'; el.setAttribute('role','status');
+    document.getElementById('currentTeamHeader')?.parentElement.appendChild(el); }
+  el.textContent=message;
+}
+function stopListener() { generation++; if(window._teamSamplesUnsub) window._teamSamplesUnsub(); window._teamSamplesUnsub=null; }
+function member(data,uid) { return Array.isArray(data.members) && data.members.some(m=>m.uid===uid); }
+function fail(err) { console.error(err); cloudStatus('팀 작업 실패 · 기기 기록은 유지됩니다.'); notifyMessage(err.message || '팀 작업에 실패했습니다.'); }
 
 function normalizeTeamName(rawName) {
   const teamName = (rawName || '').trim();
@@ -73,101 +91,60 @@ function normalizeTeamName(rawName) {
 }
 
 window.firebaseLogin = async function() {
-  try {
-    const provider = new GoogleAuthProvider();
-    const result = await signInWithPopup(auth, provider);
-    window.currentUser = result.user.displayName || result.user.email;
-
-    const display = document.getElementById('currentUserDisplay');
-    if (display) display.textContent = window.currentUser;
-
-    safeSetStorage(TEAM_STORAGE_KEYS.currentUser, window.currentUser);
-
-    const logoutBtn = document.getElementById('logoutBtn');
-    if (logoutBtn) logoutBtn.classList.remove('hidden');
-
-    const loginBtn = document.getElementById('loginBtn');
-    if (loginBtn) loginBtn.classList.add('hidden');
-  } catch (err) {
-    console.error(err);
-    notifyMessage('Google 로그인에 실패했습니다. 팝업 차단 여부를 확인해 주세요.');
-  }
+  try { await signInWithPopup(auth,new GoogleAuthProvider()); } catch(err) { fail(err); }
 };
-
 window.logoutFirebase = async function() {
   try {
+    // Save the old profile before changing Firebase identity.
+    window.getTeamShareSamples();
     await signOut(auth);
-    window.currentUser = 'default';
-    safeSetStorage(TEAM_STORAGE_KEYS.currentUser, window.currentUser);
-    safeRemoveStorage(TEAM_STORAGE_KEYS.currentTeam);
-    if (window._teamSamplesUnsub) window._teamSamplesUnsub();
-    location.reload();
-  } catch (err) {
-    console.error(err);
-    notifyMessage('로그아웃에 실패했습니다. 네트워크 상태를 확인한 뒤 다시 시도해 주세요.');
-  }
+  } catch(err) { fail(err); }
 };
-
-onAuthStateChanged(auth, user => {
-  if (user) {
-    window.currentUser = user.displayName || user.email;
-    const display = document.getElementById('currentUserDisplay');
-    if (display) display.textContent = window.currentUser;
-    const loginBtn = document.getElementById('loginBtn');
-    const logoutBtn = document.getElementById('logoutBtn');
-    if (loginBtn) loginBtn.classList.add('hidden');
-    if (logoutBtn) logoutBtn.classList.remove('hidden');
-    fetchTeamSamples().then(startTeamSamplesListener);
+onAuthStateChanged(auth, async user => {
+  stopListener(); authReady=false;
+  if(document.readyState==='loading') await new Promise(resolve=>document.addEventListener('DOMContentLoaded',resolve,{once:true}));
+  if(auth.currentUser !== user) return;
+  const key=user ? 'firebase_'+user.uid : 'default';
+  if (!window.activateLocalUser(key)) {
+    cloudStatus('사용자 기록을 전환하지 못했습니다. JSON 내보내기로 보관한 뒤 다시 시도해 주세요.'); return;
   }
+  authReady=!!user;
+  const display=document.getElementById('currentUserDisplay');
+  if(display) display.textContent=user ? (user.displayName || user.email || '로그인 사용자') : 'default';
+  document.getElementById('loginBtn')?.classList.toggle('hidden',!!user);
+  document.getElementById('logoutBtn')?.classList.toggle('hidden',!user);
+  updateTeamHeader();
+  if(user) startTeamSamplesListener();
 });
-
 window.createTeam = async function(rawName) {
-  if (!auth.currentUser) {
-    notifyMessage('먼저 로그인하세요');
-    return;
-  }
-  const teamName = normalizeTeamName(rawName);
-  if (!teamName) return;
-
-  const teamRef = doc(db, 'teams', teamName);
-  await setDoc(teamRef, {
-    owner: auth.currentUser.uid,
-    members: [{ uid: auth.currentUser.uid, name: window.currentUser }],
-    memberSamples: { [auth.currentUser.uid]: window.samples || [] }
-  }, { merge: true });
-  safeSetStorage(TEAM_STORAGE_KEYS.currentTeam, teamName);
-  updateTeamHeader();
-  await syncSamplesToTeam(window.samples || []);
-  fetchTeamSamples().then(startTeamSamplesListener);
-  notifyMessage('팀이 생성되었습니다');
+  try {
+    const c=context(), name=normalizeTeamName(rawName); if(!name) return;
+    await runTransaction(db,async tx=>{
+      const ref=doc(db,'teams',name), snap=await tx.get(ref); assertContext(c);
+      if(snap.exists()) throw new Error('이미 존재하는 팀입니다. 팀 가입을 이용하세요.');
+      tx.set(ref,{owner:c.uid,members:[{uid:c.uid,name:auth.currentUser.displayName || '사용자'}],memberSamples:{}});
+    });
+    assertContext(c); if(!safeSetStorage(teamKey(),name)) return;
+    stopListener(); updateTeamHeader(); startTeamSamplesListener(); notifyMessage('팀 생성 완료 · 현재 세션 공유 버튼으로 기록을 올려 주세요.');
+  } catch(err) { fail(err); }
 };
-
 window.joinTeam = async function(rawName) {
-  if (!auth.currentUser) {
-    notifyMessage('먼저 로그인하세요');
-    return;
-  }
-  const teamName = normalizeTeamName(rawName);
-  if (!teamName) return;
-
-  const teamRef = doc(db, 'teams', teamName);
-  const snap = await getDoc(teamRef);
-  if (!snap.exists()) {
-    notifyMessage('팀이 존재하지 않습니다');
-    return;
-  }
-  await updateDoc(teamRef, {
-    members: arrayUnion({ uid: auth.currentUser.uid, name: window.currentUser }),
-    [`memberSamples.${auth.currentUser.uid}`]: window.samples || []
-  });
-  safeSetStorage(TEAM_STORAGE_KEYS.currentTeam, teamName);
-  updateTeamHeader();
-  await fetchTeamSamples();
-  startTeamSamplesListener();
-  notifyMessage('팀에 가입했습니다');
+  try {
+    const c=context(), name=normalizeTeamName(rawName); if(!name) return;
+    await runTransaction(db,async tx=>{
+      const ref=doc(db,'teams',name),snap=await tx.get(ref); assertContext(c);
+      if(!snap.exists()) throw new Error('팀이 존재하지 않습니다.');
+      const data=snap.data();
+      if(!member(data,c.uid)) tx.update(ref,{members:arrayUnion({uid:c.uid,name:auth.currentUser.displayName || '사용자'})});
+    });
+    assertContext(c); if(!safeSetStorage(teamKey(),name)) return;
+    stopListener(); updateTeamHeader(); startTeamSamplesListener(); notifyMessage('팀 가입 완료 · 기존 팀 기록은 유지됩니다.');
+  } catch(err) { fail(err); }
 };
 
 window.loadTeamInfoToModal = async function() {
+  try {
+  const c=context();
   const teamName = getCurrentTeamName();
   const nameEl = document.getElementById('currentTeamDisplay');
   const listEl = document.getElementById('teamMembersList');
@@ -176,7 +153,8 @@ window.loadTeamInfoToModal = async function() {
   listEl.innerHTML = '';
 
   const snap = await getDoc(doc(db, 'teams', teamName));
-  if (!snap.exists()) return;
+  assertContext(c);
+  if (!snap.exists() || !member(snap.data(),c.uid)) return;
 
   const data = snap.data();
   (data.members || []).forEach(m => {
@@ -196,32 +174,22 @@ window.loadTeamInfoToModal = async function() {
     }
     listEl.appendChild(li);
   });
+  } catch(err) { fail(err); }
 };
 
 window.removeMemberFromTeam = async function(memberUid) {
-  if (!auth.currentUser) {
-    notifyMessage('로그인 후 이용해 주세요');
-    return;
-  }
-
-  const teamName = getCurrentTeamName();
-  if (!teamName) return;
-  const teamRef = doc(db, 'teams', teamName);
-  const snap = await getDoc(teamRef);
-  if (!snap.exists()) return;
-
-  const data = snap.data();
-  if (data.owner !== auth.currentUser.uid) {
-    notifyMessage('팀장만 팀원을 탈퇴시킬 수 있습니다');
-    return;
-  }
-
-  const newMembers = (data.members || []).filter(m => m.uid !== memberUid);
-  const updateObj = { members: newMembers };
-  updateObj[`memberSamples.${memberUid}`] = deleteField();
-  await updateDoc(teamRef, updateObj);
-  loadTeamInfoToModal();
-  notifyMessage('팀원이 탈퇴되었습니다');
+  try {
+    const c=context(); if(!c.team) return;
+    if(!confirm('이 팀원을 탈퇴시키고 해당 팀 공유 기록을 삭제할까요?')) return;
+    await runTransaction(db,async tx=>{
+      const ref=doc(db,'teams',c.team),snap=await tx.get(ref); assertContext(c);
+      if(!snap.exists() || snap.data().owner!==c.uid || memberUid===c.uid)
+        throw new Error('팀장만 다른 팀원을 탈퇴시킬 수 있습니다.');
+      const data=snap.data();
+      tx.update(ref,{members:(data.members || []).filter(m=>m.uid!==memberUid),['memberSamples.'+memberUid]:deleteField()});
+    });
+    assertContext(c); await window.loadTeamInfoToModal(); notifyMessage('팀원이 탈퇴되었습니다.');
+  } catch(err) { fail(err); }
 };
 
 function updateTeamHeader() {
@@ -232,89 +200,62 @@ function updateTeamHeader() {
   }
 }
 
-// === Team sample sync functions ===
-
-async function fetchTeamSamples() {
-  const teamName = getCurrentTeamName();
-  if (!teamName) return;
+// Local autosaves never publish or replace a remote session implicitly.
+window.syncSamplesToTeam = async function() {};
+window.publishTeamSamples = async function() {
   try {
-    const snap = await getDoc(doc(db, 'teams', teamName));
-    if (snap.exists()) {
-      const data = snap.data();
-      const uid = auth.currentUser ? auth.currentUser.uid : null;
-      let samplesData = null;
-      if (uid && data.memberSamples && data.memberSamples[uid]) {
-        samplesData = data.memberSamples[uid];
-      } else if (data.samples) {
-        samplesData = data.samples; // backward compatibility
-      }
-      if (samplesData) {
-        const key = `noel_sca_samples2_${window.currentUser || 'default'}`;
-        const localStr = JSON.stringify(samplesData);
-        safeSetStorage(key, localStr);
-        if (typeof loadSamplesFromStorage === 'function') {
-          loadSamplesFromStorage();
-          if (typeof renderSampleList === 'function') renderSampleList();
-        }
-      }
-    }
-  } catch (err) {
-    console.error('팀 샘플 불러오기 실패', err);
-  }
-}
-
-window.syncSamplesToTeam = async function(samples) {
-  const teamName = getCurrentTeamName();
-  if (!teamName || !auth.currentUser) return;
-  try {
-    const teamRef = doc(db, 'teams', teamName);
-    const updateObj = {};
-    updateObj[`memberSamples.${auth.currentUser.uid}`] = samples;
-    updateObj.updatedAt = Date.now();
-    await updateDoc(teamRef, updateObj);
-  } catch (err) {
-    console.error('팀 샘플 동기화 실패', err);
-  }
+    const c=context(); if(!c.team) throw new Error('먼저 팀을 선택하세요.');
+    const payload=window.getTeamShareSamples();
+    const ref=doc(db,'teams',c.team), before=await getDoc(ref); assertContext(c);
+    if(!before.exists() || !member(before.data(),c.uid)) throw new Error('팀 가입 상태를 확인하세요.');
+    const previous=JSON.stringify(before.data().memberSamples?.[c.uid] ?? null);
+    if(!confirm('현재 세션의 샘플 '+payload.length+'개를 팀에 공유합니다. 기존에 공유한 내 샘플을 교체할까요?')) return;
+    cloudStatus('팀에 저장 중…');
+    await runTransaction(db,async tx=>{
+      const snap=await tx.get(ref); assertContext(c);
+      if(!snap.exists() || !member(snap.data(),c.uid)) throw new Error('팀 가입 상태가 변경되었습니다.');
+      if(JSON.stringify(snap.data().memberSamples?.[c.uid] ?? null)!==previous)
+        throw new Error('다른 기기에서 팀 기록이 변경되었습니다. 먼저 불러와 확인해 주세요.');
+      tx.update(ref,{['memberSamples.'+c.uid]:payload,updatedAt:Date.now()});
+    });
+    assertContext(c); cloudStatus('팀 저장 완료 · 이후 수정은 다시 공유해 주세요.');
+  } catch(err) { fail(err); }
 };
-
+window.fetchTeamSamples = async function() {
+  try {
+    const c=context(); if(!c.team) throw new Error('먼저 팀을 선택하세요.');
+    const snap=await getDoc(doc(db,'teams',c.team)); assertContext(c);
+    if(!snap.exists() || !member(snap.data(),c.uid)) throw new Error('팀 가입 상태를 확인하세요.');
+    const value=snap.data().memberSamples?.[c.uid];
+    if(!Array.isArray(value) || !value.length) throw new Error('내가 공유한 팀 기록이 없습니다.');
+    if(!confirm('내 팀 기록을 새로운 세션으로 불러올까요? 기존 세션은 유지됩니다.')) return;
+    assertContext(c);
+    if(!window.importTeamSamples(value,c.team)) throw new Error('기기 저장 실패로 불러오기를 중단했습니다.');
+    cloudStatus('내 팀 기록을 새 세션으로 불러왔습니다.');
+  } catch(err) { fail(err); }
+};
 window.startTeamSamplesListener = function() {
-  const teamName = getCurrentTeamName();
-  if (!teamName) return;
-  const teamRef = doc(db, 'teams', teamName);
-  if (window._teamSamplesUnsub) window._teamSamplesUnsub();
-  window._teamSamplesUnsub = onSnapshot(teamRef, snap => {
-    if (snap.exists()) {
-      const data = snap.data();
-      const uid = auth.currentUser ? auth.currentUser.uid : null;
-      let samplesData = null;
-      if (uid && data.memberSamples && data.memberSamples[uid]) {
-        samplesData = data.memberSamples[uid];
-      } else if (data.samples) {
-        samplesData = data.samples; // backward compatibility
-      }
-      if (samplesData) {
-        const key = `noel_sca_samples2_${window.currentUser || 'default'}`;
-        const newStr = JSON.stringify(samplesData);
-        if (safeGetStorage(key) !== newStr) {
-          safeSetStorage(key, newStr);
-          if (typeof loadSamplesFromStorage === 'function') {
-            loadSamplesFromStorage();
-            if (typeof renderSampleList === 'function') renderSampleList();
-          } else {
-            location.reload();
-          }
-        }
-      }
+  if(window._teamSamplesUnsub) window._teamSamplesUnsub();
+  if(!authReady || !getCurrentTeamName()) return;
+  const c=context();
+  window._teamSamplesUnsub=onSnapshot(doc(db,'teams',c.team),snap=>{
+    try { assertContext(c); } catch(_) { return; }
+    if(!snap.exists() || !member(snap.data(),c.uid)) {
+      stopListener(); cloudStatus('팀 접근 권한이 없습니다. 가입 상태를 확인하세요.'); return;
     }
-  });
+    cloudStatus('팀 연결됨 · 현재 세션을 공유하거나 내 팀 기록을 불러올 수 있습니다.');
+  },err=>{ try { assertContext(c); fail(err); } catch(_) {} });
 };
 
 window.showTeamReport = async function() {
+  try {
+  const c=context();
   const teamName = getCurrentTeamName();
   if (!teamName) return;
 
   const snap = await getDoc(doc(db, 'teams', teamName));
-  if (!snap.exists()) return;
+  assertContext(c);
+  if (!snap.exists() || !member(snap.data(),c.uid)) return;
 
   const data = snap.data();
   const bodyEl = document.getElementById('teamReportBody');
@@ -332,7 +273,7 @@ window.showTeamReport = async function() {
     nameEl.textContent = m.name || m.uid;
     wrapper.appendChild(nameEl);
 
-    memberSamples.forEach(sample => {
+    (Array.isArray(memberSamples) ? memberSamples : []).filter(sample=>sample && sample.sampleData && typeof sample.sampleData==='object').forEach(sample => {
       const div = document.createElement('div');
       div.className = 'border rounded p-2 my-2';
 
@@ -350,9 +291,16 @@ window.showTeamReport = async function() {
   });
 
   reportModal.classList.add('show');
+  } catch(err) { fail(err); }
 };
 
 document.addEventListener('DOMContentLoaded', () => {
   updateTeamHeader();
-  fetchTeamSamples().then(startTeamSamplesListener);
+  const anchor=document.getElementById('currentTeamHeader');
+  if(anchor) {
+    for(const [label,action] of [['현재 세션 공유',()=>window.publishTeamSamples()],['내 팀 기록 불러오기',()=>window.fetchTeamSamples()]]) {
+      const button=document.createElement('button'); button.type='button'; button.textContent=label;
+      button.className='text-xs border rounded px-2 py-1 m-1'; button.addEventListener('click',action); anchor.parentElement.appendChild(button);
+    }
+  }
 });
