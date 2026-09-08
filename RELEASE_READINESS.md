@@ -47,7 +47,7 @@ npm test
 | `tests/service-worker.cjs` | 모의 Cache API 필수 설치·오프라인 앱·캐시 분리·API 제외·응답 지연/5xx·설치 실패 |
 | `scripts/audit-reference.cjs` | 실제 최신 420개 목록·정확한 키·최대 3개·순위 구조·출처 필드·스크립트 문법. 원문 내용 검증 또는 링크 접속 검사는 아님 |
 
-로컬 전체 실행은 통과했다. 원격 Actions의 실제 실행 상태는 해당 커밋의 **Actions → Draft regression checks**에서 확인한다. 이 검사는 공개 배포 작업을 포함하지 않는다.
+로컬 전체 실행 및 GitHub Actions 전체 작업이 통과했다. 검증한 코드 커밋은 `dc1cb0efe938c5793cb34fcd3f9b7612f978d558`이며, [원격 검사 결과](https://github.com/grint2000/coffee-sensory-wheel/actions/runs/34245609506)는 `completed / success`이다. 새 Ubuntu 환경에서 Node 22, `npm ci`, `npm test`의 성공을 확인했다. 이 검사는 공개 배포 작업을 포함하지 않는다.
 
 ## 해결 완료로 표시할 수 없는 항목
 
