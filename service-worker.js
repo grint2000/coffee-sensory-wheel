@@ -1,5 +1,5 @@
-const APP_CACHE = 'noel-sca-app-v9';
-const RUNTIME_CACHE = 'noel-sca-runtime-v9';
+const APP_CACHE = 'noel-sca-app-v10';
+const RUNTIME_CACHE = 'noel-sca-runtime-v10';
 
 const APP_SHELL_FILES = [
   './',
@@ -18,6 +18,8 @@ const APP_SHELL_FILES = [
 self.addEventListener('install', event => {
   event.waitUntil((async () => {
     const cache = await caches.open(APP_CACHE);
+    // Do not activate an incomplete dictionary/UI pair after a failed update.
+    await cache.addAll(['./index.html', './flavor-reference.js']);
     await Promise.allSettled(APP_SHELL_FILES.map(file => cache.add(file)));
     await self.skipWaiting();
   })());
@@ -28,7 +30,7 @@ self.addEventListener('activate', event => {
     const keys = await caches.keys();
     await Promise.all(
       keys
-        .filter(key => key !== APP_CACHE && key !== RUNTIME_CACHE)
+        .filter(key => /^noel-sca-(app|runtime)-v\d+$/.test(key) && key !== APP_CACHE && key !== RUNTIME_CACHE)
         .map(key => caches.delete(key))
     );
     await self.clients.claim();
@@ -63,6 +65,9 @@ self.addEventListener('fetch', event => {
       return networkResponse;
     } catch (_) {
       if (cached) return cached;
+      const shell = await caches.open(APP_CACHE);
+      const installed = await shell.match(request);
+      if (installed) return installed;
       if (request.mode === 'navigate') {
         const offline = await caches.match('./offline.html');
         if (offline) return offline;
