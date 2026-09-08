@@ -38,7 +38,9 @@
         }
         if (!Array.isArray(data.bodyDescriptors) || data.bodyDescriptors.some(x => typeof x !== 'string')) throw Error('바디감 목록이 올바르지 않습니다.');
         if (factories.validate && !factories.validate(data)) throw Error('샘플 평가값을 확인해 주세요.');
-        return {...defaults, ...sample, id: identifier(sample.id, defaults.id, sampleIds), sampleData:data};
+        const title = sample.title || (typeof data.title === 'string' && data.title) || defaults.title;
+        data.title = title;
+        return {...defaults, ...sample, title, id: identifier(sample.id, defaults.id, sampleIds), sampleData:data};
       });
       if (!session.samples.length) session.samples = [factories.sample('샘플 #1')];
       return session;
