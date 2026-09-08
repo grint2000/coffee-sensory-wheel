@@ -57,14 +57,16 @@ let deferredPrompt;
 
 function pushUndoState() {
   if (typeof window.getLocalCuppingState !== 'function') return;
-  undoStack.push(window.getLocalCuppingState());
+  undoStack.push({user:window.currentUser,state:window.getLocalCuppingState()});
   if (undoStack.length > 20) undoStack.shift();
 }
 
 function undoLastAction() {
   if (!undoStack.length) { notifyMessage('실행 취소할 내용이 없습니다.'); return; }
   try {
-    window.restoreLocalCuppingState(undoStack[undoStack.length-1]);
+    const entry=undoStack[undoStack.length-1];
+    if(entry.user!==window.currentUser) { undoStack=[]; notifyMessage('계정이 변경되어 이전 실행 취소 기록을 비웠습니다.'); return; }
+    if(!window.restoreLocalCuppingState(entry.state)) { notifyMessage('실행 취소 실패: 저장 공간을 확인한 뒤 다시 시도하세요.'); return; }
     undoStack.pop();
     notifyMessage('직전 샘플 작업을 취소했습니다.');
   } catch (error) { notifyMessage('실행 취소 실패: '+error.message); }
@@ -75,12 +77,7 @@ function loginUser() {
     firebaseLogin();
     return;
   }
-  const name = prompt('사용자 이름을 입력하세요', window.currentUser);
-  if (!name) return;
-  window.currentUser = name.trim();
-  if (!window.currentUser) return;
-  safeSetStorage(STORAGE_KEYS.currentUser, window.currentUser);
-  location.reload();
+  notifyMessage('로그인 서비스를 불러오지 못했습니다. 인터넷 연결을 확인하고 새로고침하세요. 기기 기록은 유지됩니다.');
 }
 
 function logoutUser() {
@@ -89,12 +86,7 @@ function logoutUser() {
     return;
   }
 
-  if (confirm('로그아웃하시겠습니까?')) {
-    window.currentUser = 'default';
-    safeSetStorage(STORAGE_KEYS.currentUser, window.currentUser);
-    safeRemoveStorage(STORAGE_KEYS.currentTeam);
-    location.reload();
-  }
+  notifyMessage('로그아웃 서비스를 불러오지 못했습니다. 연결을 확인한 뒤 다시 시도하세요.');
 }
 
 if ('serviceWorker' in navigator) {
