@@ -21,9 +21,11 @@ The application runs entirely in the browser, so you can simply double-click `in
 
 Select the flask button or hold a flavor label to see up to three key odorants of the named reference itself. The default view contains names and short odor descriptions. Study conditions, analytical methods, measurements, limitations and primary-paper citations are collapsed under “자세히 보기”.
 
-`flavor-reference.js` keeps sources, sample-specific profiles and exact note mappings separate from the renderer. No parent-category inheritance is used. Unranked key odorants remain useful and are displayed without numbers. Only the fresh-pineapple sample has an OAV ranking, limited to the 12 quantified compounds of that study. Concentration, OAV and sensory contribution are distinct. Some profiles currently rely on primary abstracts and explicitly say so.
+`flavor-reference.js` keeps sources, sample-specific profiles and exact note mappings separate from the renderer. No parent-category inheritance is used. Unranked key odorants remain useful and are displayed without numbers. Sample-scoped rankings are available for pineapple (OAV, 12 quantified compounds), ripe Haden mango (OAV, 34 quantified compounds) and shade-dried basil (AEDA FD, two confirmed leading compounds). Concentration, OAV, AEDA FD and sensory contribution are distinct. Current coverage is 28 of 420 notes with molecules: 5 ranked and 23 unranked; 387 remain pending and 5 are excluded. Some profiles currently rely on primary abstracts and explicitly say so.
 
 The historical `flavor-evidence.js` is retained for recovery but is not loaded or used as a UI fallback. Notes awaiting a reference-specific literature review show no guessed compounds. See `REFERENCE_REVIEW.md` and `flavor-reference-audit.csv` for coverage and limitations. Run `node scripts/audit-reference.cjs` to regenerate the inventory from the actual flavor list.
+
+Run `node tests/service-worker.cjs` for mocked offline-cache checks. `tests/reference-preview.html` provides isolated responsive/pointer checks using the actual modal code. Physical mobile and installed-PWA migration remain unverified.
 
 ## Browser Compatibility
 
