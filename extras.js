@@ -67,7 +67,13 @@ function undoLastAction() {
     notifyMessage('실행 취소할 내용이 없습니다.');
     return;
   }
-  const state = undoStack.pop();
+  const state = undoStack[undoStack.length - 1];
+  if (window.P0Production) {
+    try { window.P0Production.undoSamples(JSON.parse(state.samples), state.currentSampleId); undoStack.pop(); }
+    catch (error) { notifyMessage('실행 취소를 적용하지 못했습니다: ' + error.message); }
+    return;
+  }
+  undoStack.pop();
   safeSetStorage(`noel_sca_samples2_${window.currentUser}`, state.samples);
   if (state.currentSampleId) {
     safeSetStorage(`noel_sca_current_sample_${window.currentUser}`, state.currentSampleId);
