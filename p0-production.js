@@ -259,5 +259,20 @@ function installP0Production() {
     setSync('팀 전환 전 로컬 저장 완료 · 새 팀의 서버 상태는 별도로 확인합니다');
     return M.clone(samples);
   }
-  window.P0Production = { bindImport, exportAll, preview, parseBackup, accountChanged, receiveTeamSamples, undoSamples, prepareTeamTransition, saveExplicit: () => saveCurrentSample(true, true), getState: () => M.clone({ sessions, currentSessionId, currentSampleId, loadedUser, locked, dirty, history, lastImportRaw, previousBackup }) };
+  function currentDraft() {
+    if (loadedUser !== user() || locked || previewActive || syncInFlight) throw Error('계정·복구·저장 상태를 먼저 확인하세요.');
+    flushDraft(); return M.clone({ sample: getCurrentSampleObj(), sessionId: currentSessionId });
+  }
+  function replaceCurrentData(data) {
+    currentDraft(); const next=M.clone(sessions), selected=next.find(s=>s.id===currentSessionId).samples.find(s=>s.id===currentSampleId);
+    selected.sampleData=M.clone(data); selected.lastEdit=Date.now();
+    commit(next,currentSessionId,currentSampleId,{history,lastImportRaw,previousBackup});sessions=next;dirty=false;renderState();setStatus('평가 식별 정보를 이 기기에 저장했습니다','saved');
+  }
+  function appendEvaluation(data,title,restoreContext=null) {
+    currentDraft(); const next=M.clone(sessions),id=RecordModel.newId('sample');
+    if(restoreContext){const previous=next.find(s=>s.id===currentSessionId).samples.find(s=>s.id===currentSampleId);for(const key of ['coffeeName','origin','variety','farmName','harvestYear','process','lotNumber','supplierName'])if(Object.hasOwn(restoreContext,key))previous.sampleData[key]=restoreContext[key];}
+    next.find(s=>s.id===currentSessionId).samples.unshift({id,title,sampleData:M.clone(data),lastEdit:Date.now()});
+    commit(next,currentSessionId,id,{history,lastImportRaw,previousBackup});sessions=next;currentSampleId=id;dirty=false;renderState();setStatus('새 평가 기록을 이 기기에 저장했습니다','saved');
+  }
+  window.P0Production = { bindImport, exportAll, preview, parseBackup, accountChanged, receiveTeamSamples, undoSamples, prepareTeamTransition, currentDraft, replaceCurrentData, appendEvaluation, saveExplicit: () => saveCurrentSample(true, true), getState: () => M.clone({ sessions, currentSessionId, currentSampleId, loadedUser, locked, dirty, history, lastImportRaw, previousBackup }) };
 }

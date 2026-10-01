@@ -1,5 +1,5 @@
-const APP_CACHE = 'noel-sca-app-v8-p0-access';
-const RUNTIME_CACHE = 'noel-sca-runtime-v8-p0-access';
+const APP_CACHE = 'noel-sca-app-v9-record-identity';
+const RUNTIME_CACHE = 'noel-sca-runtime-v9-record-identity';
 
 const APP_SHELL_FILES = [
   './',
@@ -8,6 +8,8 @@ const APP_SHELL_FILES = [
   './manifest.json',
   './flavor-evidence.js',
   './p0-model.js',
+  './record-model.js',
+  './record-ui.js',
   './import-guard.js',
   './p0-production.js',
   './extras.js',
