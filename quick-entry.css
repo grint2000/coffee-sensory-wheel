@@ -1,0 +1,61 @@
+/* CP-03: all layout changes are scoped to this adapter and its active mode. */
+.quick-entry-toolbar { display:flex; gap:6px; padding:4px; margin:0 0 12px; border:1px solid #cabdaa; border-radius:12px; background:#eee8df; }
+.quick-entry-mode-btn { flex:1; min-height:44px; padding:10px; border:0; border-radius:8px; background:transparent; color:#4b4238; font-size:14px; font-weight:700; }
+.quick-entry-mode-btn[aria-pressed="true"] { background:#fff; color:#663d19; box-shadow:0 1px 4px #0002; }
+.quick-entry-mode-btn:focus-visible, .quick-entry-active summary:focus-visible { outline:3px solid #b46b24; outline-offset:3px; }
+.quick-entry-navigation[hidden], .quick-entry-card[hidden], .quick-entry-manager-hidden { display:none!important; }
+.quick-entry-card { min-width:0; margin-bottom:12px; padding:14px; background:#fff; border:1px solid #e3d9ca; border-radius:12px; }
+.quick-entry-heading { margin:0 0 10px; color:#65451f; font-size:16px; font-weight:700; line-height:1.5; }
+.quick-entry-hint { margin:8px 0 12px; padding:10px; background:#f8f1e7; border-radius:8px; color:#655138; font-size:12px; line-height:1.6; }
+.quick-entry-details { min-width:0; margin-top:12px; border:1px solid #ded5c7; border-radius:10px; background:#fff; }
+.quick-entry-details > summary { min-height:44px; padding:12px; color:#64472b; cursor:pointer; font-size:14px; font-weight:700; overflow-wrap:anywhere; }
+.quick-entry-details > :not(summary) { margin:0 12px 12px; }
+.quick-entry-details[open] > summary { border-bottom:1px solid #ece4d8; margin-bottom:12px; }
+.quick-entry-visually-hidden { position:absolute!important; width:1px; height:1px; padding:0; margin:-1px; overflow:hidden; clip:rect(0,0,0,0); white-space:nowrap; border:0; }
+.quick-entry-active .quick-entry-main, .quick-entry-active #cuppingForm { min-width:0; }
+.quick-entry-active #cuppingForm { border:1px solid #e3d9ca; border-radius:12px; box-shadow:none; padding:14px; }
+.quick-entry-active #quickEntryCore > section { margin-top:0; }
+.quick-entry-active #quickEntryCore > section > h3 { font-size:14px; }
+.quick-entry-active #sampleTitleInput, .quick-entry-active #tastingNotes, .quick-entry-active #sessionSelect { max-width:100%; min-width:0; font-size:16px; }
+.quick-entry-active #sampleTitleInput { width:100%; min-height:44px; }
+.quick-entry-active #tastingNotes { min-height:120px; line-height:1.65; resize:vertical; }
+.quick-entry-active #quickEntrySession > div { display:flex; flex-wrap:wrap; gap:8px; }
+.quick-entry-active #sessionSelect { flex:1 1 170px; min-height:44px; }
+.quick-entry-active #quickEntrySessionDetails > div { min-width:0; }
+.quick-entry-active #quickEntrySessionDetails input, .quick-entry-active #quickEntrySessionDetails select { width:100%; min-width:0; min-height:44px; box-sizing:border-box; }
+.quick-entry-active .quick-entry-sample-actions { display:flex; justify-content:flex-end; margin-bottom:8px; }
+.quick-entry-active .sample-toolbar { display:flex; flex-direction:row; align-items:center; gap:6px; }
+.quick-entry-active .sample-search-input { flex:1; width:0; min-width:0; font-size:16px; }
+.quick-entry-active .sample-search-clear { flex:0 0 auto; width:auto; }
+.quick-entry-active .sample-list-scroll { max-height:168px; }
+.quick-entry-active .sample-item { min-height:44px; }
+.quick-entry-active #quickEntrySamples > div:last-child { margin:10px 0 0; padding:8px 0 0; border-top:1px solid #eee5d8; box-shadow:none; }
+.quick-entry-active #quickEntryDetailedContent > section:first-child { margin-top:0; }
+.quick-entry-active #quickEntryDetailedContent .sca-total-bar { position:static; }
+.quick-entry-active #quickEntryFlavorDetails #flavorTabs { flex-wrap:wrap; }
+.quick-entry-active #quickEntryFlavorDetails .flavor-chip { max-width:100%; }
+.quick-entry-active #quickEntrySave > #saveSamplesBtn { width:100%; justify-content:center; min-height:48px; font-size:16px; }
+.quick-entry-active #quickEntrySave > #p0StoragePanel { margin:12px 0 0!important; padding:10px!important; font-size:12px; line-height:1.6; overflow-wrap:anywhere; }
+.quick-entry-active #quickEntrySave #p0SaveStatus, .quick-entry-active #quickEntrySave #p0DraftStatus { font-weight:700; }
+body.dark .quick-entry-toolbar { background:#262626; border-color:#666; }
+body.dark .quick-entry-mode-btn { color:#ddd; }
+body.dark .quick-entry-mode-btn[aria-pressed="true"], body.dark .quick-entry-card, body.dark .quick-entry-details { background:#262626; color:#f3f4f6; border-color:#666; }
+body.dark .quick-entry-heading, body.dark .quick-entry-details > summary { color:#f4d4a2; }
+body.dark .quick-entry-hint { background:#393027; color:#f3e6d4; }
+@media (max-width:767px) {
+  .quick-entry-active .quick-entry-main { padding:8px; }
+  .quick-entry-active .quick-entry-main > header { padding:8px; gap:6px; }
+  .quick-entry-active .quick-entry-main > header > div:first-child { display:none; }
+  .quick-entry-active .quick-entry-main > header > div:nth-child(2) { margin:0; }
+  .quick-entry-active .quick-entry-main > header > div:nth-child(2) > div { display:none; }
+  .quick-entry-active .quick-entry-main > header > div:nth-child(3) { justify-content:center; flex-wrap:wrap; gap:4px; margin:0; }
+  .quick-entry-active .quick-entry-main > header h2 { font-size:16px; }
+  .quick-entry-active .quick-entry-card, .quick-entry-active #cuppingForm { padding:12px; }
+  .quick-entry-active #quickEntryDetailedContent .grid { min-width:0; }
+}
+@media print {
+  .quick-entry-toolbar, .quick-entry-navigation, #quickEntrySave { display:none!important; }
+}
+/* The existing amber utility is absent from the bundled palette. Keep this action legible. */
+.quick-entry-main #newSessionBtn { background:#8a5527; color:#fff; border:1px solid #70411d; min-height:44px; padding:8px 12px; }
+.quick-entry-main #newSessionBtn:focus-visible { outline:3px solid #c08a45; outline-offset:2px; }

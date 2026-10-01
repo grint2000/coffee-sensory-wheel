@@ -14,7 +14,8 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig), auth = getAuth(app), db = getFirestore(app);
 const TEAM_STORAGE_KEYS = { currentUser: 'noel_sca_current_user', currentTeam: 'noel_sca_current_team' };
 const TEAM_NAME_REGEX = /^[0-9A-Za-z가-힣_-]{2,40}$/;
-let authEpoch = 0, teamVersion = 0, activeTeam = null, teamBusy = false, lastProfileUid = null, lastProfileName = null, blockedProfileTransfer = false;
+let authEpoch = 0, teamVersion = 0, activeTeam = null, teamBusy = false, lastProfileUid = null, lastProfileName = null, blockedProfileTransfer = false, authReady = false;
+window.getCuppingAccountId = () => !authReady ? null : auth.currentUser ? 'firebase:'+auth.currentUser.uid : 'local:default';
 const $ = id => document.getElementById(id);
 function notifyMessage(msg) { if (typeof window.showToast === 'function') window.showToast(msg); else alert(msg); }
 function status(msg) { if ($('teamAccessStatus')) $('teamAccessStatus').textContent = msg; }
@@ -56,11 +57,15 @@ function acceptSamples(data, s) {
   if (!rows.length) { status('팀의 본인 평가가 비어 있습니다. 이 기기 기록은 유지했습니다. 저장하면 본인 평가만 서버에 반영됩니다.'); return true; }
   return window.P0Production?.receiveTeamSamples(rows) !== false;
 }
-async function activateTeam(name, s, seedEmpty = false) {
+async function activateTeam(name, s, seedEmpty = false, preserveDraft = false) {
   const version=++teamVersion, check=()=>{assertCurrent(s);if(version!==teamVersion)throw Error('team-changed');};
   check(); const ref=doc(db,'teams',name);let snap;
   try{snap=await getDoc(ref);}catch(e){check();throw e;}check();
   if (!snap.exists() || !member(snap.data(),s.uid)) throw Error('membership-required');
+  if(preserveDraft&&window.P0Production?.getState().dirty){
+    check();stopListener();activeTeam={name,uid:s.uid,epoch:s.epoch};safeSetStorage(TEAM_STORAGE_KEYS.currentTeam,name);updateTeamHeader();startTeamSamplesListener();
+    status('팀 권한을 확인했습니다. 복원한 초안을 보호하며 서버 자료로 자동 교체하지 않습니다. 확인 후 저장하세요.');return;
+  }
   // Preserve the current draft before another team's values can replace this session.
   const localRows=prepareTransition(); let data=snap.data();
   if (seedEmpty) data=await runTransaction(db,async tx=>{
@@ -77,6 +82,7 @@ async function activateTeam(name, s, seedEmpty = false) {
 window.firebaseLogin=async function(){ try { await signInWithPopup(auth,new GoogleAuthProvider()); } catch (_) { notifyMessage('Google 로그인에 실패했습니다. 팝업과 연결 상태를 확인하세요.'); } };
 window.logoutFirebase=async function(){ try { await signOut(auth); } catch (_) { status('로그아웃에 실패했습니다. 로그인 상태를 확인하세요.'); } };
 onAuthStateChanged(auth, async user=>{
+  authReady = true;
   const nextName=user?(user.displayName||user.email||user.uid):'default';
   if(user&&lastProfileUid&&lastProfileUid!==user.uid&&(window.P0Production?.getState().dirty||lastProfileName===nextName)) blockedProfileTransfer=true;
   if(user){lastProfileUid=user.uid;lastProfileName=nextName;}
@@ -85,10 +91,11 @@ onAuthStateChanged(auth, async user=>{
   if ($('currentUserDisplay')) $('currentUserDisplay').textContent=window.currentUser;
   $('loginBtn')?.classList.toggle('hidden',!!user); $('logoutBtn')?.classList.toggle('hidden',!user);
   if (window.P0Production) window.P0Production.accountChanged();
+  window.dispatchEvent(new CustomEvent('cupping:auth-ready'));
   clearTeamAccess(user?'로그인 계정의 팀 권한을 다시 확인합니다.':'로그아웃했습니다. 이 기기 평가 기록은 유지됩니다.'); refreshPending();
   if(blockedProfileTransfer){status('로그인 계정 전환 중 이전 평가를 보호하고 있습니다. JSON으로 보관한 뒤 계정별 자료를 확인하세요. 팀 전송은 중단했습니다.');return;}
   if (!user || !saved) return;
-  const s=session();try { await activateTeam(saved,s,false); } catch(e){ failure(e,'기존 팀을 열지 못했습니다. 이름을 입력해 접근 또는 가입 상태를 확인하세요.',s); }
+  const s=session();try { await activateTeam(saved,s,false,true); } catch(e){ failure(e,'기존 팀을 열지 못했습니다. 이름을 입력해 접근 또는 가입 상태를 확인하세요.',s); }
 });
 window.createTeam=async raw=>guarded(async()=>{
   const s=session(),name=normalizeTeamName(raw); if(!s||!name)return;

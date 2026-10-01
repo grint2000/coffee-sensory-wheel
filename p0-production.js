@@ -13,6 +13,7 @@ function installP0Production() {
   let editVersion = 0, request = 0, pending = null, history = [];
   let lastImportRaw = null, previousBackup = null, syncRequest = 0, syncInFlight = false;
   let recoveryText = null, recoveryOffset = 0, displayedTitle = null, displayingStoredScores = false;
+  let draftBaseCache = null, draftPending = null, draftRestoreAttempt = null, draftOwnedScope = null, restoredDraftFocus = null;
   const user = () => window.currentUser || 'default';
   const keys = name => ({ sessions: `noel_sca_sessions_${name}`, samples: `noel_sca_samples2_${name}`, selected: `noel_sca_current_sample_${name}`, meta: `noel_sca_p0_meta_${name}`, original: `noel_sca_pre_p0_${name}` });
   const setStatus = (text, state) => { $('p0SaveStatus').textContent = text; $('p0SaveStatus').dataset.state = state; };
@@ -74,6 +75,61 @@ function installP0Production() {
       localStorage.setItem(k.original, JSON.stringify({ version: 1, savedAt: new Date().toISOString(), ...originalBytes() }));
     }
   }
+  function draftScope() { return window.getCuppingAccountId?.() || null; }
+  function draftStatus(message) { if($('p0DraftStatus')) $('p0DraftStatus').textContent=message; }
+  function pendingIdentityInputs(data) {
+    const fields={identityFarmId:'farm_id',identityProducerId:'producer_id',identityCropYear:'crop_year',identityRoastBatchId:'roast_batch_id'},result={};
+    for(const[id,key]of Object.entries(fields)){const value=$(id)?.value||'';if(value.trim()!==String(data.record_identity?.[key]??''))result[id]=value;}return result;
+  }
+  function draftRecord(scope,session,selected,baseSampleRaw,pendingInputs) {
+    const focused=document.activeElement?.id||'',single=M.clone(session);single.samples=[M.clone(selected)];
+    return {version:1,scope,user:loadedUser,session:single,sampleId:selected.id,baseSampleRaw,pendingInputs,focusId:/^[A-Za-z0-9_-]{0,100}$/.test(focused)?focused:'',savedAt:Date.now()};
+  }
+  function storedSampleRaw(sampleId) {
+    const old=originalBytes(),raw=old.sessions||old.samples;if(!raw)return null;
+    const parsed=JSON.parse(raw),rows=Array.isArray(parsed)&&parsed[0]?.samples?parsed.flatMap(s=>s.samples):parsed;
+    const found=Array.isArray(rows)?rows.find(s=>s.id===sampleId):null;return found?JSON.stringify(found):null;
+  }
+  function persistDraft() {
+    if(!dirty||locked||previewActive||draftPending||loadedUser!==user())return false;
+    const scope=draftScope();if(!scope){draftStatus('계정 확인 전입니다. 입력은 화면에 유지되며, 인증 확인 후 계정별 초안 보관을 시작합니다.');return false;}
+    try{
+      const previous=localStorage.getItem(CuppingDraftStore.key(scope));
+      if(previous&&draftOwnedScope!==scope){const record=CuppingDraftStore.decode(previous,scope);draftPending={record,raw:previous,scope};$('p0DraftRecovery').hidden=false;draftStatus('계정에 보관된 이전 초안과 방금 입력한 화면이 있습니다. 먼저 사용할 내용을 선택하세요.');downloadLink('p0DraftFile','계정에 보관된 이전 초안 받기',previous,'previous-input-draft.json');return false;}
+      flushDraft();const selected=getCurrentSampleObj();if(!selected)return false;
+      if(previous){const prior=CuppingDraftStore.decode(previous,scope);if(prior.sampleId!==selected.id&&Object.keys(prior.pendingInputs||{}).length){localStorage.setItem(CuppingDraftStore.archiveKey(scope),previous);downloadLink('p0DraftFile','이전 샘플의 미확정 참조 입력 받기',previous,'previous-sample-reference-draft.json');}}
+      if(!draftBaseCache||draftBaseCache.sampleId!==selected.id||draftBaseCache.scope!==scope)draftBaseCache={scope,sampleId:selected.id,raw:storedSampleRaw(selected.id)};
+      const raw=CuppingDraftStore.encode(draftRecord(scope,getCurrentSessionObj(),selected,draftBaseCache.raw,pendingIdentityInputs(selected.sampleData)));
+      localStorage.setItem(CuppingDraftStore.key(scope),raw);draftOwnedScope=scope;draftStatus('입력 초안을 이 기기에 보관했습니다. 평가 완료·서버 저장과는 별개입니다.');return true;
+    }catch(e){draftStatus('초안 보관 실패 · 화면을 닫기 전에 JSON 백업을 확인하세요. '+e.message);return false;}
+  }
+  function applyDraft(record) {
+    if(loadedUser!==user()||record.scope!==draftScope()||record.user!==loadedUser||locked||previewActive)throw Error('초안의 계정과 현재 계정이 다르거나 자료를 보호 중입니다.');
+    const next=M.clone(sessions),target=next.find(s=>s.samples.some(x=>x.id===record.sampleId));let sessionId;
+    if(target){target.samples=target.samples.map(x=>x.id===record.sampleId?M.clone(record.session.samples[0]):x);sessionId=target.id;}
+    else if(!originalBytes().sessions&&!originalBytes().samples){next.splice(0,next.length,M.clone(record.session));sessionId=record.session.id;}
+    else {const container=next.find(s=>s.id===record.session.id);if(container){container.samples.push(M.clone(record.session.samples[0]));sessionId=container.id;}else{next.push(M.clone(record.session));sessionId=record.session.id;}}
+    checkedBackup(next,sessionId,record.sampleId);sessions=next;currentSessionId=sessionId;currentSampleId=record.sampleId;dirty=true;draftPending=null;draftOwnedScope=record.scope;clearTimeout(sampleSaveTimeout);renderState();
+    for(const[id,value]of Object.entries(record.pendingInputs||{}))if($(id))$(id).value=value;
+    $('p0DraftRecovery').hidden=true;setStatus('이전 입력 초안을 복원했습니다 · 확인 후 저장하세요','dirty');draftStatus('초안 복원 완료 · 정식 저장값과 서버 자료는 아직 바꾸지 않았습니다.');
+    restoredDraftFocus={scope:record.scope,sampleId:record.sampleId,focusId:record.focusId,pendingInputs:record.pendingInputs||{}};resumeDraftFocus();
+  }
+  function resumeDraftFocus(){if(restoredDraftFocus?.scope===draftScope()&&restoredDraftFocus.sampleId===currentSampleId){for(const[id,value]of Object.entries(restoredDraftFocus.pendingInputs))if($(id))$(id).value=value;window.dispatchEvent(new CustomEvent('cupping:draft-restored',{detail:{focusId:restoredDraftFocus.focusId}}));}}
+  function restoreSavedDraft() {
+    const scope=draftScope();if(!scope||loadedUser!==user()||locked||dirty)return;
+    const key=CuppingDraftStore.key(scope);let raw;try{raw=localStorage.getItem(key);}catch{return;}if(!raw||draftRestoreAttempt===scope+'|'+raw)return;draftRestoreAttempt=scope+'|'+raw;
+    try{
+      const record=CuppingDraftStore.decode(raw,scope);if(record.user!==loadedUser)throw Error('현재 로컬 프로필과 초안의 프로필이 다릅니다.');
+      const actual=storedSampleRaw(record.sampleId),noCanonical=!originalBytes().sessions&&!originalBytes().samples;
+      if((record.baseSampleRaw!==null&&actual===record.baseSampleRaw)||(record.baseSampleRaw===null&&noCanonical)){applyDraft(record);return;}
+      draftPending={record,raw,scope};$('p0DraftRecovery').hidden=false;draftStatus('이전 초안과 현재 저장본이 다릅니다. 자동으로 덮어쓰지 않았습니다.');downloadLink('p0DraftFile','보관 초안 JSON 받기',raw,'saved-input-draft.json');
+    }catch(e){draftStatus('보관 초안을 자동 복원하지 않았습니다: '+e.message);downloadLink('p0DraftFile','읽지 못한 초안 원문 받기',raw,'unreadable-input-draft.json');}
+  }
+  $('p0DraftRestoreBtn').addEventListener('click',()=>{if(!draftPending)return;try{const p=draftPending;if(p.scope!==draftScope())throw Error('계정이 바뀌었습니다.');const before=checkedBackup();localStorage.setItem('noel_sca_before_draft_restore_'+encodeURIComponent(p.scope),before);downloadLink('p0BeforeDraftFile','초안 복원 전 현재 자료 받기',before,'before-draft-restore.json');applyDraft(p.record);}catch(e){draftStatus('초안을 적용하지 않았습니다: '+e.message);}});
+  $('p0DraftKeepBtn').addEventListener('click',()=>{if(!draftPending)return;try{const p=draftPending;if(p.scope!==draftScope())throw Error('계정이 바뀌었습니다.');localStorage.setItem(CuppingDraftStore.archiveKey(p.scope),p.raw);localStorage.removeItem(CuppingDraftStore.key(p.scope));downloadLink('p0DraftFile','별도 보관한 이전 초안 받기',p.raw,'previous-input-draft.json');draftPending=null;$('p0DraftRecovery').hidden=true;draftBaseCache=null;draftStatus('현재 저장본을 사용합니다. 이전 초안은 이 기기에 별도로 보관했습니다.');if(dirty)scheduleAutoSave();}catch(e){draftStatus('이전 초안을 보관하지 못해 선택을 유지했습니다: '+e.message);}});
+  window.addEventListener('pagehide',persistDraft);document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='hidden')persistDraft();});
+  window.addEventListener('cupping:auth-ready',()=>{if(dirty)persistDraft();else restoreSavedDraft();});
+  for(const id of ['identityFarmId','identityProducerId','identityCropYear','identityRoastBatchId'])$(id)?.addEventListener('input',()=>{dirty=true;editVersion++;clearTimeout(sampleSaveTimeout);persistDraft();setStatus('로트 참조 입력을 임시 보관했습니다. 로트 정보 확인을 눌러 연결하세요.','dirty');});
   function refreshLinks() {
     if (lastImportRaw) downloadLink('p0OriginalLink', '가져온 원본 JSON 그대로 받기', lastImportRaw, 'imported-original.json');
     if (previousBackup) downloadLink('p0PreviousLink', '직전 교체 전 백업 받기', previousBackup, 'before-restore.json');
@@ -112,10 +168,12 @@ function installP0Production() {
     checkedBackup(next, sessionId, sampleId);
     const k = keys(loadedUser), nextSamples = next.find(s => s.id === sessionId).samples;
     ensureOriginalBackup();
-    CuppingImportGuard.atomicWrite(localStorage, [
+    const entries=[
       [k.sessions, JSON.stringify(next)], [k.samples, JSON.stringify(nextSamples)], [k.selected, sampleId],
       [k.meta, JSON.stringify({ version: 1, currentSessionId: sessionId, history: meta.history, lastImportRaw: meta.lastImportRaw, previousBackup: meta.previousBackup })]
-    ]);
+    ];const scope=draftScope(),selected=nextSamples.find(x=>x.id===sampleId),remaining=sampleId===currentSampleId?pendingIdentityInputs(selected.sampleData):{};
+    if(scope){const oldDraft=localStorage.getItem(CuppingDraftStore.key(scope));if(oldDraft){try{CuppingDraftStore.decode(oldDraft,scope);}catch{entries.push([CuppingDraftStore.archiveKey(scope),oldDraft]);}}const retained=Object.keys(remaining).length?CuppingDraftStore.encode(draftRecord(scope,next.find(s=>s.id===sessionId),selected,JSON.stringify(selected),remaining)):'';entries.push([CuppingDraftStore.key(scope),retained]);}
+    CuppingImportGuard.atomicWrite(localStorage, entries);draftBaseCache=null;draftRestoreAttempt=null;draftOwnedScope=Object.keys(remaining).length?scope:null;draftStatus(Object.keys(remaining).length?'평가를 저장했고 미확정 로트 참조 입력은 초안으로 보관했습니다.':'현재 입력을 정식 저장했습니다.');
     if (sync) startSync(nextSamples);
   }
   function saveError(e) {
@@ -139,9 +197,11 @@ function installP0Production() {
   scheduleAutoSave = function() {
     dirty = true; editVersion++; clearTimeout(sampleSaveTimeout);
     setStatus('아직 이 기기에 저장하지 않은 변경이 있습니다', 'dirty');
-    if (!previewActive && !locked) sampleSaveTimeout = setTimeout(() => saveCurrentSample(), 2000);
+    persistDraft();
+    if (!previewActive && !locked && !draftPending) sampleSaveTimeout = setTimeout(() => saveCurrentSample(), 2000);
   };
   saveSessionsToStorage = function() {
+    if(draftPending){draftStatus('보관된 초안과 현재 저장본 중 사용할 자료를 먼저 선택하세요.');return false;}
     if (locked || previewActive) { setStatus(locked ? '읽지 못한 저장 원문을 보호 중입니다. 검증 복구를 먼저 진행하세요' : '복구 미리보기 중입니다. 적용 또는 취소 뒤 저장하세요', 'error'); return false; }
     if (loadedUser !== user()) { setStatus('계정이 바뀌었습니다. 이전 계정 자료를 새 계정에 저장하지 않았습니다. 먼저 JSON으로 보관하세요', 'error'); return false; }
     try { commit(sessions, currentSessionId, currentSampleId, { history, lastImportRaw, previousBackup }); dirty = false; setStatus('이 기기에 저장됨 · ' + new Date().toLocaleTimeString(), 'saved'); refreshLinks(); return true; }
@@ -155,7 +215,8 @@ function installP0Production() {
   };
   loadSamplesFromStorage = function() {
     clearTimeout(sampleSaveTimeout); syncRequest++; syncInFlight = false; loadedUser = user(); locked = false; dirty = false; setRecoveryRaw(null);
-    history = []; lastImportRaw = null; previousBackup = null;
+    history = []; lastImportRaw = null; previousBackup = null;draftBaseCache=null;draftPending=null;draftRestoreAttempt=null;draftOwnedScope=null;restoredDraftFocus=null;draftStatus('');$('p0DraftRecovery').hidden=true;
+    for(const id of ['p0DraftFile','p0BeforeDraftFile']){const link=$(id);if(link.dataset.objectUrl)URL.revokeObjectURL(link.dataset.objectUrl);link.hidden=true;link.removeAttribute('href');delete link.dataset.objectUrl;}
     for (const id of ['p0OriginalLink', 'p0PreviousLink', 'p0MigrationLink', 'p0TeamTransitionLink']) $(id).hidden = true;
     const k = keys(loadedUser);
     try {
@@ -174,7 +235,7 @@ function installP0Production() {
       setStatus('기존 저장 자료를 읽지 못해 덮어쓰기를 막았습니다: ' + e.message, 'error');
       try { const old = originalBytes(); downloadLink('p0MigrationLink', '읽지 못한 저장 원문 보관', JSON.stringify(old, null, 2), 'unreadable-local-original.json'); const raw = old.sessions || old.samples; if (raw !== null) setRecoveryRaw(raw); } catch (_) {}
     }
-    setSync('서버 저장 여부는 별도로 확인합니다'); renderState();
+    setSync('서버 저장 여부는 별도로 확인합니다'); renderState(); restoreSavedDraft();
   };
   loadSample = function(id) {
     if (loadedUser !== user()) { accountChanged(); return; }
@@ -232,7 +293,7 @@ function installP0Production() {
   }
   function receiveTeamSamples(incoming) {
     if (loadedUser !== user()) accountChanged();
-    if (loadedUser !== user() || dirty || previewActive || locked || syncInFlight) { setSync('팀의 새 자료가 있습니다. 미저장 입력 또는 진행 중인 서버 저장을 보호하기 위해 자동 교체하지 않았습니다'); return false; }
+    if (loadedUser !== user() || dirty || previewActive || locked || syncInFlight || draftPending) { setSync('팀의 새 자료가 있습니다. 미저장 입력 또는 진행 중인 서버 저장을 보호하기 위해 자동 교체하지 않았습니다'); return false; }
     try {
       const parsed = parseBackup(JSON.stringify(incoming)), next = M.clone(sessions);
       next.find(s => s.id === currentSessionId).samples = parsed.next[0].samples;
@@ -251,7 +312,7 @@ function installP0Production() {
   Object.defineProperty(window, 'samples', { configurable: true, get: () => samples });
   Object.defineProperty(window, 'currentSampleId', { configurable: true, get: () => currentSampleId });
   function prepareTeamTransition() {
-    if (loadedUser !== user() || locked || previewActive || syncInFlight) throw Error('계정·복구·저장 상태가 바뀌었습니다. 현재 입력을 보관한 뒤 다시 시도하세요.');
+    if (loadedUser !== user() || locked || previewActive || syncInFlight || draftPending) throw Error('계정·복구·저장 상태가 바뀌었습니다. 현재 입력을 보관한 뒤 다시 시도하세요.');
     flushDraft(); const raw = checkedBackup();
     localStorage.setItem(`noel_sca_team_transition_${loadedUser}`, raw);
     commit(sessions, currentSessionId, currentSampleId, { history, lastImportRaw, previousBackup }, false);
@@ -260,7 +321,7 @@ function installP0Production() {
     return M.clone(samples);
   }
   function currentDraft() {
-    if (loadedUser !== user() || locked || previewActive || syncInFlight) throw Error('계정·복구·저장 상태를 먼저 확인하세요.');
+    if (loadedUser !== user() || locked || previewActive || syncInFlight || draftPending) throw Error('계정·복구·저장 상태를 먼저 확인하세요.');
     flushDraft(); return M.clone({ sample: getCurrentSampleObj(), sessionId: currentSessionId });
   }
   function replaceCurrentData(data) {
@@ -274,5 +335,5 @@ function installP0Production() {
     next.find(s=>s.id===currentSessionId).samples.unshift({id,title,sampleData:M.clone(data),lastEdit:Date.now()});
     commit(next,currentSessionId,id,{history,lastImportRaw,previousBackup});sessions=next;currentSampleId=id;dirty=false;renderState();setStatus('새 평가 기록을 이 기기에 저장했습니다','saved');
   }
-  window.P0Production = { bindImport, exportAll, preview, parseBackup, accountChanged, receiveTeamSamples, undoSamples, prepareTeamTransition, currentDraft, replaceCurrentData, appendEvaluation, saveExplicit: () => saveCurrentSample(true, true), getState: () => M.clone({ sessions, currentSessionId, currentSampleId, loadedUser, locked, dirty, history, lastImportRaw, previousBackup }) };
+  window.P0Production = { bindImport, exportAll, preview, parseBackup, accountChanged, receiveTeamSamples, undoSamples, prepareTeamTransition, currentDraft, replaceCurrentData, appendEvaluation, resumeDraftFocus, persistCurrentDraft:persistDraft, saveExplicit: () => saveCurrentSample(true, true), getState: () => M.clone({ sessions, currentSessionId, currentSampleId, loadedUser, locked, dirty, history, lastImportRaw, previousBackup }) };
 }

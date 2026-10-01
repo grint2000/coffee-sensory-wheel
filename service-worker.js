@@ -1,5 +1,5 @@
-const APP_CACHE = 'noel-sca-app-v9-record-identity';
-const RUNTIME_CACHE = 'noel-sca-runtime-v9-record-identity';
+const APP_CACHE = 'noel-sca-app-v10-quick-drafts';
+const RUNTIME_CACHE = 'noel-sca-runtime-v10-quick-drafts';
 
 const APP_SHELL_FILES = [
   './',
@@ -10,6 +10,9 @@ const APP_SHELL_FILES = [
   './p0-model.js',
   './record-model.js',
   './record-ui.js',
+  './draft-store.js',
+  './quick-entry.js',
+  './quick-entry.css',
   './import-guard.js',
   './p0-production.js',
   './extras.js',
