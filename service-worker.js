@@ -1,5 +1,5 @@
-const APP_CACHE = 'noel-sca-app-v11-assessment-context';
-const RUNTIME_CACHE = 'noel-sca-runtime-v11-assessment-context';
+const APP_CACHE = 'noel-sca-app-v12-backup-merge';
+const RUNTIME_CACHE = 'noel-sca-runtime-v12-backup-merge';
 
 const APP_SHELL_FILES = [
   './',
@@ -17,6 +17,7 @@ const APP_SHELL_FILES = [
   './quick-entry.js',
   './quick-entry.css',
   './import-guard.js',
+  './backup-merge.js',
   './p0-production.js',
   './extras.js',
   './theme.js',

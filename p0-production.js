@@ -11,6 +11,7 @@ function installP0Production() {
   const $ = id => document.getElementById(id);
   let loadedUser = null, locked = false, dirty = false, previewActive = false;
   let editVersion = 0, request = 0, pending = null, history = [];
+  let mergeSources = [];
   let lastImportRaw = null, previousBackup = null, syncRequest = 0, syncInFlight = false;
   let recoveryText = null, recoveryOffset = 0, displayedTitle = null, displayingStoredScores = false;
   let draftBaseCache = null, draftPending = null, draftRestoreAttempt = null, draftOwnedScope = null, restoredDraftFocus = null;
@@ -134,14 +135,14 @@ function installP0Production() {
   for(const id of ['identityFarmId','identityProducerId','identityCropYear','identityRoastBatchId'])$(id)?.addEventListener('input',()=>{dirty=true;editVersion++;clearTimeout(sampleSaveTimeout);persistDraft();setStatus('로트 참조 입력을 임시 보관했습니다. 로트 정보 확인을 눌러 연결하세요.','dirty');});
   function refreshLinks() {
     if (lastImportRaw) downloadLink('p0OriginalLink', '가져온 원본 JSON 그대로 받기', lastImportRaw, 'imported-original.json');
-    if (previousBackup) downloadLink('p0PreviousLink', '직전 교체 전 백업 받기', previousBackup, 'before-restore.json');
+    if (previousBackup) downloadLink('p0PreviousLink', '직전 복구 전 백업 받기', previousBackup, 'before-restore.json');
     try {
       const original = localStorage.getItem(keys(loadedUser).original);
       if (original) downloadLink('p0MigrationLink', 'P0 전환 전 저장 원문 보관', original, 'pre-p0-local-original.json');
       const transition = localStorage.getItem(`noel_sca_team_transition_${loadedUser}`);
       if (transition) downloadLink('p0TeamTransitionLink', '최근 팀 전환 전 평가 백업', transition, 'before-team-transition.json');
     } catch (_) {}
-    $('p0RestoreHistory').textContent = history.length ? history.map(h => `${h.at} · ${h.sessions}세션 / ${h.samples}샘플 복구`).join('\n') : '이 기기에서 적용한 복구 이력이 없습니다';
+    $('p0RestoreHistory').textContent = history.length ? history.map(h => h.mode ? `${h.at} · ${h.mode === 'merge' ? '추가 병합' : '전체 교체'} · ${h.beforeSessions ?? '확인 불가'}세션 / ${h.beforeSamples ?? '확인 불가'}샘플 → ${h.sessions}세션 / ${h.samples}샘플${h.mode === 'merge' ? ` · 추가 ${h.addedSamples} / 중복 제외 ${h.skippedSamples}` : ''}` : `${h.at} · ${h.sessions}세션 / ${h.samples}샘플 복구`).join('\n') : '이 기기에서 적용한 복구 이력이 없습니다';
   }
   function renderState() {
     samples = getCurrentSessionObj().samples;
@@ -169,8 +170,8 @@ function installP0Production() {
   function commit(next, sessionId, sampleId, meta, sync = true) {
     checkedBackup(next, sessionId, sampleId);
     const k = keys(loadedUser), nextSamples = next.find(s => s.id === sessionId).samples;
-    ensureOriginalBackup();
-    const entries=[
+    const originalEntry = localStorage.getItem(k.original) === null ? [[k.original, JSON.stringify({ version: 1, savedAt: new Date().toISOString(), ...originalBytes() })]] : [];
+    const entries=[...originalEntry,
       [k.sessions, JSON.stringify(next)], [k.samples, JSON.stringify(nextSamples)], [k.selected, sampleId],
       [k.meta, JSON.stringify({ version: 1, currentSessionId: sessionId, history: meta.history, lastImportRaw: meta.lastImportRaw, previousBackup: meta.previousBackup })]
     ];const scope=draftScope(),selected=nextSamples.find(x=>x.id===sampleId),remaining=sampleId===currentSampleId?pendingIdentityInputs(selected.sampleData,true):{};
@@ -211,13 +212,14 @@ function installP0Production() {
   };
   saveSamplesToStorage = function() { syncCurrentSessionSamples(); return saveSessionsToStorage(); };
   saveCurrentSample = function(applyInput = true, explicit = false) {
+    if (previewActive) { $('courseImportStatus').textContent = '복구 미리보기를 적용 또는 취소한 뒤 저장·샘플 추가를 진행하세요'; return false; }
     if (!getCurrentSampleObj()) return false;
     if (!dirty && !explicit) return true;
     if (applyInput) flushDraft(); renderSampleList(); updateTotalScore(); return saveSamplesToStorage();
   };
   loadSamplesFromStorage = function() {
     clearTimeout(sampleSaveTimeout); syncRequest++; syncInFlight = false; loadedUser = user(); locked = false; dirty = false; setRecoveryRaw(null);
-    history = []; lastImportRaw = null; previousBackup = null;draftBaseCache=null;draftPending=null;draftRestoreAttempt=null;draftOwnedScope=null;restoredDraftFocus=null;draftStatus('');$('p0DraftRecovery').hidden=true;
+    history = []; lastImportRaw = null; previousBackup = null; mergeSources = [];draftBaseCache=null;draftPending=null;draftRestoreAttempt=null;draftOwnedScope=null;restoredDraftFocus=null;draftStatus('');$('p0DraftRecovery').hidden=true;
     for(const id of ['p0DraftFile','p0BeforeDraftFile']){const link=$(id);if(link.dataset.objectUrl)URL.revokeObjectURL(link.dataset.objectUrl);link.hidden=true;link.removeAttribute('href');delete link.dataset.objectUrl;}
     for (const id of ['p0OriginalLink', 'p0PreviousLink', 'p0MigrationLink', 'p0TeamTransitionLink']) $(id).hidden = true;
     const k = keys(loadedUser);
@@ -225,7 +227,7 @@ function installP0Production() {
       const sessionsRaw = localStorage.getItem(k.sessions), samplesRaw = localStorage.getItem(k.samples);
       const raw = sessionsRaw || samplesRaw;
       if (raw) {
-        const parsed = parseBackup(raw); checkedBackup(parsed.next, parsed.sessionId, parsed.sampleId); sessions = parsed.next;
+        const parsed = parseBackup(raw); checkedBackup(parsed.next, parsed.sessionId, parsed.sampleId); sessions = parsed.next; rememberMergeSource(parsed.data, sessions, parsed.kind);
         const selectedId = localStorage.getItem(k.selected);
         let selectedSession = sessions.find(s => s.samples.some(x => x.id === selectedId)) || sessions[0];
         currentSessionId = selectedSession.id; currentSampleId = selectedSession.samples.some(s => s.id === selectedId) ? selectedId : selectedSession.samples[0].id;
@@ -240,6 +242,7 @@ function installP0Production() {
     setSync('서버 저장 여부는 별도로 확인합니다'); renderState(); restoreSavedDraft();
   };
   loadSample = function(id) {
+    if (previewActive) { $('courseImportStatus').textContent = '복구 미리보기를 적용 또는 취소한 뒤 샘플을 선택하세요'; return; }
     if (loadedUser !== user()) { accountChanged(); return; }
     if (dirty && !saveCurrentSample()) return;
     const selected = samples.find(s => s.id === id); if (!selected) return;
@@ -248,36 +251,126 @@ function installP0Production() {
     catch (_) { setStatus('선택 위치를 저장하지 못했습니다. 평가 자료는 바꾸지 않았습니다', 'error'); }
   };
   const originalSwitch = switchSession;
-  switchSession = function(id) { if (loadedUser !== user()) { accountChanged(); return; } if (dirty && !saveCurrentSample()) return; originalSwitch(id); };
+  switchSession = function(id) { if (previewActive) { $('courseImportStatus').textContent = '복구 미리보기를 적용 또는 취소한 뒤 세션을 선택하세요'; return; } if (loadedUser !== user()) { accountChanged(); return; } if (dirty && !saveCurrentSample()) return; originalSwitch(id); };
   const originalBackupList = showBackupList;
   showBackupList = function() { refreshLinks(); $('p0BackupDetails').open = true; originalBackupList(); };
   restoreBackup = function(item) { try { preview(localStorage.getItem(item.key), item.date + ' 기존 백업'); $('backupRestoreModal')?.classList.remove('show'); } catch (e) { $('courseImportStatus').textContent = '복구하지 않았습니다: ' + e.message; } };
   setupErrorMonitoring = function() { window.addEventListener('error', () => setStatus('화면 오류가 발생했습니다. 자동 복구로 기록을 덮어쓰지 않습니다. 현재 입력을 JSON으로 보관하세요', 'error')); };
-  function cancelImport(message) { request++; pending = null; previewActive = false; $('courseImportPreview').hidden = true; $('importSamplesInput').value = ''; $('courseImportStatus').textContent = message || '취소했습니다. 기존 자료와 선택 상태를 유지합니다'; }
+  const sameContent = (a,b) => CuppingBackupMerge.same(a,b);
+  const sessionMetadata = session => Object.fromEntries(Object.entries(session).filter(([key]) => key !== 'samples'));
+  function rememberMergeSource(rawRows, hydratedRows, kind = 'sessions') {
+    if (kind !== 'sessions') return;
+    for (const raw of rawRows) {
+      const hydrated = hydratedRows.find(row => row.id === raw.id); if (!hydrated) continue;
+      const origin = mergeSources.find(row => row.raw.id === raw.id);
+      if (!origin) { mergeSources.push({raw:M.clone(raw),hydrated:M.clone(hydrated)}); continue; }
+      const rawSamples = new Map(origin.raw.samples.map(row=>[row.id,row])), hydratedSamples = new Map(origin.hydrated.samples.map(row=>[row.id,row]));
+      for (const sample of raw.samples) {
+        const current = hydrated.samples.find(row=>row.id===sample.id);
+        if (current && (!hydratedSamples.has(sample.id) || !sameContent(current,hydratedSamples.get(sample.id)))) { rawSamples.set(sample.id,M.clone(sample)); hydratedSamples.set(sample.id,M.clone(current)); }
+      }
+      const sameMetadata = sameContent(sessionMetadata(origin.hydrated),sessionMetadata(hydrated));
+      origin.raw = {...M.clone(sameMetadata?sessionMetadata(origin.raw):sessionMetadata(raw)),samples:[...rawSamples.values()]};
+      origin.hydrated = {...M.clone(sessionMetadata(hydrated)),samples:[...hydratedSamples.values()]};
+    }
+  }
+  // Only exact original bytes/content paired with an unchanged loaded record may
+  // match its hydrated display form. No absent field, name or author is inferred.
+  function mergeInput(p) {
+    return p.data.map(source => {
+      const row = M.clone(source), current = p.current.find(s => s.id === source.id);
+      if (!current) return row;
+      for (const origin of mergeSources.filter(s => s.raw.id === source.id)) {
+        if (sameContent(sessionMetadata(source), sessionMetadata(origin.raw)) && sameContent(sessionMetadata(current), sessionMetadata(origin.hydrated))) {
+          for (const key of Object.keys(row)) if (key !== 'samples') delete row[key];
+          Object.assign(row, M.clone(sessionMetadata(current))); break;
+        }
+      }
+      row.samples = source.samples.map(sample => {
+        const existing = current.samples.find(s => s.id === sample.id);
+        if (existing && mergeSources.some(origin => origin.raw.id === source.id && origin.raw.samples.some(raw => raw.id === sample.id && sameContent(raw,sample)) && origin.hydrated.samples.some(old => old.id === sample.id && sameContent(old,existing)))) return M.clone(existing);
+        return M.clone(sample);
+      });
+      return row;
+    });
+  }
+  const counts = rows => ({ sessions: rows.length, samples: rows.reduce((total,s) => total+s.samples.length,0) });
+  function formStamp() {
+    return JSON.stringify(Array.from(document.querySelectorAll('input,textarea,select')).filter(e => e.id !== 'importSamplesInput' && e.name !== 'courseImportMode').map(e => [e.id,e.value,e.checked]));
+  }
+  function storageStamp() { const k=keys(loadedUser), scope=draftScope(); return JSON.stringify([...Object.values(k).map(key=>[key,localStorage.getItem(key)]),...(scope?[[CuppingDraftStore.key(scope),localStorage.getItem(CuppingDraftStore.key(scope))]]:[])]); }
+  function previewIsCurrent(p) { return p.user === user() && p.user === loadedUser && p.scope === draftScope() && p.editVersion === editVersion && p.form === formStamp() && p.state === JSON.stringify({sessions,currentSessionId,currentSampleId}) && p.storage === storageStamp(); }
+  function cancelImport(message) { request++; pending = null; previewActive = false; $('courseImportPreview').hidden = true; $('courseImportApply').disabled = false; $('importSamplesInput').value = ''; $('courseImportStatus').textContent = message || '취소했습니다. 기존 자료와 선택 상태를 유지합니다'; }
+  function renderImportMode() {
+    if (!pending) return;
+    const p = pending, mode = document.querySelector('input[name="courseImportMode"]:checked').value;
+    p.mode = mode; p.apply = null; $('courseImportConflict').hidden = true;
+    const beforeText = p.beforeCounts ? `${p.beforeCounts.sessions}세션 / ${p.beforeCounts.samples}샘플` : '읽지 못한 저장 원문 (건수 확인 불가)';
+    try {
+      if (!previewIsCurrent(p)) throw Error('계정·입력·선택·저장값이 바뀌었습니다. 취소한 뒤 최신 상태에서 다시 미리보세요');
+      let next = p.next, sessionId = p.sessionId, sampleId = p.sampleId, plan = null;
+      if (mode === 'merge') {
+        if (locked) throw Error('읽지 못한 원문은 병합할 수 없습니다. 원문을 보관하고 전체 교체를 검토하세요');
+        if (p.kind !== 'sessions') throw Error('세션 ID가 없는 샘플 배열은 병합할 수 없습니다. 세션 백업을 사용하거나 전체 교체를 검토하세요');
+        plan = CuppingBackupMerge.plan(p.current, mergeInput(p));
+        if (!plan.ok) throw Error(plan.conflicts.slice(0,3).map(c => `${c.sessionId}${c.sampleId?' / '+c.sampleId:''}: ${c.message}`).join(' · ') + (plan.conflicts.length > 3 ? ` · 외 ${plan.conflicts.length-3}건` : '') + ' · 어느 쪽도 덮어쓰지 않았습니다');
+        // The planner compares raw input first; only genuinely new rows use the
+        // existing, validated display hydration. Existing rows remain exact.
+        const existingIds = new Set(p.current.flatMap(s=>s.samples.map(x=>x.id)));
+        next = plan.next.map(s => {
+          const incoming = p.next.find(row=>row.id===s.id);
+          return { ...(p.current.some(row=>row.id===s.id)?s:incoming), samples:s.samples.map(sample=>existingIds.has(sample.id)?sample:incoming.samples.find(row=>row.id===sample.id)) };
+        });
+        sessionId = p.currentSessionId; sampleId = p.currentSampleId;
+      }
+      checkedBackup(next,sessionId,sampleId);
+      const after = counts(next), agg = M.aggregates(next.flatMap(s=>s.samples));
+      p.apply = {next,sessionId,sampleId,after,plan};
+      $('courseImportSummary').textContent = `${p.name} · ${p.sessionCount}세션 / ${p.sampleCount}샘플 입력 · ${mode==='merge'?'추가 병합':'전체 교체'}: ${beforeText} → ${after.sessions}세션 / ${after.samples}샘플. ${plan?`추가 ${plan.addedSessions}세션 / ${plan.addedSamples}샘플 · 동일 원문 제외 ${plan.skippedSamples}샘플. 현재 선택 유지. `:''}확정 ${agg.count}개 / 제외 ${agg.excluded}개.`;
+      $('courseImportApply').textContent = plan?.addedSamples===0 ? '중복 확인 완료' : mode==='merge'?'검토한 자료 추가 병합':'검토한 자료로 교체';
+      $('courseImportApply').disabled = false;
+      $('courseImportStatus').textContent = plan?.addedSamples===0 ? '추가할 자료가 없습니다. 저장·서버 동기화·이력을 바꾸지 않습니다' : '검증 통과 · 아직 적용하지 않았습니다';
+    } catch (e) {
+      $('courseImportSummary').textContent = `${p.name} · ${p.sessionCount}세션 / ${p.sampleCount}샘플 입력 · ${mode==='merge'?'추가 병합':'전체 교체'}: ${beforeText} → 적용 불가. 기존 자료 유지.`;
+      $('courseImportConflict').textContent = e.message; $('courseImportConflict').hidden = false; $('courseImportApply').disabled = true; $('courseImportStatus').textContent = '적용하지 않았습니다. 원본을 확인하거나 다른 복구 방식을 검토하세요';
+    }
+  }
   function preview(raw, name) {
+    cancelImport('가져온 자료를 검증하고 있습니다');
     const parsed = parseBackup(raw); checkedBackup(parsed.next, parsed.sessionId, parsed.sampleId);
+    if (loadedUser !== user() || draftPending || syncInFlight) throw Error('계정·보관 초안·진행 중인 서버 저장을 먼저 확인하세요');
     flushDraft(); if (!locked) { window.AssessmentContextUI?.assertValid(); window.AssessmentContextUI?.applySession(); } const before = locked ? JSON.stringify(originalBytes(), null, 2) : checkedBackup();
-    const agg = M.aggregates(parsed.next.flatMap(s => s.samples));
-    pending = { ...parsed, raw, name, before, editVersion, user: loadedUser }; previewActive = true; clearTimeout(sampleSaveTimeout);
-    $('courseImportSummary').textContent = `${name} · ${parsed.sessionCount}세션 / ${parsed.sampleCount}샘플로 현재 ${sessions.length}세션 전체 교체. 확정 ${agg.count}개 / 제외 ${agg.excluded}개. 적용 후 기존 팀 설정에 따라 현재 세션 샘플을 동기화합니다.`;
-    $('courseImportPreview').hidden = false; $('courseImportStatus').textContent = '검증 통과 · 아직 적용하지 않았습니다';
-    downloadLink('p0BeforeLink', '교체 전 현재 자료 백업 받기', before, 'before-restore.json'); $('courseImportPreview').scrollIntoView({ block: 'center' });
+    pending = { ...parsed, raw, name, before, editVersion, user: loadedUser, scope:draftScope(), current:M.clone(sessions), currentSessionId,currentSampleId, beforeCounts:locked?null:counts(sessions), state:JSON.stringify({sessions,currentSessionId,currentSampleId}), form:formStamp(), storage:storageStamp() };
+    previewActive = true; clearTimeout(sampleSaveTimeout);
+    document.querySelector('input[name="courseImportMode"][value="replace"]').checked = true;
+    $('courseImportPreview').hidden = false; renderImportMode();
+    downloadLink('p0BeforeLink', '복구 전 현재 자료 백업 받기', before, 'before-restore.json'); $('courseImportPreview').scrollIntoView({ block: 'center' });
   }
   function bindImport() {
+    document.addEventListener('click', event => {
+      if (!previewActive || !event.target.closest?.('#removeSampleBtn')) return;
+      event.preventDefault(); event.stopImmediatePropagation(); $('courseImportStatus').textContent = '복구 미리보기를 적용 또는 취소한 뒤 샘플을 삭제하세요';
+    }, true);
     $('importSamplesInput').addEventListener('change', async e => {
-      const file = e.target.files[0], ticket = ++request; pending = null; previewActive = false; $('courseImportPreview').hidden = true;
+      const file = e.target.files[0]; cancelImport('가져온 자료를 검증하고 있습니다'); const ticket = request;
       if (!file) return;
-      try { if (file.size > CuppingImportGuard.MAX_BYTES) throw Error('파일은 1MiB 이하여야 합니다'); const raw = await file.text(); if (ticket === request) preview(raw, file.name); }
+      const context = {user:loadedUser,scope:draftScope(),editVersion,state:JSON.stringify({sessions,currentSessionId,currentSampleId}),form:formStamp(),storage:storageStamp()};
+      try { if (file.size > CuppingImportGuard.MAX_BYTES) throw Error('파일은 1MiB 이하여야 합니다'); const raw = await file.text(); if (ticket === request) { if (!previewIsCurrent(context)) throw Error('파일을 읽는 동안 계정·입력·선택·저장값이 바뀌었습니다. 파일을 다시 선택하세요'); preview(raw, file.name); } }
       catch (e) { if (ticket === request) $('courseImportStatus').textContent = '가져오지 않았습니다: ' + e.message; }
     });
+    for (const radio of document.querySelectorAll('input[name="courseImportMode"]')) radio.addEventListener('change',renderImportMode);
     $('courseImportCancel').addEventListener('click', () => cancelImport());
     $('courseImportApply').addEventListener('click', () => {
       if (!pending) return;
-      if (pending.user !== user() || pending.editVersion !== editVersion) { cancelImport('계정 또는 입력이 바뀌었습니다. 최신 상태에서 다시 미리보세요'); return; }
+      if (!previewIsCurrent(pending)) { cancelImport('계정 또는 입력·선택·저장값이 바뀌었습니다. 최신 상태에서 다시 미리보세요'); return; }
       try {
-        const p = pending, nextHistory = [...history, { at: new Date().toISOString(), sessions: p.sessionCount, samples: p.sampleCount }].slice(-20);
-        commit(p.next, p.sessionId, p.sampleId, { history: nextHistory, lastImportRaw: p.raw, previousBackup: p.before });
-        sessions = p.next; currentSessionId = p.sessionId; currentSampleId = p.sampleId; history = nextHistory; lastImportRaw = p.raw; previousBackup = p.before;
+        const p = pending, result = p.apply; if (!result) return;
+        if (p.mode === 'merge' && result.plan.addedSamples === 0) { cancelImport(`중복 ${result.plan.skippedSamples}샘플 확인 완료 · 자료·선택·저장·서버·이력을 그대로 유지했습니다`); return; }
+        const {next,sessionId,sampleId,after,plan} = result;
+        const nextHistory = [...history, { at: new Date().toISOString(), mode:p.mode, sessions:after.sessions, samples:after.samples, beforeSessions:p.beforeCounts?.sessions??null, beforeSamples:p.beforeCounts?.samples??null, inputSessions:p.sessionCount,inputSamples:p.sampleCount,addedSessions:plan?.addedSessions??null,addedSamples:plan?.addedSamples??null,skippedSamples:plan?.skippedSamples??null }].slice(-20);
+        commit(next, sessionId, sampleId, { history: nextHistory, lastImportRaw: p.raw, previousBackup: p.before });
+        if(p.mode==='replace')mergeSources=[]; rememberMergeSource(p.data,next,p.kind);
+        sessions = next; currentSessionId = sessionId; currentSampleId = sampleId; history = nextHistory; lastImportRaw = p.raw; previousBackup = p.before;
         locked = false; dirty = false; setRecoveryRaw(null); cancelImport('복구 적용 완료 · 이 기기에 저장했습니다. 서버 상태는 별도 표시를 확인하세요'); renderState(); setStatus('복구 자료가 이 기기에 저장됨', 'saved');
       } catch (e) { saveError(e); $('courseImportStatus').textContent = '적용하지 못했습니다: ' + e.message; }
     });
