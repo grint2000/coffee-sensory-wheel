@@ -777,6 +777,7 @@
   </style>
 <style>#courseImportPreview{overflow-wrap:anywhere}#p0StoragePanel [hidden]{display:none!important}#p0StoragePanel a{text-decoration:underline}#p0StoragePanel button{padding:10px;border:1px solid #685d47;border-radius:6px}#p0SaveStatus[data-state="error"]{color:#9b2509}#p0SaveStatus{font-weight:bold}#p0LegacyValues,#p0RestoreHistory{white-space:pre-wrap;overflow-wrap:anywhere}#sampleSavedState{display:none!important}</style><link rel="stylesheet" href="quick-entry.css">
 <link rel="stylesheet" href="assessment-context.css">
+<link rel="stylesheet" href="history-tools.css">
 </head>
 <body class="min-h-screen bg-[#fcfaf7]"><section id="p0StoragePanel" style="max-width:1024px;margin:12px auto;padding:14px;border:1px solid #bba98a;border-radius:10px;background:#fffbeb;color:#413722">
 <strong>평가 기록과 저장 상태</strong><p>새 점수는 미평가로 시작합니다. 기존 점수와 옛 합계는 보존하고 실제 평가 여부를 추정하지 않습니다. Noel 산식은 공식 SCA/CVA 양식과 구분합니다.</p>
@@ -895,10 +896,11 @@
         </div>
       </div>
       <h3 class="text-base font-bold mb-2 border-b pb-1 border-tan-200 flex items-center"><i class="fas fa-code-compare mr-2"></i>커핑 기록 비교</h3>
+      <p id="legacyComparisonNotice" class="history-legacy-notice">원점수 비교 · 조건 미확인: 평가 양식·로트·로스팅·추출 조건을 맞추지 않은 원문 열람입니다. 기존 점수와 평가 여부 미확인 기록도 표시하며 팀 합의나 순위로 해석하지 않습니다.</p>
       <div id="compareListBox" class="mb-2"></div>
       <div class="flex gap-2 flex-wrap"> 
         <button class="export-btn text-xs px-3 py-1 rounded flex items-center mb-2 mobile-touch-friendly" id="compareBtn">
-          <i class="fa fa-chart-radar mr-1"></i>기본 비교
+          <i class="fa fa-chart-radar mr-1"></i>원점수 비교 · 조건 미확인
         </button>
         <button class="bg-purple-600 hover:bg-purple-700 text-white text-xs px-3 py-1 rounded flex items-center mb-2 mobile-touch-friendly" id="splitViewBtn">
           <i class="fa fa-columns mr-1"></i>분할 화면
@@ -1308,7 +1310,7 @@
 <div id="splitViewModal" class="modal">
   <div class="modal-content">
     <div class="modal-header">
-      <h3 class="font-bold text-lg">분할 화면 비교</h3>
+      <h3 class="font-bold text-lg">원점수 분할 보기 · 조건 미확인</h3>
       <button id="closeSplitViewBtn" class="text-gray-500 hover:text-gray-700 mobile-touch-friendly">
         <i class="fas fa-times text-xl"></i>
       </button>
@@ -1465,6 +1467,8 @@
 <script src="assessment-context-ui.js"></script>
 <script src="quick-entry.js"></script>
 <script src="p0-production.js"></script>
+<script src="compare-search-model.js"></script>
+<script src="history-tools.js"></script>
 <script src="flavor-evidence.js"></script>
 <script>
 /* === 1단계: 기본 데이터 구조 및 상수 정의 === */
@@ -2390,12 +2394,14 @@ function updateScoreGradeBadge(totalScore) {
 function populateHarvestYearOptions() {
   const select = document.getElementById('harvestYear');
   if (!select) return;
+  const previousValue = select.value;
   const currentYear = new Date().getFullYear();
   const options = ['<option value="">선택</option>'];
   for (let y = currentYear + 1; y >= 2020; y -= 1) {
     options.push(`<option value="${y}">${y}</option>`);
   }
   select.innerHTML = options.join('');
+  setP0SelectValue('harvestYear', previousValue);
 }
 
 function updateGreenBeanWarnings() {
@@ -3849,7 +3855,8 @@ function setUIFromSample(sampleData) {
 
   GREEN_BEAN_FIELDS.forEach((field) => {
     const input = document.getElementById(field);
-    if (input) input.value = sampleData[field] ?? '';
+    if (input?.tagName === 'SELECT') setP0SelectValue(field, sampleData[field]);
+    else if (input) input.value = sampleData[field] ?? '';
   });
   updateGreenBeanWarnings();
   
@@ -3906,6 +3913,7 @@ function saveUIToSample(targetDataObj) {
   GREEN_BEAN_FIELDS.forEach((field) => {
     const input = document.getElementById(field);
     const raw = input ? input.value : '';
+    if (input?.tagName === 'SELECT' && raw === String(sampleData[field] ?? '')) return;
     const isNumericField = field === 'altitude' || field === 'moistureContent' || field === 'defectCount' || field === 'greenBagWeight';
     sampleData[field] = isNumericField && raw !== '' ? Number.parseFloat(raw) : raw;
   });
@@ -4150,6 +4158,7 @@ function createComparisonChart(selectedSamples) {
   ].map((row) => `<tr><th>${row.label}</th>${safeSamples.map((sample) => `<td>${escapeHtml(row.value(sample.sampleData))}</td>`).join('')}</tr>`).join('');
 
   compareArea.innerHTML = `
+    <p class="history-legacy-notice">원점수 비교 · 조건 미확인. 양식·로트·로스팅·추출 조건을 맞추지 않은 기록 열람이며 팀 합의나 순위가 아닙니다.</p>
     <div class="overflow-x-auto">
       <table class="compare-table w-full text-sm">
         <thead>
@@ -5349,6 +5358,7 @@ function runInit() {
   setupEventHandlers();
   setupAutoBackup();
   optimizePerformance();
+  installHistoryTools();
   installQuickEntry({getAccountId:()=>window.getCuppingAccountId?.()||null});
   P0Production.resumeDraftFocus();
 }

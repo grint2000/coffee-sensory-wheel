@@ -1,5 +1,5 @@
 function setP0SelectValue(id, value) {
-  const select = document.getElementById(id), text = String(value || '');
+  const select = document.getElementById(id), text = String(value ?? '');
   if (text && !Array.from(select.options).some(o => o.value === text)) {
     const option = document.createElement('option'); option.value = text; option.textContent = text + ' (기존 값)'; select.append(option);
   }
@@ -15,10 +15,12 @@ function installP0Production() {
   let lastImportRaw = null, previousBackup = null, syncRequest = 0, syncInFlight = false;
   let recoveryText = null, recoveryOffset = 0, displayedTitle = null, displayingStoredScores = false;
   let draftBaseCache = null, draftPending = null, draftRestoreAttempt = null, draftOwnedScope = null, restoredDraftFocus = null;
+  const historyScopes = new Map(), historyBlockedUsers = new Set();
   const user = () => window.currentUser || 'default';
   const keys = name => ({ sessions: `noel_sca_sessions_${name}`, samples: `noel_sca_samples2_${name}`, selected: `noel_sca_current_sample_${name}`, meta: `noel_sca_p0_meta_${name}`, original: `noel_sca_pre_p0_${name}` });
   const setStatus = (text, state) => { $('p0SaveStatus').textContent = text; $('p0SaveStatus').dataset.state = state; };
   const setSync = text => { $('p0SyncStatus').textContent = text; };
+  const historyChanged = (reason = 'records') => window.dispatchEvent(new CustomEvent('cupping:history-changed', { detail: { reason } }));
   function downloadLink(id, text, raw, filename) {
     const a = $(id);
     if (a.dataset.objectUrl) URL.revokeObjectURL(a.dataset.objectUrl);
@@ -77,6 +79,12 @@ function installP0Production() {
     }
   }
   function draftScope() { return window.getCuppingAccountId?.() || null; }
+  function noteHistoryScope() {
+    const scope = draftScope(); if (loadedUser === null || loadedUser !== user() || !scope) return;
+    const prior = historyScopes.get(loadedUser);
+    if (prior && prior !== scope) historyBlockedUsers.add(loadedUser);
+    else historyScopes.set(loadedUser, scope);
+  }
   function draftStatus(message) { if($('p0DraftStatus')) $('p0DraftStatus').textContent=message; }
   function pendingIdentityInputs(data, committing = false) {
     const fields={identityFarmId:'farm_id',identityProducerId:'producer_id',identityCropYear:'crop_year',identityRoastBatchId:'roast_batch_id'},result={};
@@ -131,8 +139,8 @@ function installP0Production() {
   $('p0DraftRestoreBtn').addEventListener('click',()=>{if(!draftPending)return;try{const p=draftPending;if(p.scope!==draftScope())throw Error('계정이 바뀌었습니다.');const before=checkedBackup();localStorage.setItem('noel_sca_before_draft_restore_'+encodeURIComponent(p.scope),before);downloadLink('p0BeforeDraftFile','초안 복원 전 현재 자료 받기',before,'before-draft-restore.json');applyDraft(p.record);}catch(e){draftStatus('초안을 적용하지 않았습니다: '+e.message);}});
   $('p0DraftKeepBtn').addEventListener('click',()=>{if(!draftPending)return;try{const p=draftPending;if(p.scope!==draftScope())throw Error('계정이 바뀌었습니다.');localStorage.setItem(CuppingDraftStore.archiveKey(p.scope),p.raw);localStorage.removeItem(CuppingDraftStore.key(p.scope));downloadLink('p0DraftFile','별도 보관한 이전 초안 받기',p.raw,'previous-input-draft.json');draftPending=null;$('p0DraftRecovery').hidden=true;draftBaseCache=null;draftStatus('현재 저장본을 사용합니다. 이전 초안은 이 기기에 별도로 보관했습니다.');if(dirty)scheduleAutoSave();}catch(e){draftStatus('이전 초안을 보관하지 못해 선택을 유지했습니다: '+e.message);}});
   window.addEventListener('pagehide',persistDraft);document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='hidden')persistDraft();});
-  window.addEventListener('cupping:auth-ready',()=>{if(dirty)persistDraft();else restoreSavedDraft();});
-  for(const id of ['identityFarmId','identityProducerId','identityCropYear','identityRoastBatchId'])$(id)?.addEventListener('input',()=>{dirty=true;editVersion++;clearTimeout(sampleSaveTimeout);persistDraft();setStatus('로트 참조 입력을 임시 보관했습니다. 로트 정보 확인을 눌러 연결하세요.','dirty');});
+  window.addEventListener('cupping:auth-ready',()=>{noteHistoryScope();if(dirty)persistDraft();else restoreSavedDraft();});
+  for(const id of ['identityFarmId','identityProducerId','identityCropYear','identityRoastBatchId'])$(id)?.addEventListener('input',()=>{dirty=true;editVersion++;clearTimeout(sampleSaveTimeout);persistDraft();historyChanged();setStatus('로트 참조 입력을 임시 보관했습니다. 로트 정보 확인을 눌러 연결하세요.','dirty');});
   function refreshLinks() {
     if (lastImportRaw) downloadLink('p0OriginalLink', '가져온 원본 JSON 그대로 받기', lastImportRaw, 'imported-original.json');
     if (previousBackup) downloadLink('p0PreviousLink', '직전 복구 전 백업 받기', previousBackup, 'before-restore.json');
@@ -148,6 +156,7 @@ function installP0Production() {
     samples = getCurrentSessionObj().samples;
     const selected = samples.find(s => s.id === currentSampleId) || samples[0]; currentSampleId = selected.id;
     setUIFromSample(selected.sampleData); renderSessionSelect(); renderSampleList(); refreshLinks();
+    historyChanged();
   }
   function flushDraft() {
     const s = getCurrentSampleObj(); if (!s || !dirty) return;
@@ -201,13 +210,14 @@ function installP0Production() {
     dirty = true; editVersion++; clearTimeout(sampleSaveTimeout);
     setStatus('아직 이 기기에 저장하지 않은 변경이 있습니다', 'dirty');
     persistDraft();
+    historyChanged();
     if (!previewActive && !locked && !draftPending) sampleSaveTimeout = setTimeout(() => saveCurrentSample(), 2000);
   };
   saveSessionsToStorage = function() {
     if(draftPending){draftStatus('보관된 초안과 현재 저장본 중 사용할 자료를 먼저 선택하세요.');return false;}
     if (locked || previewActive) { setStatus(locked ? '읽지 못한 저장 원문을 보호 중입니다. 검증 복구를 먼저 진행하세요' : '복구 미리보기 중입니다. 적용 또는 취소 뒤 저장하세요', 'error'); return false; }
     if (loadedUser !== user()) { setStatus('계정이 바뀌었습니다. 이전 계정 자료를 새 계정에 저장하지 않았습니다. 먼저 JSON으로 보관하세요', 'error'); return false; }
-    try { window.AssessmentContextUI?.assertValid(); window.AssessmentContextUI?.applySession(); commit(sessions, currentSessionId, currentSampleId, { history, lastImportRaw, previousBackup }); dirty = false; setStatus('이 기기에 저장됨 · ' + new Date().toLocaleTimeString(), 'saved'); refreshLinks(); return true; }
+    try { window.AssessmentContextUI?.assertValid(); window.AssessmentContextUI?.applySession(); commit(sessions, currentSessionId, currentSampleId, { history, lastImportRaw, previousBackup }); dirty = false; setStatus('이 기기에 저장됨 · ' + new Date().toLocaleTimeString(), 'saved'); refreshLinks(); historyChanged(); return true; }
     catch (e) { saveError(e); return false; }
   };
   saveSamplesToStorage = function() { syncCurrentSessionSamples(); return saveSessionsToStorage(); };
@@ -219,6 +229,7 @@ function installP0Production() {
   };
   loadSamplesFromStorage = function() {
     clearTimeout(sampleSaveTimeout); syncRequest++; syncInFlight = false; loadedUser = user(); locked = false; dirty = false; setRecoveryRaw(null);
+    noteHistoryScope();
     history = []; lastImportRaw = null; previousBackup = null; mergeSources = [];draftBaseCache=null;draftPending=null;draftRestoreAttempt=null;draftOwnedScope=null;restoredDraftFocus=null;draftStatus('');$('p0DraftRecovery').hidden=true;
     for(const id of ['p0DraftFile','p0BeforeDraftFile']){const link=$(id);if(link.dataset.objectUrl)URL.revokeObjectURL(link.dataset.objectUrl);link.hidden=true;link.removeAttribute('href');delete link.dataset.objectUrl;}
     for (const id of ['p0OriginalLink', 'p0PreviousLink', 'p0MigrationLink', 'p0TeamTransitionLink']) $(id).hidden = true;
@@ -249,9 +260,10 @@ function installP0Production() {
     currentSampleId = id; setUIFromSample(selected.sampleData); renderSampleList();
     try { localStorage.setItem(keys(loadedUser).selected, id); }
     catch (_) { setStatus('선택 위치를 저장하지 못했습니다. 평가 자료는 바꾸지 않았습니다', 'error'); }
+    historyChanged();
   };
   const originalSwitch = switchSession;
-  switchSession = function(id) { if (previewActive) { $('courseImportStatus').textContent = '복구 미리보기를 적용 또는 취소한 뒤 세션을 선택하세요'; return; } if (loadedUser !== user()) { accountChanged(); return; } if (dirty && !saveCurrentSample()) return; originalSwitch(id); };
+  switchSession = function(id) { if (previewActive) { $('courseImportStatus').textContent = '복구 미리보기를 적용 또는 취소한 뒤 세션을 선택하세요'; return; } if (loadedUser !== user()) { accountChanged(); return; } if (dirty && !saveCurrentSample()) return; originalSwitch(id); historyChanged(); };
   const originalBackupList = showBackupList;
   showBackupList = function() { refreshLinks(); $('p0BackupDetails').open = true; originalBackupList(); };
   restoreBackup = function(item) { try { preview(localStorage.getItem(item.key), item.date + ' 기존 백업'); $('backupRestoreModal')?.classList.remove('show'); } catch (e) { $('courseImportStatus').textContent = '복구하지 않았습니다: ' + e.message; } };
@@ -381,6 +393,7 @@ function installP0Production() {
   }
   exportCurrentSessionJson = function() { flushDraft(); const s = getCurrentSessionObj(); try { window.AssessmentContextUI?.assertValid(); window.AssessmentContextUI?.applySession(); downloadLink('courseBackupLink', '선택 세션 백업 JSON 저장', checkedBackup([s], s.id, currentSampleId), 'selected-session-backup.json'); } catch (e) { setStatus('백업을 만들지 못했습니다: ' + e.message, 'error'); } };
   function accountChanged() {
+    historyChanged('account');
     if (loadedUser === user()) return;
     clearTimeout(sampleSaveTimeout); syncRequest++; syncInFlight = false; request++; pending = null; previewActive = false; $('courseImportPreview').hidden = true;
     if (dirty) { setStatus('로그인 계정이 바뀌었습니다. 이전 계정의 미저장 입력을 JSON으로 보관한 뒤 저장소를 불러오세요', 'error'); return; }
@@ -430,5 +443,30 @@ function installP0Production() {
     next.find(s=>s.id===currentSessionId).samples.unshift({id,title,sampleData:M.clone(data),lastEdit:Date.now()});
     commit(next,currentSessionId,id,{history,lastImportRaw,previousBackup});sessions=next;currentSampleId=id;dirty=false;renderState();setStatus('새 평가 기록을 이 기기에 저장했습니다','saved');
   }
-  window.P0Production = { bindImport, exportAll, preview, parseBackup, accountChanged, receiveTeamSamples, undoSamples, prepareTeamTransition, currentDraft, replaceCurrentData, appendEvaluation, resumeDraftFocus, persistCurrentDraft:persistDraft, saveExplicit: () => saveCurrentSample(true, true), getState: () => M.clone({ sessions, currentSessionId, currentSampleId, loadedUser, locked, dirty, history, lastImportRaw, previousBackup }) };
+  function historySnapshot() {
+    if (loadedUser !== user() || locked || previewActive || draftPending) throw Error('계정·복구·초안 선택 상태를 먼저 확인하세요.');
+    noteHistoryScope();
+    if (historyBlockedUsers.has(loadedUser)) throw Error('같은 표시 이름에서 로그인 계정이 바뀌어 이력 조회를 중단했습니다. 계정별 원본 자료를 확인하세요.');
+    if (historyScopes.has(loadedUser) && !draftScope()) throw Error('로그인 계정을 확인한 뒤 이력을 조회하세요.');
+    return M.clone({ sessions, currentSessionId, currentSampleId, loadedUser, accountScope: draftScope(), dirty });
+  }
+  function openHistoricalRecord(target) {
+    const snapshot = historySnapshot();
+    if (target.loadedUser !== snapshot.loadedUser || target.accountScope !== snapshot.accountScope) throw Error('계정이 바뀌었습니다. 이력을 다시 검색하세요.');
+    const checkTarget = () => {
+      const session = sessions.find(s => s.id === target.sessionId), sample = session?.samples.find(s => s.id === target.sampleId);
+      if (!sample || JSON.stringify(sample) !== target.sampleRaw || JSON.stringify(sessionMetadata(session)) !== target.sessionRaw) throw Error('검색 후 기록이 바뀌었습니다. 이력을 다시 검색하세요.');
+    };
+    checkTarget();
+    if (currentSessionId === target.sessionId && currentSampleId === target.sampleId) return true;
+    window.AssessmentContextUI?.assertValid();
+    if (dirty && !saveCurrentSample()) throw Error('현재 입력을 저장하지 못했습니다. 입력을 유지한 채 이동을 중단했습니다.');
+    checkTarget();
+    if (currentSessionId !== target.sessionId) switchSession(target.sessionId);
+    if (currentSessionId !== target.sessionId) throw Error('세션을 이동하지 못했습니다. 현재 입력을 확인하세요.');
+    loadSample(target.sampleId);
+    if (currentSampleId !== target.sampleId) throw Error('샘플을 이동하지 못했습니다. 현재 입력을 확인하세요.');
+    return true;
+  }
+  window.P0Production = { bindImport, exportAll, preview, parseBackup, accountChanged, receiveTeamSamples, undoSamples, prepareTeamTransition, currentDraft, replaceCurrentData, appendEvaluation, historySnapshot, openHistoricalRecord, resumeDraftFocus, persistCurrentDraft:persistDraft, saveExplicit: () => saveCurrentSample(true, true), getState: () => M.clone({ sessions, currentSessionId, currentSampleId, loadedUser, locked, dirty, history, lastImportRaw, previousBackup }) };
 }

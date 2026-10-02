@@ -1,5 +1,5 @@
-const APP_CACHE = 'noel-sca-app-v12-backup-merge';
-const RUNTIME_CACHE = 'noel-sca-runtime-v12-backup-merge';
+const APP_CACHE = 'noel-sca-app-v13-history-compare';
+const RUNTIME_CACHE = 'noel-sca-runtime-v13-history-compare';
 
 const APP_SHELL_FILES = [
   './',
@@ -19,6 +19,9 @@ const APP_SHELL_FILES = [
   './import-guard.js',
   './backup-merge.js',
   './p0-production.js',
+  './compare-search-model.js',
+  './history-tools.js',
+  './history-tools.css',
   './extras.js',
   './theme.js',
   './team.js',
