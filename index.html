@@ -781,6 +781,7 @@
 <link rel="stylesheet" href="report-profiles.css">
 <link rel="stylesheet" href="archive-reference.css">
 <link rel="stylesheet" href="storage-status.css">
+  <link rel="stylesheet" href="ocr-label.css">
 </head>
 <body class="min-h-screen bg-[#fcfaf7]">
 
@@ -1294,7 +1295,7 @@
           <div id="selectedFlavorsArea"></div>
         </div>
         <div class="bg-white rounded-lg p-4 shadow-md flex-1 min-w-0">
-          <h4 class="font-semibold mb-2">SCA 평가 레이더 차트</h4>
+          <h4 class="font-semibold mb-2">Noel 항목별 점수 차트</h4>
           <canvas id="cuppingRadar" class="w-full max-w-full" height="200"></canvas>
         </div>
       </div>
@@ -1302,7 +1303,7 @@
         <button id="exportSnsImgBtn" type="button" class="sns-export-btn px-6 py-2 rounded flex items-center mobile-touch-friendly"><i class="fas fa-share-alt mr-2"></i>SNS형 이미지</button>
         <button id="exportXlsxBtn" type="button" class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded flex items-center mobile-touch-friendly"><i class="fas fa-file-excel mr-2"></i>엑셀로 내보내기</button>
       </div>
-      <div class="text-xs text-gray-400 mt-8 md:mt-12 text-center"> 평가일: <span id="evalDate"></span> | Noel SCA 커피 관능 평가</div>
+      <div class="text-xs text-gray-400 mt-8 md:mt-12 text-center"> 평가일: <span id="evalDate"></span> | Noel 커피 관능 평가</div>
     </section>
   </form>
 </div>
@@ -1476,6 +1477,8 @@
 <script src="report-profiles-model.js"></script>
 <script src="report-profiles.js"></script>
 <script src="archive-reference-ui.js"></script>
+<script src="ocr-apply-model.js"></script>
+<script src="ocr-entry.js"></script>
 <script src="flavor-evidence.js"></script>
 <script>
 /* === 1단계: 기본 데이터 구조 및 상수 정의 === */
@@ -5043,7 +5046,7 @@ function initApp() {
     
     // 사용자에게 환영 메시지 표시
     setTimeout(() => {
-      showToast("Noel SCA 커피 관능 평가 도구 (개선버전)에 오신 것을 환영합니다!");
+      showToast("Noel 커피 관능 평가 도구 (개선버전)에 오신 것을 환영합니다!");
     }, 1000);
     
   } catch (e) {
@@ -5370,6 +5373,7 @@ function runInit() {
   optimizePerformance();
   installHistoryTools();
   installArchiveReference();
+  installOcrLabelInput();
   installQuickEntry({getAccountId:()=>window.getCuppingAccountId?.()||null});
   installStorageStatus();
   P0Production.resumeDraftFocus();

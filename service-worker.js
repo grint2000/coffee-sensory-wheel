@@ -1,5 +1,5 @@
-const APP_CACHE = 'noel-sca-app-v17-preference-search';
-const RUNTIME_CACHE = 'noel-sca-runtime-v17-preference-search';
+const APP_CACHE = 'noel-sca-app-v18-ocr-label';
+const RUNTIME_CACHE = 'noel-sca-runtime-v18-ocr-label';
 
 const APP_SHELL_FILES = [
   './',
@@ -20,6 +20,9 @@ const APP_SHELL_FILES = [
   './storage-status.css',
   './archive-reference.js',
   './archive-reference-ui.js',
+  './ocr-entry.js',
+  './ocr-apply-model.js',
+  './ocr-label.css',
   './archive-reference.css',
   './import-guard.js',
   './backup-merge.js',

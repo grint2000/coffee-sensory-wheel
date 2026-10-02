@@ -1,0 +1,38 @@
+ISOLATED OCR REVIEW TRIAL — THIRD-PARTY SOURCE NOTICES
+
+Tesseract.js 7.0.0
+Source: https://github.com/naptha/tesseract.js/tree/v7.0.0
+Registry: https://registry.npmjs.org/tesseract.js/7.0.0
+Package license: Apache-2.0. Full license: vendor/licenses/tesseract.js-APACHE-2.0.txt
+The distributed JS/worker license notice files are retained next to the bundles.
+
+Tesseract.js-core 7.0.0
+Source: https://github.com/naptha/tesseract.js-core
+Registry: https://registry.npmjs.org/tesseract.js-core/7.0.0
+Package license: Apache-2.0. Full license: vendor/licenses/tesseract.js-core-APACHE-2.0.txt
+Official embedded-WASM runtime files are copied unchanged.
+
+@tesseract.js-data/eng 1.0.0 and @tesseract.js-data/kor 1.0.0
+Source: https://github.com/naptha/tessdata
+Registry: https://registry.npmjs.org/@tesseract.js-data/eng/1.0.0
+Registry: https://registry.npmjs.org/@tesseract.js-data/kor/1.0.0
+Only the 4.0.0_best_int models are served by this trial.
+Provenance discrepancy: both npm package metadata files declare MIT, but neither
+tarball includes a LICENSE file. The upstream naptha/tessdata repository LICENSE
+is Apache License 2.0. Both package metadata files are retained, alongside the
+unaltered upstream Apache license. This notice reports the discrepancy; it does
+not assert that the model data have been relicensed under MIT.
+Full upstream license: vendor/licenses/tessdata-upstream-APACHE-2.0.txt
+Source: https://github.com/naptha/tessdata/blob/gh-pages/LICENSE
+
+Dependency versions and official registry integrity values are pinned in the
+source deliverable's package-lock.json. Browser asset SHA-256 hashes and byte
+counts are in asset-manifest.json. Bundled dependency licenses are retained in
+vendor/licenses/dependencies/.
+
+The test images are fictional, generated from installed Noto Sans CJK KR Regular.
+No fonts are embedded or downloaded by this page.
+
+This trial is independent of the cupping evaluation application. It contains no
+account integration, analytics, upload endpoint, database, service worker,
+automatic scoring, production writes or persistent image/text storage.

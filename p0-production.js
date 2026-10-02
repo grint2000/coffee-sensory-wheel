@@ -16,6 +16,7 @@ function installP0Production() {
   let recoveryText = null, recoveryOffset = 0, displayedTitle = null, displayingStoredScores = false;
   let draftBaseCache = null, draftPending = null, draftRestoreAttempt = null, draftOwnedScope = null, restoredDraftFocus = null;
   let archivePending = null, archiveRequest = 0;
+  let ocrPending = null, ocrRequest = 0;
   const historyScopes = new Map(), historyBlockedUsers = new Set();
   const user = () => window.currentUser || 'default';
   const keys = name => ({ sessions: `noel_sca_sessions_${name}`, samples: `noel_sca_samples2_${name}`, selected: `noel_sca_current_sample_${name}`, meta: `noel_sca_p0_meta_${name}`, original: `noel_sca_pre_p0_${name}` });
@@ -184,11 +185,11 @@ function installP0Production() {
       setSync(result?.status === 'saved' ? '현재 세션 샘플의 서버 저장 완료' : result?.status === 'failed' ? '팀 동기화 실패 · 이 기기 저장은 유지됩니다. 연결 후 저장을 다시 시도하세요' : '팀 동기화 대상 없음 · 로그인과 팀 선택 상태를 확인하세요', result?.status === 'saved' ? 'saved' : result?.status === 'failed' ? 'failed' : 'idle', displayContext);
     }).catch(() => { if (token === syncRequest) { syncInFlight = false; setSync('팀 동기화 실패 · 이 기기 저장은 유지됩니다', 'failed', displayContext); } });
   }
-  function commit(next, sessionId, sampleId, meta, sync = true) {
+  function commit(next, sessionId, sampleId, meta, sync = true, extraEntries = []) {
     checkedBackup(next, sessionId, sampleId);
     const k = keys(loadedUser), nextSamples = next.find(s => s.id === sessionId).samples;
     const originalEntry = localStorage.getItem(k.original) === null ? [[k.original, JSON.stringify({ version: 1, savedAt: new Date().toISOString(), ...originalBytes() })]] : [];
-    const entries=[...originalEntry,
+    const entries=[...extraEntries,...originalEntry,
       [k.sessions, JSON.stringify(next)], [k.samples, JSON.stringify(nextSamples)], [k.selected, sampleId],
       [k.meta, JSON.stringify({ version: 1, currentSessionId: sessionId, history: meta.history, lastImportRaw: meta.lastImportRaw, previousBackup: meta.previousBackup })]
     ];const scope=draftScope(),selected=nextSamples.find(x=>x.id===sampleId),remaining=sampleId===currentSampleId?pendingIdentityInputs(selected.sampleData,true):{};
@@ -236,7 +237,7 @@ function installP0Production() {
     if (applyInput) flushDraft(); renderSampleList(); updateTotalScore(); return saveSamplesToStorage();
   };
   loadSamplesFromStorage = function() {
-    clearTimeout(sampleSaveTimeout); syncRequest++; syncInFlight = false; loadedUser = user(); locked = false; dirty = false; setRecoveryRaw(null);
+    cancelOcrLabelPatch(); clearTimeout(sampleSaveTimeout); syncRequest++; syncInFlight = false; loadedUser = user(); locked = false; dirty = false; setRecoveryRaw(null);
     noteHistoryScope();
     history = []; lastImportRaw = null; previousBackup = null; mergeSources = [];draftBaseCache=null;draftPending=null;draftRestoreAttempt=null;draftOwnedScope=null;restoredDraftFocus=null;draftStatus('');$('p0DraftRecovery').hidden=true;
     for(const id of ['p0DraftFile','p0BeforeDraftFile']){const link=$(id);if(link.dataset.objectUrl)URL.revokeObjectURL(link.dataset.objectUrl);link.hidden=true;link.removeAttribute('href');delete link.dataset.objectUrl;}
@@ -490,6 +491,50 @@ function installP0Production() {
     sessions = next; dirty = false; cancelArchiveReference(); renderState(); setStatus('선택한 아카이브 참조와 이전 참조 이력을 이 기기에 저장했습니다', 'saved');
     return true;
   }
+  function ocrFormStamp() { return JSON.stringify(Array.from(document.querySelectorAll('input,textarea,select')).filter(e => e.id && !e.closest('#ocrLabelPanel') && e.id !== 'importSamplesInput' && !e.closest('#flavorWheelMultiSelectArea')).map(e => [e.id,e.value,e.checked])); }
+  function captureOcrContext() {
+    historySnapshot();
+    if (dirty || syncInFlight) throw Error('현재 입력과 저장·동기화를 먼저 마친 뒤 라벨을 읽어 주세요. 다른 입력을 함께 저장하지 않습니다.');
+    const sample=getCurrentSampleObj();if(!sample)throw Error('현재 샘플을 먼저 선택하세요.');
+    return M.clone({user:loadedUser,scope:draftScope(),editVersion,form:ocrFormStamp(),state:JSON.stringify({sessions,currentSessionId,currentSampleId}),storage:storageStamp(),sessionId:currentSessionId,sampleId:currentSampleId});
+  }
+  function assertOcrContext(context) {
+    const current=captureOcrContext();
+    if(!context||Object.keys(current).some(key=>current[key]!==context[key]))throw Error('라벨 검토 중 계정·샘플·입력·저장값이 바뀌었습니다. 현재 상태에서 다시 시작하세요.');
+    return true;
+  }
+  function cancelOcrLabelPatch() { ocrPending=null;ocrRequest++; }
+  function getOcrLabelBackup() {
+    historySnapshot();const scope=draftScope(),key='noel_sca_before_ocr_'+encodeURIComponent(scope||'local:'+loadedUser),raw=localStorage.getItem(key);
+    if(raw===null)return null;const record=JSON.parse(raw);
+    if(record.format!=='noel-cupping-pre-ocr-original'||record.version!==1||record.accountScope!==scope||record.profile!==loadedUser||typeof record.recoverableBackup!=='string')throw Error('현재 계정의 라벨 적용 전 백업을 확인할 수 없습니다.');
+    CuppingImportGuard.parse(record.recoverableBackup);
+    return {before:record.recoverableBackup,original:JSON.stringify(record.originalStorage,null,2),at:record.at};
+  }
+  function prepareOcrLabelPatch(patch,reviewStamp,context) {
+    cancelOcrLabelPatch();assertOcrContext(context);
+    if(typeof reviewStamp!=='string'||!reviewStamp||reviewStamp.length>500000)throw Error('확인한 라벨 원문과 선택 상태가 필요합니다.');
+    const current=getCurrentSampleObj(),prepared=OcrApplyModel.prepare(current.sampleData,patch),next=M.clone(sessions);
+    next.find(s=>s.id===currentSessionId).samples.find(s=>s.id===currentSampleId).sampleData=prepared.data;
+    checkedBackup(next,currentSessionId,currentSampleId);
+    const before=checkedBackup(),original=JSON.stringify(originalBytes(),null,2),backupKey='noel_sca_before_ocr_'+encodeURIComponent(draftScope()||'local:'+loadedUser);
+    const backupRaw=JSON.stringify({format:'noel-cupping-pre-ocr-original',version:1,at:new Date().toISOString(),accountScope:draftScope(),profile:loadedUser,sessionId:currentSessionId,sampleId:currentSampleId,originalStorage:originalBytes(),recoverableBackup:before});
+    const token=++ocrRequest;
+    ocrPending={token,context:M.clone(context),patch:M.clone(patch),reviewStamp,backupKey,backupRaw};
+    return M.clone({token,before,original,changes:prepared.changes,identityInvalidated:prepared.identityInvalidated,identityNotice:prepared.identityNotice,hasPreservedArchive:!!current.sampleData.archive_reference,sampleTitle:current.title||current.sampleData.coffeeName||'샘플'});
+  }
+  function applyOcrLabelPatch(token,reviewStamp) {
+    const p=ocrPending;
+    if(!p||p.token!==token||p.reviewStamp!==reviewStamp)throw Error('라벨 텍스트·선택 또는 미리보기가 바뀌었습니다. 다시 미리보세요.');
+    assertOcrContext(p.context);
+    const next=M.clone(sessions),selected=next.find(s=>s.id===currentSessionId).samples.find(s=>s.id===currentSampleId);
+    selected.sampleData=OcrApplyModel.prepare(selected.sampleData,p.patch).data;selected.lastEdit=Date.now();
+    try { commit(next,currentSessionId,currentSampleId,{history,lastImportRaw,previousBackup},false,[[p.backupKey,p.backupRaw]]); }
+    catch(error){saveError(error);throw error;}
+    sessions=next;dirty=false;cancelOcrLabelPatch();renderState();setStatus('검토한 라벨 항목을 이 기기에 저장했습니다 · 적용 전 원문 백업 보관','saved');
+    try { startSync(samples); } catch(error) { syncInFlight=false;setSync('라벨 값은 이 기기에 저장됐지만 팀 동기화를 시작하지 못했습니다. 기존 저장 버튼으로 다시 시도하세요.','failed'); }
+    return true;
+  }
   function openHistoricalRecord(target) {
     const snapshot = historySnapshot();
     if (target.loadedUser !== snapshot.loadedUser || target.accountScope !== snapshot.accountScope) throw Error('계정이 바뀌었습니다. 이력을 다시 검색하세요.');
@@ -508,5 +553,5 @@ function installP0Production() {
     if (currentSampleId !== target.sampleId) throw Error('샘플을 이동하지 못했습니다. 현재 입력을 확인하세요.');
     return true;
   }
-  window.P0Production = { bindImport, exportAll, preview, parseBackup, accountChanged, receiveTeamSamples, undoSamples, prepareTeamTransition, currentDraft, replaceCurrentData, appendEvaluation, historySnapshot, reportSnapshot, prepareArchiveReference, applyArchiveReference, cancelArchiveReference, openHistoricalRecord, resumeDraftFocus, persistCurrentDraft:persistDraft, saveExplicit: () => saveCurrentSample(true, true), getState: () => M.clone({ sessions, currentSessionId, currentSampleId, loadedUser, locked, dirty, history, lastImportRaw, previousBackup }) };
+  window.P0Production = { bindImport, exportAll, preview, parseBackup, accountChanged, receiveTeamSamples, undoSamples, prepareTeamTransition, currentDraft, replaceCurrentData, appendEvaluation, historySnapshot, reportSnapshot, prepareArchiveReference, applyArchiveReference, cancelArchiveReference, openHistoricalRecord, captureOcrContext, assertOcrContext, prepareOcrLabelPatch, applyOcrLabelPatch, cancelOcrLabelPatch, getOcrLabelBackup, resumeDraftFocus, persistCurrentDraft:persistDraft, saveExplicit: () => saveCurrentSample(true, true), getState: () => M.clone({ sessions, currentSessionId, currentSampleId, loadedUser, locked, dirty, history, lastImportRaw, previousBackup }) };
 }
