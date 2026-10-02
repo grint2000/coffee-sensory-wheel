@@ -1,5 +1,5 @@
-const APP_CACHE = 'noel-sca-app-v16-archive-reference';
-const RUNTIME_CACHE = 'noel-sca-runtime-v16-archive-reference';
+const APP_CACHE = 'noel-sca-app-v17-preference-search';
+const RUNTIME_CACHE = 'noel-sca-runtime-v17-preference-search';
 
 const APP_SHELL_FILES = [
   './',
@@ -26,6 +26,7 @@ const APP_SHELL_FILES = [
   './p0-production.js',
   './compare-search-model.js',
   './history-tools.js',
+  './preference-search-model.js',
   './history-tools.css',
   './report-profiles-model.js',
   './report-profiles.js',

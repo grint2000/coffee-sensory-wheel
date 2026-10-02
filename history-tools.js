@@ -17,7 +17,7 @@ function installHistoryTools(options = {}) {
     'unknown-condition':'값 또는 확인된 출처 없음', 'ineligible-anchor':'현재 기준 기록이 비교 조건을 충족하지 않음', 'different-schema':'평가 양식·산식 다름', 'different-cohort':'기준 기록과 다름',
     'different-lot-metadata':'같은 로트 ID의 농장·크롭·가공 정보 불일치', 'different-condition':'조건·단위·입력 출처 다름', 'unresolved-flavor-filter':'확인할 수 없는 향미',
     'missing-flavor':'선택한 향미가 없음', 'matched-flavor':'일치한 향미', 'matched-filter':'일치', 'unknown-filter-value':'확인한 값 없음', 'different-filter-value':'필터와 다름' };
-  let terms = [], latest = null, viewVersion = 0;
+  let terms = [], latest = null, viewVersion = 0, preferenceMode = false;
   const node = (tag, text, id) => { const e = document.createElement(tag); if (text !== undefined) e.textContent = text; if (id) e.id = id; return e; };
   const button = (text, id, action) => { const e=node('button',text,id);e.type='button';if(action)e.addEventListener('click',action);return e; };
   const paragraph = (parent,text,id) => { const e=node('p',text,id);parent.append(e);return e; };
@@ -44,7 +44,17 @@ function installHistoryTools(options = {}) {
   const phase=select(form,'historyPhase','향미 단계',FLAVOR_PHASES.map(p=>[p.id,p.label]));
   const farm=select(form,'historyFarm','농장'),crop=select(form,'historyCrop','확인 크롭'),process=select(form,'historyProcess','가공'),purpose=select(form,'historyPurpose','세션 목적');
   const actions=node('div');actions.className='history-actions';searchPanel.append(actions);
-  actions.append(button('이력 검색·새로고침','historySearchBtn',runSearch),button('필터 초기화','historyResetBtn',()=>{terms=[];for(const e of [phase,farm,crop,process,purpose])e.value='';mode.value='all';flavorInput.value='';renderTerms();runSearch();}));
+  actions.append(button('이력 검색·새로고침','historySearchBtn',()=>{preferenceMode=false;runSearch();}),button('필터 초기화','historyResetBtn',()=>{preferenceMode=false;audience.value='self';minPrice.value=maxPrice.value='';preferenceStatus.textContent='조건을 초기화했습니다.';terms=[];for(const e of [phase,farm,crop,process,purpose])e.value='';mode.value='all';flavorInput.value='';renderTerms();runSearch();}));
+  const preferences=panel(searchPanel,'historyPreferencePanel','이번에 원하는 조건으로 찾기');
+  paragraph(preferences,'위의 향미·가공 등 검색 조건을 사용합니다. 이번에 직접 선택한 조건만 사용하며, 기존 점수나 과거 선택으로 취향을 추정하지 않습니다.');
+  const preferenceForm=node('div');preferenceForm.className='history-filter-grid';preferences.append(preferenceForm);
+  const audience=select(preferenceForm,'historyAudience','검색 대상',[['self','내가 원하는 조건'],['customer','고객이 직접 말한 조건']]);audience.firstElementChild.remove();audience.value='self';
+  function priceInput(id,label){const l=node('label',label),e=node('input',undefined,id);l.htmlFor=id;e.type='number';e.min='0';e.step='1';e.inputMode='numeric';e.placeholder='선택 입력';l.append(e);preferenceForm.append(l);return e;}
+  const minPrice=priceInput('historyMinPrice','희망 최소가 · 원/kg'),maxPrice=priceInput('historyMaxPrice','희망 최대가 · 원/kg');
+  paragraph(preferences,'희망 가격은 메모용입니다. 현재 단가·재고가 미확인이므로 가격 필터는 적용하지 않습니다. 고객 이름은 입력하지 않습니다.');
+  preferences.append(button('입력한 조건으로 과거 기록 찾기','historyPreferenceSearch',()=>{preferenceMode=true;runSearch();}));
+  const preferenceStatus=paragraph(preferences,'조건은 이 화면에서만 사용하며 저장·전송하지 않습니다.','historyPreferenceStatus');preferenceStatus.setAttribute('role','status');
+  for(const e of [audience,minPrice,maxPrice])e.addEventListener('input',()=>{if(preferenceMode){viewVersion++;searchResults.replaceChildren();searchExcluded.replaceChildren();searchStatus.textContent='희망 조건이 바뀌었습니다. 입력한 조건으로 다시 검색하세요.';excludedPanel.querySelector('summary').textContent='검색에서 제외된 기록';}preferenceStatus.textContent='조건을 바꿨습니다. 검색 버튼을 눌러 적용 여부를 확인하세요.';});
   const searchStatus=paragraph(searchPanel,'패널을 열어 전체 세션 이력을 확인하세요.','historySearchStatus');searchStatus.setAttribute('role','status');
   const searchResults=node('div',undefined,'historySearchResults');searchPanel.append(searchResults);
   const excludedPanel=panel(searchPanel,'historySearchExcludedPanel','검색에서 제외된 기록');const searchExcluded=node('div',undefined,'historySearchExcluded');excludedPanel.append(searchExcluded);
@@ -80,12 +90,13 @@ function installHistoryTools(options = {}) {
   }
   function runSearch(){try{
     viewVersion++;
-    const built=build();latest=built;fillFilters(built.index);const result=model.search(built.index,query());searchResults.replaceChildren();searchExcluded.replaceChildren();
+    const built=build();latest=built;fillFilters(built.index);const requested=query();const result=preferenceMode?PreferenceSearchModel.search({model,index:built.index,query:requested,preferences:{audience:audience.value,minPrice:minPrice.value===''?null:Number(minPrice.value),maxPrice:maxPrice.value===''?null:Number(maxPrice.value)}}):model.search(built.index,requested);searchResults.replaceChildren();searchExcluded.replaceChildren();
+    if(preferenceMode){const p=result.request;preferenceStatus.textContent=(p.audience==='customer'?'고객이 직접 말한 조건':'내가 직접 선택한 조건')+' · 희망 가격: '+(p.minPrice===null?'하한 없음':p.minPrice.toLocaleString()+'원/kg')+' ~ '+(p.maxPrice===null?'상한 없음':p.maxPrice.toLocaleString()+'원/kg')+'. '+result.priceNotice;paragraph(searchResults,result.notice);}else preferenceStatus.textContent='일반 이력 검색입니다. 희망 가격·검색 대상 조건은 적용하지 않습니다.';
     for(const row of result.matched){const e=card(row.entry);if(row.matched.length)reasons(e,row.matched);else paragraph(e,'선택한 필터 없음 · 전체 이력');e.append(navigation(row.entry,built.snapshot));searchResults.append(e);}
     for(const row of result.excluded){const e=card(row.entry);reasons(e,row.excluded);e.append(navigation(row.entry,built.snapshot));searchExcluded.append(e);}
     excludedPanel.querySelector('summary').textContent=`검색에서 제외된 기록 ${result.excluded.length}개`;
-    searchStatus.textContent=`일치 ${result.matched.length}개 / 전체 ${built.index.entries.length}개 · 제외 ${result.excluded.length}개. `+(result.matched.length?'':'일치하는 기록이 없습니다. 필터를 확인하세요. ')+(built.snapshot.dirty?'현재 미저장 입력은 일부만 반영될 수 있습니다. 입력을 저장한 뒤 새로 검색하세요.':'현재 앱에 불러온 전체 세션 기준입니다.');
-  }catch(e){latest=null;searchResults.replaceChildren();searchExcluded.replaceChildren();searchStatus.textContent='검색하지 않았습니다: '+e.message;}}
+    searchStatus.textContent=result.kind==='conditions-needed'?'아직 검색하지 않았습니다. 향미·가공 등의 조건을 먼저 선택하세요.':`일치 ${result.matched.length}개 / 전체 ${built.index.entries.length}개 · 제외 ${result.excluded.length}개. `+(result.matched.length?'':'일치하는 기록이 없습니다. 필터를 확인하세요. ')+(built.snapshot.dirty?'현재 미저장 입력은 일부만 반영될 수 있습니다. 입력을 저장한 뒤 새로 검색하세요.':'현재 앱에 불러온 전체 세션 기준입니다.');
+  }catch(e){latest=null;searchResults.replaceChildren();searchExcluded.replaceChildren();preferenceStatus.textContent='조건을 적용하지 않았습니다: '+e.message;searchStatus.textContent='검색하지 않았습니다: '+e.message;}}
   const number=value=>value===null?'없음':value.toFixed(2);
   function runCompare(){try{
     const {snapshot,index}=build();compareResults.replaceChildren();
@@ -109,7 +120,7 @@ function installHistoryTools(options = {}) {
   }catch(e){compareResults.replaceChildren();compareStatus.textContent='비교하지 않았습니다: '+e.message;}}
   function invalidate(event){viewVersion++;latest=null;searchResults.replaceChildren();searchExcluded.replaceChildren();compareResults.replaceChildren();excludedPanel.querySelector('summary').textContent='검색에서 제외된 기록';
     if(event?.detail?.reason==='account'||['cupping:account-changed','cupping:auth-ready'].includes(event?.type)){
-      terms=[];renderTerms();flavorInput.value='';phase.value='';mode.value='all';for(const select of [farm,crop,process,purpose]){select.value='';setOptions(select,[]);}searchPanel.open=comparePanel.open=excludedPanel.open=false;
+      preferenceMode=false;audience.value='self';minPrice.value=maxPrice.value='';preferenceStatus.textContent='계정이 바뀌어 이번 검색 조건을 지웠습니다.';preferences.open=false;terms=[];renderTerms();flavorInput.value='';phase.value='';mode.value='all';for(const select of [farm,crop,process,purpose]){select.value='';setOptions(select,[]);}searchPanel.open=comparePanel.open=excludedPanel.open=false;
     }
     searchStatus.textContent='기록·입력·선택 상태가 바뀌었습니다. 이력을 다시 검색하세요.';compareStatus.textContent='기록·입력·선택 상태가 바뀌었습니다. 조건 비교를 다시 실행하세요.';
   }
