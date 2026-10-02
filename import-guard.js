@@ -2,6 +2,7 @@
  'use strict';
  const M=typeof P0Model!=='undefined'?P0Model:require('./p0-model.js');
  const R=typeof RecordModel!=='undefined'?RecordModel:require('./record-model.js');
+ const A=typeof AssessmentContextModel!=='undefined'?AssessmentContextModel:require('./assessment-context-model.js');
  const MAX_BYTES=1048576,MAX_SESSIONS=50,MAX_SAMPLES=500;
  const SCORES=['scoreFragranceAroma','scoreFlavor','scoreAftertaste','scoreAcidity','scoreBody','scoreBalance','scoreOverall'];
  const plain=x=>x&&typeof x==='object'&&!Array.isArray(x);
@@ -24,6 +25,8 @@
   for(const key of ['defectUnderdevelopment','defectOverdevelopment','defectBaked','defectScorching'])if(x.sampleData[key]!==undefined&&!['none','very_weak','weak','moderate','strong','very_strong'].includes(x.sampleData[key]))throw Error('결점 선택값이 올바르지 않습니다');
   M.validate(x.sampleData);
   R.validate(x.sampleData.record_identity);
+  A.validateAssessment(x.sampleData.assessment_context);
+  A.validateBrewing(x.sampleData.brewing_context);
   for(const key of SCORES)if(x.sampleData[key]!==undefined&&x.sampleData[key]!==null){const v=x.sampleData[key];if(!M.valid(v)&&!M.preservedScore(x.sampleData,key))throw Error('새 평가 점수는 6~10 사이의 0.25 단위이며, 기존 0~10 원점수는 미확인 상태로만 보존합니다');}
   if(x.sampleData.flavorSelections!==undefined){if(!plain(x.sampleData.flavorSelections))throw Error('flavorSelections는 객체여야 합니다');for(const a of Object.values(x.sampleData.flavorSelections))if(!Array.isArray(a)||a.length>200||a.some(v=>typeof v!=='string'))throw Error('향미 선택은 문자열 배열이어야 합니다');}
   if(x.sampleData.bodyDescriptors!==undefined&&(!Array.isArray(x.sampleData.bodyDescriptors)||x.sampleData.bodyDescriptors.some(v=>typeof v!=='string')))throw Error('bodyDescriptors는 문자열 배열이어야 합니다');
@@ -34,7 +37,7 @@
   let selection=null;if(plain(data)&&data.format==='noel-cupping-review-backup'){if(data.version!==1||!plain(data.state))throw Error('지원하지 않는 백업 버전입니다');selection={currentSessionId:data.state.currentSessionId,currentSampleId:data.state.currentSampleId};data=data.state.sessions;}
   checkTree(data);if(!Array.isArray(data)||!data.length)throw Error('세션 또는 샘플의 비어 있지 않은 배열을 선택하세요');
   const sessionForm=plain(data[0])&&Object.hasOwn(data[0],'samples'),sampleIds=new Set(),sessionIds=new Set();let count=0;
-  if(sessionForm){if(data.length>MAX_SESSIONS)throw Error('세션은 최대 50개입니다');for(const s of data){if(!plain(s)||!Array.isArray(s.samples)||!s.samples.length)throw Error('세션마다 샘플이 1개 이상 있어야 합니다');const key=id(s.id,'세션');if(sessionIds.has(key))throw Error('중복 세션 ID입니다');sessionIds.add(key);for(const field of ['title','date','time','purpose','location','cupper','grindSize'])optionalText(s,field);for(const x of s.samples)sample(x,sampleIds);count+=s.samples.length;}}
+  if(sessionForm){if(data.length>MAX_SESSIONS)throw Error('세션은 최대 50개입니다');for(const s of data){if(!plain(s)||!Array.isArray(s.samples)||!s.samples.length)throw Error('세션마다 샘플이 1개 이상 있어야 합니다');const key=id(s.id,'세션');if(sessionIds.has(key))throw Error('중복 세션 ID입니다');sessionIds.add(key);A.validateSession(s);for(const field of ['title','date','time','purpose','location','cupper','grindSize'])optionalText(s,field);for(const x of s.samples)sample(x,sampleIds);count+=s.samples.length;}}
   else{for(const x of data){if(Object.hasOwn(x,'samples'))throw Error('세션과 샘플 형식을 섞을 수 없습니다');sample(x,sampleIds);}count=data.length;}
   if(count>MAX_SAMPLES)throw Error('전체 샘플은 최대 500개입니다');
   const evaluations=new Set();for(const x of sessionForm?data.flatMap(s=>s.samples):data){const id=x.sampleData.record_identity?.evaluation_id;if(id){if(evaluations.has(id))throw Error('중복 평가 ID입니다. 원기록을 보존하고 복구 범위를 확인하세요.');evaluations.add(id);}}

@@ -776,6 +776,7 @@
     }
   </style>
 <style>#p0StoragePanel [hidden]{display:none!important}#p0StoragePanel a{text-decoration:underline}#p0StoragePanel button{padding:10px;border:1px solid #685d47;border-radius:6px}#p0SaveStatus[data-state="error"]{color:#9b2509}#p0SaveStatus{font-weight:bold}#p0LegacyValues,#p0RestoreHistory{white-space:pre-wrap;overflow-wrap:anywhere}#sampleSavedState{display:none!important}</style><link rel="stylesheet" href="quick-entry.css">
+<link rel="stylesheet" href="assessment-context.css">
 </head>
 <body class="min-h-screen bg-[#fcfaf7]"><section id="p0StoragePanel" style="max-width:1024px;margin:12px auto;padding:14px;border:1px solid #bba98a;border-radius:10px;background:#fffbeb;color:#413722">
 <strong>평가 기록과 저장 상태</strong><p>새 점수는 미평가로 시작합니다. 기존 점수와 옛 합계는 보존하고 실제 평가 여부를 추정하지 않습니다. Noel 산식은 공식 SCA/CVA 양식과 구분합니다.</p>
@@ -1451,9 +1452,11 @@
 
 <script src="p0-model.js"></script>
 <script src="record-model.js"></script>
+<script src="assessment-context-model.js"></script>
 <script src="import-guard.js"></script>
 <script src="draft-store.js"></script>
 <script src="record-ui.js"></script>
+<script src="assessment-context-ui.js"></script>
 <script src="quick-entry.js"></script>
 <script src="p0-production.js"></script>
 <script src="flavor-evidence.js"></script>
@@ -2577,7 +2580,8 @@ function createNewSessionObj(overrides = {}) {
     purpose: overrides.purpose || '기타',
     location,
     cupper: overrides.cupper || '',
-    waterTemp: Number.parseFloat(overrides.waterTemp ?? 93) || 93,
+    waterTemp: Object.hasOwn(overrides, 'waterTemp') ? AssessmentContextModel.waterTemperature(overrides.waterTemp) : 93,
+    condition_provenance: overrides.condition_provenance || AssessmentContextModel.freshSessionProvenance(Object.hasOwn(overrides, 'waterTemp') ? (AssessmentContextModel.waterTemperature(overrides.waterTemp) === null ? 'unset' : 'manual') : 'default'),
     grindSize: overrides.grindSize || '',
     samples: Array.isArray(overrides.samples) && overrides.samples.length ? overrides.samples : [createNewSampleObj('샘플 #1')],
     createdAt: overrides.createdAt || Date.now()
@@ -2605,7 +2609,7 @@ function renderSessionMeta() {
   }
   metaEl.innerHTML = `
     <div>목적: <span class="font-semibold">${escapeHtml(session.purpose || '기타')}</span> | 날짜: ${escapeHtml(session.date || '-')} ${escapeHtml(session.time || '')}</div>
-    <div>장소: ${escapeHtml(session.location || '-')} | 평가자: ${escapeHtml(session.cupper || '-')} | 수온: ${escapeHtml(String(session.waterTemp ?? 93))}°C</div>
+    <div>장소: ${escapeHtml(session.location || '-')} | 평가자: ${escapeHtml(session.cupper || '-')} | 수온: ${escapeHtml(String(session.waterTemp ?? '미입력'))}°C · ${escapeHtml(AssessmentContextModel.SOURCES[AssessmentContextModel.sessionProvenance(session).waterTemp.source])}</div>
   `;
   const dateInline = document.getElementById('sessionDateInline');
   const timeInline = document.getElementById('sessionTimeInline');
@@ -2689,11 +2693,14 @@ function openSessionModal() {
   if (cupperInput) cupperInput.value = window.currentUser && window.currentUser !== 'default' ? window.currentUser : '';
   if (dateInput) dateInput.value = today;
   if (timeInput) timeInput.value = `${hh}:${mm}`;
-  if (waterTempInput) waterTempInput.value = '93';
+  if (waterTempInput) { waterTempInput.value = '93'; delete waterTempInput.dataset.edited; }
   modal?.classList.add('show');
 }
 
 function createSessionFromModal() {
+  if (currentSampleId && !saveCurrentSample()) return;
+  const waterInput = document.getElementById('sessionWaterTempInput');
+  let waterValue; try { waterValue = AssessmentContextModel.waterTemperature(waterInput.value); } catch (e) { showToast(e.message); return; }
   const dateValue = document.getElementById('sessionDateInput')?.value || new Date().toISOString().slice(0, 10);
   const timeValue = document.getElementById('sessionTimeInput')?.value || new Date().toTimeString().slice(0, 5);
   const locationValue = document.getElementById('sessionLocationInput')?.value.trim() || '';
@@ -2704,7 +2711,8 @@ function createSessionFromModal() {
     time: timeValue,
     purpose: document.getElementById('sessionPurposeInput')?.value || '기타',
     cupper: document.getElementById('sessionCupperInput')?.value.trim() || '',
-    waterTemp: document.getElementById('sessionWaterTempInput')?.value || 93,
+    waterTemp: waterValue,
+    condition_provenance: AssessmentContextModel.freshSessionProvenance(waterValue === null ? 'unset' : waterInput.dataset.edited === 'true' ? 'manual' : 'default'),
     grindSize: document.getElementById('sessionGrindSizeInput')?.value.trim() || '',
     location: locationValue
   });
@@ -2733,6 +2741,7 @@ function exportCurrentSessionJson() {
 
 
 function exportCurrentSessionExcel() {
+  if (!saveCurrentSample()) return;
   const session = getCurrentSessionObj();
   if (!session) {
     showToast('내보낼 세션이 없습니다.');
@@ -2742,6 +2751,7 @@ function exportCurrentSessionExcel() {
 }
 
 function saveSessionMetaFromInline() {
+  try { AssessmentContextUI.assertValid(); } catch (e) { showToast(e.message); return false; }
   const session = getCurrentSessionObj();
   if (!session) return;
   const shouldSyncTitle = !session.title || isAutoSessionTitle(session.title);
@@ -2749,14 +2759,12 @@ function saveSessionMetaFromInline() {
   session.time = document.getElementById('sessionTimeInline')?.value || session.time || '';
   session.purpose = document.getElementById('sessionPurposeInline')?.value || '기타';
   session.cupper = document.getElementById('sessionCupperInline')?.value.trim() || '';
-  session.waterTemp = Number.parseFloat(document.getElementById('sessionWaterTempInline')?.value || '93') || 93;
+  AssessmentContextUI.applySession();
   session.location = document.getElementById('sessionLocationInline')?.value.trim() || '';
   if (shouldSyncTitle) {
     session.title = buildAutoSessionTitle(session.date, session.time, session.location);
   }
-  renderSessionSelect();
-  renderSessionMeta();
-  saveSessionsToStorage();
+  if (saveSessionsToStorage()) { renderSessionSelect(); renderSessionMeta(); }
 }
 
 // 샘플 이동 시 토스트 메시지 표시
@@ -4642,7 +4650,7 @@ function buildSessionExcelRows(session) {
   const sessionSamples = Array.isArray(session?.samples) ? session.samples : [];
   const header = ['샘플명','커피명','원산지','품종','가공방식','로스팅 날짜','로스팅 레벨','농장명','고도(masl)','수확연도','크롭상태','수분함량(%)','스크린사이즈','결점두수','로트번호','공급자','생두중량(kg)','산미','단맛','바디','바디 디스크립터','프래그런스','아로마','플레이버','에프터테이스트','테이스팅 노트','총점','등급'];
   const rows = [
-    ['세션명', session?.title || '-', '날짜', session?.date || '-', '시간', session?.time || '-', '장소', session?.location || '-', '목적', session?.purpose || '-', '평가자', session?.cupper || '-', '수온', `${session?.waterTemp || 93}`],
+    ['세션명', session?.title || '-', '날짜', session?.date || '-', '시간', session?.time || '-', '장소', session?.location || '-', '목적', session?.purpose || '-', '평가자', session?.cupper || '-', '수온', `${session?.waterTemp ?? ''}`],
     [],
     header
   ];
@@ -4671,15 +4679,15 @@ function buildSessionExcelRows(session) {
       d.roastDate || '',
       d.roastLevel || '',
       d.farmName || '',
-      d.altitude || '',
+      d.altitude ?? '',
       d.harvestYear || '',
       d.cropStatus || '',
-      d.moistureContent || '',
+      d.moistureContent ?? '',
       d.screenSize || '',
-      d.defectCount || '',
+      d.defectCount ?? '',
       d.lotNumber || '',
       d.supplierName || '',
-      d.greenBagWeight || '',
+      d.greenBagWeight ?? '',
       d.acidityLevel || '',
       d.sweetnessLevel || '',
       d.bodyLevel || '',
@@ -4721,7 +4729,7 @@ function exportSessionToExcel(session, useSessionFileName = false) {
 }
 
 function exportToExcel() {
-  saveCurrentSample();
+  if (!saveCurrentSample()) return;
   const currentSession = getCurrentSessionObj();
   exportSessionToExcel(currentSession, false);
 }
@@ -5049,9 +5057,7 @@ function setupEventHandlers() {
   // 샘플 관리 버튼들
   const addSampleBtn = document.getElementById('addSampleBtn');
   if (addSampleBtn) addSampleBtn.addEventListener('click', function() {
-    if (currentSampleId) {
-      saveCurrentSample();
-    }
+    if (currentSampleId && !saveCurrentSample()) return;
     
     const newSample = createNewSampleObj(`샘플 #${samples.length + 1}`);
     samples.unshift(newSample);
@@ -5329,6 +5335,7 @@ function setupEventHandlers() {
 
 installP0Production();
 installRecordIdentity();
+installAssessmentContext();
 
 // DOM 준비 상태 확인 후 앱 초기화
 function runInit() {

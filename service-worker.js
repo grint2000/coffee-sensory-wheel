@@ -1,5 +1,5 @@
-const APP_CACHE = 'noel-sca-app-v10-quick-drafts';
-const RUNTIME_CACHE = 'noel-sca-runtime-v10-quick-drafts';
+const APP_CACHE = 'noel-sca-app-v11-assessment-context';
+const RUNTIME_CACHE = 'noel-sca-runtime-v11-assessment-context';
 
 const APP_SHELL_FILES = [
   './',
@@ -9,6 +9,9 @@ const APP_SHELL_FILES = [
   './flavor-evidence.js',
   './p0-model.js',
   './record-model.js',
+  './assessment-context-model.js',
+  './assessment-context-ui.js',
+  './assessment-context.css',
   './record-ui.js',
   './draft-store.js',
   './quick-entry.js',
