@@ -1,0 +1,60 @@
+/* Shared status hierarchy for detailed and quick input; the header remains first. */
+.storage-status-panel { margin:0 0 12px; padding:10px 12px; border:1px solid #ddd5c9; border-radius:10px; background:#fff; color:#413722; min-width:0; font-size:12px; line-height:1.5; overflow-wrap:anywhere; }
+.storage-status-row { display:flex; flex-wrap:wrap; gap:4px 18px; align-items:center; }
+.storage-status-row p { margin:0; font-weight:600; }
+.storage-status-row [data-state="dirty"], .storage-status-row [data-state="warning"] { color:#825414; }
+.storage-status-row [data-state="error"] { color:#9b2509; }
+.storage-status-row [data-state="success"] { color:#256141; }
+#storageUrgentStatus { margin:8px 0; padding:10px; border-left:3px solid #b94726; background:#fff2ec; color:#852b17; font-weight:600; }
+#p0StorageDetails { margin-top:4px; }
+#p0StorageDetails > summary { min-height:44px; display:list-item; padding:12px 0 8px; cursor:pointer; color:#655c50; font-weight:600; }
+#p0StorageDetails[open] > summary { border-bottom:1px solid #e6dfd5; margin-bottom:10px; }
+#p0StorageDetails p { margin:8px 0; }
+#p0StorageDetails > summary:focus-visible, #p0StoragePanel button:focus-visible, #p0StoragePanel a:focus-visible { outline:3px solid #b46b24; outline-offset:3px; }
+#p0StoragePanel button { min-height:44px; max-width:100%; white-space:normal; overflow-wrap:anywhere; }
+#p0StoragePanel #p0DraftStatus:empty { display:none; }
+#p0StoragePanel #p0DraftStatus { margin-top:6px; }
+#p0DraftRecovery:not([hidden]), #p0Recovery:not([hidden]), #courseImportPreview:not([hidden]) { margin:10px 0; padding:12px; border:1px solid #be8d52; border-radius:8px; background:#fff8ef; }
+.storage-backup-actions { display:flex; flex-wrap:wrap; gap:8px; }
+.storage-backup-actions > button { flex:1 1 230px; text-align:left; }
+body.dark .storage-status-panel { background:#262626; color:#f3f4f6; border-color:#666; }
+body.dark #p0StorageDetails > summary { color:#ddd; }
+body.dark .storage-status-row [data-state="dirty"], body.dark .storage-status-row [data-state="warning"] { color:#efc176; }
+body.dark .storage-status-row [data-state="error"] { color:#ffb29e; }
+body.dark .storage-status-row [data-state="success"] { color:#9dddba; }
+@media(max-width:480px) {
+  .storage-status-row { display:grid; gap:3px; }
+  .storage-status-panel { padding:8px 10px; }
+  #p0DraftRecovery > button, #courseImportPreview > button { width:100%; margin-top:6px; }
+}
+@media print { .storage-status-panel { display:none; } }
+/* Header controls keep their touch size and wrap in both input modes. */
+.quick-entry-main > header > div:nth-child(3) { display:flex; flex-wrap:wrap; min-width:0; max-width:100%; gap:6px; }
+.quick-entry-main > header button { min-width:44px; min-height:44px; padding:8px 10px; box-sizing:border-box; flex:0 0 auto; }
+.quick-entry-main > header #currentUserDisplay, .quick-entry-main > header #currentTeamHeader { min-width:0; max-width:100%; margin-left:0; white-space:normal; overflow-wrap:anywhere; word-break:break-word; }
+.management-help { margin-top:10px; border-top:1px solid #e2dacf; font-size:12px; }
+.management-help > summary { min-height:44px; padding:12px 2px; cursor:pointer; color:#655c50; font-weight:600; }
+.management-help > summary:focus-visible { outline:3px solid #b46b24; outline-offset:2px; }
+.management-help > div { margin:0; }
+body.dark .management-help > summary { color:#ddd; }
+/* Persistent save feedback stays by the original button; the existing toast confirms it in view. */
+.storage-save-feedback { flex:1 0 100%; width:100%; margin:8px 0 0; padding:10px; border:1px solid #b94726; border-radius:8px; background:#fff2ec; color:#852b17; font-size:14px; line-height:1.6; overflow-wrap:anywhere; scroll-margin-block:100px; }
+.storage-save-feedback[hidden] { display:none!important; }
+.storage-save-feedback:focus { outline:3px solid #b94726; outline-offset:2px; }
+@media(max-width:767px) { #toast { left:12px; right:12px; bottom:calc(82px + env(safe-area-inset-bottom)); min-width:0; max-width:calc(100% - 24px); box-sizing:border-box; padding:12px; overflow-wrap:anywhere; } }
+/* Match the existing theme's !important text rules only for current feedback and primary controls. */
+body.dark #storageUrgentStatus, body.dark .storage-save-feedback { background:#482b26!important; color:#ffe3da!important; border-color:#e8a18d!important; }
+body.dark .quick-entry-main > header button { background:#333b45!important; color:#f3f4f6!important; border:1px solid #9ca7b5!important; }
+body.dark .quick-entry-main #saveSamplesBtn { background:#244c73!important; color:#fff!important; border:1px solid #99bedf!important; }
+body.dark .mobile-quick-actions { background:#202428!important; border-top-color:#697079!important; }
+body.dark .mobile-quick-btn { background:#32383f!important; color:#f3f4f6!important; border-color:#a5aab4!important; }
+/* Recovery and report controls remain readable without changing the printable report palette. */
+body.dark #p0DraftRecovery, body.dark #p0Recovery, body.dark #courseImportPreview { background:#2c3138!important; color:#f3f4f6!important; border-color:#9ca7b5!important; }
+body.dark #p0DraftRecovery *, body.dark #p0Recovery *, body.dark #courseImportPreview * { color:#f3f4f6!important; }
+body.dark #p0DraftRecovery button, body.dark #p0Recovery button, body.dark #courseImportPreview button { background:#333b45!important; border-color:#9ca7b5!important; }
+body.dark .report-profiles { background:#262b31!important; color:#f3f4f6!important; border-color:#9ca7b5!important; }
+body.dark .report-profiles * { color:#f3f4f6!important; }
+body.dark .report-profiles button, body.dark .report-profiles select { background:#333b45!important; border-color:#9ca7b5!important; }
+body.dark .report-profiles fieldset { border-color:#697079!important; }
+body.dark .report-profiles a { color:#f4d4a2!important; }
+#reportPreview, #reportPreview *, .report-capture, .report-capture *, body.dark #reportPreview, body.dark #reportPreview *, body.dark .report-capture, body.dark .report-capture * { background-color:#fff!important; color:#28231d!important; }

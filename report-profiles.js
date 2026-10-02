@@ -16,6 +16,7 @@ function installReportProfiles(){
  const preview=node('div');preview.id='reportPreview';panel.append(preview);
  const actions=node('div');actions.className='report-actions';panel.append(actions);
  const outputs={};for(const[format,label]of [['image','미리본 이미지 생성'],['excel','미리본 Excel 내보내기'],['json','미리본 리포트 JSON 생성']]){const b=node('button',label);b.type='button';b.id='reportExport'+format;b.disabled=true;b.addEventListener('click',()=>exportReport(format));actions.append(b);outputs[format]=b;}
+ const outputNotice=node('p','선택 필드 리포트 · 복구용 JSON 백업 아님 · 외부 자동 전송 없음');outputNotice.id='reportOutputNotice';panel.append(outputNotice);
  const download=node('a');download.id='reportDownload';download.hidden=true;download.setAttribute('download','');panel.append(download);
  panel.append(node('p','세 형식은 확정한 같은 항목·값으로 만들어집니다. 다운로드 요청 뒤 실제 파일 수신·Excel 앱 표시·기기 화면은 직접 확인하세요. 이 리포트 JSON은 복구 입력으로 사용할 수 없습니다. 전체 원문은 별도의 복구용 백업을 사용하세요.'));
  const close=node('button','검토 닫기');close.type='button';close.id='reportClose';panel.append(close);$('p0StoragePanel').after(panel);
@@ -38,7 +39,7 @@ function installReportProfiles(){
    status.textContent=profile.value==='customer'?'값을 읽고 공개할 필드만 선택한 뒤 미리보기를 확정하세요.':'내부용에는 평가자·기존 메모·개인 판단 등 비공개 정보가 포함될 수 있습니다. 필요 없는 필드를 해제한 뒤 확정하세요.';
   }catch(e){candidate=null;choices.replaceChildren();status.textContent=e.message;}
  }
- function render(target,p){target.replaceChildren();target.append(node('h2',p.title),node('p',p.notice),node('p','출력 시점: '+p.createdAt));
+ function render(target,p){target.replaceChildren();target.append(node('h2',p.title),node('p','출력 시점: '+p.createdAt));
   for(const record of p.records){const section=node('section');section.append(node('h3',`기록 ${record.number}`));const list=node('dl');for(const field of record.fields){list.append(node('dt',field.label),node('dd',String(field.value)));}section.append(list);target.append(section);}
  }
  function open(requestedScope='sample',format='image'){

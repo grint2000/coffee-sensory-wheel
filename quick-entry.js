@@ -16,7 +16,7 @@
     const sampleNav = byId('currentSampleIndicator')?.parentElement;
     const titleRow = byId('sampleTitleInput')?.parentElement;
     const notesSection = notes.closest('section'), flavorSection = flavorArea.closest('section');
-    const storagePanel = byId('p0StoragePanel'), saveButton = byId('saveSamplesBtn');
+    const saveButton = byId('saveSamplesBtn');
     if (!manager || !sampleListBox || !sampleSearch || !sampleNav || !titleRow || !saveButton) return null;
     const media = global.matchMedia?.('(max-width: 767px)');
     const mobile = () => media ? media.matches : global.innerWidth < 768;
@@ -124,8 +124,7 @@
         move(notesSection, core); core.append(flavorDetails); move(flavorSection, flavorDetails);
         form.append(detailFields); for (const child of detailNodes) move(child, detailContent);
         move(saveButton, saveCard);
-        // Keep live draft/save/recovery warnings visible, including future P0 status nodes.
-        move(storagePanel, saveCard);
+        // Storage status stays below the app header in both input modes.
       }
       mode = next;
       doc.body.classList.toggle('quick-entry-active', next === 'quick');

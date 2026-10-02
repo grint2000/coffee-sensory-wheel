@@ -16,6 +16,18 @@ const TEAM_STORAGE_KEYS = { currentUser: 'noel_sca_current_user', currentTeam: '
 const TEAM_NAME_REGEX = /^[0-9A-Za-z가-힣_-]{2,40}$/;
 let authEpoch = 0, teamVersion = 0, activeTeam = null, teamBusy = false, lastProfileUid = null, lastProfileName = null, blockedProfileTransfer = false, authReady = false;
 window.getCuppingAccountId = () => !authReady ? null : auth.currentUser ? 'firebase:'+auth.currentUser.uid : 'local:default';
+// Read-only display signals. These never change authentication, team selection, or data.
+let teamDisplayState = 'checking';
+window.getCuppingTeamStatus = () => ({
+  state: !authReady ? 'checking' : !auth.currentUser ? 'signed-out' : teamDisplayState,
+  authReady, signedIn: !!auth.currentUser, teamName: activeTeam?.name || null,
+  displayName: auth.currentUser ? (auth.currentUser.displayName || auth.currentUser.email || '로그인됨') : '이 기기 기록',
+  context: { account: window.getCuppingAccountId(), team: activeTeam?.name || null, version: teamVersion }
+});
+function publishTeamStatus(state) {
+  if (state) teamDisplayState = state;
+  window.dispatchEvent(new CustomEvent('cupping:team-status', { detail: window.getCuppingTeamStatus() }));
+}
 const $ = id => document.getElementById(id);
 function notifyMessage(msg) { if (typeof window.showToast === 'function') window.showToast(msg); else alert(msg); }
 function status(msg) { if ($('teamAccessStatus')) $('teamAccessStatus').textContent = msg; }
@@ -30,16 +42,16 @@ function assertCurrent(s) { if (!current(s)) throw Error('account-changed'); }
 function member(data, uid) { return Array.isArray(data?.memberUids) && data.memberUids.includes(uid); }
 function displayName() { return String(auth.currentUser?.displayName || auth.currentUser?.email || window.currentUser || '회원').slice(0, 100); }
 function stopListener() { if (window._teamSamplesUnsub) window._teamSamplesUnsub(); window._teamSamplesUnsub = null; }
-function updateTeamHeader() { if ($('currentTeamHeader')) $('currentTeamHeader').textContent = activeTeam ? `팀: ${activeTeam.name}` : ''; if ($('currentTeamDisplay')) $('currentTeamDisplay').textContent = activeTeam?.name || '없음'; }
-function clearTeamAccess(message) {
+function updateTeamHeader() { if ($('currentTeamHeader')) $('currentTeamHeader').textContent = activeTeam ? `팀: ${activeTeam.name}` : ''; if ($('currentTeamDisplay')) $('currentTeamDisplay').textContent = activeTeam?.name || '없음'; publishTeamStatus(activeTeam ? 'ready' : auth.currentUser ? 'no-team' : 'signed-out'); }
+function clearTeamAccess(message, displayState) {
   teamVersion++; stopListener(); activeTeam = null; safeRemoveStorage(TEAM_STORAGE_KEYS.currentTeam); safeRemoveStorage('mollis_sca_current_team');
   if ($('teamMembersList')) $('teamMembersList').replaceChildren(); if ($('teamJoinRequests')) $('teamJoinRequests').replaceChildren();
-  if ($('teamReportBody')) $('teamReportBody').replaceChildren(); $('teamReportModal')?.classList.remove('show'); updateTeamHeader(); if (message) status(message);
+  if ($('teamReportBody')) $('teamReportBody').replaceChildren(); $('teamReportModal')?.classList.remove('show'); updateTeamHeader(); if (displayState) publishTeamStatus(displayState); if (message) status(message);
 }
 function failure(error, message, s) {
   if ((s && !current(s)) || error?.message === 'team-changed') return;
-  if (error?.code === 'permission-denied') clearTeamAccess('이 팀의 접근 권한을 확인할 수 없습니다. 선택을 해제했으며 이 기기 평가 기록은 유지됩니다. 팀장 승인 또는 권한 설정을 확인하세요.');
-  else status(error?.message === 'account-changed' ? '계정이 바뀌어 작업을 중단했습니다.' : message);
+  if (error?.code === 'permission-denied') clearTeamAccess('이 팀의 접근 권한을 확인할 수 없습니다. 선택을 해제했으며 이 기기 평가 기록은 유지됩니다. 팀장 승인 또는 권한 설정을 확인하세요.', 'denied');
+  else { publishTeamStatus(error?.message === 'membership-required' ? 'denied' : 'failed'); status(error?.message === 'account-changed' ? '계정이 바뀌어 작업을 중단했습니다.' : message); }
 }
 function setBusy(on) { teamBusy = on; for (const id of ['createTeamBtn','joinTeamBtn','checkTeamApprovalBtn']) if ($(id)) $(id).disabled = on; }
 async function guarded(action) { if (teamBusy) return; setBusy(true); try { return await action(); } finally { setBusy(false); } }
@@ -59,7 +71,7 @@ function acceptSamples(data, s) {
 }
 async function activateTeam(name, s, seedEmpty = false, preserveDraft = false) {
   const version=++teamVersion, check=()=>{assertCurrent(s);if(version!==teamVersion)throw Error('team-changed');};
-  check(); const ref=doc(db,'teams',name);let snap;
+  check(); publishTeamStatus('connecting'); const ref=doc(db,'teams',name);let snap;
   try{snap=await getDoc(ref);}catch(e){check();throw e;}check();
   if (!snap.exists() || !member(snap.data(),s.uid)) throw Error('membership-required');
   if(preserveDraft&&window.P0Production?.getState().dirty){
@@ -93,7 +105,7 @@ onAuthStateChanged(auth, async user=>{
   if (window.P0Production) window.P0Production.accountChanged();
   window.dispatchEvent(new CustomEvent('cupping:auth-ready'));
   clearTeamAccess(user?'로그인 계정의 팀 권한을 다시 확인합니다.':'로그아웃했습니다. 이 기기 평가 기록은 유지됩니다.'); refreshPending();
-  if(blockedProfileTransfer){status('로그인 계정 전환 중 이전 평가를 보호하고 있습니다. JSON으로 보관한 뒤 계정별 자료를 확인하세요. 팀 전송은 중단했습니다.');return;}
+  if(blockedProfileTransfer){publishTeamStatus('blocked');status('로그인 계정 전환 중 이전 평가를 보호하고 있습니다. JSON으로 보관한 뒤 계정별 자료를 확인하세요. 팀 전송은 중단했습니다.');return;}
   if (!user || !saved) return;
   const s=session();try { await activateTeam(saved,s,false,true); } catch(e){ failure(e,'기존 팀을 열지 못했습니다. 이름을 입력해 접근 또는 가입 상태를 확인하세요.',s); }
 });
@@ -130,7 +142,7 @@ window.cancelTeamRequest=async()=>{
 };
 window.loadTeamInfoToModal=async function(){
   const s=session(),name=getCurrentTeamName();if(!s||!name)return;const list=$('teamMembersList'),requests=$('teamJoinRequests');list?.replaceChildren();requests?.replaceChildren();
-  try{const snap=await getDoc(doc(db,'teams',name));assertCurrent(s);if(!snap.exists()||!member(snap.data(),s.uid)){clearTeamAccess('팀 접근 권한이 없습니다. 이 기기 자료는 유지됩니다.');return;}const data=snap.data();
+  try{const snap=await getDoc(doc(db,'teams',name));assertCurrent(s);if(!snap.exists()||!member(snap.data(),s.uid)){clearTeamAccess('팀 접근 권한이 없습니다. 이 기기 자료는 유지됩니다.', 'denied');return;}const data=snap.data();
     if(getCurrentTeamName()!==name)return;
     for(const m of data.members||[]){const li=document.createElement('li'),span=document.createElement('span');span.textContent=(m.name||m.uid)+(m.uid===data.owner?' (팀장)':'');li.appendChild(span);if(data.owner===s.uid&&m.uid!==data.owner){const button=document.createElement('button');button.textContent='접근 권한 회수';button.type='button';button.addEventListener('click',()=>removeMemberFromTeam(m.uid,name));li.appendChild(button);}list?.appendChild(li);}
     if($('teamOwnerOnly'))$('teamOwnerOnly').hidden=data.owner!==s.uid;
@@ -168,8 +180,8 @@ window.startTeamSamplesListener=function(){
  const s=session(true),target=activeTeam;stopListener();if(!s||!target||target.uid!==s.uid)return;
  window._teamSamplesUnsub=onSnapshot(doc(db,'teams',target.name),snap=>{
    if(!current(s)||activeTeam?.name!==target.name)return;
-   if(!snap.exists()||!member(snap.data(),s.uid)){clearTeamAccess('팀 권한이 회수되었습니다. 이 기기 평가 기록은 유지됩니다.');return;}
-   acceptSamples(snap.data(),s);
+   if(!snap.exists()||!member(snap.data(),s.uid)){clearTeamAccess('팀 권한이 회수되었습니다. 이 기기 평가 기록은 유지됩니다.', 'denied');return;}
+   publishTeamStatus('ready'); acceptSamples(snap.data(),s);
  },e=>{if(activeTeam?.name===target.name)failure(e,'팀 자료 수신에 실패했습니다. 이 기기 평가 기록은 유지됩니다.',s);});
 };
 window.showTeamReport=async function(){

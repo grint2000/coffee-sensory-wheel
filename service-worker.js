@@ -1,5 +1,5 @@
-const APP_CACHE = 'noel-sca-app-v14-report-profiles';
-const RUNTIME_CACHE = 'noel-sca-runtime-v14-report-profiles';
+const APP_CACHE = 'noel-sca-app-v15-status-design';
+const RUNTIME_CACHE = 'noel-sca-runtime-v15-status-design';
 
 const APP_SHELL_FILES = [
   './',
@@ -16,6 +16,8 @@ const APP_SHELL_FILES = [
   './draft-store.js',
   './quick-entry.js',
   './quick-entry.css',
+  './storage-status.js',
+  './storage-status.css',
   './import-guard.js',
   './backup-merge.js',
   './p0-production.js',

@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>Noel SCA 커피 관능 평가 (개선버전)</title>
+  <title>Noel Noel 커피 관능 평가</title>
   <link rel="manifest" href="manifest.json">
   <meta name="theme-color" content="#8B5A2B">
   <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
@@ -779,20 +779,9 @@
 <link rel="stylesheet" href="assessment-context.css">
 <link rel="stylesheet" href="history-tools.css">
 <link rel="stylesheet" href="report-profiles.css">
+<link rel="stylesheet" href="storage-status.css">
 </head>
-<body class="min-h-screen bg-[#fcfaf7]"><section id="p0StoragePanel" style="max-width:1024px;margin:12px auto;padding:14px;border:1px solid #bba98a;border-radius:10px;background:#fffbeb;color:#413722">
-<strong>평가 기록과 저장 상태</strong><p>새 점수는 미평가로 시작합니다. 기존 점수와 옛 합계는 보존하고 실제 평가 여부를 추정하지 않습니다. Noel 산식은 공식 SCA/CVA 양식과 구분합니다.</p>
-<p id="p0SaveStatus" role="status" aria-live="polite">저장 기록 확인 중…</p><p id="p0SyncStatus" role="status" aria-live="polite">서버 상태 확인 전</p><p id="p0Aggregate"></p><p id="p0DraftStatus" role="status" aria-live="polite"></p><section id="p0DraftRecovery" hidden><h3>보관된 초안 확인</h3><p>현재 저장본과 이전 초안이 달라 자동 교체하지 않았습니다. 초안을 불러와도 정식 저장과 서버 전송은 저장 버튼을 누르기 전까지 하지 않습니다.</p><button id="p0DraftRestoreBtn" type="button">보관 초안으로 이어쓰기</button> <button id="p0DraftKeepBtn" type="button">현재 저장본 유지</button></section><p><a id="p0DraftFile" hidden download>초안 JSON 받기</a> <a id="p0BeforeDraftFile" hidden download>초안 복원 전 현재 자료 받기</a></p>
-<section id="p0Recovery" hidden><h2>기존 자료 읽기 전용 복구</h2><p>기존 저장 자료가 일반 검사 한도를 넘거나 형식이 맞지 않습니다. 자료를 삭제·초기화하지 않았습니다. 원문을 먼저 보관한 뒤 필요한 세션을 나눠 복구를 검토하세요.</p><p id="p0RecoverySize"></p><p><a id="p0RecoveryRawLink" download>기존 원문 받기</a></p><p id="p0RecoveryRange"></p><textarea id="p0RecoveryText" readonly aria-label="기존 저장 원문 읽기" style="width:100%;height:220px;font-family:monospace"></textarea><button id="p0RecoveryPrev" type="button">이전 원문</button> <button id="p0RecoveryNext" type="button">다음 원문</button></section>
-<p>복구용 백업은 비공개 정보를 포함한 원문 전체를 보존합니다. 고객용 리포트와 구분해 보관하세요.</p><p><button id="reportBackupAll" type="button">전체 복구용 JSON 백업 · 비공개 포함</button> <button id="reportBackupSession" type="button">선택 세션 복구용 JSON 백업 · 비공개 포함</button></p><p><a id="courseBackupLink" hidden download>백업 JSON 저장</a></p>
-<details id="p0BackupDetails"><summary>원본 보관과 복구 이력</summary><p><a id="p0MigrationLink" hidden download>전환 전 저장 원문 보관</a></p><p><a id="p0OriginalLink" hidden download>가져온 원본 JSON 받기</a></p><p><a id="p0PreviousLink" hidden download>직전 교체 전 백업 받기</a></p><p><a id="p0TeamTransitionLink" hidden download>최근 팀 전환 전 평가 백업</a></p><p>팀을 바꾸기 직전의 평가 백업은 이 기기에 마지막 1개를 보관합니다. 다음 전환 전에 파일로 내려받으세요.</p><pre id="p0RestoreHistory"></pre><p>이 기기의 전환 전 원문을 처음 한 번 보존합니다. 최근 가져온 원본과 직전 교체 전 백업은 각각 마지막 1개입니다. 다음 복구 전에 파일을 내려받으세요. 별도 파일 보관과 서버 백업은 구분합니다.</p></details>
-<p id="courseImportStatus" role="status" aria-live="polite">JSON 복구는 검증 → 미리보기 → 적용 순서입니다.</p>
-<section id="courseImportPreview" hidden><h2>복구 미리보기</h2>
-<fieldset><legend>복구 방식</legend><label><input type="radio" name="courseImportMode" value="replace" checked> 전체 교체</label> <label><input type="radio" name="courseImportMode" value="merge"> 기존 자료에 추가 병합</label></fieldset>
-<p id="courseImportSummary" role="status" aria-live="polite"></p><p id="courseImportConflict" role="alert" hidden></p>
-<p>파일과 적용 후 전체 자료 모두 최대 1MiB / 50세션 / 500샘플입니다. 병합은 현재 선택을 유지하며, 이름으로 같은 기록을 추정하지 않습니다. 같은 ID의 내용·위치·세션 조건이 다르면 병합을 중단합니다. 세션 ID가 없는 기존 샘플 배열은 전체 교체로만 복구합니다. 필요한 경우 별도의 빈 검토 환경에서 전체 교체 후 선택 세션 백업으로 내보내면 세션 단위로 병합할 수 있습니다. 기존 자료가 있는 환경에서는 먼저 전체 백업을 보관하세요.</p>
-<p>적용 전 백업을 보관하세요. 적용하면 현재 로그인 계정의 이 기기에 저장하고, 서버에는 기존 팀 설정에 따라 현재 선택 세션의 샘플만 동기화합니다. 병합으로 추가한 다른 세션은 이 단계에서 서버에 저장되지 않습니다. 중복뿐인 병합은 저장·동기화·이력 추가 없이 끝납니다.</p>
-<p><a id="p0BeforeLink" hidden download>복구 전 현재 자료 백업 받기</a></p><button id="courseImportApply" type="button">검토한 자료로 교체</button> <button id="courseImportCancel" type="button">취소</button></section></section>
+<body class="min-h-screen bg-[#fcfaf7]">
 
 <div class="max-w-5xl mx-auto p-1 md:p-4 bg-[#fcfaf7]">
   <!-- Header -->
@@ -803,8 +792,8 @@
       </div>
     </div>
     <div class="mt-3 md:mt-0 text-center md:text-right">
-      <h2 class="text-lg md:text-2xl font-semibold">SCA 커피 관능 평가 (개선버전)</h2>
-      <div class="text-xs text-gray-500 mt-1">PC/모바일 대응 · PDF 저장 최적 · 확장형 바디감/향미 추가 · 개선된 UI/UX</div>
+      <h2 class="text-lg md:text-2xl font-semibold">Noel 커피 관능 평가</h2>
+      <div class="text-xs text-gray-500 mt-1">커핑 기록·비교·리포트</div>
     </div>
     <div class="mt-3 md:mt-0 flex items-center">
       <button id="loginBtn" class="px-2 py-1 bg-gray-200 hover:bg-gray-300 rounded text-xs">로그인</button>
@@ -817,20 +806,19 @@
     </div>
   </header>
 
+  <section id="p0StoragePanel" class="storage-status-panel" aria-label="기기 저장과 팀 동기화"><div class="storage-status-row"><p id="storageDeviceSummary" role="status" aria-live="polite">기기 · 저장 상태 확인 중</p><p id="storageTeamSummary" role="status" aria-live="polite">팀 동기화 · 로그인 상태 확인 중</p></div><p id="storageUrgentStatus" role="alert" hidden=""></p><p id="p0DraftStatus" role="status" aria-live="polite"></p><section id="p0DraftRecovery" hidden=""><h3>보관된 초안 확인</h3><p>현재 저장본과 이전 초안이 달라 자동 교체하지 않았습니다. 초안을 불러와도 정식 저장과 서버 전송은 저장 버튼을 누르기 전까지 하지 않습니다.</p><button id="p0DraftRestoreBtn" type="button">보관 초안으로 이어쓰기</button> <button id="p0DraftKeepBtn" type="button">현재 저장본 유지</button></section><section id="p0Recovery" hidden=""><h2>기존 자료 읽기 전용 복구</h2><p>기존 저장 자료가 일반 검사 한도를 넘거나 형식이 맞지 않습니다. 자료를 삭제·초기화하지 않았습니다. 원문을 먼저 보관한 뒤 필요한 세션을 나눠 복구를 검토하세요.</p><p id="p0RecoverySize"></p><p><a id="p0RecoveryRawLink" download="">기존 원문 받기</a></p><p id="p0RecoveryRange"></p><textarea id="p0RecoveryText" readonly="" aria-label="기존 저장 원문 읽기" style="width:100%;height:220px;font-family:monospace"></textarea><button id="p0RecoveryPrev" type="button">이전 원문</button> <button id="p0RecoveryNext" type="button">다음 원문</button></section><p id="courseImportStatus" role="status" aria-live="polite" hidden="">JSON 복구는 검증 → 미리보기 → 적용 순서입니다.</p><section id="courseImportPreview" hidden=""><h2>복구 미리보기</h2>
+<fieldset><legend>복구 방식</legend><label><input type="radio" name="courseImportMode" value="replace" checked=""> 전체 교체</label> <label><input type="radio" name="courseImportMode" value="merge"> 기존 자료에 추가 병합</label></fieldset>
+<p id="courseImportSummary" role="status" aria-live="polite"></p><p id="courseImportConflict" role="alert" hidden=""></p>
+<p>파일과 적용 후 전체 자료 모두 최대 1MiB / 50세션 / 500샘플입니다. 병합은 현재 선택을 유지하며, 이름으로 같은 기록을 추정하지 않습니다. 같은 ID의 내용·위치·세션 조건이 다르면 병합을 중단합니다. 세션 ID가 없는 기존 샘플 배열은 전체 교체로만 복구합니다. 필요한 경우 별도의 빈 검토 환경에서 전체 교체 후 선택 세션 백업으로 내보내면 세션 단위로 병합할 수 있습니다. 기존 자료가 있는 환경에서는 먼저 전체 백업을 보관하세요.</p>
+<p>적용 전 백업을 보관하세요. 적용하면 현재 로그인 계정의 이 기기에 저장하고, 서버에는 기존 팀 설정에 따라 현재 선택 세션의 샘플만 동기화합니다. 병합으로 추가한 다른 세션은 이 단계에서 서버에 저장되지 않습니다. 중복뿐인 병합은 저장·동기화·이력 추가 없이 끝납니다.</p>
+<p><a id="p0BeforeLink" hidden="" download="">복구 전 현재 자료 백업 받기</a></p><button id="courseImportApply" type="button">검토한 자료로 교체</button> <button id="courseImportCancel" type="button">취소</button></section><details id="p0StorageDetails"><summary>저장·백업·복구 상세</summary><strong>평가 기록과 저장 상태</strong><p>새 점수는 미평가로 시작합니다. 기존 점수와 옛 합계는 보존하고 실제 평가 여부를 추정하지 않습니다. Noel 산식은 공식 SCA/CVA 양식과 구분합니다.</p><p id="p0SaveStatus" role="status" aria-live="polite">저장 기록 확인 중…</p><p id="p0SyncStatus" role="status" aria-live="polite">서버 상태 확인 전</p><p id="p0Aggregate"></p><p><a id="p0DraftFile" hidden="" download="">초안 JSON 받기</a> <a id="p0BeforeDraftFile" hidden="" download="">초안 복원 전 현재 자료 받기</a></p><p>복구용 백업은 비공개 정보를 포함한 원문 전체를 보존합니다. 고객용 리포트와 구분해 보관하세요.</p><p class="storage-backup-actions"><button id="reportBackupAll" type="button">전체 복구용 JSON 백업 · 비공개 포함</button> <button id="reportBackupSession" type="button">선택 세션 복구용 JSON 백업 · 비공개 포함</button></p><p><a id="courseBackupLink" hidden="" download="">백업 JSON 저장</a></p><details id="p0BackupDetails"><summary>원본 보관과 복구 이력</summary><p><a id="p0MigrationLink" hidden="" download="">전환 전 저장 원문 보관</a></p><p><a id="p0OriginalLink" hidden="" download="">가져온 원본 JSON 받기</a></p><p><a id="p0PreviousLink" hidden="" download="">직전 교체 전 백업 받기</a></p><p><a id="p0TeamTransitionLink" hidden="" download="">최근 팀 전환 전 평가 백업</a></p><p>팀을 바꾸기 직전의 평가 백업은 이 기기에 마지막 1개를 보관합니다. 다음 전환 전에 파일로 내려받으세요.</p><pre id="p0RestoreHistory"></pre><p>이 기기의 전환 전 원문을 처음 한 번 보존합니다. 최근 가져온 원본과 직전 교체 전 백업은 각각 마지막 1개입니다. 다음 복구 전에 파일을 내려받으세요. 별도 파일 보관과 서버 백업은 구분합니다.</p></details></details></section>
+
+
   <!-- Sample/Data/Compare Section -->
   <section class="bg-white shadow rounded-lg p-3 md:p-6 mb-3 flex flex-col md:flex-row gap-3">
     <!-- 샘플 관리 -->
     <div class="flex-1 min-w-[260px] mb-3 md:mb-0">
-      <div class="mb-3 bg-yellow-50 border border-yellow-200 rounded px-2 py-2 flex items-center text-xs text-yellow-800 leading-5">
-        <i class="fa fa-info-circle mr-2"></i>
-        <div>
-          <span class="font-semibold">샘플 관리 방법 안내:</span><br>
-          - <b>샘플 추가</b>로 새로운 커피 평가를 기록/관리할 수 있습니다.<br>
-          - <b>샘플 선택</b>시 해당 샘플 내용을 상세 편집/저장하며, 자동저장이 지원됩니다.<br>
-          - <b>이 기기에 저장</b> 또는 <b>웹에서 불러오기</b> 버튼을 통해 LocalStorage에 전체 평가 내역을 관리할 수 있습니다.<br>
-          - <b>복구용 JSON 백업 · 비공개 포함</b>으로 전체 원문을 보관하고 <b>불러오기</b>로 복원합니다. <b>리포트 JSON</b>은 선택한 공개용 항목이며 복구에 사용할 수 없습니다.
-        </div>
-      </div>
+      
       <h3 class="text-base font-bold mb-2 border-b pb-1 border-tan-200 flex items-center"><i class="fa fa-database mr-2"></i>샘플 관리/불러오기</h3>
       <div class="border rounded-lg p-2 mb-2 bg-amber-50">
         <div class="flex flex-wrap items-center gap-2 mb-2">
@@ -875,27 +863,28 @@
       </div>
       <div class="flex flex-wrap gap-1 mt-2">
         <button class="px-3 py-1 bg-blue-100 hover:bg-blue-200 text-blue-800 rounded text-xs flex items-center mobile-touch-friendly" id="saveSamplesBtn"><i class="fa fa-save mr-1"></i>이 기기에 저장</button>
-        <button class="px-3 py-1 bg-blue-200 hover:bg-blue-300 text-blue-900 rounded text-xs flex items-center mobile-touch-friendly" id="loadSamplesWebBtn"><i class="fa fa-cloud-download-alt mr-1"></i>웹에서 불러오기</button>
+        <button class="px-3 py-1 bg-blue-200 hover:bg-blue-300 text-blue-900 rounded text-xs flex items-center mobile-touch-friendly" id="loadSamplesWebBtn"><i class="fa fa-folder-open mr-1"></i>기기 저장본 다시 열기</button>
         <button class="px-3 py-1 bg-green-100 hover:bg-green-200 text-green-800 rounded text-xs flex items-center mobile-touch-friendly" id="exportSamplesBtn"><i class="fa fa-download mr-1"></i>전체 리포트 JSON</button>
         <button class="px-3 py-1 bg-emerald-100 hover:bg-emerald-200 text-emerald-800 rounded text-xs flex items-center mobile-touch-friendly" id="exportCurrentSessionBtn"><i class="fa fa-box-archive mr-1"></i>현재 세션 리포트</button>
         <button class="px-3 py-1 bg-teal-100 hover:bg-teal-200 text-teal-800 rounded text-xs flex items-center mobile-touch-friendly" id="exportCurrentSessionXlsxBtn"><i class="fa fa-file-excel mr-1"></i>현재 세션 엑셀</button>
         <label class="px-3 py-1 bg-yellow-100 hover:bg-yellow-200 text-yellow-800 rounded text-xs flex items-center cursor-pointer mb-0 mobile-touch-friendly"><i class="fa fa-upload mr-1"></i>불러오기<input type="file" id="importSamplesInput" accept=".json" class="hidden"></label>
         <button class="px-3 py-1 bg-indigo-100 hover:bg-indigo-200 text-indigo-800 rounded text-xs flex items-center mobile-touch-friendly" id="backupManageBtn"><i class="fa fa-history mr-1"></i>백업 복원</button>
       </div>
+      <details id="sampleManagementHelp" class="management-help"><summary>샘플 관리 안내</summary><div class="mb-3 bg-yellow-50 border border-yellow-200 rounded px-2 py-2 flex items-center text-xs text-yellow-800 leading-5">
+        <i class="fa fa-info-circle mr-2"></i>
+        <div>
+          <span class="font-semibold">샘플 관리 방법 안내:</span><br>
+          - <b>샘플 추가</b>로 새로운 커피 평가를 기록/관리할 수 있습니다.<br>
+          - <b>샘플 선택</b>시 해당 샘플 내용을 상세 편집/저장하며, 자동저장이 지원됩니다.<br>
+          - <b>이 기기에 저장</b> 또는 <b>기기 저장본 다시 열기</b> 버튼으로 이 브라우저 저장본을 관리할 수 있습니다.<br>
+          - <b>복구용 JSON 백업 · 비공개 포함</b>으로 전체 원문을 보관하고 <b>불러오기</b>로 복원합니다. <b>리포트 JSON</b>은 선택한 공개용 항목이며 복구에 사용할 수 없습니다.
+        </div>
+      </div></details>
     </div>
     
     <!-- 커핑 비교 -->
     <div class="flex-1 min-w-[260px]">
-      <div class="mb-3 bg-blue-50 border border-blue-200 rounded px-2 py-2 flex items-center text-xs text-blue-800 leading-5">
-        <i class="fa fa-info-circle mr-2"></i>
-        <div>
-          <span class="font-semibold">커핑 기록 비교 안내:</span><br>
-          - <b>아래 평가 목록에서 2개 이상 선택</b> 후 <b>비교차트 표시</b>를 클릭하면 Noel 점수/향미/결점 비교차트와 표가 생성됩니다.<br>
-          - 다양한 샘플을 추가한 후, 손쉽게 차트로 비교・분석이 가능합니다.<br>
-          - 샘플을 새로고침하거나 불러온 후에도 비교기능 사용 가능.<br>
-          <span class="text-gray-400">※ 고객용 이미지에는 미리보기에서 선택한 항목만 포함됩니다. 브라우저 인쇄는 앱 화면의 내부 기록도 포함할 수 있습니다.</span>
-        </div>
-      </div>
+      
       <h3 class="text-base font-bold mb-2 border-b pb-1 border-tan-200 flex items-center"><i class="fas fa-code-compare mr-2"></i>커핑 기록 비교</h3>
       <p id="legacyComparisonNotice" class="history-legacy-notice">원점수 비교 · 조건 미확인: 평가 양식·로트·로스팅·추출 조건을 맞추지 않은 원문 열람입니다. 기존 점수와 평가 여부 미확인 기록도 표시하며 팀 합의나 순위로 해석하지 않습니다.</p>
       <div id="compareListBox" class="mb-2"></div>
@@ -908,6 +897,16 @@
         </button>
       </div>
       <div id="compareArea"><div class="text-xs text-gray-400 my-2">2개 이상 샘플을 선택 후 비교 버튼을 눌러주세요.</div></div>
+      <details id="comparisonHelp" class="management-help"><summary>비교·출력 안내</summary><div class="mb-3 bg-blue-50 border border-blue-200 rounded px-2 py-2 flex items-center text-xs text-blue-800 leading-5">
+        <i class="fa fa-info-circle mr-2"></i>
+        <div>
+          <span class="font-semibold">커핑 기록 비교 안내:</span><br>
+          - <b>아래 평가 목록에서 2개 이상 선택</b> 후 <b>비교차트 표시</b>를 클릭하면 Noel 점수/향미/결점 비교차트와 표가 생성됩니다.<br>
+          - 다양한 샘플을 추가한 후, 손쉽게 차트로 비교・분석이 가능합니다.<br>
+          - 샘플을 새로고침하거나 불러온 후에도 비교기능 사용 가능.<br>
+          <span class="text-gray-400">※ 고객용 이미지에는 미리보기에서 선택한 항목만 포함됩니다. 브라우저 인쇄는 앱 화면의 내부 기록도 포함할 수 있습니다.</span>
+        </div>
+      </div></details>
     </div>
   </section>
   
@@ -1467,6 +1466,7 @@
 <script src="record-ui.js"></script>
 <script src="assessment-context-ui.js"></script>
 <script src="quick-entry.js"></script>
+<script src="storage-status.js"></script>
 <script src="p0-production.js"></script>
 <script src="compare-search-model.js"></script>
 <script src="history-tools.js"></script>
@@ -5162,7 +5162,7 @@ function setupEventHandlers() {
   
   const loadSamplesWebBtn = document.getElementById('loadSamplesWebBtn');
   if (loadSamplesWebBtn) loadSamplesWebBtn.addEventListener('click', function() {
-    if (confirm("웹 스토리지에서 샘플을 불러오시겠습니까? 저장되지 않은 변경사항은 사라집니다.")) {
+    if (confirm("이 브라우저에 저장된 기록을 다시 열까요? 저장하지 않은 현재 입력은 바뀔 수 있습니다.")) {
       loadSamplesFromStorage();
     }
   });
@@ -5366,6 +5366,7 @@ function runInit() {
   optimizePerformance();
   installHistoryTools();
   installQuickEntry({getAccountId:()=>window.getCuppingAccountId?.()||null});
+  installStorageStatus();
   P0Production.resumeDraftFocus();
 }
 

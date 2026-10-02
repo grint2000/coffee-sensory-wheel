@@ -19,7 +19,13 @@ function installP0Production() {
   const user = () => window.currentUser || 'default';
   const keys = name => ({ sessions: `noel_sca_sessions_${name}`, samples: `noel_sca_samples2_${name}`, selected: `noel_sca_current_sample_${name}`, meta: `noel_sca_p0_meta_${name}`, original: `noel_sca_pre_p0_${name}` });
   const setStatus = (text, state) => { $('p0SaveStatus').textContent = text; $('p0SaveStatus').dataset.state = state; };
-  const setSync = text => { $('p0SyncStatus').textContent = text; };
+  let syncDisplay = { state: 'idle', text: '', context: null };
+  window.getCuppingSyncStatus = () => ({ ...syncDisplay, context: syncDisplay.context ? { ...syncDisplay.context } : null });
+  const setSync = (text, state = 'idle', context = window.getCuppingTeamStatus?.().context || null) => {
+    $('p0SyncStatus').textContent = text;
+    syncDisplay = { text, state, context };
+    window.dispatchEvent(new CustomEvent('cupping:sync-status', { detail: window.getCuppingSyncStatus() }));
+  };
   const historyChanged = (reason = 'records') => window.dispatchEvent(new CustomEvent('cupping:history-changed', { detail: { reason } }));
   function downloadLink(id, text, raw, filename) {
     const a = $(id);
@@ -169,12 +175,13 @@ function installP0Production() {
   function startSync(nextSamples) {
     if (user() !== loadedUser) return;
     const token = ++syncRequest; syncInFlight = true;
+    const displayContext = window.getCuppingTeamStatus?.().context || null;
     if (typeof window.syncSamplesToTeam !== 'function') { syncInFlight = false; setSync('팀 동기화 모듈 준비 전 · 이 기기 저장과 별개입니다'); return; }
-    setSync('팀 동기화 결과 확인 중…');
+    setSync('팀 동기화 결과 확인 중…', 'saving', displayContext);
     Promise.resolve(window.syncSamplesToTeam(M.clone(nextSamples))).then(result => {
       if (token !== syncRequest) return; syncInFlight = false;
-      setSync(result?.status === 'saved' ? '현재 세션 샘플의 서버 저장 완료' : result?.status === 'failed' ? '팀 동기화 실패 · 이 기기 저장은 유지됩니다. 연결 후 저장을 다시 시도하세요' : '팀 동기화 대상 없음 · 로그인과 팀 선택 상태를 확인하세요');
-    }).catch(() => { if (token === syncRequest) { syncInFlight = false; setSync('팀 동기화 실패 · 이 기기 저장은 유지됩니다'); } });
+      setSync(result?.status === 'saved' ? '현재 세션 샘플의 서버 저장 완료' : result?.status === 'failed' ? '팀 동기화 실패 · 이 기기 저장은 유지됩니다. 연결 후 저장을 다시 시도하세요' : '팀 동기화 대상 없음 · 로그인과 팀 선택 상태를 확인하세요', result?.status === 'saved' ? 'saved' : result?.status === 'failed' ? 'failed' : 'idle', displayContext);
+    }).catch(() => { if (token === syncRequest) { syncInFlight = false; setSync('팀 동기화 실패 · 이 기기 저장은 유지됩니다', 'failed', displayContext); } });
   }
   function commit(next, sessionId, sampleId, meta, sync = true) {
     checkedBackup(next, sessionId, sampleId);
@@ -250,7 +257,7 @@ function installP0Production() {
       setStatus('기존 저장 자료를 읽지 못해 덮어쓰기를 막았습니다: ' + e.message, 'error');
       try { const old = originalBytes(); downloadLink('p0MigrationLink', '읽지 못한 저장 원문 보관', JSON.stringify(old, null, 2), 'unreadable-local-original.json'); const raw = old.sessions || old.samples; if (raw !== null) setRecoveryRaw(raw); } catch (_) {}
     }
-    setSync('서버 저장 여부는 별도로 확인합니다'); renderState(); restoreSavedDraft();
+    setSync('현재 계정과 팀의 저장 결과는 헤더 아래 상태에서 확인합니다'); renderState(); restoreSavedDraft();
   };
   loadSample = function(id) {
     if (previewActive) { $('courseImportStatus').textContent = '복구 미리보기를 적용 또는 취소한 뒤 샘플을 선택하세요'; return; }
@@ -401,15 +408,15 @@ function installP0Production() {
   }
   function receiveTeamSamples(incoming) {
     if (loadedUser !== user()) accountChanged();
-    if (loadedUser !== user() || dirty || previewActive || locked || syncInFlight || draftPending) { setSync('팀의 새 자료가 있습니다. 미저장 입력 또는 진행 중인 서버 저장을 보호하기 위해 자동 교체하지 않았습니다'); return false; }
+    if (loadedUser !== user() || dirty || previewActive || locked || syncInFlight || draftPending) { setSync('팀의 새 자료가 있습니다. 미저장 입력 또는 진행 중인 서버 저장을 보호하기 위해 자동 교체하지 않았습니다', 'blocked'); return false; }
     try {
       const parsed = parseBackup(JSON.stringify(incoming)), next = M.clone(sessions);
       next.find(s => s.id === currentSessionId).samples = parsed.next[0].samples;
       const chosen = parsed.next[0].samples.some(s => s.id === currentSampleId) ? currentSampleId : parsed.next[0].samples[0].id;
       if (JSON.stringify(samples) === JSON.stringify(parsed.next[0].samples)) return true;
       commit(next, currentSessionId, chosen, { history, lastImportRaw, previousBackup }, false);
-      sessions = next; currentSampleId = chosen; renderState(); setStatus('팀에서 받은 샘플을 이 기기에 저장했습니다', 'saved'); setSync('팀 자료 수신 완료 · 서버에 재전송하지 않았습니다'); return true;
-    } catch (e) { saveError(e); setSync('팀 자료 검증 또는 로컬 저장 실패 · 현재 자료를 유지합니다'); return false; }
+      sessions = next; currentSampleId = chosen; renderState(); setStatus('팀에서 받은 샘플을 이 기기에 저장했습니다', 'saved'); setSync('팀 자료 수신 완료 · 서버에 재전송하지 않았습니다', 'received'); return true;
+    } catch (e) { saveError(e); setSync('팀 자료 검증 또는 로컬 저장 실패 · 현재 자료를 유지합니다', 'failed'); return false; }
   }
   function undoSamples(incoming, selected) {
     const parsed = parseBackup(JSON.stringify(incoming)), next = M.clone(sessions);
