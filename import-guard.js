@@ -34,6 +34,7 @@
  function parse(raw){
   if(typeof raw!=='string'||new TextEncoder().encode(raw).length>MAX_BYTES)throw Error('파일은 1MB 이하여야 합니다');
   let data;try{data=JSON.parse(raw);}catch{throw Error('JSON 문법이 올바르지 않습니다');}
+  if(plain(data)&&data.format==='noel-cupping-report')throw Error('리포트 JSON은 복구용 백업이 아닙니다. 전체 또는 선택 세션 복구용 JSON 백업을 선택하세요.');
   let selection=null;if(plain(data)&&data.format==='noel-cupping-review-backup'){if(data.version!==1||!plain(data.state))throw Error('지원하지 않는 백업 버전입니다');selection={currentSessionId:data.state.currentSessionId,currentSampleId:data.state.currentSampleId};data=data.state.sessions;}
   checkTree(data);if(!Array.isArray(data)||!data.length)throw Error('세션 또는 샘플의 비어 있지 않은 배열을 선택하세요');
   const sessionForm=plain(data[0])&&Object.hasOwn(data[0],'samples'),sampleIds=new Set(),sessionIds=new Set();let count=0;

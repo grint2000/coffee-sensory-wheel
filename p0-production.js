@@ -450,6 +450,12 @@ function installP0Production() {
     if (historyScopes.has(loadedUser) && !draftScope()) throw Error('로그인 계정을 확인한 뒤 이력을 조회하세요.');
     return M.clone({ sessions, currentSessionId, currentSampleId, loadedUser, accountScope: draftScope(), dirty });
   }
+  function reportSnapshot() {
+    historySnapshot();
+    flushDraft(); window.AssessmentContextUI?.assertValid(); window.AssessmentContextUI?.applySession();
+    clearTimeout(sampleSaveTimeout);
+    return historySnapshot();
+  }
   function openHistoricalRecord(target) {
     const snapshot = historySnapshot();
     if (target.loadedUser !== snapshot.loadedUser || target.accountScope !== snapshot.accountScope) throw Error('계정이 바뀌었습니다. 이력을 다시 검색하세요.');
@@ -468,5 +474,5 @@ function installP0Production() {
     if (currentSampleId !== target.sampleId) throw Error('샘플을 이동하지 못했습니다. 현재 입력을 확인하세요.');
     return true;
   }
-  window.P0Production = { bindImport, exportAll, preview, parseBackup, accountChanged, receiveTeamSamples, undoSamples, prepareTeamTransition, currentDraft, replaceCurrentData, appendEvaluation, historySnapshot, openHistoricalRecord, resumeDraftFocus, persistCurrentDraft:persistDraft, saveExplicit: () => saveCurrentSample(true, true), getState: () => M.clone({ sessions, currentSessionId, currentSampleId, loadedUser, locked, dirty, history, lastImportRaw, previousBackup }) };
+  window.P0Production = { bindImport, exportAll, preview, parseBackup, accountChanged, receiveTeamSamples, undoSamples, prepareTeamTransition, currentDraft, replaceCurrentData, appendEvaluation, historySnapshot, reportSnapshot, openHistoricalRecord, resumeDraftFocus, persistCurrentDraft:persistDraft, saveExplicit: () => saveCurrentSample(true, true), getState: () => M.clone({ sessions, currentSessionId, currentSampleId, loadedUser, locked, dirty, history, lastImportRaw, previousBackup }) };
 }

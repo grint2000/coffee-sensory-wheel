@@ -8,7 +8,11 @@
 
   const normalize = value => String(value ?? '').normalize('NFC').trim().toLocaleLowerCase('en');
   const present = value => typeof value === 'string' && value.trim() !== '';
-  const same = (a, b) => JSON.stringify(a) === JSON.stringify(b);
+  const same = (a, b) => {
+    if(a===b)return true;
+    if(!a||!b||typeof a!=='object'||typeof b!=='object'||Array.isArray(a)!==Array.isArray(b))return false;
+    const keys=Object.keys(a);return keys.length===Object.keys(b).length&&keys.every(key=>Object.hasOwn(b,key)&&same(a[key],b[key]));
+  };
   const CONDITION_KEYS = ['waterTemp', 'grindSize', 'water_info', 'grinder', 'ratio', 'time', 'roastDate', 'roastLevel'];
   const CONTEXT_KEYS = ['coffeeName', 'origin', 'variety', 'farmName', 'harvestYear', 'process', 'lotNumber', 'supplierName'];
   const SOURCE_KINDS = ['observed', 'supplier', 'my-note', 'team-aggregate', 'unknown'];

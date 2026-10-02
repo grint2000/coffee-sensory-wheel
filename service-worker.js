@@ -1,5 +1,5 @@
-const APP_CACHE = 'noel-sca-app-v13-history-compare';
-const RUNTIME_CACHE = 'noel-sca-runtime-v13-history-compare';
+const APP_CACHE = 'noel-sca-app-v14-report-profiles';
+const RUNTIME_CACHE = 'noel-sca-runtime-v14-report-profiles';
 
 const APP_SHELL_FILES = [
   './',
@@ -22,6 +22,9 @@ const APP_SHELL_FILES = [
   './compare-search-model.js',
   './history-tools.js',
   './history-tools.css',
+  './report-profiles-model.js',
+  './report-profiles.js',
+  './report-profiles.css',
   './extras.js',
   './theme.js',
   './team.js',
