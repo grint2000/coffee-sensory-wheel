@@ -3,16 +3,20 @@
  const M=typeof P0Model!=='undefined'?P0Model:require('./p0-model.js');
  const R=typeof RecordModel!=='undefined'?RecordModel:require('./record-model.js');
  const A=typeof AssessmentContextModel!=='undefined'?AssessmentContextModel:require('./assessment-context-model.js');
+ const AR=typeof ArchiveReference!=='undefined'?ArchiveReference:require('./archive-reference.js');
  const MAX_BYTES=1048576,MAX_SESSIONS=50,MAX_SAMPLES=500;
  const SCORES=['scoreFragranceAroma','scoreFlavor','scoreAftertaste','scoreAcidity','scoreBody','scoreBalance','scoreOverall'];
  const plain=x=>x&&typeof x==='object'&&!Array.isArray(x);
- function checkTree(value,depth=0){
+ function checkTree(value,depth=0,parentKey=''){
   if(depth>8)throw Error('데이터 중첩이 너무 깊습니다');
   if(typeof value==='string'&&value.length>5000)throw Error('문자열은 5000자 이하여야 합니다');
   if(typeof value==='number'&&!Number.isFinite(value))throw Error('유한한 숫자만 허용합니다');
   if(value&&typeof value==='object'){
    if(Array.isArray(value)&&value.length>500)throw Error('배열 항목이 너무 많습니다');
-   for(const [key,v] of Object.entries(value)){if(['__proto__','constructor','prototype','toString','valueOf','toJSON'].includes(key)||key.length>80)throw Error('허용하지 않는 속성 이름입니다');checkTree(v,depth+1);}
+   for(const [key,v] of Object.entries(value)){if(['__proto__','constructor','prototype','toString','valueOf','toJSON'].includes(key)||key.length>80)throw Error('허용하지 않는 속성 이름입니다');
+    if(parentKey==='sampleData'&&key==='archive_reference'){AR.validateSnapshot(v);continue;}
+    if(parentKey==='sampleData'&&key==='archive_reference_history'){AR.validateRecord({archive_reference_history:v});continue;}
+    checkTree(v,depth+1,key);}
   }
  }
  function id(value,label){if(typeof value!=='string'||!/^[A-Za-z0-9_-]{1,100}$/.test(value))throw Error(label+' ID 형식이 올바르지 않습니다');return value;}
@@ -27,6 +31,7 @@
   R.validate(x.sampleData.record_identity);
   A.validateAssessment(x.sampleData.assessment_context);
   A.validateBrewing(x.sampleData.brewing_context);
+  AR.validateRecord(x.sampleData);
   for(const key of SCORES)if(x.sampleData[key]!==undefined&&x.sampleData[key]!==null){const v=x.sampleData[key];if(!M.valid(v)&&!M.preservedScore(x.sampleData,key))throw Error('새 평가 점수는 6~10 사이의 0.25 단위이며, 기존 0~10 원점수는 미확인 상태로만 보존합니다');}
   if(x.sampleData.flavorSelections!==undefined){if(!plain(x.sampleData.flavorSelections))throw Error('flavorSelections는 객체여야 합니다');for(const a of Object.values(x.sampleData.flavorSelections))if(!Array.isArray(a)||a.length>200||a.some(v=>typeof v!=='string'))throw Error('향미 선택은 문자열 배열이어야 합니다');}
   if(x.sampleData.bodyDescriptors!==undefined&&(!Array.isArray(x.sampleData.bodyDescriptors)||x.sampleData.bodyDescriptors.some(v=>typeof v!=='string')))throw Error('bodyDescriptors는 문자열 배열이어야 합니다');

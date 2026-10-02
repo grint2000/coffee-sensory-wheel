@@ -779,6 +779,7 @@
 <link rel="stylesheet" href="assessment-context.css">
 <link rel="stylesheet" href="history-tools.css">
 <link rel="stylesheet" href="report-profiles.css">
+<link rel="stylesheet" href="archive-reference.css">
 <link rel="stylesheet" href="storage-status.css">
 </head>
 <body class="min-h-screen bg-[#fcfaf7]">
@@ -1460,6 +1461,7 @@
 <script src="p0-model.js"></script>
 <script src="record-model.js"></script>
 <script src="assessment-context-model.js"></script>
+<script src="archive-reference.js"></script>
 <script src="import-guard.js"></script>
 <script src="backup-merge.js"></script>
 <script src="draft-store.js"></script>
@@ -1472,6 +1474,7 @@
 <script src="history-tools.js"></script>
 <script src="report-profiles-model.js"></script>
 <script src="report-profiles.js"></script>
+<script src="archive-reference-ui.js"></script>
 <script src="flavor-evidence.js"></script>
 <script>
 /* === 1단계: 기본 데이터 구조 및 상수 정의 === */
@@ -5365,6 +5368,7 @@ function runInit() {
   setupAutoBackup();
   optimizePerformance();
   installHistoryTools();
+  installArchiveReference();
   installQuickEntry({getAccountId:()=>window.getCuppingAccountId?.()||null});
   installStorageStatus();
   P0Production.resumeDraftFocus();

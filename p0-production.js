@@ -15,6 +15,7 @@ function installP0Production() {
   let lastImportRaw = null, previousBackup = null, syncRequest = 0, syncInFlight = false;
   let recoveryText = null, recoveryOffset = 0, displayedTitle = null, displayingStoredScores = false;
   let draftBaseCache = null, draftPending = null, draftRestoreAttempt = null, draftOwnedScope = null, restoredDraftFocus = null;
+  let archivePending = null, archiveRequest = 0;
   const historyScopes = new Map(), historyBlockedUsers = new Set();
   const user = () => window.currentUser || 'default';
   const keys = name => ({ sessions: `noel_sca_sessions_${name}`, samples: `noel_sca_samples2_${name}`, selected: `noel_sca_current_sample_${name}`, meta: `noel_sca_p0_meta_${name}`, original: `noel_sca_pre_p0_${name}` });
@@ -463,6 +464,32 @@ function installP0Production() {
     clearTimeout(sampleSaveTimeout);
     return historySnapshot();
   }
+  function prepareArchiveReference(reference) {
+    archivePending = null; const token = ++archiveRequest;
+    historySnapshot(); currentDraft(); clearTimeout(sampleSaveTimeout);
+    const ref = M.clone(reference), current = getCurrentSampleObj();
+    const data = ArchiveReference.apply(current.sampleData, ref, { acknowledgedFarmId: ref.farm.id, acknowledgedLotId: ref.selected_lot?.id || null });
+    const next = M.clone(sessions); next.find(s => s.id === currentSessionId).samples.find(s => s.id === currentSampleId).sampleData = data;
+    checkedBackup(next, currentSessionId, currentSampleId);
+    const before = checkedBackup();
+    archivePending = { token, reference: ref, user: loadedUser, scope: draftScope(), editVersion, form: archiveFormStamp(), state: JSON.stringify({ sessions, currentSessionId, currentSampleId }), storage: storageStamp() };
+    return { token, reference: M.clone(ref), previousCount: (data.archive_reference_history || []).length, before, sampleTitle: current.title || '샘플' };
+  }
+  function cancelArchiveReference() { archivePending = null; archiveRequest++; }
+  function archiveFormStamp() { return JSON.stringify(Array.from(document.querySelectorAll('input,textarea,select')).filter(e => e.id && e.id !== 'importSamplesInput' && !e.closest('#flavorWheelMultiSelectArea')).map(e => [e.id,e.value,e.checked])); }
+  function applyArchiveReference(token) {
+    historySnapshot(); const pendingReference = archivePending;
+    if (!pendingReference || pendingReference.token !== token || pendingReference.user !== loadedUser || pendingReference.user !== user() || pendingReference.scope !== draftScope() || pendingReference.editVersion !== editVersion || pendingReference.form !== archiveFormStamp() || pendingReference.state !== JSON.stringify({sessions,currentSessionId,currentSampleId}) || pendingReference.storage !== storageStamp()) throw Error('참조 미리보기 후 계정·입력·선택·저장값이 바뀌었습니다. 다시 미리보세요.');
+    if (syncInFlight) throw Error('현재 저장·동기화가 끝난 뒤 다시 미리보세요.');
+    window.AssessmentContextUI?.assertValid();
+    const next = M.clone(sessions), selected = next.find(s => s.id === currentSessionId).samples.find(s => s.id === currentSampleId);
+    const ref = pendingReference.reference;
+    selected.sampleData = ArchiveReference.apply(selected.sampleData, ref, { acknowledgedFarmId: ref.farm.id, acknowledgedLotId: ref.selected_lot?.id || null });
+    selected.lastEdit = Date.now();
+    commit(next, currentSessionId, currentSampleId, { history, lastImportRaw, previousBackup });
+    sessions = next; dirty = false; cancelArchiveReference(); renderState(); setStatus('선택한 아카이브 참조와 이전 참조 이력을 이 기기에 저장했습니다', 'saved');
+    return true;
+  }
   function openHistoricalRecord(target) {
     const snapshot = historySnapshot();
     if (target.loadedUser !== snapshot.loadedUser || target.accountScope !== snapshot.accountScope) throw Error('계정이 바뀌었습니다. 이력을 다시 검색하세요.');
@@ -481,5 +508,5 @@ function installP0Production() {
     if (currentSampleId !== target.sampleId) throw Error('샘플을 이동하지 못했습니다. 현재 입력을 확인하세요.');
     return true;
   }
-  window.P0Production = { bindImport, exportAll, preview, parseBackup, accountChanged, receiveTeamSamples, undoSamples, prepareTeamTransition, currentDraft, replaceCurrentData, appendEvaluation, historySnapshot, reportSnapshot, openHistoricalRecord, resumeDraftFocus, persistCurrentDraft:persistDraft, saveExplicit: () => saveCurrentSample(true, true), getState: () => M.clone({ sessions, currentSessionId, currentSampleId, loadedUser, locked, dirty, history, lastImportRaw, previousBackup }) };
+  window.P0Production = { bindImport, exportAll, preview, parseBackup, accountChanged, receiveTeamSamples, undoSamples, prepareTeamTransition, currentDraft, replaceCurrentData, appendEvaluation, historySnapshot, reportSnapshot, prepareArchiveReference, applyArchiveReference, cancelArchiveReference, openHistoricalRecord, resumeDraftFocus, persistCurrentDraft:persistDraft, saveExplicit: () => saveCurrentSample(true, true), getState: () => M.clone({ sessions, currentSessionId, currentSampleId, loadedUser, locked, dirty, history, lastImportRaw, previousBackup }) };
 }

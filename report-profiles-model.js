@@ -23,7 +23,7 @@
      add('crop','수확연도·크롭 표기 · 원문 확인 필요',d.harvestYear);
      add('evaluation-date','개별 평가일','미기록 · 세션 날짜나 수정일로 추정하지 않음');
      add('session-date','세션 기록일 · 개별 평가일과 별개',typeof session.date==='string'&&/^\d{4}-\d{2}-\d{2}$/.test(session.date)?session.date:null);
-     add('verification','검증 출처','외부 검증 출처 미기록 · 앱 입력값이며 검증을 보증하지 않음');
+     add('verification','검증 출처',plain(d.archive_reference)&&d.archive_reference.kind==='farm-archive-reference'&&d.archive_reference.version===1?'아카이브 참조가 있으나 이 리포트에는 포함하지 않음 · 출처 진위 보증 아님':'외부 검증 출처 미기록 · 앱 입력값이며 검증을 보증하지 않음');
      if(plain(d.flavorSelections))for(const phase of adapters.phases||[]){
       const selected=d.flavorSelections[phase.id];if(!Array.isArray(selected))continue;
       selected.forEach((key,i)=>{

@@ -1,6 +1,7 @@
 /* Every report format consumes one reviewed, immutable scalar-only projection. */
 function installReportProfiles(){
  const M=CuppingReportModel,$=id=>document.getElementById(id);
+ const IMAGE_SCALE=2,MAX_IMAGE_PIXELS=8000000,MAX_IMAGE_SIDE=16384;
  let snapshot=null,candidate=null,projection=null,stamp=null,request=0,lastUrl=null;
  const node=(tag,text)=>{const e=document.createElement(tag);if(text!==undefined)e.textContent=text;return e;};
  const panel=node('section');panel.id='reportProfiles';panel.className='report-profiles';panel.hidden=true;panel.setAttribute('aria-label','출력 필드 검토');
@@ -50,17 +51,25 @@ function installReportProfiles(){
  close.addEventListener('click',()=>{invalidate();snapshot=null;stamp=null;candidate=null;choices.replaceChildren();panel.hidden=true;});
  function link(blob,p,ext){clearDownload();lastUrl=URL.createObjectURL(blob);download.href=lastUrl;download.download=M.filename(p,ext);download.textContent=ext.toUpperCase()+' 파일 받기 · 실제 수신 여부를 확인하세요';download.hidden=false;}
  download.addEventListener('click',event=>{try{current();if(!projection)throw Error('미리보기를 다시 확정하세요.');}catch(e){event.preventDefault();invalidate(e.message);}});
+ function checkImageSize(element){
+  const box=element.getBoundingClientRect(),width=Math.ceil(Math.max(box.width,element.scrollWidth,element.offsetWidth)),height=Math.ceil(Math.max(box.height,element.scrollHeight,element.offsetHeight));
+  const pixelsWide=Math.ceil(width*IMAGE_SCALE),pixelsHigh=Math.ceil(height*IMAGE_SCALE);
+  if(!Number.isFinite(pixelsWide)||!Number.isFinite(pixelsHigh)||pixelsWide<=0||pixelsHigh<=0||pixelsWide>MAX_IMAGE_SIDE||pixelsHigh>MAX_IMAGE_SIDE||pixelsWide*pixelsHigh>MAX_IMAGE_PIXELS){
+   const error=Error('이미지 크기 한도(총 800만 픽셀, 각 변 16,384px)를 확인하세요. 범위를 줄이거나 Excel/JSON을 사용하세요. 자동 자르기·축소는 하지 않았습니다.');error.code='report-image-size';throw error;
+  }
+ }
  async function exportReport(format){let capture=null,ticket=null,expected=null;try{
   current();if(!projection)throw Error('필드를 선택하고 미리보기를 먼저 확정하세요.');const p=projection;expected=p;ticket=++request;
   if(format==='json'){link(new Blob([JSON.stringify(p,null,2)],{type:'application/json;charset=utf-8'}),p,'json');status.textContent='리포트 JSON을 생성했습니다. 복구용 백업이 아닙니다. 파일 받기를 눌러 실제 수신을 확인하세요.';return p;}
   if(format==='excel'){if(!window.XLSX?.writeFile)throw Error('Excel 모듈을 불러오지 못했습니다. 연결을 확인하고 다시 시도하세요.');const wb=M.workbook(p);current();XLSX.writeFile(wb,M.filename(p,'xlsx'));status.textContent='Excel 다운로드를 요청했습니다. 실제 수신·Excel 앱 표시는 확인되지 않았습니다.';return wb;}
   if(format!=='image'||typeof html2canvas!=='function')throw Error('이미지 모듈을 불러오지 못했습니다. 연결을 확인하고 다시 시도하세요.');
   const captureId='reportCapture_'+ticket;capture=node('div');capture.id=captureId;capture.className='report-capture';render(capture,p);document.body.append(capture);
-  const canvas=await html2canvas(capture,{backgroundColor:'#ffffff',scale:2,logging:false,useCORS:false,onclone:doc=>{const only=doc.getElementById(captureId);if(!only)throw Error('리포트 화면을 복사하지 못했습니다.');doc.body.replaceChildren(only);}});
+  checkImageSize(capture);
+  const canvas=await html2canvas(capture,{backgroundColor:'#ffffff',scale:IMAGE_SCALE,logging:false,useCORS:false,onclone:doc=>{const only=doc.getElementById(captureId);if(!only)throw Error('리포트 화면을 복사하지 못했습니다.');doc.body.replaceChildren(only);checkImageSize(only);}});
   current();if(ticket!==request||p!==projection)throw Error('이미지 생성 중 미리보기가 바뀌었습니다. 최신 내용을 다시 검토하세요.');
   const png=canvas.toDataURL('image/png');if(!/^data:image\/png;base64,.+/.test(png))throw Error('브라우저가 유효한 PNG를 만들지 못했습니다. 범위를 줄여 다시 검토하세요.');
   clearDownload();download.href=png;download.download=M.filename(p,'png');download.textContent='PNG 파일 받기 · 실제 수신 여부를 확인하세요';download.hidden=false;status.textContent='미리본 이미지가 생성되었습니다. 파일 받기를 눌러 실제 수신을 확인하세요.';return p;
- }catch(e){if(ticket===null||(ticket===request&&expected===projection))invalidate(e.message);return null;}finally{capture?.remove();}}
+ }catch(e){if(ticket===null||(ticket===request&&expected===projection)){if(e.code==='report-image-size'){try{current();clearDownload();status.textContent=e.message;}catch(stale){invalidate(stale.message);}}else invalidate(e.message);}return null;}finally{capture?.remove();}}
  for(const event of ['input','change'])document.addEventListener(event,e=>{if(snapshot&&!panel.contains(e.target)&&e.target.id!=='importSamplesInput')invalidate('입력이 바뀌었습니다. 출력 창을 다시 열어 최신 값을 검토하세요.');},true);
  window.addEventListener('storage',event=>{if(snapshot&&(event.key===null||['noel_sca_sessions_','noel_sca_samples2_','noel_sca_current_sample_'].some(prefix=>event.key===prefix+snapshot.loadedUser)))invalidate('저장본이 바뀌었습니다. 출력 창을 다시 열어 최신 값을 검토하세요.');});
  window.addEventListener('cupping:auth-ready',()=>{if(snapshot)try{current();}catch(e){invalidate(e.message);}});

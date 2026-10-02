@@ -1,5 +1,5 @@
-const APP_CACHE = 'noel-sca-app-v15-status-design';
-const RUNTIME_CACHE = 'noel-sca-runtime-v15-status-design';
+const APP_CACHE = 'noel-sca-app-v16-archive-reference';
+const RUNTIME_CACHE = 'noel-sca-runtime-v16-archive-reference';
 
 const APP_SHELL_FILES = [
   './',
@@ -18,6 +18,9 @@ const APP_SHELL_FILES = [
   './quick-entry.css',
   './storage-status.js',
   './storage-status.css',
+  './archive-reference.js',
+  './archive-reference-ui.js',
+  './archive-reference.css',
   './import-guard.js',
   './backup-merge.js',
   './p0-production.js',
