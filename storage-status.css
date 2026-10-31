@@ -57,4 +57,5 @@ body.dark .report-profiles * { color:#f3f4f6!important; }
 body.dark .report-profiles button, body.dark .report-profiles select { background:#333b45!important; border-color:#9ca7b5!important; }
 body.dark .report-profiles fieldset { border-color:#697079!important; }
 body.dark .report-profiles a { color:#f4d4a2!important; }
-#reportPreview, #reportPreview *, .report-capture, .report-capture *, body.dark #reportPreview, body.dark #reportPreview *, body.dark .report-capture, body.dark .report-capture * { background-color:#fff!important; color:#28231d!important; }
+/* Keep the report surface light; each card owns its text and badge colors. */
+#reportPreview, .report-capture, body.dark #reportPreview, body.dark .report-capture { background-color:#fff!important; color:#28231d!important; }

@@ -33,15 +33,39 @@ function installReportProfiles(){
  function invalidate(message){request++;projection=null;preview.replaceChildren();for(const b of Object.values(outputs))b.disabled=true;clearDownload();if(message)status.textContent=message;}
  function current(){if(!snapshot||!stamp||stamp!==sourceStamp())throw Error('미리보기 후 입력·계정·선택이 바뀌었습니다. 출력 창을 다시 열어 최신 값을 검토하세요.');}
  function renderCandidates(){
-  invalidate();try{current();candidate=M.candidates(snapshot,scope.value,profile.value,{internalRows:buildSessionExcelRows,phases:FLAVOR_PHASES,flavors:FLAVOR_DATA});choices.replaceChildren();
+  invalidate();try{current();candidate=M.candidates(snapshot,scope.value,profile.value,{internalRows:buildSessionExcelRows,phases:FLAVOR_PHASES,flavors:FLAVOR_DATA,attributes:ATTR_TO_BADGE,intensities:ATTR_VALUE_LABELS,bodyDescriptors:BODY_DESCRIPTORS});choices.replaceChildren();
    for(const record of candidate.records){const group=node('fieldset'),legend=node('legend',`기록 ${record.number}`);group.append(legend);
     for(const field of record.fields){const label=node('label'),check=node('input');check.type='checkbox';check.value=field.key;check.checked=profile.value==='internal';check.addEventListener('change',()=>invalidate('필드 선택이 바뀌었습니다. 미리보기를 다시 확정하세요.'));label.append(check,node('span',field.label+' : '+field.value));group.append(label);}choices.append(group);
    }
    status.textContent=profile.value==='customer'?'값을 읽고 공개할 필드만 선택한 뒤 미리보기를 확정하세요.':'내부용에는 평가자·기존 메모·개인 판단 등 비공개 정보가 포함될 수 있습니다. 필요 없는 필드를 해제한 뒤 확정하세요.';
   }catch(e){candidate=null;choices.replaceChildren();status.textContent=e.message;}
  }
- function render(target,p){target.replaceChildren();target.append(node('h2',p.title),node('p','출력 시점: '+p.createdAt));
-  for(const record of p.records){const section=node('section');section.append(node('h3',`기록 ${record.number}`));const list=node('dl');for(const field of record.fields){list.append(node('dt',field.label),node('dd',String(field.value)));}section.append(list);target.append(section);}
+ // Both preview and capture use only the frozen, reviewed projection.
+ function render(target,p){target.replaceChildren();
+  const styled=(tag,className,text)=>{const e=node(tag,text);e.className=className;return e;};
+  function badge(value,color,ink){const e=styled('span','sns-badge',value);const safe=/^#[0-9a-f]{6}$/i.test(color)?color:'#B8B2A5';e.style.backgroundColor=safe;e.style.setProperty('--sns-ink',ink||getContrastColor(safe));return e;}
+  for(const record of p.records){
+   const card=styled('article','sns-report'),header=styled('header','sns-header');
+   const name=record.fields.find(f=>f.kind==='name');header.append(styled('h2','sns-title',name?name.value:p.title));
+   const coffee=styled('div','sns-coffee'),details=record.fields.filter(f=>f.kind==='coffee');
+   const roast=details.filter(f=>['로스팅 날짜','로스팅 정도','로스팅 레벨'].includes(f.label));
+   for(const field of details.filter(f=>!roast.includes(f)))coffee.append(node('div',field.label+': '+field.value));
+   if(roast.length)coffee.append(node('div','로스팅: '+roast.map(f=>f.value).join(' / ')));header.append(coffee);card.append(header);
+   const content=styled('section','sns-profile');content.append(styled('h3','sns-profile-title','향미 프로필'));
+   const groups=new Map();for(const field of record.fields.filter(f=>['flavor','flavor-list'].includes(f.kind))){if(!groups.has(field.group))groups.set(field.group,[]);groups.get(field.group).push(field);}
+   function group(label){const section=styled('section','sns-group');section.append(styled('h4','sns-group-title',label));const badges=styled('div','sns-badges');section.append(badges);content.append(section);return badges;}
+   for(const[label,fields]of groups){const badges=group(label);for(const field of fields){
+    if(field.kind==='flavor')badges.append(badge(field.value,field.color));
+    else for(const value of field.value.split(', ')){const match=FLAVOR_DATA.find(f=>f[6]===value||f[2]===value);badges.append(badge(value,match?.[3]));}
+   }}
+   const attributes=record.fields.filter(f=>f.kind==='attribute');if(attributes.length){const badges=group('맛 속성');badges.parentElement.classList.add('sns-divided');for(const field of attributes)badges.append(badge(field.label+': '+field.value,field.color,'#FFFFFF'));}
+   const body=record.fields.filter(f=>['body','body-list'].includes(f.kind));if(body.length){const badges=group('바디감');badges.parentElement.classList.add('sns-divided');for(const field of body){
+    if(field.kind==='body')badges.append(badge(field.value,field.color));
+    else for(const value of field.value.split(', ')){const match=BODY_DESCRIPTORS.find(b=>b.korean===value||b.label===value);badges.append(badge(value,match?.color));}
+   }}
+   const extra=record.fields.filter(f=>!f.kind);if(extra.length){const section=styled('section','sns-extra sns-divided');section.append(styled('h4','sns-group-title','추가 정보'));const list=node('dl');for(const field of extra)list.append(node('dt',field.label),node('dd',field.value));section.append(list);content.append(section);}
+   content.append(styled('footer','sns-footer','출력일: '+new Date(p.createdAt).toLocaleDateString('ko-KR')+' | Noel Coffee Cupping'));card.append(content);target.append(card);
+  }
  }
  function open(requestedScope='sample',format='image'){
   invalidate();try{snapshot=P0Production.reportSnapshot();stamp=sourceStamp();profile.value='customer';scope.value=requestedScope;panel.hidden=false;renderCandidates();status.textContent+=' '+({image:'이미지',excel:'Excel',json:'리포트 JSON'}[format]||'출력')+'도 이 미리보기를 사용합니다.';panel.scrollIntoView({block:'start'});return true;}catch(e){snapshot=null;stamp=null;panel.hidden=false;choices.replaceChildren();status.textContent=e.message;return false;}
@@ -64,6 +88,8 @@ function installReportProfiles(){
   if(format==='excel'){if(!window.XLSX?.writeFile)throw Error('Excel 모듈을 불러오지 못했습니다. 연결을 확인하고 다시 시도하세요.');const wb=M.workbook(p);current();XLSX.writeFile(wb,M.filename(p,'xlsx'));status.textContent='Excel 다운로드를 요청했습니다. 실제 수신·Excel 앱 표시는 확인되지 않았습니다.';return wb;}
   if(format!=='image'||typeof html2canvas!=='function')throw Error('이미지 모듈을 불러오지 못했습니다. 연결을 확인하고 다시 시도하세요.');
   const captureId='reportCapture_'+ticket;capture=node('div');capture.id=captureId;capture.className='report-capture';render(capture,p);document.body.append(capture);
+  await document.fonts.ready;
+  current();if(ticket!==request||p!==projection)throw Error('이미지 생성 중 미리보기가 바뀌었습니다. 최신 내용을 다시 검토하세요.');
   checkImageSize(capture);
   const canvas=await html2canvas(capture,{backgroundColor:'#ffffff',scale:IMAGE_SCALE,logging:false,useCORS:false,onclone:doc=>{const only=doc.getElementById(captureId);if(!only)throw Error('리포트 화면을 복사하지 못했습니다.');doc.body.replaceChildren(only);checkImageSize(only);}});
   current();if(ticket!==request||p!==projection)throw Error('이미지 생성 중 미리보기가 바뀌었습니다. 최신 내용을 다시 검토하세요.');

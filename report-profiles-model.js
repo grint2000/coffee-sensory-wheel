@@ -16,9 +16,10 @@
    session.samples.forEach((sample,index)=>{
     if(scope==='sample'&&sample.id!==snapshot.currentSampleId)return;
     const number=++sequence,fields=[],d=sample.sampleData;
-    const add=(key,label,value)=>{const v=profile==='internal'&&typeof value==='boolean'?String(value):text(value);if(v!==null&&v!=='')fields.push({key:`${number}.${key}`,label,value:v});};
+    const add=(key,label,value,presentation={})=>{const v=profile==='internal'&&typeof value==='boolean'?String(value):text(value);if(v!==null&&v!=='')fields.push({key:`${number}.${key}`,label,value:v,...presentation});};
     if(profile==='customer'){
-     add('name','커피명 · 원문 확인 필요',d.coffeeName);
+     add('name','커피명 · 원문 확인 필요',d.coffeeName,{kind:'name'});
+     for(const[key,label]of [['origin','원산지'],['process','가공법'],['roastDate','로스팅 날짜'],['roastLevel','로스팅 정도']])add(key,label,d[key],{kind:'coffee'});
      add('lot','로트 표기 · 원문 확인 필요',d.lotNumber);
      add('crop','수확연도·크롭 표기 · 원문 확인 필요',d.harvestYear);
      add('evaluation-date','개별 평가일','미기록 · 세션 날짜나 수정일로 추정하지 않음');
@@ -29,13 +30,25 @@
       selected.forEach((key,i)=>{
        if(typeof key!=='string')return;
        const match=(adapters.flavors||[]).find(f=>`${f[0]}|${f[1]}|${f[2]}`===key);
-       add(`flavor-${phase.id}-${i}`,`${phase.label} · ${match?'기록자가 선택한 향미':'미확인 자유 향미 · 원문 확인 필요'}`,match?match[6]||match[2]:key);
+       add(`flavor-${phase.id}-${i}`,`${phase.label} · ${match?'기록자가 선택한 향미':'미확인 자유 향미 · 원문 확인 필요'}`,match?match[6]||match[2]:key,{kind:'flavor',group:phase.label,color:match?match[3]:'#B8B2A5'});
       });
      }
+     for(const[key,meta]of Object.entries(adapters.attributes||{})){
+      const value=d[key];add(key,meta.label,adapters.intensities?.[value]?.kr||value,{kind:'attribute',color:meta.color});
+     }
+     if(Array.isArray(d.bodyDescriptors))d.bodyDescriptors.forEach((id,i)=>{
+      if(typeof id!=='string')return;
+      const descriptor=(adapters.bodyDescriptors||[]).find(b=>b.id===id);
+      add(`body-${i}`,'바디감 · '+(descriptor?'기록자가 선택한 질감':'미확인 원문 확인 필요'),descriptor?descriptor.korean:id,{kind:'body',color:descriptor?descriptor.color:'#B8B2A5'});
+     });
     }else{
      for(let i=0;i<excel[0].length;i+=2)if(excel[0][i])add(`session-${i}`,`세션 · ${cell(excel[0][i])}`,excel[0][i+1]);
      const headers=excel[2]||[],row=excel[index+3]||[];
-     headers.forEach((label,i)=>add(`internal-${i}`,cell(label),row[i]));
+     headers.forEach((label,i)=>{
+      const phase=(adapters.phases||[]).find(p=>p.label===label),attribute=Object.values(adapters.attributes||{}).find(a=>a.label===label||(label==='바디'&&a.label==='바디감'));
+      const presentation=label==='커피명'?{kind:'name'}:['원산지','가공방식','로스팅 날짜','로스팅 레벨'].includes(label)?{kind:'coffee'}:phase?{kind:'flavor-list',group:phase.label}:attribute?{kind:'attribute',color:attribute.color}:label==='바디 디스크립터'?{kind:'body-list'}:{};
+      add(`internal-${i}`,cell(label),row[i],presentation);
+     });
     }
     records.push({number,fields});
    });
@@ -44,7 +57,7 @@
  }
  function project(candidates,selected,createdAt=new Date().toISOString()){
   if(!Array.isArray(selected))throw Error('출력할 필드를 직접 선택하세요.');
-  const keys=new Set(selected),records=candidates.records.map(record=>({number:record.number,fields:record.fields.filter(field=>keys.has(field.key)).map(({label,value})=>({label,value}))})).filter(record=>record.fields.length);
+  const keys=new Set(selected),records=candidates.records.map(record=>({number:record.number,fields:record.fields.filter(field=>keys.has(field.key)).map(({key,...field})=>({...field}))})).filter(record=>record.fields.length);
   if(!records.length)throw Error('실제 값을 확인한 뒤 출력할 필드를 하나 이상 선택하세요.');
   return freeze({format:FORMAT,version:VERSION,profile:candidates.profile,scope:candidates.scope,createdAt,title:candidates.profile==='customer'?'고객용 커핑 리포트':'내부용 커핑 기록',notice:'선택 필드 리포트 · 복구용 JSON 백업 아님 · 외부 자동 전송 없음',records});
  }

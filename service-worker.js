@@ -1,5 +1,5 @@
-const APP_CACHE = 'noel-sca-app-v17-preference-search';
-const RUNTIME_CACHE = 'noel-sca-runtime-v17-preference-search';
+const APP_CACHE = 'noel-sca-app-v18-sns-cards';
+const RUNTIME_CACHE = 'noel-sca-runtime-v18-sns-cards';
 
 const APP_SHELL_FILES = [
   './',

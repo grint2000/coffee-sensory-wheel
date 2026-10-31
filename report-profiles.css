@@ -10,16 +10,30 @@
 #reportFieldChoices fieldset { padding:.6rem; margin:.6rem 0; border:1px solid #a99c89; min-width:0; }
 #reportFieldChoices label { display:flex; align-items:flex-start; gap:.55rem; padding:.35rem 0; overflow-wrap:anywhere; white-space:pre-wrap; }
 #reportFieldChoices input { flex:0 0 auto; margin-top:.35rem; }
-#reportPreview,.report-capture { background:white; color:#28231d; padding:1rem; overflow-wrap:anywhere; }
+#reportPreview,.report-capture { background:white; color:#28231d; overflow-wrap:anywhere; }
+#reportPreview { overflow:auto; margin:1rem 0; }
 #reportPreview:empty { display:none; }
-#reportPreview dl,.report-capture dl { display:grid; grid-template-columns:minmax(6rem,1fr) minmax(0,2fr); gap:.3rem .75rem; }
-#reportPreview dt,.report-capture dt { font-weight:700; }
-#reportPreview dd,.report-capture dd { white-space:pre-wrap; margin:0; }
-.report-capture { position:absolute; left:-10000px; top:0; width:720px; max-width:720px; font-family:Arial,sans-serif; padding:32px; }
-.report-capture h2 { font-size:26px; margin:0 0 20px; }
-.report-capture h3 { margin-top:28px; font-size:20px; }
+.report-capture { position:absolute; left:-10000px; top:0; width:600px; padding:0; }
+/* A fixed canvas keeps badge wrapping identical in preview and PNG, even on phones. */
+.sns-report { --sns-ink:#555; box-sizing:border-box; width:600px; padding:40px; border:2px solid #f0f0f0; border-radius:12px; background:#fff; font-family:'Noto Sans KR',sans-serif; font-size:14px; line-height:1.5; white-space:pre-wrap; word-break:keep-all; overflow-wrap:anywhere; }
+#reportPreview .sns-report,#reportPreview .sns-report *,.report-capture .sns-report,.report-capture .sns-report * { color:var(--sns-ink) !important; }
+.sns-report + .sns-report { margin-top:20px; }
+.sns-report .sns-header { background:#fff; text-align:center; margin:0 0 30px; }
+.sns-report .sns-title { --sns-ink:#8B5A2B; font-size:24px; font-weight:700; line-height:1.5; margin:0 0 10px; }
+.sns-report .sns-coffee { font-size:14px; line-height:1.4; }
+.sns-report .sns-profile { border:1px solid #e5e5e5; border-radius:8px; padding:25px; }
+.sns-report .sns-profile-title { --sns-ink:#8B5A2B; font-size:18px; font-weight:700; text-align:center; border-bottom:1px solid #e5e5e5; padding-bottom:10px; margin:0 0 20px; }
+.sns-report .sns-group { margin:0 0 28px; }
+.sns-report .sns-group-title { font-size:14px; font-weight:600; margin:0 0 6px; }
+.sns-report .sns-badges { line-height:1.8; }
+.sns-report .sns-badge { display:inline-block; box-sizing:border-box; max-width:100%; border-radius:12px; padding:4px 10px; margin:2px; font-size:12px; font-weight:500; vertical-align:top; }
+.sns-report .sns-divided { border-top:1px solid #e5e5e5; padding-top:22px; }
+.sns-report dl { display:grid; grid-template-columns:minmax(0,1fr) minmax(0,2fr); gap:6px 12px; font-size:12px; }
+.sns-report dt { font-weight:700; }
+.sns-report dd { margin:0; white-space:pre-wrap; }
+.sns-report .sns-footer { --sns-ink:#888; margin-top:24px; border-top:1px solid #e5e5e5; padding-top:22px; text-align:center; font-size:11px; }
 #reportDownload { display:inline-block; padding:.6rem; color:#553917; text-decoration:underline; }
 #reportDownload[hidden] { display:none; }
-@media(max-width:480px) { #reportPreview dl { display:block; } #reportPreview dd { margin:.2rem 0 .8rem; } .report-profiles { padding:.7rem; } }
+@media(max-width:480px) { .report-profiles { padding:.7rem; } }
 
 .report-profiles p,.report-profiles label,#reportPreview,.report-capture { word-break:keep-all; overflow-wrap:anywhere; }

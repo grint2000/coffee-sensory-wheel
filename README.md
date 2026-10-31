@@ -59,6 +59,6 @@ This update applies both on desktop and mobile views and is cached for offline u
 ### Exporting Images
 
 1. Fill in the sample details including **원산지**, **가공 방식**, **로스팅 날짜**, and **로스팅 정도**.
-2. Click **이미지로 내보내기** to download a full report with the radar chart and tasting notes.
-3. Click **SNS형 이미지** for a compact version that is easy to share on social networks.
-4. Both image types will display the coffee's origin and roasting information in the header.
+2. Click **SNS형 이미지** to open **출력 전 필드 검토**. Customer reports start with every field excluded; read and select the values you want to share.
+3. Select coffee information, flavor notes, taste attributes, and body descriptors, then click **선택한 값으로 미리보기 확정**. The preview shows a card with the selected coffee details and colored sensory badges.
+4. Click **미리본 이미지 생성**, then **PNG 파일 받기** to download the card. Preview and PNG use the same reviewed values and layout, including on mobile and in dark mode. Unselected fields stay excluded. Excel and report JSON use the same selected fields.
