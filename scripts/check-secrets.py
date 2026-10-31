@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 """Reject credential literals without printing their values.
 
-The single, already public Firebase browser key is a temporary, path-bound
-exception identified by SHA-256. This does NOT revoke or restrict that key.
-Remove the exception after the project owner rotates it. See SECURITY.md.
+The single public Firebase browser configuration key has a path-bound exception
+identified by SHA-256. Provider restrictions are separate from this source scan;
+see SECURITY.md for the verification scope. Revisit this exception on rotation.
 """
 import hashlib
 from pathlib import Path
@@ -50,7 +50,7 @@ def main():
     for path, line, kind in errors:
         print(f'{path}:{line}: blocked {kind} (value redacted)', file=sys.stderr)
     if legacy:
-        print('WARNING: the previously exposed Firebase browser key remains pending owner rotation/restrictions; see SECURITY.md.', file=sys.stderr)
+        print('NOTICE: one reviewed public Firebase browser configuration key is allowed at its existing path; provider restriction checks are documented in SECURITY.md.', file=sys.stderr)
     if errors:
         return 1
     print('Credential scan passed: no new credential literals detected.')
