@@ -1,0 +1,37 @@
+.flavor-evidence-trigger { display:inline-flex; flex:0 0 auto; align-items:center; justify-content:center; width:32px; height:32px; margin:1px 5px 1px 1px; border:1px solid currentColor; border-radius:50%; background:rgba(255,255,255,.36); color:inherit; font-size:11px; line-height:1; vertical-align:middle; cursor:pointer; }
+.flavor-evidence-trigger:focus-visible { outline:2px solid #1f2937; outline-offset:2px; }
+.flavor-evidence-modal { position:fixed; inset:0; z-index:10000; display:none; align-items:flex-end; justify-content:center; background:rgba(17,24,39,.52); padding:16px; }
+.flavor-evidence-modal.is-open { display:flex; }
+.flavor-evidence-panel { width:min(760px,100%); max-height:min(86vh,850px); overflow:auto; overscroll-behavior:contain; background:#fff; border-radius:16px; box-shadow:0 18px 60px rgba(0,0,0,.28); padding:22px; word-break:keep-all; overflow-wrap:anywhere; }
+.flavor-evidence-modal .flavor-evidence-panel,.flavor-evidence-modal .flavor-evidence-panel * { color:var(--food-ink,#1f2937)!important; }
+.flavor-evidence-head { display:flex; gap:14px; align-items:flex-start; justify-content:space-between; }
+.flavor-evidence-head h3 { font-size:20px; font-weight:800; margin:0; }
+.flavor-evidence-close { width:44px; height:44px; flex:0 0 auto; border:0; border-radius:8px; background:#f3f4f6; font-size:24px; cursor:pointer; }
+.food-aroma-status { --food-ink:#79501f; display:inline-block; margin:8px 0 12px; padding:3px 9px; border-radius:6px; font-size:12px; background:#faf1df; }
+.food-aroma-reference { background:#f8f7f4; border:1px solid #e6dfd3; border-radius:10px; padding:12px 14px; }
+.food-aroma-reference h4,.food-aroma-sources h4 { margin:0 0 8px; font-weight:700; font-size:14px; }
+.food-aroma-reference dl { display:grid; grid-template-columns:5em minmax(0,1fr); gap:5px 10px; font-size:13px; }
+.food-aroma-reference dt { font-weight:600; }
+.food-aroma-reference dd { margin:0; }
+.food-aroma-basis { font-size:14px; font-weight:700; margin:16px 0 10px; }
+.food-aroma-entries { list-style:none; margin:0; padding:0; }
+.food-aroma-entry { display:flex; align-items:center; gap:12px; padding:14px 0; border-bottom:1px solid #e5e7eb; }
+.food-aroma-rank { --food-ink:#8b5a2b; flex:0 0 3em; font-size:16px; font-weight:800; }
+.food-aroma-compound { flex:1; min-width:0; }
+.food-aroma-compound strong { display:block; font-size:16px; font-weight:700; }
+.food-aroma-original { --food-ink:#64748b; display:block; font-size:13px; margin-top:3px; }
+.food-aroma-value { white-space:nowrap; font-size:17px; font-weight:700; }
+.food-aroma-unit { font-size:12px; font-weight:400; }
+.food-aroma-empty,.food-aroma-explanation,.food-aroma-note { font-size:13px; line-height:1.65; margin:12px 0; }
+.food-aroma-explanation,.food-aroma-note { --food-ink:#64748b; }
+.food-aroma-sources { margin-top:18px; }
+.flavor-evidence-source { display:block; margin-top:8px; font-size:12px; line-height:1.6; }
+.flavor-evidence-source a { --food-ink:#8b5a2b; text-decoration:underline; text-underline-offset:2px; }
+.flavor-evidence-source em,.food-aroma-locator { display:block; font-style:normal; }
+.food-aroma-details { margin-top:14px; border:1px solid #e5e7eb; border-radius:8px; padding:10px 12px; font-size:12px; line-height:1.65; }
+.food-aroma-details summary { min-height:32px; cursor:pointer; font-weight:600; }
+.food-aroma-details ul { list-style:disc; padding-left:18px; }
+.food-aroma-details li { margin:8px 0; }
+.food-aroma-note { border-top:1px solid #e5e7eb; padding-top:12px; }
+@media(max-width:699px) { .flavor-evidence-trigger { width:44px; height:44px; margin-right:3px; } .flavor-evidence-modal { padding:10px; } .flavor-evidence-panel { padding:18px; } .flavor-evidence-head h3 { font-size:18px; } .food-aroma-entry { gap:8px; } }
+@media(min-width:700px) { .flavor-evidence-modal { align-items:center; } }

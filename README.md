@@ -17,15 +17,19 @@ The application runs entirely in the browser, so you can simply double-click `in
 - **Comparison Tools** – Select two or more samples to generate charts comparing SCA scores, flavor notes, and defects.
 - **Export Options** – Save your results as images, SNS-ready images, Excel spreadsheets, or JSON files for backup and sharing. The exported images now include the coffee's origin, processing method, roast date, and roast level so you have full context when sharing.
 
-## Flavor Molecule Evidence
+## Reference-Food Aroma Components
 
-Press and hold a flavor chip, or select its flask button, to inspect the evidence behind its molecule mapping. The displayed numbers are evidence stages, not a universal ranking of concentration, odor activity value (OAV), or sensory contribution:
+Press and hold a flavor chip, or select its flask button, to view the reference food's aroma components with Korean and original names. This is reference-food analysis, not a measurement of the current coffee. Coffee detection is not a condition for showing a food component.
 
-1. Evidence directly supports the displayed coffee note or defect.
-2. The compound is reported in coffee or supports only the broader aroma family; the exact note is not proven.
-3. The compound is supported in the named reference food, flower, spice, or tea and is not presented as direct coffee evidence.
+The popup shows the food, cultivar/part/state, ranking basis, components and values/units, followed by source links and expandable analytical conditions. The former coffee-evidence stages are removed. Quantitative ranks are calculated only within the same source, food, cultivar, part, state, harvest, sample group, table column, unit and analytical basis. GC relative composition is neither mass content nor aroma contribution; OAV and evidence grades do not substitute for abundance. Ties share a rank. Missing/censored/conflicting values leave ranks unconfirmed, synonyms are deduplicated, and mixtures are not split into invented molecules. Two measured compounds produce two rows, not an invented third.
 
-Each entry links to its supporting paper and identifies the study scope or analytical method. Acids are treated separately as nonvolatile taste compounds. Mappings intentionally remain unassigned when the available evidence does not justify a molecule-level claim.
+The initial verified example is **Orange → Navelina, first harvest, cold-pressed flavedo oil**, Bozova et al. (2025), DOI [10.3934/agrfood.2025003](https://doi.org/10.3934/agrfood.2025003), Table 7: Limonene 96.4%, β-Myrcene 2.0%, α-Pinene 0.5%, calculated from GC-FID relative composition. This is one sample context, not a universal orange ranking.
+
+All **420 original flavor keys, classifications and selection values are preserved**. Current coverage: 1 item with verified ranks, 7 with representative names only (Apple, Pear, Strawberry, Banana, Peach, Grape, Raspberry; ranks unconfirmed), 328 with source data not yet verified, and 84 outside the reference-food scope. There is no parent-category fallback or transfer to variants such as Blood Orange, Green Apple or White Peach.
+
+See [data rules and source audit](docs/reference-food-aroma.md). Data and calculation live in `food-aroma-data.js`; `flavor-evidence.js` resolves exact keys. Both the data and `food-aroma.css` are included in the app shell cache.
+
+Verification: `node tests/food-aroma.test.js`; with a local HTTP server and Playwright/Chromium installed, `python tests/food-aroma-browser.py`. The browser check writes screenshots and downloads outside the repository.
 
 ## Browser Compatibility
 
