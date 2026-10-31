@@ -1,5 +1,5 @@
 /* Reference-food composition data. No coffee-detection gate or category fallback. */
-(function(root,factory){const api=factory();if(typeof module==='object'&&module.exports)module.exports=api;else root.FoodAromaData=api;})(typeof globalThis!=='undefined'?globalThis:this,function(){
+(function(root,factory){const node=typeof module==='object'&&module.exports;const api=factory(node?require('./aroma-literature-data.js'):root.AromaLiteratureData);if(node)module.exports=api;else root.FoodAromaData=api;})(typeof globalThis!=='undefined'?globalThis:this,function(literature){
   'use strict';
   const freeze=value=>{if(value&&typeof value==='object'){Object.values(value).forEach(freeze);Object.freeze(value);}return value;};
   const sources={
@@ -77,6 +77,7 @@
     'Fruity|Other Fruit|Grape':representative({food:'포도 (Vitis vinifera)',cultivar:'적·백포도 자료 · 단일 품종 미지정',part:'과실',state:'종설의 유리 테르펜올 자료'},['linalool','geraniol'],'§2.2 포도 문단 · free terpenols 및 [72]'),
     'Fruity|Berry|Raspberry':representative({food:'라즈베리',cultivar:'red raspberry · 단일 품종 미지정',part:'과실',state:'종설의 라즈베리 향기 자료'},['raspberryKetone','alphaIonone','betaIonone'],'§2.2 라즈베리 문단 · important compounds 및 [76]')
   };
+  Object.assign(sources,literature?.sources||{});
   const contextKeys=['sourceId','food','cultivar','part','state','harvest','sampleGroup','column','unit','basis','method'];
   function identify(row){
     if(row.compoundId)return compounds[row.compoundId]||null;
@@ -100,39 +101,58 @@
     if(incomparable)return {status:'unverified',entries:[],issues:[...new Set(issues)]};
     const entries=[...selected.values()].map(e=>conflicts.has(e.id)?{...e,value:null,reported:null}:e);
     if(!entries.length)return {status:'unverified',entries:[],issues:[...new Set(issues)]};
-    if(missing||conflicts.size)return {status:'representative',entries,issues:[...new Set([...issues,'결측·검출한계·충돌값 때문에 전체 성분량 순위는 미확정입니다.'])],basisLabel:basis.label,basisNote:basis.note};
+    if(missing||conflicts.size)return {status:'representative',entries:entries.slice(0,3),issues:[...new Set([...issues,'결측·검출한계·충돌값 때문에 전체 성분량 순위는 미확정입니다.'])],basisLabel:basis.label,basisNote:basis.note};
     entries.sort((a,b)=>b.value-a.value||a.nameOriginal.localeCompare(b.nameOriginal));
     entries.forEach((e,i)=>{e.rank=i&&e.value===entries[i-1].value?entries[i-1].rank:i+1;e.tied=entries.filter(other=>other.value===e.value).length>1;});
-    return {status:'verified-ranking',entries:entries.filter(e=>e.rank<=3),issues:[...new Set(issues)],basisLabel:basis.label,basisNote:basis.note};
+    if(entries.filter(e=>e.rank<=3).length>3)issues.push('공동 순위가 있어 최대 3개까지만 표시합니다. 같은 순위의 다른 성분도 있습니다.');
+    return {status:'verified-ranking',entries:entries.filter(e=>e.rank<=3).slice(0,3),issues:[...new Set(issues)],basisLabel:basis.label,basisNote:basis.note};
   }
-  const nonFoodKeys=new Set([
-    'Fruity|Citrus Fruit|Citrus','Fruity|Berry|Berry','Fruity|Stone Fruit|Stone Fruit','Fruity|Tropical Fruit|Tropical Fruit',
-    'Floral|General Flowers|Flower','Floral|White Flowers|White Flower','Green/Vegetative|Fresh Green|Under-ripe','Green/Vegetative|Fresh Green|Fresh',
-    'Green/Vegetative|Fresh Green|Grass','Green/Vegetative|Fresh Green|Fresh Cut Grass','Sour/Fermented|Sour|Acetic Acid',
-    'Sour/Fermented|Fermented|Winey','Sour/Fermented|Fermented|Overripe','Other|Earthy|Soil','Other|Earthy|Wet Earth','Other|Earthy|Dry Earth',
-    'Other|Earthy|Forest Floor','Other|Earthy|Moss','Other|Animal|Leather','Other|Animal|Suede','Other|Animal|Musk'
-  ]);
-  function notApplicable(key){
-    const [category,group,note]=key.split('|');
-    if(category==='Roasted'&&!['Dark Chocolate','Barbecue'].includes(note))return '배전도·로스팅 감각 표현으로, 단일 참고 식품의 성분량 비교 대상이 아닙니다.';
-    // Potato is still a food reference even though its legacy category is Defect.
-    if(category==='Other'&&['Defect','Chemical','Mineral','Woody'].includes(group)&&!(group==='Defect'&&note==='Potato'))return '결점·비식품·미네랄·목재 레퍼런스로, 참고 식품의 주요 향기 성분 순위 적용 대상이 아닙니다.';
-    if(category==='Sour/Fermented'&&group==='Clean Acidity')return '산미를 나타내는 개별 비휘발성 산입니다. 참고 식품의 휘발성 향기 성분 순위 대상이 아닙니다.';
-    if(category==='Sour/Fermented'&&group==='Aged/Funky'&&note!=='Blue Cheese')return '흙·곰팡이·노화 감각 표현으로, 단일 참고 식품을 지정하지 않습니다.';
-    return nonFoodKeys.has(key)?'상위 계열·감각 표현 또는 비식품 대상입니다. 하위 식품의 성분 목록을 대신 배정하지 않습니다.':null;
+  const orderingBases={
+    composition:{label:'조성 순위',note:'원문의 조성·농도 기준 순서입니다. GC 상대 조성은 실제 질량 함량이나 향 기여율이 아닙니다.'},
+    'odor-activity':{label:'향활성도(OAV) 순위',note:'OAV는 농도를 냄새 역치로 나눈 값입니다. 함량·조성 비율이나 향 기여율(%)이 아닙니다.'},
+    'flavor-dilution':{label:'향 희석 분석(FD) 순위',note:'FD는 GC-O에서 냄새가 감지된 최종 희석배수입니다. 함량·농도 순위가 아닙니다.'}
+  };
+  // Source order must be explicit. Neither array position nor a representative list creates a rank.
+  function analyseLiterature(profile){
+    const order=profile.ordering,basis=orderingBases[order?.basis];
+    const entries=(profile.entries||[]).slice(0,3).map(e=>({
+      ...e,reference:e.reference||profile.reference,value:e.value??null,
+      reported:e.reported??null,unit:e.unit??null,rank:null,tied:false
+    }));
+    const reference=profile.reference||{};
+    const sameContext=entries.every(e=>{
+      if(!e.reference||!e.citations?.length)return false;
+      const fields=new Set([...Object.keys(reference),...Object.keys(e.reference)]);
+      if([...fields].some(k=>e.reference[k]!==reference[k]))return false;
+      if(!e.citations.every(c=>c.sourceId===profile.sourceId&&sources[c.sourceId]))return false;
+      if(e.value===null)return true; // A verified source order does not require amounts.
+      const unitMatches=order?.basis==='odor-activity'?e.unit==='OAV':order?.basis==='flavor-dilution'?e.unit==='FD':!!e.unit;
+      return typeof e.value==='number'&&Number.isFinite(e.value)&&e.value>=0&&
+        e.reported!==null&&Number(e.reported)===e.value&&unitMatches;
+    });
+    const units=new Set(entries.map(e=>e.unit).filter(Boolean));
+    const identities=new Set(entries.map(e=>e.id));
+    const ranked=!!(entries.length&&units.size<=1&&identities.size===entries.length&&
+      sameContext&&basis&&order.verified===true&&order.contextId&&order.evidence&&
+      entries.every(e=>e.kind!=='mixture'&&Number.isInteger(e.sourceRank)&&e.sourceRank>=1&&e.sourceRank<=3));
+    if(ranked){entries.sort((a,b)=>a.sourceRank-b.sourceRank);entries.forEach(e=>{e.rank=e.sourceRank;e.tied=entries.some(other=>other!==e&&other.sourceRank===e.sourceRank);});}
+    return {status:ranked?'verified-ranking':'representative',entries,basisLabel:ranked?(order.label||basis.label):'대표 향기 성분 · 순위 미확정',basisNote:ranked?basis.note:'문헌에서 주요 성분임을 확인했습니다. 나열 순서는 순위가 아닙니다.',issues:[]};
   }
+  function annotated(entries,ref,sourceId,locator){return entries.slice(0,3).map(e=>({...e,kind:e.kind||'compound',reference:ref,description:e.description||`${ref.food}의 ${ref.part} · ${ref.state} 자료에서 확인된 주요 향기 성분입니다.`,citations:[{sourceId,locator}]}));}
   function resolve(key,record){
     key=String(key||'');
-    const base={key,foodName:record?.[6]||record?.[2]||key.split('|').pop(),note:'참고 식품의 분석 자료이며 현재 커피의 측정 결과는 아닙니다.',entries:[],sources:[],conditions:[],issues:[]};
+    const base={key,foodName:record?.[6]||record?.[2]||key.split('|').pop(),note:'참고 재료의 분석 자료이며 현재 커피의 측정 결과는 아닙니다.',entries:[],sources:[],conditions:[],issues:[]};
     if(!record||record.slice(0,3).join('|')!==key)return {...base,status:'unverified',reason:'등록된 향미 항목을 확인하지 못했습니다.'};
     if(key==='Fruity|Citrus Fruit|Orange'){
       const analysis=analyseStudy(orangeStudy);
-      return {...base,...analysis,reference:orangeStudy.reference,datasetId:orangeStudy.id,sources:[sources[orangeStudy.sourceId]],conditions:orangeStudy.conditions,scopeNote:analysis.status==='verified-ranking'?'Navelina·1차 수확·CP 시료에서 동정된 개별 성분 내 순위입니다. 오렌지 전체의 고정 순위가 아닙니다.':'Navelina·1차 수확·CP 자료의 순위를 확정하지 못했습니다.'};
+      return {...base,...analysis,entries:annotated(analysis.entries,orangeStudy.reference,orangeStudy.sourceId,sources[orangeStudy.sourceId].locator),reference:orangeStudy.reference,datasetId:orangeStudy.id,sources:[sources[orangeStudy.sourceId]],conditions:orangeStudy.conditions,scopeNote:analysis.status==='verified-ranking'?'Navelina·1차 수확·CP 시료에서 동정된 개별 성분 내 순위입니다. 오렌지 전체의 고정 순위가 아닙니다.':'Navelina·1차 수확·CP 자료의 순위를 확정하지 못했습니다.'};
     }
+    const profile=literature?.profiles?.[key];
+    if(profile){const analysis=analyseLiterature(profile);return {...base,...analysis,reference:profile.reference,sources:[{...sources[profile.sourceId],locator:profile.locator}],conditions:[profile.reviewNote,'품종·부위·가공·분석법에 따라 조성과 향활성은 달라집니다.'].filter(Boolean)};}
     const rep=representatives[key];
-    if(rep)return {...base,status:'representative',reference:rep.reference,entries:rep.compoundIds.map(id=>({...compounds[id],value:null,reported:null,unit:null,rank:null,tied:false})),basisLabel:'대표 성분 · 순위 미확정',reason:'동일 시료군에서 비교할 정량값은 아직 채택하지 않았습니다.',sources:[{...sources[rep.sourceId],locator:rep.locator}],conditions:rep.conditions};
-    const reason=notApplicable(key);return {...base,status:reason?'not-applicable':'unverified',reason:reason||'이 식품·품종·부위·상태에 맞는 원문 자료를 아직 확인하지 못했습니다. 다른 식품이나 상위 계열의 성분을 대신 표시하지 않습니다.'};
+    if(rep)return {...base,status:'representative',reference:rep.reference,entries:annotated(rep.compoundIds.map(id=>({...compounds[id],value:null,reported:null,unit:null,rank:null,tied:false})),rep.reference,rep.sourceId,rep.locator),basisLabel:'대표 향기 성분 · 순위 미확정',reason:'문헌에서 주요 성분을 확인했으며 순서는 입증되지 않았습니다.',sources:[{...sources[rep.sourceId],locator:rep.locator}],conditions:rep.conditions};
+    return {...base,status:'pending',reason:'업데이트 예정 · 이 참고 재료에 맞는 신뢰할 수 있는 문헌 자료를 검토하고 있습니다.',basisLabel:'아직 확인되지 않음'};
   }
-  freeze(sources);freeze(compounds);freeze(orangeStudy);freeze(representatives);freeze(bases);
-  return {sources,compounds,orangeStudy,representatives,analyseStudy,resolve};
+  freeze(sources);freeze(compounds);freeze(orangeStudy);freeze(representatives);freeze(bases);freeze(literature);freeze(orderingBases);
+  return {sources,compounds,orangeStudy,representatives,analyseStudy,analyseLiterature,resolve};
 });

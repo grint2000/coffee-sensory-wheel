@@ -34,11 +34,11 @@ test('two measured compounds produce exactly two ranks',()=>{
  const s=study();s.measurements=s.measurements.filter(m=>['limonene','myrcene'].includes(m.compoundId));
  assert.deepEqual(M.analyseStudy(s).entries.map(e=>e.rank),[1,2]);
 });
-test('ties use competition ranks and include everyone tied at the third rank',()=>{
+test('ties use competition ranks, cap at three and disclose omitted ties',()=>{
  const s=study();s.measurements=[{compoundId:'limonene',value:10},{compoundId:'myrcene',value:10},{compoundId:'pinene',value:5}];
  let r=M.analyseStudy(s);assert.deepEqual(r.entries.map(e=>e.rank),[1,1,3]);assert.ok(r.entries[0].tied&&r.entries[1].tied);
  s.measurements=[{compoundId:'limonene',value:10},{compoundId:'myrcene',value:8},{compoundId:'pinene',value:5},{compoundId:'sabinene',value:5}];
- assert.deepEqual(M.analyseStudy(s).entries.map(e=>e.rank),[1,2,3,3]);
+ const capped=M.analyseStudy(s);assert.deepEqual(capped.entries.map(e=>e.rank),[1,2,3]);assert.match(capped.issues.join(' '),/같은 순위/);
 });
 for(const [field,value]of Object.entries({sourceId:'another-paper',food:'lemon',cultivar:'Moro',part:'juice',state:'heated juice',harvest:'2',sampleGroup:'other group',column:'HD',unit:'mg/L',basis:'gc-ms-relative-area',method:'headspace'})){
  test('mixed '+field+' is rejected rather than silently ranked',()=>{
@@ -77,18 +77,18 @@ test('unknown source, unsupported unit, or unverified transcription has no ranke
 });
 test('all 420 entries have explicit statuses, exact-key mapping and bilingual supported names',()=>{
  const counts={};for(const row of rows){const key=row.slice(0,3).join('|'),r=resolve(key);counts[r.status]=(counts[r.status]||0)+1;
-  assert.equal(r.key,key);assert.ok(['verified-ranking','representative','unverified','not-applicable'].includes(r.status));
-  if(['unverified','not-applicable'].includes(r.status))assert.equal(r.entries.length,0);
+  assert.equal(r.key,key);assert.ok(['verified-ranking','representative','pending'].includes(r.status));
+  if(r.status==='pending')assert.equal(r.entries.length,0);
   for(const e of r.entries){assert.ok(e.nameKo&&e.nameOriginal);if(r.status==='representative')assert.equal(e.rank,null);}
  }
- assert.equal(counts['verified-ranking'],1);assert.equal(counts.representative,7);assert.equal(counts.unverified,328);assert.equal(counts['not-applicable'],84);
+ assert.deepEqual(counts,{'pending':290,'representative':118,'verified-ranking':12});
 });
 test('representative names do not inherit rank or coffee evidence gates',()=>{
  const banana=resolve('Fruity|Tropical Fruit|Banana');assert.equal(banana.entries.length,2);assert.ok(banana.entries.every(e=>e.rank===null&&e.value===null));
  assert.ok(!('primary'in banana)&&!('secondary'in banana)&&!('tertiary'in banana));
- for(const key of ['Fruity|Other Fruit|Green Apple','Fruity|Other Fruit|Red Apple','Fruity|Tropical Fruit|Ripe Banana','Fruity|Citrus Fruit|Blood Orange','Fruity|Stone Fruit|White Peach'])assert.equal(resolve(key).status,'unverified');
- assert.equal(resolve('Other|Mineral|Salt').status,'not-applicable');
- assert.equal(resolve('Other|Defect|Potato').status,'unverified');
+ for(const key of ['Fruity|Other Fruit|Green Apple','Fruity|Other Fruit|Red Apple','Fruity|Citrus Fruit|Blood Orange','Fruity|Stone Fruit|White Peach'])assert.equal(resolve(key).status,'pending');
+ assert.equal(resolve('Other|Mineral|Salt').status,'pending');
+ assert.equal(resolve('Other|Defect|Potato').status,'pending');
 });
 test('public getFlavorEvidence integrates with the original flavor keys',()=>{
  const context=vm.createContext({window:{},FoodAromaData:M,FLAVOR_DATA:rows});vm.runInContext(fs.readFileSync(require.resolve('../flavor-evidence.js'),'utf8'),context);
@@ -96,9 +96,81 @@ test('public getFlavorEvidence integrates with the original flavor keys',()=>{
  assert.equal(context.window.getFlavorEvidence('unknown').status,'unverified');
 });
 test('new local assets load before the resolver and are included in the bumped app cache',()=>{
+ assert.ok(html.indexOf('src="aroma-literature-data.js"')<html.indexOf('src="food-aroma-data.js"'));
  assert.ok(html.indexOf('src="food-aroma-data.js"')<html.indexOf('src="flavor-evidence.js"'));
  assert.ok(html.includes('href="food-aroma.css"'));
  const sw=fs.readFileSync(require.resolve('../service-worker.js'),'utf8');
  assert.ok(sw.includes("'./food-aroma-data.js'"));assert.ok(sw.includes("'./food-aroma.css'"));
- assert.ok(sw.includes('v19-food-aroma'));
+ assert.ok(sw.includes('v20-aroma-literature'));assert.ok(sw.includes("'./aroma-literature-data.js'"));
+});
+
+const literature=require('../aroma-literature-data.js');
+test('each supported molecule has material, known matrix, explanation and a located scientific citation',()=>{
+ for(const row of rows){
+  const r=resolve(row.slice(0,3).join('|'));
+  assert.ok(r.entries.length<=3);
+  if(r.status==='pending'){assert.match(r.reason,/업데이트 예정/);assert.doesNotMatch(r.reason,/존재하지 않|적용 대상 아님/);continue;}
+  assert.ok(r.entries.length>=1);
+  for(const e of r.entries){
+   assert.ok(e.description?.length>5,e.nameOriginal);
+   for(const f of ['food','cultivar','part','state'])assert.ok(e.reference[f],r.key+' '+f);
+   assert.ok(e.citations.length);
+   for(const c of e.citations){assert.ok(M.sources[c.sourceId]);assert.ok(c.locator.length>5);assert.match(M.sources[c.sourceId].url,/^https:\/\/doi.org\//);}
+  }
+ }
+});
+test('122 new exact mappings enrich 130 total entries; parent materials are not copied to variants',()=>{
+ assert.equal(Object.keys(literature.profiles).length,122);
+ for(const key of ['Floral|General Flowers|Flower','Floral|Rose|Red Rose','Fruity|Citrus Fruit|Blood Orange','Nutty/Cocoa|Nuts|Black Walnut']){
+  const row=rows.find(r=>r.slice(0,3).join('|')===key);
+  if(row)assert.equal(resolve(key).status,'pending');
+ }
+ for(const note of ['Red Rose','Pink Rose','Blood Orange','Young Coconut','Raw Cocoa','70% Dark Chocolate','85% Dark Chocolate','French Oak']){
+  for(const row of rows.filter(r=>r[2]===note))assert.equal(resolve(row.slice(0,3).join('|')).status,'pending');
+ }
+ for(const note of ['Cedar','Pine','Sandalwood','Lotus','Magnolia','Honeysuckle']){
+  const row=rows.find(r=>r[2]===note);assert.notEqual(resolve(row.slice(0,3).join('|')).status,'pending');
+ }
+});
+test('one or two confirmed constituents remain useful and no empty third position is invented',()=>{
+ for(const [note,count]of [['Vanilla',1],['Star Anise',1],['Sandalwood',2],['Coconut',2],['Porcini',3]]){
+  const row=rows.find(r=>r[2]===note),r=resolve(row.slice(0,3).join('|'));
+  assert.equal(r.entries.length,count);assert.equal(r.status,'representative');assert.ok(r.entries.every(e=>e.rank===null));
+ }
+});
+test('source-established composition order can be shown without numerical values',()=>{
+ const row=rows.find(r=>r[2]==='Oolong'),r=resolve(row.slice(0,3).join('|'));
+ assert.deepEqual(r.entries.map(e=>[e.nameOriginal,e.rank,e.value]),[['(E)-Nerolidol',1,null],['Indole',2,null],['Linalool',3,null]]);
+ assert.match(r.basisLabel,/조성/);assert.match(r.sources[0].locator,/Table 1/);
+});
+test('OAV and FD keep their own units, explanations and source-established ties',()=>{
+ let row=rows.find(r=>r[2]==='Shiitake'),r=resolve(row.slice(0,3).join('|'));
+ assert.deepEqual(r.entries.map(e=>[e.rank,e.nameOriginal,e.value,e.unit]),[[1,'1-Octen-3-ol',105100,'OAV'],[2,'1-Octen-3-one',36547,'OAV'],[3,'Lenthionine',4048,'OAV']]);
+ assert.match(r.basisLabel,/OAV/);assert.match(r.basisNote,/농도.*역치/);
+ row=rows.find(r=>r[2]==='Honeysuckle');r=resolve(row.slice(0,3).join('|'));
+ assert.deepEqual(r.entries.map(e=>[e.rank,e.tied,e.value,e.unit]),[[1,true,625,'FD'],[1,true,625,'FD'],[1,true,625,'FD']]);
+ assert.match(r.conditions.join(' '),/총 4개/);assert.match(r.basisLabel,/FD/);assert.match(r.basisNote,/희석배수/);
+});
+test('no source ranks, no verified order, or an unsupported criterion cannot produce ordinal labels',()=>{
+ const key=Object.keys(literature.profiles).find(k=>k.endsWith('|Oolong'));
+ for(const change of [p=>p.ordering=null,p=>p.ordering.verified=false,p=>p.ordering.basis='paper-count',p=>delete p.entries[0].sourceRank,p=>p.entries[0].kind='mixture']){
+  const p=clone(literature.profiles[key]);change(p);let r=M.analyseLiterature(p);assert.equal(r.status,'representative');assert.ok(r.entries.every(e=>e.rank===null));assert.equal(r.entries.length,3);
+ }
+ const p=clone(literature.profiles[key]);p.entries.reverse();assert.deepEqual(M.analyseLiterature(p).entries.map(e=>e.nameOriginal),['(E)-Nerolidol','Indole','Linalool']);
+});
+test('source-order guard rejects mixed material, parts, sources, units, ambiguous duplicate identity and OAV/percent substitution',()=>{
+ const key=Object.keys(literature.profiles).find(k=>k.endsWith('|Shiitake'));
+ for(const change of [p=>p.entries[0].reference={...p.reference,part:'dried stem'},p=>p.entries[0].reference={...p.reference,cultivar:'other'},p=>p.entries[0].unit='%',p=>p.entries[0].citations[0].sourceId='unknown',p=>p.entries[0].value=NaN,p=>p.entries[1].id=p.entries[0].id]){
+  const p=clone(literature.profiles[key]);change(p);assert.equal(M.analyseLiterature(p).status,'representative');
+ }
+});
+test('mixture labels are explicit representatives and never split into fabricated isomers',()=>{
+ const row=rows.find(r=>r[2]==='Lemongrass'),r=resolve(row.slice(0,3).join('|'));
+ assert.equal(r.status,'representative');assert.equal(r.entries[0].kind,'mixture');assert.match(r.entries[0].description,/혼합명/);
+ assert.ok(r.entries.every(e=>e.rank===null));
+});
+test('scientific source URLs refer to article DOIs, including the honeysuckle paper rather than its reference DOI',()=>{
+ assert.equal(M.sources.PMC7440650.url,'https://doi.org/10.1371/journal.pone.0237881');
+ assert.equal(new Set(Object.values(M.sources).map(s=>s.url)).size,43);
+ assert.ok(Object.isFrozen(literature.profiles));
 });

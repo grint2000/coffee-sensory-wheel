@@ -48,9 +48,9 @@ with sync_playwright() as pw:
     expect(modal.locator('.food-aroma-rank')).to_have_text(['1위','2위','3위'])
     expect(modal.locator('.food-aroma-original')).to_have_text(['Limonene','β-Myrcene','α-Pinene'])
     expect(modal.locator('.food-aroma-value')).to_have_text(['96.4 %','2.0 %','0.5 %'])
-    expect(modal.locator('.food-aroma-reference')).to_contain_text('Navelina')
-    expect(modal.locator('.food-aroma-reference')).to_contain_text('플라베도')
-    expect(modal.locator('.food-aroma-reference')).to_contain_text('냉압착 정유 (CP)')
+    expect(modal.locator('.food-aroma-reference').first).to_contain_text('Navelina')
+    expect(modal.locator('.food-aroma-reference').first).to_contain_text('플라베도')
+    expect(modal.locator('.food-aroma-reference').first).to_contain_text('냉압착 정유 (CP)')
     assert '1단계' not in modal.inner_text() and '커피 직접 근거' not in modal.inner_text()
     assert page.evaluate('JSON.stringify(getCurrentSampleObj().sampleData.flavorSelections)') == before
     hrefs = modal.locator('a').evaluate_all('(nodes)=>nodes.map(n=>({href:n.href,rel:n.rel}))')
@@ -64,7 +64,7 @@ with sync_playwright() as pw:
     close = modal.locator('.flavor-evidence-close')
     expect(close).to_be_focused()
     page.keyboard.press('Shift+Tab')
-    expect(modal.locator('summary')).to_be_focused()
+    expect(modal.locator('summary').last).to_be_focused()
     page.keyboard.press('Tab')
     expect(close).to_be_focused()
     page.keyboard.press('Escape')
@@ -73,15 +73,16 @@ with sync_playwright() as pw:
     assert page.evaluate('document.body.style.overflow') != 'hidden'
     results.append('Keyboard focus trap includes analysis summary; Escape restores focus and scrolling')
 
-    for key, status, count in [('Fruity|Tropical Fruit|Banana','representative',2),('Fruity|Citrus Fruit|Blood Orange','unverified',0),('Other|Mineral|Salt','not-applicable',0)]:
+    for key, status, count in [('Fruity|Tropical Fruit|Banana','representative',2),('Fruity|Citrus Fruit|Blood Orange','pending',0),('Other|Mineral|Salt','pending',0)]:
         page.evaluate('(key)=>openFlavorEvidenceModal(key)',key)
         expect(modal.locator('.food-aroma-status')).to_have_attribute('data-status',status)
         expect(modal.locator('.food-aroma-entry')).to_have_count(count)
         expect(modal.locator('.food-aroma-rank')).to_have_count(0)
-        if count: expect(modal.locator('.food-aroma-value')).to_have_text(['값 미확인']*count)
+        if count: expect(modal.locator('.food-aroma-value')).to_have_count(0)
+        else: expect(modal).to_contain_text('업데이트 예정')
         modal.screenshot(path=str(OUT/(status+'-desktop.png')))
         page.keyboard.press('Escape')
-    results.append('Representative-only, unverified and not-applicable states do not fabricate ranks')
+    results.append('Representative-only and pending states do not fabricate quantities or ranks')
 
     # Exercise actual formatting of tied and missing data, then restore the real resolver.
     page.evaluate('''() => {
@@ -99,8 +100,8 @@ with sync_playwright() as pw:
       openFlavorEvidenceModal('Fruity|Citrus Fruit|Orange');
     }''')
     expect(modal.locator('.food-aroma-rank')).to_have_count(0)
-    expect(modal.locator('.food-aroma-status')).to_contain_text('순위 미확정')
-    assert '값 미확인' in modal.inner_text()
+    expect(modal.locator('.food-aroma-status')).to_contain_text('대표 향기 성분')
+    assert '1위' not in modal.inner_text()
     page.keyboard.press('Escape')
     page.evaluate('window.getFlavorEvidence=window.testOriginalFoodResolver; delete window.testOriginalFoodResolver')
     results.append('Actual renderer handles ties and missing values without inventing ranks')
@@ -130,7 +131,7 @@ with sync_playwright() as pw:
     mpage.evaluate('document.fonts.ready')
     mmodal.screenshot(path=str(OUT/'orange-mobile.png'))
     assert mmodal.locator('.flavor-evidence-panel').evaluate('(e)=>e.scrollWidth<=e.clientWidth')
-    mmodal.locator('summary').tap()
+    mmodal.locator('.food-aroma-details summary').tap()
     expect(mmodal.locator('.food-aroma-details')).to_have_attribute('open','')
     panel=mmodal.locator('.flavor-evidence-panel')
     scroll_y=mpage.evaluate('window.scrollY')
@@ -169,6 +170,43 @@ with sync_playwright() as pw:
     expect(mmodal).to_be_hidden()
     assert mpage.evaluate('JSON.stringify(getCurrentSampleObj().sampleData.flavorSelections)') == before
     results.append('Mobile long press opens without selecting; moved/cancelled presses preserve selection')
+
+    # Every legacy flavor opens under the revised schema and fits a mobile panel.
+    coverage=mpage.evaluate('''() => {
+      const counts={},bad=[];
+      for(const row of FLAVOR_DATA){const key=row.slice(0,3).join('|');openFlavorEvidenceModal(key);
+        const e=getFlavorEvidence(key),panel=document.querySelector('.flavor-evidence-panel');
+        counts[e.status]=(counts[e.status]||0)+1;
+        if(panel.scrollWidth>panel.clientWidth||e.entries.length>3)bad.push(key);
+        closeFlavorEvidenceModal();
+      }
+      return {counts,bad};
+    }''')
+    assert coverage=={'counts':{'pending':290,'representative':118,'verified-ranking':12},'bad':[]},coverage
+    for note in ['Rose','Cedar','Shiitake','Honeysuckle','Oolong']:
+        key=mpage.evaluate('(note)=>FLAVOR_DATA.find(r=>r[2]===note).slice(0,3).join("|")',note)
+        mpage.evaluate('(key)=>openFlavorEvidenceModal(key)',key)
+        expect(mmodal).to_be_visible()
+        assert mmodal.locator('.food-aroma-entry').count() in [1,2,3]
+        if note=='Oolong':
+            expect(mmodal.locator('.food-aroma-rank')).to_have_text(['1위','2위','3위'])
+            expect(mmodal.locator('.food-aroma-value')).to_have_count(0)
+        if note=='Shiitake':
+            expect(mmodal.locator('.food-aroma-value')).to_have_text(['105100 OAV','36547 OAV','4048 OAV'])
+            expect(mmodal.locator('.food-aroma-basis')).to_contain_text('OAV')
+        if note=='Honeysuckle':expect(mmodal.locator('.food-aroma-rank')).to_have_text(['공동 1위']*3)
+        detail=mmodal.locator('.food-aroma-component-details').first
+        detail.locator('summary').tap()
+        expect(detail).to_have_attribute('open','')
+        assert detail.locator('a[href^="https://doi.org/"]').count()==1
+        assert len(detail.locator('.food-aroma-locator').inner_text())>5
+        mmodal.locator('.flavor-evidence-panel').evaluate('(e)=>e.scrollTop=0')
+        mpage.evaluate('document.fonts.ready')
+        mmodal.screenshot(path=str(OUT/(note.lower()+'-mobile.png')))
+        # Actual mobile close button restores the previous body scroll mode.
+        mmodal.locator('.flavor-evidence-close').tap()
+        expect(mmodal).to_be_hidden()
+    results.append('All 420 mobile popups render; flowers/wood/one-or-two compounds, located per-molecule links, OAV, tied FD and quantity-free source ordering verified')
 
     # Existing report controls and SNS card remain the production implementation.
     page.locator('#exportSnsImgBtn').click()

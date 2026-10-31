@@ -1477,6 +1477,7 @@
 <script src="report-profiles-model.js"></script>
 <script src="report-profiles.js"></script>
 <script src="archive-reference-ui.js"></script>
+<script src="aroma-literature-data.js"></script>
 <script src="food-aroma-data.js"></script>
 <script src="flavor-evidence.js"></script>
 <script>
@@ -3446,14 +3447,17 @@ function formatEvidenceSource(source) {
 }
 
 function formatFoodAromaEntries(evidence) {
-  if (!evidence.entries.length) return `<p class="food-aroma-empty">${escapeHtml(evidence.reason || '자료 미확인')}</p>`;
-  return `<ul class="food-aroma-entries">${evidence.entries.map(item => `<li class="food-aroma-entry">${item.rank === null ? '' : `<span class="food-aroma-rank">${item.tied ? '공동 ' : ''}${item.rank}위</span>`}<div class="food-aroma-compound"><strong>${escapeHtml(item.nameKo)}</strong><span class="food-aroma-original">${escapeHtml(item.nameOriginal)}</span></div><span class="food-aroma-value">${item.value === null ? '<span class="food-aroma-unit">값 미확인</span>' : `${escapeHtml(item.reported)} <span class="food-aroma-unit">${escapeHtml(item.unit)}</span>`}</span></li>`).join('')}</ul>`;
+  if (!evidence.entries.length) return `<p class="food-aroma-empty">${escapeHtml(evidence.reason || '업데이트 예정')}</p>`;
+  return `<ul class="food-aroma-entries">${evidence.entries.map(item => {
+    const citations=(item.citations||[]).map(c=>formatEvidenceSource({...FoodAromaData.sources[c.sourceId],locator:c.locator})).join('');
+    return `<li class="food-aroma-entry"><div class="food-aroma-entry-heading">${item.rank == null ? '' : `<span class="food-aroma-rank">${item.tied ? '공동 ' : ''}${item.rank}위</span>`}<div class="food-aroma-compound"><strong>${escapeHtml(item.nameKo)}</strong><span class="food-aroma-original">${escapeHtml(item.nameOriginal)}</span></div>${item.value == null ? '' : `<span class="food-aroma-value">${escapeHtml(item.reported)} <span class="food-aroma-unit">${escapeHtml(item.unit)}</span></span>`}</div>${item.description?`<p class="food-aroma-description">${escapeHtml(item.description)}</p>`:''}${item.reference||citations?`<details class="food-aroma-component-details"><summary>${escapeHtml(item.nameKo)} · 참고 재료·문헌</summary>${formatFoodAromaReference({reference:item.reference})}${citations}</details>`:''}</li>`;
+  }).join('')}</ul>`;
 }
 
 function formatFoodAromaReference(evidence) {
   if (!evidence.reference) return '';
   const ref = evidence.reference;
-  const fields = [['식품', ref.food], ['품종', ref.cultivar], ['부위', ref.part], ['상태', ref.state], ['수확', ref.harvest]];
+  const fields = [['재료', ref.food], ['학명', ref.taxon], ['품종', ref.cultivar], ['부위', ref.part], ['상태', ref.state], ['수확', ref.harvest]];
   return `<section class="food-aroma-reference"><h4>참고 대상</h4><dl>${fields.filter(([,value]) => value).map(([label,value]) => `<dt>${escapeHtml(label)}</dt><dd>${escapeHtml(value)}</dd>`).join('')}</dl></section>`;
 }
 
@@ -3510,14 +3514,14 @@ function openFlavorEvidenceModal(key, trigger = document.activeElement) {
   const label = currentLanguage === 'ko' ? (rec[6] || rec[2]) : rec[2];
   const statusText = {
     'verified-ranking': '검증된 순위 · ' + evidence.basisLabel,
-    'representative': '대표 성분 · 순위 미확정',
-    'unverified': '자료 미확인',
-    'not-applicable': '적용 대상 아님'
-  }[evidence.status] || '자료 미확인';
+    'representative': '대표 향기 성분',
+    'pending': '업데이트 예정',
+    'unverified': '업데이트 예정'
+  }[evidence.status] || '업데이트 예정';
   const details = [...(evidence.conditions || []), ...(evidence.issues || [])];
   if (evidence.reference?.sampleGroup) details.unshift('시료군: ' + evidence.reference.sampleGroup, '분석 열: ' + evidence.reference.column);
   const modal = ensureFlavorEvidenceModal();
-  modal.innerHTML = `<article class="flavor-evidence-panel" aria-labelledby="flavorEvidenceTitle" tabindex="-1"><div class="flavor-evidence-head"><h3 id="flavorEvidenceTitle">${escapeHtml(label)} · 주요 향기 성분</h3><button type="button" class="flavor-evidence-close" aria-label="성분 창 닫기">×</button></div><p class="food-aroma-status" data-status="${escapeHtml(evidence.status)}">${escapeHtml(statusText)}</p>${formatFoodAromaReference(evidence)}<h4 class="food-aroma-basis">순위 기준: ${escapeHtml(evidence.basisLabel || (evidence.status === 'not-applicable' ? '적용하지 않음' : '미확정 · 정량 자료 미확인'))}</h4>${formatFoodAromaEntries(evidence)}${evidence.basisNote ? `<p class="food-aroma-explanation">${escapeHtml(evidence.basisNote)}</p>` : ''}${evidence.scopeNote ? `<p class="food-aroma-explanation">${escapeHtml(evidence.scopeNote)}</p>` : ''}${evidence.sources.length ? `<section class="food-aroma-sources"><h4>출처</h4>${evidence.sources.map(formatEvidenceSource).join('')}</section>` : ''}${details.length ? `<details class="food-aroma-details"><summary>상세 분석 조건 · 자료 처리</summary><ul>${details.map(text => `<li>${escapeHtml(text)}</li>`).join('')}</ul></details>` : ''}<p class="food-aroma-note">${escapeHtml(evidence.note)}</p></article>`;
+  modal.innerHTML = `<article class="flavor-evidence-panel" aria-labelledby="flavorEvidenceTitle" tabindex="-1"><div class="flavor-evidence-head"><h3 id="flavorEvidenceTitle">${escapeHtml(label)} · 주요 향기 성분</h3><button type="button" class="flavor-evidence-close" aria-label="성분 창 닫기">×</button></div><p class="food-aroma-status" data-status="${escapeHtml(evidence.status)}">${escapeHtml(statusText)}</p>${formatFoodAromaReference(evidence)}<h4 class="food-aroma-basis">순위 기준: ${escapeHtml(evidence.basisLabel || '미확정')}</h4>${formatFoodAromaEntries(evidence)}${evidence.basisNote ? `<p class="food-aroma-explanation">${escapeHtml(evidence.basisNote)}</p>` : ''}${evidence.scopeNote ? `<p class="food-aroma-explanation">${escapeHtml(evidence.scopeNote)}</p>` : ''}${evidence.sources.length ? `<section class="food-aroma-sources"><h4>출처</h4>${evidence.sources.map(formatEvidenceSource).join('')}</section>` : ''}${details.length ? `<details class="food-aroma-details"><summary>상세 분석 조건 · 자료 처리</summary><ul>${details.map(text => `<li>${escapeHtml(text)}</li>`).join('')}</ul></details>` : ''}<p class="food-aroma-note">${escapeHtml(evidence.note)}</p></article>`;
   modal.querySelector('.flavor-evidence-close').addEventListener('click', closeFlavorEvidenceModal);
   lastFlavorEvidenceTrigger = trigger instanceof HTMLElement ? trigger : null;
   flavorEvidencePreviousBodyOverflow = document.body.style.overflow;

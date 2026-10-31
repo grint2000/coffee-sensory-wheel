@@ -1,11 +1,12 @@
-const APP_CACHE = 'noel-sca-app-v19-food-aroma';
-const RUNTIME_CACHE = 'noel-sca-runtime-v19-food-aroma';
+const APP_CACHE = 'noel-sca-app-v20-aroma-literature';
+const RUNTIME_CACHE = 'noel-sca-runtime-v20-aroma-literature';
 
 const APP_SHELL_FILES = [
   './',
   './index.html',
   './offline.html',
   './manifest.json',
+  './aroma-literature-data.js',
   './food-aroma-data.js',
   './food-aroma.css',
   './flavor-evidence.js',

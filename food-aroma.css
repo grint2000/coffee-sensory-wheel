@@ -15,7 +15,7 @@
 .food-aroma-reference dd { margin:0; }
 .food-aroma-basis { font-size:14px; font-weight:700; margin:16px 0 10px; }
 .food-aroma-entries { list-style:none; margin:0; padding:0; }
-.food-aroma-entry { display:flex; align-items:center; gap:12px; padding:14px 0; border-bottom:1px solid #e5e7eb; }
+.food-aroma-entry { display:block; padding:14px 0; border-bottom:1px solid #e5e7eb; }
 .food-aroma-rank { --food-ink:#8b5a2b; flex:0 0 3em; font-size:16px; font-weight:800; }
 .food-aroma-compound { flex:1; min-width:0; }
 .food-aroma-compound strong { display:block; font-size:16px; font-weight:700; }
@@ -35,3 +35,9 @@
 .food-aroma-note { border-top:1px solid #e5e7eb; padding-top:12px; }
 @media(max-width:699px) { .flavor-evidence-trigger { width:44px; height:44px; margin-right:3px; } .flavor-evidence-modal { padding:10px; } .flavor-evidence-panel { padding:18px; } .flavor-evidence-head h3 { font-size:18px; } .food-aroma-entry { gap:8px; } }
 @media(min-width:700px) { .flavor-evidence-modal { align-items:center; } }
+
+.food-aroma-entry-heading { display:flex; align-items:center; gap:12px; }
+.food-aroma-description { font-size:13px; line-height:1.65; margin:8px 0; }
+.food-aroma-component-details { font-size:12px; line-height:1.6; }
+.food-aroma-component-details summary { cursor:pointer; min-height:44px; display:list-item; padding:10px 0; }
+.food-aroma-component-details .food-aroma-reference { margin:5px 0; }
