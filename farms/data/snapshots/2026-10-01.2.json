@@ -1,0 +1,1011 @@
+{
+  "schema_version": "1.0.0",
+  "archive_id": "noel-farm-knowledge",
+  "revision": "2026-10-01.2",
+  "updated_at": "2026-10-01",
+  "fictional": false,
+  "owner_label": "Noel",
+  "scope": "질문·관심 농장부터 확인된 자료를 누적",
+  "storage": {
+    "mode": "versioned-site-source",
+    "canonical_path": "dist/data/archive.json",
+    "browser_storage_is_authoritative": false,
+    "update_mode": "source revision + private publish",
+    "snapshot_policy": "append-only",
+    "price_data_included": false
+  },
+  "countries": [
+    {
+      "id": "country-000001",
+      "name_ko": "과테말라",
+      "name": "Guatemala",
+      "iso2": "GT",
+      "source_ids": [
+        "src-000010"
+      ],
+      "hierarchy_note": "행정구역과 커피 산지 체계를 구분한다. 대·중·소는 탐색 단계이며 모든 국가의 법정 단위가 같다는 뜻이 아니다."
+    }
+  ],
+  "regions": [
+    {
+      "id": "region-000001",
+      "name": "Huehuetenango",
+      "name_ko": "우에우에테낭고",
+      "parent_id": "country-000001",
+      "country_id": "country-000001",
+      "browse_level": "large",
+      "native_level": "Departamento",
+      "region_type": "administrative",
+      "source_ids": [
+        "src-000010"
+      ]
+    },
+    {
+      "id": "region-000002",
+      "name": "San Pedro Necta",
+      "name_ko": "산 페드로 넥타",
+      "parent_id": "region-000001",
+      "country_id": "country-000001",
+      "browse_level": "middle",
+      "native_level": "Municipio",
+      "region_type": "administrative",
+      "source_ids": [
+        "src-000010"
+      ]
+    },
+    {
+      "id": "region-000003",
+      "name": "Buena Vista",
+      "name_ko": "부에나 비스타",
+      "parent_id": "region-000002",
+      "country_id": "country-000001",
+      "browse_level": "small",
+      "native_level": "Caserío",
+      "region_type": "settlement",
+      "source_ids": [
+        "src-000003"
+      ]
+    },
+    {
+      "id": "region-000004",
+      "name": "Highland Huehue",
+      "name_ko": "하이랜드 우에우에",
+      "parent_id": "country-000001",
+      "country_id": "country-000001",
+      "browse_level": null,
+      "native_level": "Coffee region",
+      "region_type": "coffee_region",
+      "source_ids": [
+        "src-000011"
+      ]
+    }
+  ],
+  "farms": [
+    {
+      "id": "farm-000001",
+      "name": "Finca Rosma",
+      "name_ko": "핀카 로스마",
+      "aliases": [
+        "Rosma",
+        "ROSMA",
+        "로스마",
+        "로즈마"
+      ],
+      "country_id": "country-000001",
+      "region_ids": [
+        "region-000001",
+        "region-000002",
+        "region-000003"
+      ],
+      "related_region_ids": [
+        "region-000004"
+      ],
+      "summary": "과테말라 우에우에테낭고의 Morales 가문 농장. 공식 연혁과 대회 기록을 연도별로 연결해 읽습니다.",
+      "source_ids": [
+        "src-000001",
+        "src-000003",
+        "src-000010"
+      ],
+      "updated_at": "2026-10-01",
+      "entity_type": "farm",
+      "notes_status": "실제 자료 · 출처별 범위 표시"
+    }
+  ],
+  "people": [
+    {
+      "id": "person-000001",
+      "name": "Don Alejandro Morales",
+      "role": "1963 매입자",
+      "farm_id": "farm-000001",
+      "source_ids": [
+        "src-000001"
+      ],
+      "period": "1963"
+    },
+    {
+      "id": "person-000002",
+      "name": "Dr. Fredy Milton Morales Merida",
+      "role": "1980 승계 · 2024 소개상 소유자",
+      "farm_id": "farm-000001",
+      "source_ids": [
+        "src-000001",
+        "src-000003"
+      ],
+      "period": "1980 / 2024"
+    },
+    {
+      "id": "person-000003",
+      "name": "Fredy Milton Morales de la Peña",
+      "role": "2024 소개상 Q grader",
+      "farm_id": "farm-000001",
+      "source_ids": [
+        "src-000003"
+      ],
+      "period": "2024"
+    },
+    {
+      "id": "person-000004",
+      "name": "Angel Alejandro Morales",
+      "role": "2024 소개상 Q processing",
+      "farm_id": "farm-000001",
+      "source_ids": [
+        "src-000003"
+      ],
+      "period": "2024"
+    }
+  ],
+  "organizations": [
+    {
+      "id": "organization-000001",
+      "name": "Rosma Coffee Land",
+      "type": "producer_exporter_group",
+      "relationship": "Rosma 및 여러 농장 커피의 수출 조직",
+      "source_ids": [
+        "src-000002"
+      ]
+    }
+  ],
+  "claims": [
+    {
+      "id": "clm-000001",
+      "entity_id": "farm-000001",
+      "section": "history",
+      "title": "1963 · 농장 매입",
+      "text": "Don Alejandro Morales가 기존 Bourbon·Typica 나무가 있던 농장을 매입했다는 농장 공식 연혁이다.",
+      "source_ids": [
+        "src-000001"
+      ],
+      "applicable_period": "1963",
+      "status": "source_claim",
+      "evidence_level": "E1",
+      "verified_at": "2026-10-01",
+      "fictional": false,
+      "supersedes": null
+    },
+    {
+      "id": "clm-000002",
+      "entity_id": "farm-000001",
+      "section": "history",
+      "title": "1980 · 승계와 이름",
+      "text": "아들 Dr. Fredy Morales가 이어받아 아내 Rose Mary의 이름에서 ROSMA라는 농장명을 만들었다.",
+      "source_ids": [
+        "src-000001"
+      ],
+      "applicable_period": "1980",
+      "status": "source_claim",
+      "evidence_level": "E1",
+      "verified_at": "2026-10-01",
+      "fictional": false,
+      "supersedes": null
+    },
+    {
+      "id": "clm-000003",
+      "entity_id": "farm-000001",
+      "section": "history",
+      "title": "도로·용수·습식 가공장",
+      "text": "Buena Vista 공동체의 도움으로 도로를 마련했고, 약 5km 떨어진 수원의 물을 연결해 습식 가공에 사용했다고 소개한다. 건설 연도는 미상이다.",
+      "source_ids": [
+        "src-000001"
+      ],
+      "applicable_period": "연도 미상",
+      "status": "source_claim",
+      "evidence_level": "E1",
+      "verified_at": "2026-10-01",
+      "fictional": false,
+      "supersedes": null
+    },
+    {
+      "id": "clm-000004",
+      "entity_id": "farm-000001",
+      "section": "geography",
+      "title": "행정구역",
+      "text": "Huehuetenango는 Departamento, San Pedro Necta는 Municipio로 확인된다. 이 화면에서는 각각 대지역과 중지역 탐색 단계에 대응한다.",
+      "source_ids": [
+        "src-000010"
+      ],
+      "applicable_period": "2025 결과 표",
+      "status": "verified",
+      "evidence_level": "E1",
+      "verified_at": "2026-10-01",
+      "fictional": false,
+      "supersedes": null
+    },
+    {
+      "id": "clm-000005",
+      "entity_id": "farm-000001",
+      "section": "geography",
+      "title": "소지역 · Caserío Buena Vista",
+      "text": "2024 대회 농장 소개의 주소는 Caserío Buena Vista이다. Caserío라는 원문 단위를 보존하며, Michicoy와의 세부 포함 관계는 확인하지 못했다.",
+      "source_ids": [
+        "src-000003"
+      ],
+      "applicable_period": "2024 농장 제출 소개",
+      "status": "source_claim",
+      "evidence_level": "E1",
+      "verified_at": "2026-10-01",
+      "fictional": false,
+      "supersedes": null
+    },
+    {
+      "id": "clm-000006",
+      "entity_id": "farm-000001",
+      "section": "geography",
+      "title": "고도",
+      "text": "2024 본문은 4,900–6,000ft, 2026 구조화 필드는 1,494–1,829를 제시한다. 2026 필드의 단위는 별도 기재가 없어 수치만 보존한다. 2024 카드의 단일값 1,800과 농장 전체 범위를 구분한다.",
+      "source_ids": [
+        "src-000003",
+        "src-000009"
+      ],
+      "applicable_period": "2024·2026 농장 소개",
+      "status": "needs_context",
+      "evidence_level": "E2",
+      "verified_at": "2026-10-01",
+      "fictional": false,
+      "supersedes": null
+    },
+    {
+      "id": "clm-000007",
+      "entity_id": "farm-000001",
+      "section": "geography",
+      "title": "면적",
+      "text": "2024 농장 소개의 면적은 60ha이다. 전체 소유 면적인지 커피 재배 면적인지 구분되지 않아 재배면적으로 단정하지 않는다.",
+      "source_ids": [
+        "src-000003"
+      ],
+      "applicable_period": "2024 농장 제출 소개",
+      "status": "needs_context",
+      "evidence_level": "E2",
+      "verified_at": "2026-10-01",
+      "fictional": false,
+      "supersedes": null
+    },
+    {
+      "id": "clm-000008",
+      "entity_id": "farm-000001",
+      "section": "people",
+      "title": "소유자로 소개된 인물",
+      "text": "2024 소개의 Our Team은 Dr. Fredy Milton Morales Merida를 Owner로 명시한다. 현재 등기 소유자나 지분 구조까지 확인한 자료는 아니다.",
+      "source_ids": [
+        "src-000003"
+      ],
+      "applicable_period": "2024 농장 제출 소개",
+      "status": "source_claim",
+      "evidence_level": "E1",
+      "verified_at": "2026-10-01",
+      "fictional": false,
+      "supersedes": null
+    },
+    {
+      "id": "clm-000009",
+      "entity_id": "farm-000001",
+      "section": "people",
+      "title": "품질·가공 담당",
+      "text": "2024 소개에서 Fredy Milton Morales de la Peña는 Q grader, Angel Alejandro Morales는 Q processing 담당으로 구분된다.",
+      "source_ids": [
+        "src-000003"
+      ],
+      "applicable_period": "2024 농장 제출 소개",
+      "status": "source_claim",
+      "evidence_level": "E1",
+      "verified_at": "2026-10-01",
+      "fictional": false,
+      "supersedes": null
+    },
+    {
+      "id": "clm-000010",
+      "entity_id": "farm-000001",
+      "section": "people",
+      "title": "농장과 수출 조직",
+      "text": "Rosma Coffee Land는 Finca Rosma뿐 아니라 여러 소·중규모 농장의 커피를 수출한다고 설명한다. 그룹이 취급한 품종·가공을 Rosma 농장에 자동 귀속하지 않는다.",
+      "source_ids": [
+        "src-000002"
+      ],
+      "applicable_period": "시점 미상",
+      "status": "source_claim",
+      "evidence_level": "E1",
+      "verified_at": "2026-10-01",
+      "fictional": false,
+      "supersedes": null
+    },
+    {
+      "id": "clm-000011",
+      "entity_id": "farm-000001",
+      "section": "varieties",
+      "title": "농장 소개의 품종",
+      "text": "2026 소개에 Hibrid H1, Pacamara, Gesha, SL28, Maragogype와 유지 중인 Bourbon이 나온다. 나무 수·구획·연도별 생산 비중은 미확인이다.",
+      "source_ids": [
+        "src-000009"
+      ],
+      "applicable_period": "2026 농장 제출 소개",
+      "status": "source_claim",
+      "evidence_level": "E1",
+      "verified_at": "2026-10-01",
+      "fictional": false,
+      "supersedes": null
+    },
+    {
+      "id": "clm-000012",
+      "entity_id": "farm-000001",
+      "section": "processing",
+      "title": "농장 소개의 가공",
+      "text": "2024 소개에는 fully washed, red honey, yellow honey, natural drying이 기재된다. 모든 판매 로트에 이 가공법을 일괄 적용하지 않는다.",
+      "source_ids": [
+        "src-000003"
+      ],
+      "applicable_period": "2024 농장 제출 소개",
+      "status": "source_claim",
+      "evidence_level": "E1",
+      "verified_at": "2026-10-01",
+      "fictional": false,
+      "supersedes": null
+    },
+    {
+      "id": "clm-000013",
+      "entity_id": "farm-000001",
+      "section": "processing",
+      "title": "수확기와 건조",
+      "text": "2024 소개는 수확기를 1–4월, 건조 장소를 직사광 파티오·아프리칸 베드·그린하우스로 제시한다. 특정 로트의 실제 수확일·건조 기간은 별도 확인이 필요하다.",
+      "source_ids": [
+        "src-000003"
+      ],
+      "applicable_period": "2024 농장 제출 소개",
+      "status": "source_claim",
+      "evidence_level": "E1",
+      "verified_at": "2026-10-01",
+      "fictional": false,
+      "supersedes": null
+    },
+    {
+      "id": "clm-000014",
+      "entity_id": "farm-000001",
+      "section": "geography",
+      "title": "Highland Huehue 산지 맥락",
+      "text": "Anacafé는 비화산성 고지대, Tehuantepec의 따뜻하고 건조한 바람, 풍부한 하천을 이 산지의 특징으로 설명한다. 이 설명만으로 Rosma 로트의 컵노트를 만들지 않는다.",
+      "source_ids": [
+        "src-000011"
+      ],
+      "applicable_period": "게시 시점 미상",
+      "status": "source_claim",
+      "evidence_level": "E1",
+      "verified_at": "2026-10-01",
+      "fictional": false,
+      "supersedes": null
+    }
+  ],
+  "lots": [
+    {
+      "id": "lot-000001",
+      "farm_id": "farm-000001",
+      "label": "Rosma · 2010 COE",
+      "competition_year": 2010,
+      "crop_year": null,
+      "crop_year_status": "미확인",
+      "sale_year": null,
+      "arrival_date": null,
+      "original_lot_id": "2",
+      "lot_id_type": "2010 공식 경매결과 Lot #",
+      "variety": null,
+      "process": null,
+      "representative": "Fredy Milton Morales Merida",
+      "source_ids": [
+        "src-000004"
+      ],
+      "award_id": "awd-000001",
+      "verified_at": "2026-10-01",
+      "note": "대회 연도는 수확연도와 다름. 현재 판매 제품과 동일한 로트인지 별도 대조 필요.",
+      "competition_rank_display": "2"
+    },
+    {
+      "id": "lot-000002",
+      "farm_id": "farm-000001",
+      "label": "Rosma · 2023 COE",
+      "competition_year": 2023,
+      "crop_year": null,
+      "crop_year_status": "미확인",
+      "sale_year": null,
+      "arrival_date": null,
+      "original_lot_id": null,
+      "lot_id_type": "실제 경매·생산 로트번호 직접 확인 필요",
+      "variety": "Gesha",
+      "process": "Washed",
+      "representative": "Fredy Milton Morales Merida",
+      "source_ids": [
+        "src-000005"
+      ],
+      "award_id": "awd-000002",
+      "verified_at": "2026-10-01",
+      "note": "2a·2b는 공식 결과표의 분할 순위 표기다. 실제 거래용 로트번호는 별도 대조하며, 두 번의 수상으로 집계하지 않는다.",
+      "competition_rank_display": "2a·2b"
+    },
+    {
+      "id": "lot-000003",
+      "farm_id": "farm-000001",
+      "label": "Rosma · 2024 COE",
+      "competition_year": 2024,
+      "crop_year": null,
+      "crop_year_status": "미확인",
+      "sale_year": null,
+      "arrival_date": null,
+      "original_lot_id": null,
+      "lot_id_type": "실제 경매·생산 로트번호 직접 확인 필요",
+      "variety": "Geisha",
+      "process": "Washed",
+      "representative": "Fredy Milton Morales Merida",
+      "source_ids": [
+        "src-000006"
+      ],
+      "award_id": "awd-000003",
+      "verified_at": "2026-10-01",
+      "note": "대회 연도는 수확연도와 다름. 현재 판매 제품과 동일한 로트인지 별도 대조 필요.",
+      "competition_rank_display": "4"
+    },
+    {
+      "id": "lot-000004",
+      "farm_id": "farm-000001",
+      "label": "Rosma · 2025 COE",
+      "competition_year": 2025,
+      "crop_year": null,
+      "crop_year_status": "미확인",
+      "sale_year": null,
+      "arrival_date": null,
+      "original_lot_id": null,
+      "lot_id_type": "실제 경매·생산 로트번호 직접 확인 필요",
+      "variety": "Geisha",
+      "process": "Washed",
+      "representative": "Alejandro Morales de la Peña",
+      "source_ids": [
+        "src-000007"
+      ],
+      "award_id": "awd-000004",
+      "verified_at": "2026-10-01",
+      "note": "대회 연도는 수확연도와 다름. 현재 판매 제품과 동일한 로트인지 별도 대조 필요.",
+      "competition_rank_display": "6"
+    },
+    {
+      "id": "lot-000005",
+      "farm_id": "farm-000001",
+      "label": "Rosma · 2026 COE",
+      "competition_year": 2026,
+      "crop_year": null,
+      "crop_year_status": "미확인",
+      "sale_year": null,
+      "arrival_date": null,
+      "original_lot_id": null,
+      "lot_id_type": "실제 경매·생산 로트번호 직접 확인 필요",
+      "variety": "Geisha",
+      "process": "Washed",
+      "representative": "Finca Rosma, S. A.",
+      "source_ids": [
+        "src-000008"
+      ],
+      "award_id": "awd-000005",
+      "verified_at": "2026-10-01",
+      "note": "대회 연도는 수확연도와 다름. 현재 판매 제품과 동일한 로트인지 별도 대조 필요.",
+      "competition_rank_display": "9"
+    },
+    {
+      "id": "lot-000006",
+      "farm_id": "farm-000001",
+      "label": "Rosma · 2025 지역 대회",
+      "competition_year": 2025,
+      "crop_year": null,
+      "crop_year_status": "미확인",
+      "sale_year": null,
+      "arrival_date": null,
+      "original_lot_id": null,
+      "lot_id_type": "실제 경매·생산 로트번호 직접 확인 필요",
+      "variety": "Pacamára",
+      "process": "Natural",
+      "representative": null,
+      "source_ids": [
+        "src-000012"
+      ],
+      "award_id": "awd-000006",
+      "verified_at": "2026-10-01",
+      "note": "대회 연도는 수확연도와 다름. 현재 판매 제품과 동일한 로트인지 별도 대조 필요.",
+      "competition_rank_display": "공동 4"
+    }
+  ],
+  "awards": [
+    {
+      "id": "awd-000001",
+      "lot_id": "lot-000001",
+      "farm_id": "farm-000001",
+      "event": "Cup of Excellence",
+      "organizer": "ACE / Cup of Excellence",
+      "event_year": 2010,
+      "category": "전체 결과",
+      "rank": "2",
+      "score": "89.80",
+      "source_ids": [
+        "src-000004"
+      ],
+      "status": "verified"
+    },
+    {
+      "id": "awd-000002",
+      "lot_id": "lot-000002",
+      "farm_id": "farm-000001",
+      "event": "Cup of Excellence",
+      "organizer": "ACE / Cup of Excellence",
+      "event_year": 2023,
+      "category": "전체 결과",
+      "rank": "2a·2b",
+      "score": "90.82",
+      "source_ids": [
+        "src-000005"
+      ],
+      "status": "verified"
+    },
+    {
+      "id": "awd-000003",
+      "lot_id": "lot-000003",
+      "farm_id": "farm-000001",
+      "event": "Cup of Excellence",
+      "organizer": "ACE / Cup of Excellence",
+      "event_year": 2024,
+      "category": "Exotic Washed",
+      "rank": "4",
+      "score": "89.31",
+      "source_ids": [
+        "src-000006"
+      ],
+      "status": "verified"
+    },
+    {
+      "id": "awd-000004",
+      "lot_id": "lot-000004",
+      "farm_id": "farm-000001",
+      "event": "Cup of Excellence",
+      "organizer": "ACE / Cup of Excellence",
+      "event_year": 2025,
+      "category": "Exotic Washed",
+      "rank": "6",
+      "score": "88.76",
+      "source_ids": [
+        "src-000007"
+      ],
+      "status": "verified"
+    },
+    {
+      "id": "awd-000005",
+      "lot_id": "lot-000005",
+      "farm_id": "farm-000001",
+      "event": "Cup of Excellence",
+      "organizer": "ACE / Cup of Excellence",
+      "event_year": 2026,
+      "category": "Exotic Washed",
+      "rank": "9",
+      "score": "87.71",
+      "source_ids": [
+        "src-000008"
+      ],
+      "status": "verified"
+    },
+    {
+      "id": "awd-000006",
+      "lot_id": "lot-000006",
+      "farm_id": "farm-000001",
+      "event": "Anacafé 지역 대회",
+      "organizer": "Anacafé",
+      "event_year": 2025,
+      "category": "Región V · Procesos",
+      "rank": "공동 4",
+      "score": "88.50",
+      "source_ids": [
+        "src-000012"
+      ],
+      "status": "verified"
+    }
+  ],
+  "issues": [
+    {
+      "id": "issue-000001",
+      "title": "대회 대표자와 소유자는 다를 수 있다",
+      "severity": "표기 차이",
+      "text": "2024 결과 표는 Fredy Milton Morales Merida, 농장 카드의 Farmer 필드는 Fredy Milton Morales De La Peña이다. 2026 결과 표는 Finca Rosma, S. A., 농장 카드는 Angel Alejandro Morales De La Peña이다. 역할·법인·연도 차이를 보존하며 소유권 변경으로 해석하지 않는다.",
+      "source_ids": [
+        "src-000003",
+        "src-000006",
+        "src-000008",
+        "src-000009"
+      ],
+      "question": "각 연도 Farmer / Representative의 실제 역할과 현재 소유·운영 관계 확인",
+      "status": "open"
+    },
+    {
+      "id": "issue-000002",
+      "title": "면적·고도의 적용 범위",
+      "severity": "조건 미확인",
+      "text": "60ha의 면적 정의, 단일 고도와 범위 고도의 적용 대상, 2026 고도 필드의 단위가 미확인이다.",
+      "source_ids": [
+        "src-000003",
+        "src-000009"
+      ],
+      "question": "재배 면적과 농장 전체 면적, 구획별 고도·단위 확인",
+      "status": "open"
+    },
+    {
+      "id": "issue-000003",
+      "title": "수확연도·판매 로트 연결",
+      "severity": "미확인",
+      "text": "대회 연도만 기록했다. 수입 입고일, 판매 게시일, 대회연도로 수확기를 채우지 않았다. 현재 취급 상품의 로트번호·수확기 원문이 필요하다.",
+      "source_ids": [],
+      "question": "수입 서류나 생산자 lot sheet와 대회 lot ID 대조",
+      "status": "open"
+    },
+    {
+      "id": "issue-000004",
+      "title": "소지역의 추가 포함 관계",
+      "severity": "미확인",
+      "text": "Caserío Buena Vista까지 농장 주소를 확인했다. Michicoy가 중간에 포함되는지는 이번에 읽은 직접 자료로 확정하지 않았다.",
+      "source_ids": [
+        "src-000003"
+      ],
+      "question": "Buena Vista·Michicoy의 행정·취락 포함 관계 확인",
+      "status": "open"
+    },
+    {
+      "id": "issue-000005",
+      "title": "대회 순위와 실제 로트번호",
+      "severity": "구분 필요",
+      "text": "COE 결과표의 Rank는 순위 표기다. 2023의 2a·2b와 2024–2026의 순위를 실제 생산·경매 로트번호로 사용하지 않는다. 원문이 Lot #를 명시한 2010 기록만 해당 번호를 보존했다.",
+      "source_ids": [
+        "src-000004",
+        "src-000005",
+        "src-000006",
+        "src-000007",
+        "src-000008"
+      ],
+      "question": "각 연도의 경매 플랫폼 lot ID와 수입 lot sheet를 별도 대조",
+      "status": "open"
+    }
+  ],
+  "sources": [
+    {
+      "id": "src-000001",
+      "title": "Finca Rosma · 농장 공식 연혁",
+      "publisher": "Rosma Coffee Land",
+      "url": "https://www.fincarosma.com/copia-de-los-aguacatones-3",
+      "type": "생산자 공식 소개",
+      "published_at": null,
+      "accessed_at": "2026-10-01",
+      "fact_period": "1963·1980 및 날짜 미상 연혁",
+      "location": "FINCA ROSMA 본문, 연혁과 수로·습식 가공장 문단",
+      "language": "en",
+      "read_scope": "FINCA ROSMA 본문, 연혁과 수로·습식 가공장 문단",
+      "access": "public",
+      "rights": "서지정보·자체 요약만 보존. 원문과 사진의 재사용 권한을 의미하지 않음.",
+      "summary": "공식 소개는 1963년 Alejandro Morales의 매입, 1980년 아들 Fredy Morales의 승계와 Rose Mary에서 유래한 명칭을 설명한다. 공동체 도로와 약 5km 수로를 통한 용수 확보를 소개한다.",
+      "revision": 1,
+      "supersedes": null,
+      "record_path": "data/source-records/src-000001.json",
+      "record_sha256": "d39331422e3138f1c6ef5875050ae43d8e7e953c41daf43df281372b3a198c09",
+      "hash_scope": "저장한 서지·요약 카드의 바이트. 웹 원문 해시가 아님."
+    },
+    {
+      "id": "src-000002",
+      "title": "Rosma Coffee Land · About Us",
+      "publisher": "Rosma Coffee Land",
+      "url": "https://www.fincarosma.com/quienes-somos",
+      "type": "생산자·수출자 공식 소개",
+      "published_at": null,
+      "accessed_at": "2026-10-01",
+      "fact_period": "기준 시점 미상",
+      "location": "ABOUT US 본문",
+      "language": "en",
+      "read_scope": "ABOUT US 본문",
+      "access": "public",
+      "rights": "서지정보·자체 요약만 보존. 원문과 사진의 재사용 권한을 의미하지 않음.",
+      "summary": "Finca Rosma의 생산량 한계 이후 친척·이웃·지인 농장을 모아 자사 및 여러 소·중규모 농장의 커피를 수출하기 시작했다고 설명한다. 수출 그룹과 개별 농장을 구분한다.",
+      "revision": 1,
+      "supersedes": null,
+      "record_path": "data/source-records/src-000002.json",
+      "record_sha256": "597011933117235f3996d35677961c5015819c7f0c5aa9425fedabbc375728cd",
+      "hash_scope": "저장한 서지·요약 카드의 바이트. 웹 원문 해시가 아님."
+    },
+    {
+      "id": "src-000003",
+      "title": "Rosma · Guatemala 2024 (Wet) 농장 카드",
+      "publisher": "Cup of Excellence Farm Directory",
+      "url": "https://farmdirectory.cupofexcellence.org/listing/4-rosma-guatemala-2024-wet/",
+      "type": "대회 농장 제출 소개",
+      "published_at": null,
+      "accessed_at": "2026-10-01",
+      "fact_period": "2024 대회 소개; 현재성 별도 확인 필요",
+      "location": "Description, Our Team, Geographic characteristics, Coffee production characteristics, Farm Information, Lot Information",
+      "language": "en",
+      "read_scope": "Description, Our Team, Geographic characteristics, Coffee production characteristics, Farm Information, Lot Information",
+      "access": "public",
+      "rights": "서지정보·자체 요약만 보존. 원문과 사진의 재사용 권한을 의미하지 않음.",
+      "summary": "Caserío Buena Vista 소재, 소유자 Fredy Milton Morales Merida, Q grader와 Q processing 담당, 면적 60ha와 고도 4,900–6,000ft, 1–4월 수확, 품종 갱신 및 가공 방식을 소개한다. 구조화된 Farmer 필드는 다른 이름을 사용한다.",
+      "revision": 1,
+      "supersedes": null,
+      "record_path": "data/source-records/src-000003.json",
+      "record_sha256": "0b9c5de8acd04da08a17a8b53ba981581855415daf3a7635edc976505306a7a9",
+      "hash_scope": "저장한 서지·요약 카드의 바이트. 웹 원문 해시가 아님."
+    },
+    {
+      "id": "src-000004",
+      "title": "Guatemala 2010 · 공식 결과",
+      "publisher": "Alliance for Coffee Excellence",
+      "url": "https://allianceforcoffeeexcellence.org/guatemala-2010/",
+      "type": "대회 주최기관 결과",
+      "published_at": null,
+      "accessed_at": "2026-10-01",
+      "fact_period": "2010 대회",
+      "location": "Competition Results 표의 Rosma 행",
+      "language": "en",
+      "read_scope": "Competition Results 표의 Rosma 행",
+      "access": "public",
+      "rights": "서지정보·자체 요약만 보존. 원문과 사진의 재사용 권한을 의미하지 않음.",
+      "summary": "2010년 Rosma 2위, 89.80점, Fredy Milton Morales Merida, San Pedro Necta·Huehuetenango를 확인한다.",
+      "revision": 1,
+      "supersedes": null,
+      "record_path": "data/source-records/src-000004.json",
+      "record_sha256": "336533834ef9b4cbda62e99df15621bab673562ec0f8e9db626cd4cac9f9d4a2",
+      "hash_scope": "저장한 서지·요약 카드의 바이트. 웹 원문 해시가 아님."
+    },
+    {
+      "id": "src-000005",
+      "title": "Guatemala 2023 · 공식 결과",
+      "publisher": "Alliance for Coffee Excellence",
+      "url": "https://allianceforcoffeeexcellence.org/guatemala-2023/",
+      "type": "대회 주최기관 결과",
+      "published_at": null,
+      "accessed_at": "2026-10-01",
+      "fact_period": "2023 대회",
+      "location": "COE Competition Results 표의 ROSMA 2a·2b 행",
+      "language": "en",
+      "read_scope": "COE Competition Results 표의 ROSMA 2a·2b 행",
+      "access": "public",
+      "rights": "서지정보·자체 요약만 보존. 원문과 사진의 재사용 권한을 의미하지 않음.",
+      "summary": "2023년 ROSMA 2a·2b, 90.82점, Washed·Gesha, Fredy Milton Morales Merida를 확인한다. 두 행의 분할 경매 표기를 유지한다.",
+      "revision": 1,
+      "supersedes": null,
+      "record_path": "data/source-records/src-000005.json",
+      "record_sha256": "54ed6cd65b7a0e130158133f6ff2bd0d6fb9941cc6ec3773214b024e27050345",
+      "hash_scope": "저장한 서지·요약 카드의 바이트. 웹 원문 해시가 아님."
+    },
+    {
+      "id": "src-000006",
+      "title": "Guatemala 2024 · 공식 결과",
+      "publisher": "Alliance for Coffee Excellence",
+      "url": "https://allianceforcoffeeexcellence.org/guatemala-2024/",
+      "type": "대회 주최기관 결과",
+      "published_at": null,
+      "accessed_at": "2026-10-01",
+      "fact_period": "2024 대회",
+      "location": "COE Results → Exotic Washed → Rosma 4위 행",
+      "language": "en",
+      "read_scope": "COE Results → Exotic Washed → Rosma 4위 행",
+      "access": "public",
+      "rights": "서지정보·자체 요약만 보존. 원문과 사진의 재사용 권한을 의미하지 않음.",
+      "summary": "2024년 Exotic Washed 부문 Rosma 4위, 89.31점, Washed·Geisha, Fredy Milton Morales Merida를 확인한다.",
+      "revision": 1,
+      "supersedes": null,
+      "record_path": "data/source-records/src-000006.json",
+      "record_sha256": "29d26e1705ef80cb1fec228cf0680f6e533c12015db993f37cb159e1a2a41505",
+      "hash_scope": "저장한 서지·요약 카드의 바이트. 웹 원문 해시가 아님."
+    },
+    {
+      "id": "src-000007",
+      "title": "Guatemala 2025 · 공식 결과",
+      "publisher": "Alliance for Coffee Excellence",
+      "url": "https://allianceforcoffeeexcellence.org/guatemala-2025/",
+      "type": "대회 주최기관 결과",
+      "published_at": null,
+      "accessed_at": "2026-10-01",
+      "fact_period": "2025 대회",
+      "location": "COE Results → Exotic Washed → Rosma 6위 행",
+      "language": "en",
+      "read_scope": "COE Results → Exotic Washed → Rosma 6위 행",
+      "access": "public",
+      "rights": "서지정보·자체 요약만 보존. 원문과 사진의 재사용 권한을 의미하지 않음.",
+      "summary": "2025년 Exotic Washed 부문 Rosma 6위, 88.76점, Washed·Geisha, Alejandro Morales de la Peña를 확인한다.",
+      "revision": 1,
+      "supersedes": null,
+      "record_path": "data/source-records/src-000007.json",
+      "record_sha256": "547fecc67f517ffbce341021114568b11a0dd2c2aff648eb2fd8ef7ab5338593",
+      "hash_scope": "저장한 서지·요약 카드의 바이트. 웹 원문 해시가 아님."
+    },
+    {
+      "id": "src-000008",
+      "title": "Guatemala 2026 · 공식 결과",
+      "publisher": "Alliance for Coffee Excellence",
+      "url": "https://allianceforcoffeeexcellence.org/guatemala-2026/",
+      "type": "대회 주최기관 결과",
+      "published_at": null,
+      "accessed_at": "2026-10-01",
+      "fact_period": "2026 대회",
+      "location": "COE Results → Exotic Washed → Rosma 9위 행",
+      "language": "en",
+      "read_scope": "COE Results → Exotic Washed → Rosma 9위 행",
+      "access": "public",
+      "rights": "서지정보·자체 요약만 보존. 원문과 사진의 재사용 권한을 의미하지 않음.",
+      "summary": "2026년 Exotic Washed 부문 Rosma 9위, 87.71점, Washed·Geisha를 확인한다. Farmer / Representative에는 Finca Rosma, S. A.가 표기되어 있다.",
+      "revision": 1,
+      "supersedes": null,
+      "record_path": "data/source-records/src-000008.json",
+      "record_sha256": "1a9f9e884b7b492cca4489d6ca45c3c59dd43fd3c377a46fb7fff58aef62427a",
+      "hash_scope": "저장한 서지·요약 카드의 바이트. 웹 원문 해시가 아님."
+    },
+    {
+      "id": "src-000009",
+      "title": "Rosma · Guatemala 2026 (Exotic Washed) 농장 카드",
+      "publisher": "Cup of Excellence Farm Directory",
+      "url": "https://farmdirectory.cupofexcellence.org/listing/9-rosma-guatemala-2026-exotic-washed/",
+      "type": "대회 농장 제출 소개",
+      "published_at": null,
+      "accessed_at": "2026-10-01",
+      "fact_period": "2026 대회 소개",
+      "location": "Description, Farm Information, Lot Information",
+      "language": "en",
+      "read_scope": "Description, Farm Information, Lot Information",
+      "access": "public",
+      "rights": "서지정보·자체 요약만 보존. 원문과 사진의 재사용 권한을 의미하지 않음.",
+      "summary": "농장 소개는 H1·Pacamara·Gesha·SL28·Maragogype 갱신과 Bourbon 유지, 고도 1494–1829를 기재한다. Farmer 필드는 Angel Alejandro Morales De La Peña이며 해당 대회 로트는 Washed·Geisha이다.",
+      "revision": 1,
+      "supersedes": null,
+      "record_path": "data/source-records/src-000009.json",
+      "record_sha256": "74ef019de21d9863c5119a739ee6b661524a738f48150c93f4d975e849785db0",
+      "hash_scope": "저장한 서지·요약 카드의 바이트. 웹 원문 해시가 아님."
+    },
+    {
+      "id": "src-000010",
+      "title": "Cup of Excellence 2025 · Anacafé 결과",
+      "publisher": "Anacafé",
+      "url": "https://www.anacafe.org/resultados-coe-2025/",
+      "type": "국가 커피기관 결과",
+      "published_at": "2025-06-05",
+      "accessed_at": "2026-10-01",
+      "fact_period": "2025 대회",
+      "location": "CATEGORÍA EXÓTICO LAVADO 표의 Rosma 행",
+      "language": "es",
+      "read_scope": "CATEGORÍA EXÓTICO LAVADO 표의 Rosma 행",
+      "access": "public",
+      "rights": "서지정보·자체 요약만 보존. 원문과 사진의 재사용 권한을 의미하지 않음.",
+      "summary": "Rosma의 Municipio를 San Pedro Necta, Departamento를 Huehuetenango로 구분해 기재한다. Exótico Lavado 6위, 88.76점이다.",
+      "revision": 1,
+      "supersedes": null,
+      "record_path": "data/source-records/src-000010.json",
+      "record_sha256": "c959da22733b0f53cf6af90a345ffdaf11111e82d2486e56aae0aac09ce0ae4c",
+      "hash_scope": "저장한 서지·요약 카드의 바이트. 웹 원문 해시가 아님."
+    },
+    {
+      "id": "src-000011",
+      "title": "Highland Huehue · 산지 개요",
+      "publisher": "Guatemalan Coffees / Anacafé",
+      "url": "https://www.guatemalancoffees.com/main/regions-and-profiles/highland-huehue/",
+      "type": "국가 커피기관 산지 소개",
+      "published_at": null,
+      "accessed_at": "2026-10-01",
+      "fact_period": "게시 기준 시점 미상",
+      "location": "산지 소개, Region profile, Huehue in the cup",
+      "language": "es",
+      "read_scope": "산지 소개, Region profile, Huehue in the cup",
+      "access": "public",
+      "rights": "서지정보·자체 요약만 보존. 원문과 사진의 재사용 권한을 의미하지 않음.",
+      "summary": "Highland Huehue는 비화산성 고지대 산지로 설명된다. 멕시코 Tehuantepec의 건조하고 따뜻한 바람과 풍부한 하천을 소개한다. 산지의 일반적 컵 프로필은 개별 농장이나 로트의 관능 결과가 아니다.",
+      "revision": 1,
+      "supersedes": null,
+      "record_path": "data/source-records/src-000011.json",
+      "record_sha256": "4a94e1684d5b3d07adb823914c68e407dc4e9eba99579e981a5892512bd7c5de",
+      "hash_scope": "저장한 서지·요약 카드의 바이트. 웹 원문 해시가 아님."
+    },
+    {
+      "id": "src-000012",
+      "title": "Huehuetenango·Quiché 지역 대회 2025",
+      "publisher": "Anacafé",
+      "url": "https://www.anacafe.org/competencia-huehuetenango-2025/",
+      "type": "지역 대회 주최기관 결과",
+      "published_at": null,
+      "accessed_at": "2026-10-01",
+      "fact_period": "2025 지역 대회",
+      "location": "CATEGORÍA PROCESOS 표의 ROSMA 행",
+      "language": "es",
+      "read_scope": "CATEGORÍA PROCESOS 표의 ROSMA 행",
+      "access": "public",
+      "rights": "서지정보·자체 요약만 보존. 원문과 사진의 재사용 권한을 의미하지 않음.",
+      "summary": "Rosma의 2025년 Región V Procesos 부문 공동 4위 표기, 88.50점, Pacamára·Natural을 확인한다. Cup of Excellence와는 다른 지역 대회다.",
+      "revision": 1,
+      "supersedes": null,
+      "record_path": "data/source-records/src-000012.json",
+      "record_sha256": "1557d871d2bae302d77908ace4deeb29f06c0621fd0eca78100b73cad05719df",
+      "hash_scope": "저장한 서지·요약 카드의 바이트. 웹 원문 해시가 아님."
+    }
+  ],
+  "changes": [
+    {
+      "id": "change-000001",
+      "date": "2026-10-01",
+      "revision": "2026-10-01.1",
+      "type": "initial_seed",
+      "title": "Rosma의 첫 출처 기반 농장 카드",
+      "summary": "공식 연혁, 국가·대·중·소 지역, 담당 관계, 농장 소개의 품종·가공, 2010·2023–2026 COE 및 2025 지역 대회를 분리해 등록. 표기 차이와 미확인 사항을 보존.",
+      "source_ids": [
+        "src-000001",
+        "src-000002",
+        "src-000003",
+        "src-000004",
+        "src-000005",
+        "src-000006",
+        "src-000007",
+        "src-000008",
+        "src-000009",
+        "src-000010",
+        "src-000011",
+        "src-000012"
+      ],
+      "previous_revision": null,
+      "snapshot_path": "data/snapshots/2026-10-01.1.json"
+    },
+    {
+      "id": "change-000002",
+      "date": "2026-10-01",
+      "revision": "2026-10-01.2",
+      "type": "editorial_correction",
+      "title": "대회 순위와 원문 로트번호 분리",
+      "summary": "원문 결과표를 재검수해 순위 표기와 실제 lot ID 필드를 분리했습니다. 미확인 로트번호는 빈칸으로 정정했고 2010의 명시적 Lot #만 유지했습니다. 초판·원문카드·수상 점수는 보존합니다.",
+      "source_ids": [
+        "src-000004",
+        "src-000005",
+        "src-000006",
+        "src-000007",
+        "src-000008"
+      ],
+      "previous_revision": "2026-10-01.1",
+      "snapshot_path": "data/snapshots/2026-10-01.2.json",
+      "field_changes": [
+        {
+          "entity_id": "lot-000002",
+          "field": "original_lot_id",
+          "previous": "2a / 2b",
+          "new": null,
+          "reason": "결과표 Rank를 실제 원문 lot ID로 오인하지 않도록 분리"
+        },
+        {
+          "entity_id": "lot-000003",
+          "field": "original_lot_id",
+          "previous": "4",
+          "new": null,
+          "reason": "결과표 Rank를 실제 원문 lot ID로 오인하지 않도록 분리"
+        },
+        {
+          "entity_id": "lot-000004",
+          "field": "original_lot_id",
+          "previous": "6",
+          "new": null,
+          "reason": "결과표 Rank를 실제 원문 lot ID로 오인하지 않도록 분리"
+        },
+        {
+          "entity_id": "lot-000005",
+          "field": "original_lot_id",
+          "previous": "9",
+          "new": null,
+          "reason": "결과표 Rank를 실제 원문 lot ID로 오인하지 않도록 분리"
+        }
+      ]
+    }
+  ]
+}
