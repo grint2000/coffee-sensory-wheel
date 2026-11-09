@@ -1,14 +1,15 @@
-/* CP-12 explicit local-file reference selection. Whole archives stay in memory only. */
+/* Public and local archive selection. Whole archives stay in memory only. */
 function installArchiveReference(){
  if(window.ArchiveReferenceUI)return window.ArchiveReferenceUI;
  const A=ArchiveReference,$=id=>document.getElementById(id),node=(tag,text,id)=>{const e=document.createElement(tag);if(text!==undefined)e.textContent=text;if(id)e.id=id;return e;};
- let index=null,fileHash=null,ticket=0,pending=null,backupURL=null;const browseFarms=new Map();
+ let index=null,fileHash=null,ticket=0,pending=null,backupURL=null,publicSource=false,onlineRequest=null,retryLink=null;const browseFarms=new Map();
  const panel=node('details',undefined,'archiveReferencePanel');panel.className='archive-reference-panel';panel.append(node('summary','농장 아카이브 참조 · 선택'));
- panel.append(node('p','농장 아카이브에서 자료 내보내기 → 전체 자료 JSON으로 받은 파일을 선택하세요. 읽기용 Markdown은 이 입력에 사용할 수 없습니다.','archiveFileHelp'));
- panel.append(node('p','직접 선택한 로컬 JSON 파일만 이 창의 메모리에서 읽습니다. 전체 아카이브는 저장하거나 서버로 보내지 않습니다. 선택한 농장·로트의 공개 참조 사본(읽을 당시 판본)만 검토 후 현재 평가에 연결합니다.'));
+ panel.append(node('p','공개 농장 아카이브를 불러오거나, 이전 판본을 쓰려면 보관한 JSON을 선택하세요. 전체 자료는 이 창의 메모리에서만 읽습니다.','archiveFileHelp'));
+ const onlineBtn=node('button','온라인 농장 불러오기','archiveOnlineBtn');onlineBtn.type='button';panel.append(onlineBtn);
+ const browseLink=node('a','농장 아카이브에서 찾아보기','archiveBrowseLink');browseLink.href='./farms/';panel.append(browseLink);
  const fileLabel=node('label','아카이브 JSON · 최대 4MiB'),fileInput=node('input',undefined,'archiveFileInput');fileInput.type='file';fileInput.accept='.json,application/json';fileLabel.htmlFor=fileInput.id;fileLabel.append(fileInput);panel.append(fileLabel);
  const fileInfo=node('p','불러온 파일 없음','archiveFileInfo');panel.append(fileInfo);
- const release=node('button','불러온 파일을 메모리에서 해제','archiveRelease');release.type='button';panel.append(release);
+ const release=node('button','불러온 자료를 메모리에서 해제','archiveRelease');release.type='button';panel.append(release);
  const grid=node('div');grid.className='archive-reference-grid';panel.append(grid);
  function select(id,label){const l=node('label',label),s=node('select',undefined,id);l.htmlFor=id;l.append(s);grid.append(l);return s;}
  const country=select('archiveCountry','1. 국가'),region=select('archiveRegion','2. 지역 경로'),farm=select('archiveFarm','3. 농장'),lot=select('archiveLot','4. 로트 · 선택 사항');
@@ -18,7 +19,7 @@ function installArchiveReference(){
  resetSelections();
  panel.append(node('p','지역의 대·중·소 단계가 없으면 미확인으로 유지합니다. 같은 경로의 대·중·소 조상은 하나의 경로로 표시합니다. 형제·별개 경로가 있으면 모두 참조 사본에 남깁니다. 농장 수상을 현재 커피의 수상으로 복사하지 않으며 수상·크롭·판매 연도는 서로 구분합니다.'));
  const previewBtn=node('button','선택한 참조 전체 미리보기','archivePreviewBtn');previewBtn.type='button';panel.append(previewBtn);
- const status=node('p','파일을 직접 선택한 뒤 농장과 필요할 경우 정확한 로트를 선택하세요.','archiveStatus');status.setAttribute('role','status');panel.append(status);
+ const status=node('p','온라인 자료나 JSON 파일을 불러온 뒤 농장과 필요할 경우 정확한 로트를 선택하세요.','archiveStatus');status.setAttribute('role','status');panel.append(status);
  const preview=node('section',undefined,'archivePreview');preview.hidden=true;panel.append(preview);
  preview.append(node('h4','현재 평가에 붙일 참조 전체'));
  const target=node('p',undefined,'archivePreviewTarget');preview.append(target);
@@ -31,10 +32,17 @@ function installArchiveReference(){
  const stored=node('details',undefined,'archiveStoredReference');stored.append(node('summary','현재 평가에 보존된 참조'));const storedBody=node('div',undefined,'archiveStoredBody');stored.append(storedBody);panel.append(stored);
  $('recordIdentitySummary').closest('section').after(panel);
  function clearPreview(){pending=null;P0Production.cancelArchiveReference();preview.hidden=true;applyBtn.disabled=true;referenceBody.replaceChildren();target.textContent='';if(backupURL)URL.revokeObjectURL(backupURL);backupURL=null;beforeLink.hidden=true;beforeLink.removeAttribute('href');beforeLink.removeAttribute('download');}
- function clearFile(){index=null;fileHash=null;fileInput.value='';fileInfo.textContent='불러온 파일 없음';resetSelections();}
- function invalidate(event){ticket++;clearPreview();const account=event?.detail?.reason==='account'||['cupping:auth-ready','cupping:account-changed','storage'].includes(event?.type);if(account){clearFile();panel.open=false;}status.textContent='입력·계정·선택 상태가 바뀌었습니다. 참조를 다시 미리보세요.';renderStored();}
+ function stopOnline(){onlineRequest?.abort();onlineRequest=null;}
+ function clearFile(){index=null;fileHash=null;publicSource=false;fileInput.value='';fileInfo.textContent='불러온 자료 없음';resetSelections();}
+ function invalidate(event){
+  const current=++ticket,loading=onlineRequest!==null,requested=retryLink;stopOnline();clearPreview();
+  const account=event?.detail?.reason==='account'||['cupping:auth-ready','cupping:account-changed','storage'].includes(event?.type);
+  if(account&&!publicSource){clearFile();panel.open=Boolean(requested);}
+  status.textContent='입력·계정·선택 상태가 바뀌었습니다. 참조를 다시 미리보세요.';renderStored();
+  if(account&&loading&&requested&&event?.type!=='storage')queueMicrotask(()=>{if(ticket===current)loadOnline(requested);});
+ }
  function externalStamp(){const state=P0Production.historySnapshot();const fields=Array.from(document.querySelectorAll('input,textarea,select')).filter(e=>e.id&&!panel.contains(e)&&e.id!=='importSamplesInput'&&!e.closest('#flavorWheelMultiSelectArea')).map(e=>[e.id,e.value,e.checked]);const stored=['noel_sca_sessions_','noel_sca_samples2_','noel_sca_current_sample_'].map(prefix=>localStorage.getItem(prefix+state.loadedUser));return JSON.stringify({state,fields,stored});}
- async function loadFile(file){const request=++ticket;clearPreview();clearFile();if(!file)return;let stamp;try{
+ async function loadFile(file){const request=++ticket;retryLink=null;stopOnline();clearPreview();clearFile();if(!file)return;let stamp;try{
   stamp=externalStamp();if(!Number.isFinite(file.size)||file.size>A.MAX_BYTES)throw Error('아카이브는 4MiB 이하여야 합니다. 파일을 읽지 않았습니다.');status.textContent='선택한 파일을 메모리에서 검증하고 원본 바이트 SHA-256을 계산합니다.';
   const buffer=await file.arrayBuffer();if(request!==ticket)return;if(buffer.byteLength>A.MAX_BYTES)throw Error('읽은 파일이 4MiB를 넘습니다.');
   const raw=new TextDecoder('utf-8',{fatal:true}).decode(buffer),parsed=A.parse(raw);
@@ -46,14 +54,68 @@ function installArchiveReference(){
   status.textContent='파일을 메모리에만 불러왔습니다. 국가·지역 경로·농장을 직접 선택하세요.';renderStored();
  }catch(e){if(request===ticket){clearFile();status.textContent='파일을 연결하지 않았습니다: '+e.message;}}
  }
+ function linkSelection(){
+  const params=new URLSearchParams(window.location.search),farms=params.getAll('archiveFarm'),lots=params.getAll('archiveLot');
+  if(!farms.length&&!lots.length)return null;
+  const valid=id=>/^[A-Za-z0-9][A-Za-z0-9_.:-]{0,149}$/.test(id);
+  if(farms.length!==1||lots.length>1||!valid(farms[0])||(lots.length&&!valid(lots[0])))throw Error('농장·로트 링크의 ID 형식이 맞지 않습니다.');
+  return {farmId:farms[0],lotId:lots[0]??null};
+ }
+ async function boundedBody(response){
+  const limit=A.MAX_BYTES;
+  if(Number(response.headers.get('content-length'))>limit||!response.body)throw Error('공개 아카이브 크기 또는 응답 형식을 확인하세요.');
+  const reader=response.body.getReader(),chunks=[];let size=0;
+  try{
+   while(true){const {done,value}=await reader.read();if(done)break;size+=value.byteLength;if(size>limit){await reader.cancel();throw Error('공개 아카이브가 4MiB를 넘습니다.');}chunks.push(value);}
+  }finally{reader.releaseLock();}
+  const bytes=new Uint8Array(size);let offset=0;for(const chunk of chunks){bytes.set(chunk,offset);offset+=chunk.byteLength;}return bytes;
+ }
+ function selectLink({farmId,lotId}){
+  const entry=index.farms.get(farmId);
+  if(!entry||!index.countries.has(entry.country_id)||(lotId!==null&&index.lots.get(lotId)?.farm_id!==farmId))throw Error('링크의 농장·로트를 현재 공개 판본에서 찾거나 연결할 수 없습니다.');
+  country.value=entry.country_id;populateRegions();
+  const route=[...browseFarms].find(([,ids])=>ids.has(farmId))?.[0];
+  if(!route)throw Error('선택한 농장의 지역 경로를 확인할 수 없습니다.');
+  region.value=route;populateFarms();farm.value=farmId;populateLots();lot.value=lotId??'';
+ }
+ async function loadOnline(requested=null){
+  const request=++ticket;retryLink=requested;stopOnline();clearPreview();clearFile();
+  const controller=new AbortController();onlineRequest=controller;
+  status.textContent='공개 농장 아카이브를 불러오는 중입니다.';
+  try{
+   const url=new URL('./farms/data/archive.json',window.location.href);
+   if(!['https:','http:'].includes(url.protocol)||url.origin!==window.location.origin)throw Error('온라인 평가 화면에서 다시 열거나 보관한 JSON을 사용하세요.');
+   const response=await fetch(url,{credentials:'omit',mode:'same-origin',redirect:'error',cache:'no-store',signal:controller.signal});
+   if(!response.ok)throw Error('공개 자료에 연결하지 못했습니다.');
+   const bytes=await boundedBody(response);if(request!==ticket)return;
+   const parsed=A.parse(new TextDecoder('utf-8',{fatal:true}).decode(bytes));
+   if(!window.crypto?.subtle)throw Error('원본 SHA-256을 계산할 수 없습니다.');
+   const digest=await window.crypto.subtle.digest('SHA-256',bytes);if(request!==ticket)return;
+   index=parsed;fileHash=Array.from(new Uint8Array(digest),b=>b.toString(16).padStart(2,'0')).join('');
+   publicSource=true;options(country,[...index.countries.values()].map(c=>[c.id,label(c)]));
+   fileInfo.textContent='공개 아카이브 · 판본 '+index.archive.revision+' · SHA-256 '+fileHash;
+   if(requested)selectLink(requested);
+   retryLink=null;
+   status.textContent=requested?'링크의 농장·로트를 선택했습니다. 전체 참조를 미리본 뒤 현재 평가에 적용하세요.':'공개 자료를 불러왔습니다. 국가·지역·농장과 필요한 로트를 선택하세요.';
+   renderStored();
+  }catch(e){if(request===ticket){
+   if(index&&requested){retryLink=null;resetSelections();options(country,[...index.countries.values()].map(c=>[c.id,label(c)]));}
+   else clearFile();
+   status.textContent='참조를 적용하지 않았습니다: '+e.message+' 온라인 자료를 다시 불러오거나 JSON을 선택할 수 있습니다.';
+  }}finally{if(onlineRequest===controller)onlineRequest=null;}
+ }
+ onlineBtn.addEventListener('click',()=>loadOnline(retryLink));
  fileInput.addEventListener('change',()=>loadFile(fileInput.files?.[0]));
- function selectionChanged(){ticket++;clearPreview();status.textContent='선택이 바뀌었습니다. 전체 참조를 다시 미리보세요.';}
- country.addEventListener('change',()=>{selectionChanged();browseFarms.clear();options(region,[]);options(farm,[]);options(lot,[],'농장만 참조 · 수상 로트 선택 안 함');if(!index||!country.value)return;const paths=new Map();function addPath(key,text,farmId){paths.set(key,text);if(!browseFarms.has(key))browseFarms.set(key,new Set());browseFarms.get(key).add(farmId);}for(const f of index.farms.values()){if(f.country_id!==country.value)continue;try{const normalized=A.regionPaths(index,Array.isArray(f.region_ids)?f.region_ids:[],country.value,[]);if(!normalized.length)addPath('__unknown__','지역 경로 미확인',f.id);for(const path of normalized){const unknown=path.chain.filter(r=>r.browse_level===null);addPath(path.chain[path.chain.length-1].id,['large','middle','small'].map((key,i)=>['대','중','소'][i]+': '+(path.levels[key]?label(path.levels[key]):'미확인')).join(' → ')+(unknown.length?' · 단계 미확인 원문: '+unknown.map(r=>label(r)+(r.native_level?' ('+r.native_level+')':'')).join(' → '):''),f.id);}}catch{addPath('__invalid__'+f.id,'지역 연결 확인 필요 · '+f.id,f.id);}}options(region,[...paths]);});
- region.addEventListener('change',()=>{selectionChanged();options(farm,[]);options(lot,[],'농장만 참조 · 수상 로트 선택 안 함');if(!index||!country.value||!region.value)return;options(farm,[...index.farms.values()].filter(f=>f.country_id===country.value&&browseFarms.get(region.value)?.has(f.id)).map(f=>[f.id,label(f)+' · '+f.id]));});
- farm.addEventListener('change',()=>{selectionChanged();options(lot,index?[...index.lots.values()].filter(l=>l.farm_id===farm.value).map(l=>[l.id,l.label||l.id]):[],'농장만 참조 · 수상 로트 선택 안 함');});
+ function selectionChanged(){ticket++;retryLink=null;stopOnline();clearPreview();status.textContent='선택이 바뀌었습니다. 전체 참조를 다시 미리보세요.';}
+ function populateRegions(){browseFarms.clear();options(region,[]);options(farm,[]);options(lot,[],'농장만 참조 · 수상 로트 선택 안 함');if(!index||!country.value)return;const paths=new Map();function addPath(key,text,farmId){paths.set(key,text);if(!browseFarms.has(key))browseFarms.set(key,new Set());browseFarms.get(key).add(farmId);}for(const f of index.farms.values()){if(f.country_id!==country.value)continue;try{const normalized=A.regionPaths(index,Array.isArray(f.region_ids)?f.region_ids:[],country.value,[]);if(!normalized.length)addPath('__unknown__','지역 경로 미확인',f.id);for(const path of normalized){const unknown=path.chain.filter(r=>r.browse_level===null);addPath(path.chain[path.chain.length-1].id,['large','middle','small'].map((key,i)=>['대','중','소'][i]+': '+(path.levels[key]?label(path.levels[key]):'미확인')).join(' → ')+(unknown.length?' · 단계 미확인 원문: '+unknown.map(r=>label(r)+(r.native_level?' ('+r.native_level+')':'')).join(' → '):''),f.id);}}catch{addPath('__invalid__'+f.id,'지역 연결 확인 필요 · '+f.id,f.id);}}options(region,[...paths]);}
+ function populateFarms(){options(farm,[]);options(lot,[],'농장만 참조 · 수상 로트 선택 안 함');if(!index||!country.value||!region.value)return;options(farm,[...index.farms.values()].filter(f=>f.country_id===country.value&&browseFarms.get(region.value)?.has(f.id)).map(f=>[f.id,label(f)+' · '+f.id]));}
+ function populateLots(){options(lot,index?[...index.lots.values()].filter(l=>l.farm_id===farm.value).map(l=>[l.id,l.label||l.id]):[],'농장만 참조 · 수상 로트 선택 안 함');}
+ country.addEventListener('change',()=>{selectionChanged();populateRegions();});
+ region.addEventListener('change',()=>{selectionChanged();populateFarms();});
+ farm.addEventListener('change',()=>{selectionChanged();populateLots();});
  lot.addEventListener('change',selectionChanged);
  previewBtn.addEventListener('click',()=>{clearPreview();try{
-  if(!index||!fileHash||!country.value||!region.value||!farm.value)throw Error('파일·국가·지역 경로·농장을 직접 선택하세요.');
+  if(!index||!fileHash||!country.value||!region.value||!farm.value)throw Error('자료를 불러온 뒤 국가·지역 경로·농장을 선택하세요.');
   const reference=A.prepare(index,{farmId:farm.value,lotId:lot.value||null,archiveSha256:fileHash,referencedAt:new Date().toISOString()});
   pending=P0Production.prepareArchiveReference(reference);target.textContent=`적용 대상: ${pending.sampleTitle} · 이전 참조 이력 ${pending.previousCount}건 보존 · 현재 샘플명·농장명·점수·평가 상태는 변경하지 않음`;
   renderReference(referenceBody,pending.reference,'archivePreviewText');backupURL=URL.createObjectURL(new Blob([pending.before],{type:'application/json;charset=utf-8'}));beforeLink.href=backupURL;beforeLink.download='before-archive-reference.json';beforeLink.hidden=false;preview.hidden=false;applyBtn.disabled=false;
@@ -61,7 +123,7 @@ function installArchiveReference(){
  }catch(e){clearPreview();status.textContent='미리보기를 만들지 않았습니다: '+e.message;}});
  applyBtn.addEventListener('click',()=>{if(!pending)return;try{const token=pending.token;P0Production.applyArchiveReference(token);clearPreview();renderStored();status.textContent='검토한 선택 참조를 저장했습니다. 전체 아카이브는 메모리에만 남아 있습니다. 서버 저장 여부는 기존 동기화 표시를 확인하세요.';}catch(e){status.textContent='적용하지 않았습니다. 기존 참조를 유지합니다: '+e.message;}});
  cancelBtn.addEventListener('click',()=>{ticket++;clearPreview();status.textContent='미리보기를 취소했습니다. 현재 평가와 이전 참조를 바꾸지 않았습니다.';});
- release.addEventListener('click',()=>{ticket++;clearPreview();clearFile();renderStored();status.textContent='파일을 메모리에서 해제했습니다. 평가에 이미 저장한 참조 사본(읽을 당시 판본)은 그대로입니다.';});
+ release.addEventListener('click',()=>{ticket++;retryLink=null;stopOnline();clearPreview();clearFile();renderStored();status.textContent='파일을 메모리에서 해제했습니다. 평가에 이미 저장한 참조 사본(읽을 당시 판본)은 그대로입니다.';});
  function renderReference(container,ref,rawId){
   const summary=node('div');summary.className='archive-reference-summary';container.append(summary);
   function row(title,value){const p=node('p');p.append(node('strong',title+' · '),node('span',String(value)));summary.append(p);}
@@ -86,5 +148,7 @@ function installArchiveReference(){
  for(const type of ['input','change'])document.addEventListener(type,event=>{if(!panel.contains(event.target))invalidate(event);},true);
  for(const type of ['cupping:history-changed','cupping:account-changed','cupping:auth-ready'])window.addEventListener(type,invalidate);
  window.addEventListener('storage',event=>{if(!event.key||event.key.startsWith('noel_sca_'))invalidate(event);});
- renderStored();window.ArchiveReferenceUI={renderStored};return window.ArchiveReferenceUI;
+ renderStored();window.ArchiveReferenceUI={renderStored};
+ try{const linked=linkSelection();if(linked){panel.open=true;panel.scrollIntoView?.({block:'start'});loadOnline(linked);}}catch(e){panel.open=true;status.textContent=e.message+' 온라인 자료에서 직접 선택할 수 있습니다.';}
+ return window.ArchiveReferenceUI;
 }

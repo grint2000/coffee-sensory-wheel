@@ -1,5 +1,5 @@
-const APP_CACHE = 'noel-sca-app-v20-aroma-literature';
-const RUNTIME_CACHE = 'noel-sca-runtime-v20-aroma-literature';
+const APP_CACHE = 'noel-sca-app-v21-archive-link';
+const RUNTIME_CACHE = 'noel-sca-runtime-v21-archive-link';
 
 const APP_SHELL_FILES = [
   './',
@@ -65,6 +65,9 @@ self.addEventListener('activate', event => {
 self.addEventListener('fetch', event => {
   const { request } = event;
   if (request.method !== 'GET') return;
+  // Online archive selection must not return a cached catalog when offline.
+  if (request.cache === 'no-store' &&
+      request.url === new URL('farms/data/archive.json', self.registration.scope).href) return;
 
   event.respondWith((async () => {
     const url = new URL(request.url);
