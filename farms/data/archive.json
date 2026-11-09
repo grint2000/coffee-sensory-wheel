@@ -1,8 +1,8 @@
 {
   "schema_version": "1.0.0",
   "archive_id": "noel-farm-knowledge",
-  "revision": "2026-10-07.review-1",
-  "updated_at": "2026-10-07",
+  "revision": "2026-11-09.ethiopia-1",
+  "updated_at": "2026-11-09",
   "fictional": false,
   "owner_label": "Noel",
   "scope": "질문·관심 농장부터 확인된 자료를 누적",
@@ -34,6 +34,17 @@
         "src-000018"
       ],
       "hierarchy_note": "행정구역과 취락 이름을 구분하고 원문 범위만 보존한다."
+    },
+    {
+      "id": "country-000003",
+      "name_ko": "에티오피아",
+      "name": "Ethiopia",
+      "iso2": "ET",
+      "source_ids": [
+        "src-000028",
+        "src-000029"
+      ],
+      "hierarchy_note": "세부 행정 계층은 미확인. 소개의 기반 지역과 모든 취급 로트 원산지는 다르다."
     }
   ],
   "regions": [
@@ -330,6 +341,112 @@
       "updated_at": "2026-10-07",
       "entity_type": "farm",
       "notes_status": "실제 자료 · 농장 일반과 대회 로트 구분"
+    },
+    {
+      "id": "farm-000006",
+      "name": "Alo Coffee",
+      "name_ko": "알로 커피",
+      "aliases": [
+        "알로",
+        "Tamiru Tadesse",
+        "Tamiru Tadesse Tesema"
+      ],
+      "country_id": "country-000003",
+      "region_ids": [],
+      "related_region_ids": [],
+      "summary": "알로 커피는 Tamiru Tadesse와 그의 아내 Messi의 이야기를 바탕으로 한 에티오피아 생산·수출 사업체다. 공식 소개는 시다마 벤사의 알로 마을을 기반으로 설명한다. 단일 농장이나 모든 취급 로트의 공통 원산지로 해석하지 않는다.",
+      "source_ids": [
+        "src-000028"
+      ],
+      "updated_at": "2026-11-09",
+      "entity_type": "producer_exporter_network",
+      "notes_status": "공개 아카이브 · 회사/인물 유형 · 세부 지역 미확인 · 평가 연결 보류",
+      "evaluation_status": "deferred"
+    },
+    {
+      "id": "farm-000007",
+      "name": "Karamo Coffee",
+      "name_ko": "카라모 커피",
+      "aliases": [
+        "Karamo",
+        "케라모",
+        "카라모",
+        "Niguse Gemeda",
+        "Niguse Gemeda Mude"
+      ],
+      "country_id": "country-000003",
+      "region_ids": [],
+      "related_region_ids": [],
+      "summary": "카라모 커피는 Niguse Gemeda와 연결된 에티오피아 생산·수출 사업체다. 공식 사이트는 설립자를 Niguse Gemeda Mude로, 생산 기반을 Sidama Regional Bura Wereda Keramo Kebele로 소개한다. Daye Bensa의 Keramo·Adara Keramo·Keramo Gatta와 별개 대상이다.",
+      "source_ids": [
+        "src-000029",
+        "src-000030"
+      ],
+      "updated_at": "2026-11-09",
+      "entity_type": "producer_exporter_network",
+      "notes_status": "공개 아카이브 · 회사/인물 유형 · 세부 지역 미확인 · 평가 연결 보류",
+      "evaluation_status": "deferred"
+    },
+    {
+      "id": "farm-000008",
+      "name": "Bursa Coffee",
+      "name_ko": "부르사 커피",
+      "aliases": [
+        "부르사",
+        "Mulugeta Muntasha",
+        "Mullugeta Muntasha"
+      ],
+      "country_id": "country-000003",
+      "region_ids": [],
+      "related_region_ids": [],
+      "summary": "부르사 커피는 에티오피아 시다마 아르베고나의 부르사 지역과 연결된 생산·수출 사업체다. 공식 소개는 Mulugeta Muntasha와 그의 아들 Degefu Mulugeta 및 주변 농가와의 협업을 설명한다. 자가 농장과 인근 생산자의 커피를 구분해 기록한다.",
+      "source_ids": [
+        "src-000031",
+        "src-000032"
+      ],
+      "updated_at": "2026-11-09",
+      "entity_type": "producer_exporter_network",
+      "notes_status": "공개 아카이브 · 회사/인물 유형 · 세부 지역 미확인 · 평가 연결 보류",
+      "evaluation_status": "deferred"
+    },
+    {
+      "id": "farm-000009",
+      "name": "Tariku Kare",
+      "name_ko": "타리쿠 카레",
+      "aliases": [
+        "타리쿠 카레",
+        "타리쿠카레"
+      ],
+      "country_id": "country-000003",
+      "region_ids": [],
+      "related_region_ids": [],
+      "summary": "타리쿠 카레는 에티오피아의 커피 생산자이자 가공시설 운영자다. 수입사 소개는 오로미아 넨세보의 Refisa 스테이션과 주변 마을 소농 조달을 설명한다. 고향 Bombe의 시설과 Refisa의 커피를 같은 로트로 취급하지 않는다.",
+      "source_ids": [
+        "src-000033"
+      ],
+      "updated_at": "2026-11-09",
+      "entity_type": "person_station_operator",
+      "notes_status": "공개 아카이브 · 회사/인물 유형 · 세부 지역 미확인 · 평가 연결 보류",
+      "evaluation_status": "deferred"
+    },
+    {
+      "id": "farm-000010",
+      "name": "YKM Coffee Trading",
+      "name_ko": "YKM 커피 트레이딩",
+      "aliases": [
+        "YKM"
+      ],
+      "country_id": "country-000003",
+      "region_ids": [],
+      "related_region_ids": [],
+      "summary": "YKM Coffee Trading은 에티오피아의 가족 경영 커피 생산·수출사다. 공식 소개는 여러 생산지의 가공시설과 Bonga의 자가 커피 농장을 설명한다. 회사의 전체 취급 커피를 한 농장산으로 표시하지 않는다.",
+      "source_ids": [
+        "src-000034"
+      ],
+      "updated_at": "2026-11-09",
+      "entity_type": "producer_exporter_company",
+      "notes_status": "공개 아카이브 · 회사/인물 유형 · 세부 지역 미확인 · 평가 연결 보류",
+      "evaluation_status": "deferred"
     }
   ],
   "people": [
@@ -416,6 +533,48 @@
         "src-000008"
       ],
       "period": "각 출처 연도 기준; 현재 소유권 미확인"
+    },
+    {
+      "id": "person-000009",
+      "name": "Tamiru Tadesse",
+      "role": "생산·수출 사업체의 인물 · 공식 소개",
+      "farm_id": "farm-000006",
+      "source_ids": [
+        "src-000028"
+      ],
+      "period": "소개 기준 시점 미상"
+    },
+    {
+      "id": "person-000010",
+      "name": "Niguse Gemeda Mude",
+      "role": "설립자 · 공식 사이트 표기; 사용자 확인 이름 Niguse Gemeda",
+      "farm_id": "farm-000007",
+      "source_ids": [
+        "src-000029",
+        "src-000030"
+      ],
+      "period": "소개 기준 시점 미상"
+    },
+    {
+      "id": "person-000011",
+      "name": "Mulugeta Muntasha",
+      "role": "생산·수출 네트워크 관련 인물 · 공식 소개",
+      "farm_id": "farm-000008",
+      "source_ids": [
+        "src-000031",
+        "src-000032"
+      ],
+      "period": "소개 기준 시점 미상"
+    },
+    {
+      "id": "person-000012",
+      "name": "Tariku Kare",
+      "role": "생산자·가공시설 운영자 · 수입사 소개",
+      "farm_id": "farm-000009",
+      "source_ids": [
+        "src-000033"
+      ],
+      "period": "소개 기준 시점 미상"
     }
   ],
   "organizations": [
@@ -1005,6 +1164,170 @@
       "fictional": false,
       "supersedes": "clm-000027",
       "revision_reason": "Rosma 한정 출처 연결을 해당 농장 근거로 교체하고 원문별 인물·과거명 연결을 명시"
+    },
+    {
+      "id": "clm-000035",
+      "entity_id": "farm-000006",
+      "section": "geography",
+      "title": "소개와 적용 범위",
+      "text": "알로 커피는 Tamiru Tadesse와 그의 아내 Messi의 이야기를 바탕으로 한 에티오피아 생산·수출 사업체다. 공식 소개는 시다마 벤사의 알로 마을을 기반으로 설명한다. 단일 농장이나 모든 취급 로트의 공통 원산지로 해석하지 않는다.",
+      "source_ids": [
+        "src-000028"
+      ],
+      "applicable_period": "소개 기준 시점 미상 · 2026-11-09 검토",
+      "status": "source_claim",
+      "evidence_level": "E1",
+      "verified_at": "2026-11-09",
+      "fictional": false,
+      "supersedes": null
+    },
+    {
+      "id": "clm-000036",
+      "entity_id": "farm-000006",
+      "section": "people",
+      "title": "신원·대상 경계와 미확인",
+      "text": "사용자가 지칭한 Alo는 Tamiru Tadesse의 Alo Coffee로 확정됐다. DWD의 동명 Alo 시설과 병합하지 않는다. 시설별 고도·품종·가공 및 현재 로트의 수상 동일성은 미확인이다.",
+      "source_ids": [
+        "src-000028"
+      ],
+      "applicable_period": "소개 기준 시점 미상 · 2026-11-09 검토",
+      "status": "needs_context",
+      "evidence_level": "E1",
+      "verified_at": "2026-11-09",
+      "fictional": false,
+      "supersedes": null
+    },
+    {
+      "id": "clm-000037",
+      "entity_id": "farm-000007",
+      "section": "geography",
+      "title": "소개와 적용 범위",
+      "text": "카라모 커피는 Niguse Gemeda와 연결된 에티오피아 생산·수출 사업체다. 공식 사이트는 설립자를 Niguse Gemeda Mude로, 생산 기반을 Sidama Regional Bura Wereda Keramo Kebele로 소개한다. Daye Bensa의 Keramo·Adara Keramo·Keramo Gatta와 별개 대상이다.",
+      "source_ids": [
+        "src-000029",
+        "src-000030"
+      ],
+      "applicable_period": "소개 기준 시점 미상 · 2026-11-09 검토",
+      "status": "source_claim",
+      "evidence_level": "E1",
+      "verified_at": "2026-11-09",
+      "fictional": false,
+      "supersedes": null
+    },
+    {
+      "id": "clm-000038",
+      "entity_id": "farm-000007",
+      "section": "people",
+      "title": "신원·대상 경계와 미확인",
+      "text": "공식 사이트의 설립연도 2017과 The Coffee Quest의 2020이 다르므로 확정 연혁으로 채택하지 않는다. Daye Bensa의 고도·농가 수·품종·공정은 이전하지 않는다. Morke 상품의 값도 회사 전체에 적용하지 않는다.",
+      "source_ids": [
+        "src-000029",
+        "src-000030"
+      ],
+      "applicable_period": "소개 기준 시점 미상 · 2026-11-09 검토",
+      "status": "needs_context",
+      "evidence_level": "E1",
+      "verified_at": "2026-11-09",
+      "fictional": false,
+      "supersedes": null
+    },
+    {
+      "id": "clm-000039",
+      "entity_id": "farm-000008",
+      "section": "geography",
+      "title": "소개와 적용 범위",
+      "text": "부르사 커피는 에티오피아 시다마 아르베고나의 부르사 지역과 연결된 생산·수출 사업체다. 공식 소개는 Mulugeta Muntasha와 그의 아들 Degefu Mulugeta 및 주변 농가와의 협업을 설명한다. 자가 농장과 인근 생산자의 커피를 구분해 기록한다.",
+      "source_ids": [
+        "src-000031",
+        "src-000032"
+      ],
+      "applicable_period": "소개 기준 시점 미상 · 2026-11-09 검토",
+      "status": "source_claim",
+      "evidence_level": "E1",
+      "verified_at": "2026-11-09",
+      "fictional": false,
+      "supersedes": null
+    },
+    {
+      "id": "clm-000040",
+      "entity_id": "farm-000008",
+      "section": "people",
+      "title": "신원·대상 경계와 미확인",
+      "text": "자가 농장과 인근 생산자의 공급을 구분한다. Dawencho와 Muntasha/Bursa Main의 동일성, 서로 다른 고도값은 미확인. Dawencho 그룹의 수상을 개인 Mulugeta 또는 현재 입고 로트의 수상으로 옮기지 않는다.",
+      "source_ids": [
+        "src-000031",
+        "src-000032"
+      ],
+      "applicable_period": "소개 기준 시점 미상 · 2026-11-09 검토",
+      "status": "needs_context",
+      "evidence_level": "E1",
+      "verified_at": "2026-11-09",
+      "fictional": false,
+      "supersedes": null
+    },
+    {
+      "id": "clm-000041",
+      "entity_id": "farm-000009",
+      "section": "geography",
+      "title": "소개와 적용 범위",
+      "text": "타리쿠 카레는 에티오피아의 커피 생산자이자 가공시설 운영자다. 수입사 소개는 오로미아 넨세보의 Refisa 스테이션과 주변 마을 소농 조달을 설명한다. 고향 Bombe의 시설과 Refisa의 커피를 같은 로트로 취급하지 않는다.",
+      "source_ids": [
+        "src-000033"
+      ],
+      "applicable_period": "소개 기준 시점 미상 · 2026-11-09 검토",
+      "status": "source_claim",
+      "evidence_level": "E2",
+      "verified_at": "2026-11-09",
+      "fictional": false,
+      "supersedes": null
+    },
+    {
+      "id": "clm-000042",
+      "entity_id": "farm-000009",
+      "section": "people",
+      "title": "신원·대상 경계와 미확인",
+      "text": "Refisa / Nensebo와 Bombe는 별도 시설이다. 출처의 상단 지역표기와 본문 Oromia 차이는 확정 계층으로 정규화하지 않았다. 특정 상품의 고도·품종·컵노트를 전체 시설에 적용하지 않는다.",
+      "source_ids": [
+        "src-000033"
+      ],
+      "applicable_period": "소개 기준 시점 미상 · 2026-11-09 검토",
+      "status": "needs_context",
+      "evidence_level": "E2",
+      "verified_at": "2026-11-09",
+      "fictional": false,
+      "supersedes": null
+    },
+    {
+      "id": "clm-000043",
+      "entity_id": "farm-000010",
+      "section": "geography",
+      "title": "소개와 적용 범위",
+      "text": "YKM Coffee Trading은 에티오피아의 가족 경영 커피 생산·수출사다. 공식 소개는 여러 생산지의 가공시설과 Bonga의 자가 커피 농장을 설명한다. 회사의 전체 취급 커피를 한 농장산으로 표시하지 않는다.",
+      "source_ids": [
+        "src-000034"
+      ],
+      "applicable_period": "소개 기준 시점 미상 · 2026-11-09 검토",
+      "status": "source_claim",
+      "evidence_level": "E1",
+      "verified_at": "2026-11-09",
+      "fictional": false,
+      "supersedes": null
+    },
+    {
+      "id": "clm-000044",
+      "entity_id": "farm-000010",
+      "section": "people",
+      "title": "신원·대상 경계와 미확인",
+      "text": "회사와 Bonga 자가 농장 후보는 동일 대상이 아니다. Bonga 고유명·경계·인증은 미확인. 다른 산지 취급 제품에 Bonga의 고도·면적을 복사하지 않는다. 공급자 소개는 당사 인증·품질 검증이 아니다.",
+      "source_ids": [
+        "src-000034"
+      ],
+      "applicable_period": "소개 기준 시점 미상 · 2026-11-09 검토",
+      "status": "needs_context",
+      "evidence_level": "E1",
+      "verified_at": "2026-11-09",
+      "fictional": false,
+      "supersedes": null
     }
   ],
   "lots": [
@@ -1545,6 +1868,68 @@
         "src-000021"
       ],
       "question": "필요한 상세값은 생산자 또는 해당 로트 원문으로 추가 확인",
+      "status": "open"
+    },
+    {
+      "id": "issue-000010",
+      "farm_id": "farm-000006",
+      "title": "Alo Coffee · 적용 경계",
+      "severity": "미확인",
+      "text": "사용자가 지칭한 Alo는 Tamiru Tadesse의 Alo Coffee로 확정됐다. DWD의 동명 Alo 시설과 병합하지 않는다. 시설별 고도·품종·가공 및 현재 로트의 수상 동일성은 미확인이다.",
+      "source_ids": [
+        "src-000028"
+      ],
+      "question": "시설·개별 로트 직접 자료가 제공되면 별도 대조. 확정 신원은 재질문하지 않음.",
+      "status": "open"
+    },
+    {
+      "id": "issue-000011",
+      "farm_id": "farm-000007",
+      "title": "Karamo Coffee · 적용 경계",
+      "severity": "미확인",
+      "text": "공식 사이트의 설립연도 2017과 The Coffee Quest의 2020이 다르므로 확정 연혁으로 채택하지 않는다. Daye Bensa의 고도·농가 수·품종·공정은 이전하지 않는다. Morke 상품의 값도 회사 전체에 적용하지 않는다.",
+      "source_ids": [
+        "src-000029",
+        "src-000030"
+      ],
+      "question": "시설·개별 로트 직접 자료가 제공되면 별도 대조. 확정 신원은 재질문하지 않음.",
+      "status": "open"
+    },
+    {
+      "id": "issue-000012",
+      "farm_id": "farm-000008",
+      "title": "Bursa Coffee · 적용 경계",
+      "severity": "미확인",
+      "text": "자가 농장과 인근 생산자의 공급을 구분한다. Dawencho와 Muntasha/Bursa Main의 동일성, 서로 다른 고도값은 미확인. Dawencho 그룹의 수상을 개인 Mulugeta 또는 현재 입고 로트의 수상으로 옮기지 않는다.",
+      "source_ids": [
+        "src-000031",
+        "src-000032"
+      ],
+      "question": "시설·개별 로트 직접 자료가 제공되면 별도 대조. 확정 신원은 재질문하지 않음.",
+      "status": "open"
+    },
+    {
+      "id": "issue-000013",
+      "farm_id": "farm-000009",
+      "title": "Tariku Kare · 적용 경계",
+      "severity": "미확인",
+      "text": "Refisa / Nensebo와 Bombe는 별도 시설이다. 출처의 상단 지역표기와 본문 Oromia 차이는 확정 계층으로 정규화하지 않았다. 특정 상품의 고도·품종·컵노트를 전체 시설에 적용하지 않는다.",
+      "source_ids": [
+        "src-000033"
+      ],
+      "question": "시설·개별 로트 직접 자료가 제공되면 별도 대조. 확정 신원은 재질문하지 않음.",
+      "status": "open"
+    },
+    {
+      "id": "issue-000014",
+      "farm_id": "farm-000010",
+      "title": "YKM Coffee Trading · 적용 경계",
+      "severity": "미확인",
+      "text": "회사와 Bonga 자가 농장 후보는 동일 대상이 아니다. Bonga 고유명·경계·인증은 미확인. 다른 산지 취급 제품에 Bonga의 고도·면적을 복사하지 않는다. 공급자 소개는 당사 인증·품질 검증이 아니다.",
+      "source_ids": [
+        "src-000034"
+      ],
+      "question": "시설·개별 로트 직접 자료가 제공되면 별도 대조. 확정 신원은 재질문하지 않음.",
       "status": "open"
     }
   ],
@@ -2115,6 +2500,153 @@
       "record_path": "data/source-records/src-000027.json",
       "record_sha256": "41c572bd5402c87837c2a2966355632bad91127aae286d8e1205c9ee5695bcec",
       "hash_scope": "저장한 서지·요약 카드의 바이트. 웹 원문 해시가 아님."
+    },
+    {
+      "id": "src-000028",
+      "title": "Alo Coffee · Our Story",
+      "publisher": "Alo Coffee",
+      "url": "https://alo-coffee.com/about/",
+      "type": "생산자 공식",
+      "published_at": null,
+      "accessed_at": "2026-11-09",
+      "fact_period": "소개 기준 시점 미상",
+      "location": "Who we are / Mr. Tamiru Tadesse & his wife Messi",
+      "language": "en",
+      "read_scope": "Who we are / Mr. Tamiru Tadesse & his wife Messi",
+      "access": "public",
+      "rights": "서지정보·자체 요약만 보존. 사진·원문 재배포 허락을 의미하지 않음.",
+      "summary": "Tamiru Tadesse와 Messi의 사업 이야기 및 Alo in Bensa 기반. 직접 재열람.",
+      "revision": 1,
+      "supersedes": null,
+      "record_path": "data/source-records/src-000028.json",
+      "record_sha256": "af8112bb676fc35034edee4442a0bde216a6ac9ff4997c3fb5560dbb33d397ad",
+      "hash_scope": "저장한 서지·요약 카드 바이트; 웹 원문 해시 아님."
+    },
+    {
+      "id": "src-000029",
+      "title": "Karamo Coffee Export · About Our Company",
+      "publisher": "Karamo Coffee Export",
+      "url": "https://karamocoffeeexport.com/",
+      "type": "생산자 공식",
+      "published_at": null,
+      "accessed_at": "2026-11-09",
+      "fact_period": "소개 기준 시점 미상",
+      "location": "About Our Company / Established By / Location of site",
+      "language": "en",
+      "read_scope": "About Our Company / Established By / Location of site",
+      "access": "public",
+      "rights": "서지정보·자체 요약만 보존. 사진·원문 재배포 허락을 의미하지 않음.",
+      "summary": "Niguse Gemeda Mude, Sidama Regional Bura Wereda Keramo Kebele. 공식 설립연도 2017은 수입사 2020과 달라 확정 보류.",
+      "revision": 1,
+      "supersedes": null,
+      "record_path": "data/source-records/src-000029.json",
+      "record_sha256": "6e3d201f4420d0c4dbe5f007ce75e28abed724f11f00820e215cb24d8b3c1c18",
+      "hash_scope": "저장한 서지·요약 카드 바이트; 웹 원문 해시 아님."
+    },
+    {
+      "id": "src-000030",
+      "title": "Morke Natural · Karamo 관계",
+      "publisher": "The Coffee Quest",
+      "url": "https://www.thecoffeequest.com/morke-natural/",
+      "type": "수입사",
+      "published_at": null,
+      "accessed_at": "2026-11-09",
+      "fact_period": "소개 기준 시점 미상",
+      "location": "High Elevation Goodness",
+      "language": "en",
+      "read_scope": "High Elevation Goodness",
+      "access": "public",
+      "rights": "서지정보·자체 요약만 보존. 사진·원문 재배포 허락을 의미하지 않음.",
+      "summary": "Karamo Coffee와 Niguse Gemeda 관계를 교차 확인. 설립 2020 서술은 공식 2017과 불일치. Morke 로트 수치·가공은 회사 전체로 확대하지 않음.",
+      "revision": 1,
+      "supersedes": null,
+      "record_path": "data/source-records/src-000030.json",
+      "record_sha256": "05e294e8528e96395626efeae9744bc5e74875d520c30e0a016c718afa0bdc7d",
+      "hash_scope": "저장한 서지·요약 카드 바이트; 웹 원문 해시 아님."
+    },
+    {
+      "id": "src-000031",
+      "title": "Bursa Speciality Coffee",
+      "publisher": "Bursa Speciality Coffee",
+      "url": "https://bursaspecialitycoffee.com/",
+      "type": "생산자 공식 · 기존 조사 재사용",
+      "published_at": null,
+      "accessed_at": "2026-11-09",
+      "fact_period": "소개 기준 시점 미상",
+      "location": "기존 coffee S08 web_extract 보존 발췌",
+      "language": "en",
+      "read_scope": "기존 coffee S08 web_extract 보존 발췌",
+      "access": "public",
+      "rights": "서지정보·자체 요약만 보존. 사진·원문 재배포 허락을 의미하지 않음.",
+      "summary": "Mulugeta Muntasha와 Degefu Mulugeta, Bursa/Arbegona 기반. 기존 coffee 조사 재사용; 직접 HTTP 406 한계 유지.",
+      "revision": 1,
+      "supersedes": null,
+      "record_path": "data/source-records/src-000031.json",
+      "record_sha256": "d19f73f013372d98d83d315d5a09d3905309e0c42a7ea57e306eca67aedbec59",
+      "hash_scope": "저장한 서지·요약 카드 바이트; 웹 원문 해시 아님."
+    },
+    {
+      "id": "src-000032",
+      "title": "Crop to Cup — Mullugeta Muntasha",
+      "publisher": "Crop to Cup",
+      "url": "https://www.croptocup.com/community/mullugeta-muntasha/",
+      "type": "수입사 · 기존 조사 재사용",
+      "published_at": null,
+      "accessed_at": "2026-11-09",
+      "fact_period": "소개 기준 시점 미상",
+      "location": "기존 coffee S09 Mullugeta Muntasha 소개",
+      "language": "en",
+      "read_scope": "기존 coffee S09 Mullugeta Muntasha 소개",
+      "access": "public",
+      "rights": "서지정보·자체 요약만 보존. 사진·원문 재배포 허락을 의미하지 않음.",
+      "summary": "자가 농장과 주변 생산자 체리의 가공 구조. Dawencho와 타 시설의 동일성은 미확인.",
+      "revision": 1,
+      "supersedes": null,
+      "record_path": "data/source-records/src-000032.json",
+      "record_sha256": "6315da4bd08a1bef1c31865d1c91ef352ef084434f4888f5c20b6efe76afdc91",
+      "hash_scope": "저장한 서지·요약 카드 바이트; 웹 원문 해시 아님."
+    },
+    {
+      "id": "src-000033",
+      "title": "Crop to Cup — Tariku Kare",
+      "publisher": "Crop to Cup",
+      "url": "https://www.croptocup.com/community/tariku-kare/",
+      "type": "수입사 · 기존 조사 재사용",
+      "published_at": null,
+      "accessed_at": "2026-11-09",
+      "fact_period": "소개 기준 시점 미상",
+      "location": "기존 coffee S11 Tariku Kare 소개",
+      "language": "en",
+      "read_scope": "기존 coffee S11 Tariku Kare 소개",
+      "access": "public",
+      "rights": "서지정보·자체 요약만 보존. 사진·원문 재배포 허락을 의미하지 않음.",
+      "summary": "Refisa / Nensebo와 고향 Bombe의 시설 구분. 상단 지역표기와 본문의 차이 보존.",
+      "revision": 1,
+      "supersedes": null,
+      "record_path": "data/source-records/src-000033.json",
+      "record_sha256": "2f586b74fd4910f4476d0788cbdac1455ff773b889621e903254f7e9a2ffcf12",
+      "hash_scope": "저장한 서지·요약 카드 바이트; 웹 원문 해시 아님."
+    },
+    {
+      "id": "src-000034",
+      "title": "YKM Coffee Trading — About Us",
+      "publisher": "YKM Coffee Trading",
+      "url": "https://ykmcoffee.com/about-us/",
+      "type": "수출사 공식 · 기존 조사 재사용",
+      "published_at": null,
+      "accessed_at": "2026-11-09",
+      "fact_period": "소개 기준 시점 미상",
+      "location": "기존 coffee S13 About Us",
+      "language": "en",
+      "read_scope": "기존 coffee S13 About Us",
+      "access": "public",
+      "rights": "서지정보·자체 요약만 보존. 사진·원문 재배포 허락을 의미하지 않음.",
+      "summary": "가족 경영 생산·수출사, 여러 산지의 가공시설 및 Bonga 자가 농장 소개. 회사 전체와 단일 농장 동일시 금지.",
+      "revision": 1,
+      "supersedes": null,
+      "record_path": "data/source-records/src-000034.json",
+      "record_sha256": "16df96d29e7a7c5b471e24719cdf7b47e3bbc6625f00a2360b9427f00939e01c",
+      "hash_scope": "저장한 서지·요약 카드 바이트; 웹 원문 해시 아님."
     }
   ],
   "changes": [
@@ -2397,6 +2929,25 @@
         "clm-000033",
         "clm-000034"
       ]
+    },
+    {
+      "id": "change-000005",
+      "date": "2026-11-09",
+      "revision": "2026-11-09.ethiopia-1",
+      "type": "editorial_publication",
+      "title": "에티오피아 생산자·사업체 5개 항목 공개",
+      "summary": "Alo/Karamo 확인 신원을 반영하고 Bursa/Tariku/YKM 조사 결과를 추가했다. 기존 5농장·로트·수상은 보존하며 새 항목의 평가 연결은 보류한다.",
+      "source_ids": [
+        "src-000028",
+        "src-000029",
+        "src-000030",
+        "src-000031",
+        "src-000032",
+        "src-000033",
+        "src-000034"
+      ],
+      "previous_revision": "2026-10-07.review-1",
+      "snapshot_path": "data/snapshots/2026-11-09.ethiopia-1.json"
     }
   ]
 }
