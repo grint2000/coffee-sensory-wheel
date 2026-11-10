@@ -1,5 +1,5 @@
-const APP_CACHE = 'noel-sca-app-v22-archive-hold';
-const RUNTIME_CACHE = 'noel-sca-runtime-v22-archive-hold';
+const APP_CACHE = 'noel-sca-app-v23-peru-coe';
+const RUNTIME_CACHE = 'noel-sca-runtime-v23-peru-coe';
 
 const APP_SHELL_FILES = [
   './',

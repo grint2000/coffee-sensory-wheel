@@ -1,8 +1,8 @@
 {
   "schema_version": "1.0.0",
   "archive_id": "noel-farm-knowledge",
-  "revision": "2026-11-09.ethiopia-1",
-  "updated_at": "2026-11-09",
+  "revision": "2026-11-10.peru-coe-1",
+  "updated_at": "2026-11-10",
   "fictional": false,
   "owner_label": "Noel",
   "scope": "질문·관심 농장부터 확인된 자료를 누적",
@@ -45,6 +45,16 @@
         "src-000029"
       ],
       "hierarchy_note": "세부 행정 계층은 미확인. 소개의 기반 지역과 모든 취급 로트 원산지는 다르다."
+    },
+    {
+      "id": "country-000004",
+      "name": "Peru",
+      "name_ko": "페루",
+      "iso2": "PE",
+      "source_ids": [
+        "src-000035"
+      ],
+      "hierarchy_note": "공식 대회 결과표의 지역 표기를 사용한다."
     }
   ],
   "regions": [
@@ -217,6 +227,84 @@
       "region_type": "administrative",
       "source_ids": [
         "src-000020"
+      ]
+    },
+    {
+      "id": "region-000014",
+      "name": "Cajamarca",
+      "name_ko": "Cajamarca",
+      "parent_id": "country-000004",
+      "country_id": "country-000004",
+      "browse_level": "large",
+      "native_level": "공식 결과표 지역",
+      "region_type": "competition_reported",
+      "source_ids": [
+        "src-000035"
+      ]
+    },
+    {
+      "id": "region-000015",
+      "name": "Huanuco",
+      "name_ko": "Huanuco",
+      "parent_id": "country-000004",
+      "country_id": "country-000004",
+      "browse_level": "large",
+      "native_level": "공식 결과표 지역",
+      "region_type": "competition_reported",
+      "source_ids": [
+        "src-000035"
+      ]
+    },
+    {
+      "id": "region-000016",
+      "name": "Cusco",
+      "name_ko": "Cusco",
+      "parent_id": "country-000004",
+      "country_id": "country-000004",
+      "browse_level": "large",
+      "native_level": "공식 결과표 지역",
+      "region_type": "competition_reported",
+      "source_ids": [
+        "src-000035"
+      ]
+    },
+    {
+      "id": "region-000017",
+      "name": "Amazonas",
+      "name_ko": "Amazonas",
+      "parent_id": "country-000004",
+      "country_id": "country-000004",
+      "browse_level": "large",
+      "native_level": "공식 결과표 지역",
+      "region_type": "competition_reported",
+      "source_ids": [
+        "src-000035"
+      ]
+    },
+    {
+      "id": "region-000018",
+      "name": "Junin",
+      "name_ko": "Junin",
+      "parent_id": "country-000004",
+      "country_id": "country-000004",
+      "browse_level": "large",
+      "native_level": "공식 결과표 지역",
+      "region_type": "competition_reported",
+      "source_ids": [
+        "src-000035"
+      ]
+    },
+    {
+      "id": "region-000019",
+      "name": "Puno",
+      "name_ko": "Puno",
+      "parent_id": "country-000004",
+      "country_id": "country-000004",
+      "browse_level": "large",
+      "native_level": "공식 결과표 지역",
+      "region_type": "competition_reported",
+      "source_ids": [
+        "src-000035"
       ]
     }
   ],
@@ -447,6 +535,788 @@
       "entity_type": "producer_exporter_company",
       "notes_status": "공개 아카이브 · 회사/인물 유형 · 세부 지역 미확인 · 평가 연결 보류",
       "evaluation_status": "deferred"
+    },
+    {
+      "id": "farm-000011",
+      "name": "Finca La Esperanza",
+      "name_ko": "Fidel Huancas Huancas",
+      "aliases": [],
+      "country_id": "country-000004",
+      "region_ids": [
+        "region-000014"
+      ],
+      "related_region_ids": [],
+      "summary": "2026 페루 COE COE 수상 공식 결과표의 농장 표기. 지역 Cajamarca.",
+      "source_ids": [
+        "src-000035"
+      ],
+      "updated_at": "2026-11-10",
+      "entity_type": "farm",
+      "notes_status": "대회 결과표 기반 잠정 식별 · 평가 연결 보류",
+      "evaluation_status": "deferred",
+      "reviewed_candidate_id": "peru2026-farm-001"
+    },
+    {
+      "id": "farm-000012",
+      "name": "Palma Pampa",
+      "name_ko": "Alcides Nicki Rodriguez Melgarejo",
+      "aliases": [],
+      "country_id": "country-000004",
+      "region_ids": [
+        "region-000015"
+      ],
+      "related_region_ids": [],
+      "summary": "2026 페루 COE COE 수상 공식 결과표의 농장 표기. 지역 Huanuco.",
+      "source_ids": [
+        "src-000035",
+        "src-000036"
+      ],
+      "updated_at": "2026-11-10",
+      "entity_type": "farm",
+      "notes_status": "대회 결과표 기반 잠정 식별 · 평가 연결 보류",
+      "evaluation_status": "deferred",
+      "reviewed_candidate_id": "peru2026-farm-002"
+    },
+    {
+      "id": "farm-000013",
+      "name": "Finca La Ponderosa",
+      "name_ko": "Dreyde Perez Delgado",
+      "aliases": [],
+      "country_id": "country-000004",
+      "region_ids": [
+        "region-000014"
+      ],
+      "related_region_ids": [],
+      "summary": "2026 페루 COE COE 수상 공식 결과표의 농장 표기. 지역 Cajamarca.",
+      "source_ids": [
+        "src-000035"
+      ],
+      "updated_at": "2026-11-10",
+      "entity_type": "farm",
+      "notes_status": "대회 결과표 기반 잠정 식별 · 평가 연결 보류",
+      "evaluation_status": "deferred",
+      "reviewed_candidate_id": "peru2026-farm-003"
+    },
+    {
+      "id": "farm-000014",
+      "name": "Caminos del Inka Coffee Estate",
+      "name_ko": "Samuel Smith Perez Aragon",
+      "aliases": [],
+      "country_id": "country-000004",
+      "region_ids": [
+        "region-000016"
+      ],
+      "related_region_ids": [],
+      "summary": "2026 페루 COE COE 수상 공식 결과표의 농장 표기. 지역 Cusco.",
+      "source_ids": [
+        "src-000035"
+      ],
+      "updated_at": "2026-11-10",
+      "entity_type": "farm",
+      "notes_status": "대회 결과표 기반 잠정 식별 · 평가 연결 보류",
+      "evaluation_status": "deferred",
+      "reviewed_candidate_id": "peru2026-farm-004"
+    },
+    {
+      "id": "farm-000015",
+      "name": "Campo Verde",
+      "name_ko": "Wilfredo Arias Candia",
+      "aliases": [],
+      "country_id": "country-000004",
+      "region_ids": [
+        "region-000016"
+      ],
+      "related_region_ids": [],
+      "summary": "2026 페루 COE COE 수상 공식 결과표의 농장 표기. 지역 Cusco.",
+      "source_ids": [
+        "src-000035"
+      ],
+      "updated_at": "2026-11-10",
+      "entity_type": "farm",
+      "notes_status": "대회 결과표 기반 잠정 식별 · 평가 연결 보류",
+      "evaluation_status": "deferred",
+      "reviewed_candidate_id": "peru2026-farm-005"
+    },
+    {
+      "id": "farm-000016",
+      "name": "La Florentina",
+      "name_ko": "Alberto Casa Balboa",
+      "aliases": [],
+      "country_id": "country-000004",
+      "region_ids": [
+        "region-000016"
+      ],
+      "related_region_ids": [],
+      "summary": "2026 페루 COE COE 수상 공식 결과표의 농장 표기. 지역 Cusco.",
+      "source_ids": [
+        "src-000035"
+      ],
+      "updated_at": "2026-11-10",
+      "entity_type": "farm",
+      "notes_status": "대회 결과표 기반 잠정 식별 · 평가 연결 보류",
+      "evaluation_status": "deferred",
+      "reviewed_candidate_id": "peru2026-farm-006"
+    },
+    {
+      "id": "farm-000017",
+      "name": "El Romerillo 2",
+      "name_ko": "Eduar Troyes Puelles",
+      "aliases": [],
+      "country_id": "country-000004",
+      "region_ids": [
+        "region-000014"
+      ],
+      "related_region_ids": [],
+      "summary": "2026 페루 COE COE 수상 공식 결과표의 농장 표기. 지역 Cajamarca.",
+      "source_ids": [
+        "src-000035"
+      ],
+      "updated_at": "2026-11-10",
+      "entity_type": "farm",
+      "notes_status": "대회 결과표 기반 잠정 식별 · 평가 연결 보류",
+      "evaluation_status": "deferred",
+      "reviewed_candidate_id": "peru2026-farm-007"
+    },
+    {
+      "id": "farm-000018",
+      "name": "Finca Los Pinos",
+      "name_ko": "Jaime Perez Linares",
+      "aliases": [],
+      "country_id": "country-000004",
+      "region_ids": [
+        "region-000014"
+      ],
+      "related_region_ids": [],
+      "summary": "2026 페루 COE COE 수상 공식 결과표의 농장 표기. 지역 Cajamarca.",
+      "source_ids": [
+        "src-000035"
+      ],
+      "updated_at": "2026-11-10",
+      "entity_type": "farm",
+      "notes_status": "대회 결과표 기반 잠정 식별 · 평가 연결 보류",
+      "evaluation_status": "deferred",
+      "reviewed_candidate_id": "peru2026-farm-008"
+    },
+    {
+      "id": "farm-000019",
+      "name": "La Palmera",
+      "name_ko": "Octavio Cayotopa Olano",
+      "aliases": [],
+      "country_id": "country-000004",
+      "region_ids": [
+        "region-000014"
+      ],
+      "related_region_ids": [],
+      "summary": "2026 페루 COE COE 수상 공식 결과표의 농장 표기. 지역 Cajamarca.",
+      "source_ids": [
+        "src-000035"
+      ],
+      "updated_at": "2026-11-10",
+      "entity_type": "farm",
+      "notes_status": "대회 결과표 기반 잠정 식별 · 평가 연결 보류",
+      "evaluation_status": "deferred",
+      "reviewed_candidate_id": "peru2026-farm-009"
+    },
+    {
+      "id": "farm-000020",
+      "name": "Yuzu",
+      "name_ko": "Teresa Livaque Tarrillo",
+      "aliases": [],
+      "country_id": "country-000004",
+      "region_ids": [
+        "region-000014"
+      ],
+      "related_region_ids": [],
+      "summary": "2026 페루 COE COE 수상 공식 결과표의 농장 표기. 지역 Cajamarca.",
+      "source_ids": [
+        "src-000035"
+      ],
+      "updated_at": "2026-11-10",
+      "entity_type": "farm",
+      "notes_status": "대회 결과표 기반 잠정 식별 · 평가 연결 보류",
+      "evaluation_status": "deferred",
+      "reviewed_candidate_id": "peru2026-farm-010"
+    },
+    {
+      "id": "farm-000021",
+      "name": "El Mirador",
+      "name_ko": "Juan Padilla Guerrero",
+      "aliases": [],
+      "country_id": "country-000004",
+      "region_ids": [
+        "region-000014"
+      ],
+      "related_region_ids": [],
+      "summary": "2026 페루 COE COE 수상 공식 결과표의 농장 표기. 지역 Cajamarca.",
+      "source_ids": [
+        "src-000035"
+      ],
+      "updated_at": "2026-11-10",
+      "entity_type": "farm",
+      "notes_status": "대회 결과표 기반 잠정 식별 · 평가 연결 보류",
+      "evaluation_status": "deferred",
+      "reviewed_candidate_id": "peru2026-farm-011"
+    },
+    {
+      "id": "farm-000022",
+      "name": "Cheqreccpampa",
+      "name_ko": "Ricardo Chavez Candia",
+      "aliases": [],
+      "country_id": "country-000004",
+      "region_ids": [
+        "region-000016"
+      ],
+      "related_region_ids": [],
+      "summary": "2026 페루 COE COE 수상 공식 결과표의 농장 표기. 지역 Cusco.",
+      "source_ids": [
+        "src-000035"
+      ],
+      "updated_at": "2026-11-10",
+      "entity_type": "farm",
+      "notes_status": "대회 결과표 기반 잠정 식별 · 평가 연결 보류",
+      "evaluation_status": "deferred",
+      "reviewed_candidate_id": "peru2026-farm-012"
+    },
+    {
+      "id": "farm-000023",
+      "name": "Agua Colorada I",
+      "name_ko": "Filadelfo Cordova Mejia",
+      "aliases": [],
+      "country_id": "country-000004",
+      "region_ids": [
+        "region-000014"
+      ],
+      "related_region_ids": [],
+      "summary": "2026 페루 COE COE 수상 공식 결과표의 농장 표기. 지역 Cajamarca.",
+      "source_ids": [
+        "src-000035"
+      ],
+      "updated_at": "2026-11-10",
+      "entity_type": "farm",
+      "notes_status": "대회 결과표 기반 잠정 식별 · 평가 연결 보류",
+      "evaluation_status": "deferred",
+      "reviewed_candidate_id": "peru2026-farm-013"
+    },
+    {
+      "id": "farm-000024",
+      "name": "Finca Los Santos SAC",
+      "name_ko": "Jose Santos Requejo Villanueva",
+      "aliases": [],
+      "country_id": "country-000004",
+      "region_ids": [
+        "region-000017"
+      ],
+      "related_region_ids": [],
+      "summary": "2026 페루 COE COE 수상 공식 결과표의 농장 표기. 지역 Amazonas.",
+      "source_ids": [
+        "src-000035"
+      ],
+      "updated_at": "2026-11-10",
+      "entity_type": "farm",
+      "notes_status": "대회 결과표 기반 잠정 식별 · 평가 연결 보류",
+      "evaluation_status": "deferred",
+      "reviewed_candidate_id": "peru2026-farm-014"
+    },
+    {
+      "id": "farm-000025",
+      "name": "Uscamayta",
+      "name_ko": "Marcos Severo Uscamayta Malpartida",
+      "aliases": [],
+      "country_id": "country-000004",
+      "region_ids": [
+        "region-000018"
+      ],
+      "related_region_ids": [],
+      "summary": "2026 페루 COE COE 수상 공식 결과표의 농장 표기. 지역 Junin.",
+      "source_ids": [
+        "src-000035",
+        "src-000036"
+      ],
+      "updated_at": "2026-11-10",
+      "entity_type": "farm",
+      "notes_status": "대회 결과표 기반 잠정 식별 · 평가 연결 보류",
+      "evaluation_status": "deferred",
+      "reviewed_candidate_id": "peru2026-farm-015"
+    },
+    {
+      "id": "farm-000026",
+      "name": "La Naranja",
+      "name_ko": "Pablo Neira Melendrez",
+      "aliases": [],
+      "country_id": "country-000004",
+      "region_ids": [
+        "region-000014"
+      ],
+      "related_region_ids": [],
+      "summary": "2026 페루 COE COE 수상 공식 결과표의 농장 표기. 지역 Cajamarca.",
+      "source_ids": [
+        "src-000035"
+      ],
+      "updated_at": "2026-11-10",
+      "entity_type": "farm",
+      "notes_status": "대회 결과표 기반 잠정 식별 · 평가 연결 보류",
+      "evaluation_status": "deferred",
+      "reviewed_candidate_id": "peru2026-farm-016"
+    },
+    {
+      "id": "farm-000027",
+      "name": "La Palmera",
+      "name_ko": "Eli Espinosa Soberon",
+      "aliases": [],
+      "country_id": "country-000004",
+      "region_ids": [
+        "region-000014"
+      ],
+      "related_region_ids": [],
+      "summary": "2026 페루 COE COE 수상 공식 결과표의 농장 표기. 지역 Cajamarca.",
+      "source_ids": [
+        "src-000035"
+      ],
+      "updated_at": "2026-11-10",
+      "entity_type": "farm",
+      "notes_status": "대회 결과표 기반 잠정 식별 · 평가 연결 보류",
+      "evaluation_status": "deferred",
+      "reviewed_candidate_id": "peru2026-farm-017"
+    },
+    {
+      "id": "farm-000028",
+      "name": "El Mirador",
+      "name_ko": "Yoniser Mego Silva",
+      "aliases": [],
+      "country_id": "country-000004",
+      "region_ids": [
+        "region-000014"
+      ],
+      "related_region_ids": [],
+      "summary": "2026 페루 COE COE 수상 공식 결과표의 농장 표기. 지역 Cajamarca.",
+      "source_ids": [
+        "src-000035"
+      ],
+      "updated_at": "2026-11-10",
+      "entity_type": "farm",
+      "notes_status": "대회 결과표 기반 잠정 식별 · 평가 연결 보류",
+      "evaluation_status": "deferred",
+      "reviewed_candidate_id": "peru2026-farm-018"
+    },
+    {
+      "id": "farm-000029",
+      "name": "La Huaca",
+      "name_ko": "Demostenes Tantalean Acuña",
+      "aliases": [],
+      "country_id": "country-000004",
+      "region_ids": [
+        "region-000014"
+      ],
+      "related_region_ids": [],
+      "summary": "2026 페루 COE COE 수상 공식 결과표의 농장 표기. 지역 Cajamarca.",
+      "source_ids": [
+        "src-000035"
+      ],
+      "updated_at": "2026-11-10",
+      "entity_type": "farm",
+      "notes_status": "대회 결과표 기반 잠정 식별 · 평가 연결 보류",
+      "evaluation_status": "deferred",
+      "reviewed_candidate_id": "peru2026-farm-019"
+    },
+    {
+      "id": "farm-000030",
+      "name": "La Lucma",
+      "name_ko": "Orlando Pedraza Ramirez",
+      "aliases": [],
+      "country_id": "country-000004",
+      "region_ids": [
+        "region-000014"
+      ],
+      "related_region_ids": [],
+      "summary": "2026 페루 COE COE 수상 공식 결과표의 농장 표기. 지역 Cajamarca.",
+      "source_ids": [
+        "src-000035"
+      ],
+      "updated_at": "2026-11-10",
+      "entity_type": "farm",
+      "notes_status": "대회 결과표 기반 잠정 식별 · 평가 연결 보류",
+      "evaluation_status": "deferred",
+      "reviewed_candidate_id": "peru2026-farm-020"
+    },
+    {
+      "id": "farm-000031",
+      "name": "Los Cedros",
+      "name_ko": "Nevado Palacios Carrasco",
+      "aliases": [],
+      "country_id": "country-000004",
+      "region_ids": [
+        "region-000014"
+      ],
+      "related_region_ids": [],
+      "summary": "2026 페루 COE COE 수상 공식 결과표의 농장 표기. 지역 Cajamarca.",
+      "source_ids": [
+        "src-000035"
+      ],
+      "updated_at": "2026-11-10",
+      "entity_type": "farm",
+      "notes_status": "대회 결과표 기반 잠정 식별 · 평가 연결 보류",
+      "evaluation_status": "deferred",
+      "reviewed_candidate_id": "peru2026-farm-021"
+    },
+    {
+      "id": "farm-000032",
+      "name": "Pedregal",
+      "name_ko": "Abel Raymundo Arotaype Huayllas",
+      "aliases": [],
+      "country_id": "country-000004",
+      "region_ids": [
+        "region-000016"
+      ],
+      "related_region_ids": [],
+      "summary": "2026 페루 COE COE 수상 공식 결과표의 농장 표기. 지역 Cusco.",
+      "source_ids": [
+        "src-000035"
+      ],
+      "updated_at": "2026-11-10",
+      "entity_type": "farm",
+      "notes_status": "대회 결과표 기반 잠정 식별 · 평가 연결 보류",
+      "evaluation_status": "deferred",
+      "reviewed_candidate_id": "peru2026-farm-022"
+    },
+    {
+      "id": "farm-000033",
+      "name": "Llaqtapata",
+      "name_ko": "Gilber Huayllas Huaman",
+      "aliases": [],
+      "country_id": "country-000004",
+      "region_ids": [
+        "region-000016"
+      ],
+      "related_region_ids": [],
+      "summary": "2026 페루 COE COE 수상 공식 결과표의 농장 표기. 지역 Cusco.",
+      "source_ids": [
+        "src-000035"
+      ],
+      "updated_at": "2026-11-10",
+      "entity_type": "farm",
+      "notes_status": "대회 결과표 기반 잠정 식별 · 평가 연결 보류",
+      "evaluation_status": "deferred",
+      "reviewed_candidate_id": "peru2026-farm-023"
+    },
+    {
+      "id": "farm-000034",
+      "name": "Ollaytay Baja",
+      "name_ko": "Camilo Almanza Ccahua",
+      "aliases": [],
+      "country_id": "country-000004",
+      "region_ids": [
+        "region-000016"
+      ],
+      "related_region_ids": [],
+      "summary": "2026 페루 COE COE 수상 공식 결과표의 농장 표기. 지역 Cusco.",
+      "source_ids": [
+        "src-000035"
+      ],
+      "updated_at": "2026-11-10",
+      "entity_type": "farm",
+      "notes_status": "대회 결과표 기반 잠정 식별 · 평가 연결 보류",
+      "evaluation_status": "deferred",
+      "reviewed_candidate_id": "peru2026-farm-024"
+    },
+    {
+      "id": "farm-000035",
+      "name": "Bella Rosa",
+      "name_ko": "Wilbert Almanza Cabrera",
+      "aliases": [],
+      "country_id": "country-000004",
+      "region_ids": [
+        "region-000016"
+      ],
+      "related_region_ids": [],
+      "summary": "2026 페루 COE COE 수상 공식 결과표의 농장 표기. 지역 Cusco.",
+      "source_ids": [
+        "src-000035"
+      ],
+      "updated_at": "2026-11-10",
+      "entity_type": "farm",
+      "notes_status": "대회 결과표 기반 잠정 식별 · 평가 연결 보류",
+      "evaluation_status": "deferred",
+      "reviewed_candidate_id": "peru2026-farm-025"
+    },
+    {
+      "id": "farm-000036",
+      "name": "El Pino",
+      "name_ko": "Wilian Ivan Guerrero Santos",
+      "aliases": [],
+      "country_id": "country-000004",
+      "region_ids": [
+        "region-000014"
+      ],
+      "related_region_ids": [],
+      "summary": "2026 페루 COE COE 수상 공식 결과표의 농장 표기. 지역 Cajamarca.",
+      "source_ids": [
+        "src-000035"
+      ],
+      "updated_at": "2026-11-10",
+      "entity_type": "farm",
+      "notes_status": "대회 결과표 기반 잠정 식별 · 평가 연결 보류",
+      "evaluation_status": "deferred",
+      "reviewed_candidate_id": "peru2026-farm-026"
+    },
+    {
+      "id": "farm-000037",
+      "name": "San Sebastian",
+      "name_ko": "Sinhtya Montalvo Alcarras",
+      "aliases": [],
+      "country_id": "country-000004",
+      "region_ids": [
+        "region-000016"
+      ],
+      "related_region_ids": [],
+      "summary": "2026 페루 COE COE 수상 공식 결과표의 농장 표기. 지역 Cusco.",
+      "source_ids": [
+        "src-000035"
+      ],
+      "updated_at": "2026-11-10",
+      "entity_type": "farm",
+      "notes_status": "대회 결과표 기반 잠정 식별 · 평가 연결 보류",
+      "evaluation_status": "deferred",
+      "reviewed_candidate_id": "peru2026-farm-027"
+    },
+    {
+      "id": "farm-000038",
+      "name": "Finca’s Remi",
+      "name_ko": "Richard Velasque Damiano",
+      "aliases": [],
+      "country_id": "country-000004",
+      "region_ids": [
+        "region-000018"
+      ],
+      "related_region_ids": [],
+      "summary": "2026 페루 COE COE 수상 공식 결과표의 농장 표기. 지역 Junin.",
+      "source_ids": [
+        "src-000035"
+      ],
+      "updated_at": "2026-11-10",
+      "entity_type": "farm",
+      "notes_status": "대회 결과표 기반 잠정 식별 · 평가 연결 보류",
+      "evaluation_status": "deferred",
+      "reviewed_candidate_id": "peru2026-farm-028"
+    },
+    {
+      "id": "farm-000039",
+      "name": "Huallhuayocc",
+      "name_ko": "Juan Pablo Luque Vargas",
+      "aliases": [],
+      "country_id": "country-000004",
+      "region_ids": [
+        "region-000016"
+      ],
+      "related_region_ids": [],
+      "summary": "2026 페루 COE COE 수상 공식 결과표의 농장 표기. 지역 Cusco.",
+      "source_ids": [
+        "src-000035"
+      ],
+      "updated_at": "2026-11-10",
+      "entity_type": "farm",
+      "notes_status": "대회 결과표 기반 잠정 식별 · 평가 연결 보류",
+      "evaluation_status": "deferred",
+      "reviewed_candidate_id": "peru2026-farm-029"
+    },
+    {
+      "id": "farm-000040",
+      "name": "Pedregal",
+      "name_ko": "Lidia Venero Azorsa",
+      "aliases": [],
+      "country_id": "country-000004",
+      "region_ids": [
+        "region-000016"
+      ],
+      "related_region_ids": [],
+      "summary": "2026 페루 COE COE 수상 공식 결과표의 농장 표기. 지역 Cusco.",
+      "source_ids": [
+        "src-000035"
+      ],
+      "updated_at": "2026-11-10",
+      "entity_type": "farm",
+      "notes_status": "대회 결과표 기반 잠정 식별 · 평가 연결 보류",
+      "evaluation_status": "deferred",
+      "reviewed_candidate_id": "peru2026-farm-030"
+    },
+    {
+      "id": "farm-000041",
+      "name": "La Pomarrosa",
+      "name_ko": "Angel Antonio Manosalva Palomino",
+      "aliases": [],
+      "country_id": "country-000004",
+      "region_ids": [
+        "region-000014"
+      ],
+      "related_region_ids": [],
+      "summary": "2026 페루 COE National Winners 공식 결과표의 농장 표기. 지역 Cajamarca.",
+      "source_ids": [
+        "src-000035"
+      ],
+      "updated_at": "2026-11-10",
+      "entity_type": "farm",
+      "notes_status": "대회 결과표 기반 잠정 식별 · 평가 연결 보류",
+      "evaluation_status": "deferred",
+      "reviewed_candidate_id": "peru2026-farm-031"
+    },
+    {
+      "id": "farm-000042",
+      "name": "El Descanso",
+      "name_ko": "Hermitaño Casa Urbina",
+      "aliases": [],
+      "country_id": "country-000004",
+      "region_ids": [
+        "region-000016"
+      ],
+      "related_region_ids": [],
+      "summary": "2026 페루 COE National Winners 공식 결과표의 농장 표기. 지역 Cusco.",
+      "source_ids": [
+        "src-000035"
+      ],
+      "updated_at": "2026-11-10",
+      "entity_type": "farm",
+      "notes_status": "대회 결과표 기반 잠정 식별 · 평가 연결 보류",
+      "evaluation_status": "deferred",
+      "reviewed_candidate_id": "peru2026-farm-032"
+    },
+    {
+      "id": "farm-000043",
+      "name": "El Romerillo",
+      "name_ko": "Guillermo Masape Quispe",
+      "aliases": [],
+      "country_id": "country-000004",
+      "region_ids": [
+        "region-000014"
+      ],
+      "related_region_ids": [],
+      "summary": "2026 페루 COE National Winners 공식 결과표의 농장 표기. 지역 Cajamarca.",
+      "source_ids": [
+        "src-000035"
+      ],
+      "updated_at": "2026-11-10",
+      "entity_type": "farm",
+      "notes_status": "대회 결과표 기반 잠정 식별 · 평가 연결 보류",
+      "evaluation_status": "deferred",
+      "reviewed_candidate_id": "peru2026-farm-033"
+    },
+    {
+      "id": "farm-000044",
+      "name": "Montaña Alta",
+      "name_ko": "Jaime Meliton Huayllas Huaman",
+      "aliases": [],
+      "country_id": "country-000004",
+      "region_ids": [
+        "region-000016"
+      ],
+      "related_region_ids": [],
+      "summary": "2026 페루 COE National Winners 공식 결과표의 농장 표기. 지역 Cusco.",
+      "source_ids": [
+        "src-000035"
+      ],
+      "updated_at": "2026-11-10",
+      "entity_type": "farm",
+      "notes_status": "대회 결과표 기반 잠정 식별 · 평가 연결 보류",
+      "evaluation_status": "deferred",
+      "reviewed_candidate_id": "peru2026-farm-034"
+    },
+    {
+      "id": "farm-000045",
+      "name": "Santa Yamileth",
+      "name_ko": "Genaro Cahuana Quispe",
+      "aliases": [],
+      "country_id": "country-000004",
+      "region_ids": [
+        "region-000019"
+      ],
+      "related_region_ids": [],
+      "summary": "2026 페루 COE National Winners 공식 결과표의 농장 표기. 지역 Puno.",
+      "source_ids": [
+        "src-000035"
+      ],
+      "updated_at": "2026-11-10",
+      "entity_type": "farm",
+      "notes_status": "대회 결과표 기반 잠정 식별 · 평가 연결 보류",
+      "evaluation_status": "deferred",
+      "reviewed_candidate_id": "peru2026-farm-035"
+    },
+    {
+      "id": "farm-000046",
+      "name": "El Jazmin",
+      "name_ko": "Andres Abarca Gomez",
+      "aliases": [],
+      "country_id": "country-000004",
+      "region_ids": [
+        "region-000014"
+      ],
+      "related_region_ids": [],
+      "summary": "2026 페루 COE National Winners 공식 결과표의 농장 표기. 지역 Cajamarca.",
+      "source_ids": [
+        "src-000035"
+      ],
+      "updated_at": "2026-11-10",
+      "entity_type": "farm",
+      "notes_status": "대회 결과표 기반 잠정 식별 · 평가 연결 보류",
+      "evaluation_status": "deferred",
+      "reviewed_candidate_id": "peru2026-farm-036"
+    },
+    {
+      "id": "farm-000047",
+      "name": "El Morerillo",
+      "name_ko": "Elvis Edwin Davila Horna",
+      "aliases": [],
+      "country_id": "country-000004",
+      "region_ids": [
+        "region-000014"
+      ],
+      "related_region_ids": [],
+      "summary": "2026 페루 COE National Winners 공식 결과표의 농장 표기. 지역 Cajamarca.",
+      "source_ids": [
+        "src-000035"
+      ],
+      "updated_at": "2026-11-10",
+      "entity_type": "farm",
+      "notes_status": "대회 결과표 기반 잠정 식별 · 평가 연결 보류",
+      "evaluation_status": "deferred",
+      "reviewed_candidate_id": "peru2026-farm-037"
+    },
+    {
+      "id": "farm-000048",
+      "name": "Wallpa Wasi",
+      "name_ko": "Mateo Carpio Pacocha",
+      "aliases": [],
+      "country_id": "country-000004",
+      "region_ids": [
+        "region-000016"
+      ],
+      "related_region_ids": [],
+      "summary": "2026 페루 COE National Winners 공식 결과표의 농장 표기. 지역 Cusco.",
+      "source_ids": [
+        "src-000035"
+      ],
+      "updated_at": "2026-11-10",
+      "entity_type": "farm",
+      "notes_status": "대회 결과표 기반 잠정 식별 · 평가 연결 보류",
+      "evaluation_status": "deferred",
+      "reviewed_candidate_id": "peru2026-farm-038"
+    },
+    {
+      "id": "farm-000049",
+      "name": "Don Thiago",
+      "name_ko": "Esgar Jesus Delgado Saucedo",
+      "aliases": [],
+      "country_id": "country-000004",
+      "region_ids": [
+        "region-000014"
+      ],
+      "related_region_ids": [],
+      "summary": "2026 페루 COE National Winners 공식 결과표의 농장 표기. 지역 Cajamarca.",
+      "source_ids": [
+        "src-000035"
+      ],
+      "updated_at": "2026-11-10",
+      "entity_type": "farm",
+      "notes_status": "대회 결과표 기반 잠정 식별 · 평가 연결 보류",
+      "evaluation_status": "deferred",
+      "reviewed_candidate_id": "peru2026-farm-039"
     }
   ],
   "people": [
@@ -575,6 +1445,396 @@
         "src-000033"
       ],
       "period": "소개 기준 시점 미상"
+    },
+    {
+      "id": "person-000013",
+      "name": "Fidel Huancas Huancas",
+      "role": "공식 결과표 Farmer / Representative",
+      "farm_id": "farm-000011",
+      "source_ids": [
+        "src-000035"
+      ],
+      "period": "2026 대회"
+    },
+    {
+      "id": "person-000014",
+      "name": "Alcides Nicki Rodriguez Melgarejo",
+      "role": "공식 결과표 Farmer / Representative",
+      "farm_id": "farm-000012",
+      "source_ids": [
+        "src-000035"
+      ],
+      "period": "2026 대회"
+    },
+    {
+      "id": "person-000015",
+      "name": "Dreyde Perez Delgado",
+      "role": "공식 결과표 Farmer / Representative",
+      "farm_id": "farm-000013",
+      "source_ids": [
+        "src-000035"
+      ],
+      "period": "2026 대회"
+    },
+    {
+      "id": "person-000016",
+      "name": "Samuel Smith Perez Aragon",
+      "role": "공식 결과표 Farmer / Representative",
+      "farm_id": "farm-000014",
+      "source_ids": [
+        "src-000035"
+      ],
+      "period": "2026 대회"
+    },
+    {
+      "id": "person-000017",
+      "name": "Wilfredo Arias Candia",
+      "role": "공식 결과표 Farmer / Representative",
+      "farm_id": "farm-000015",
+      "source_ids": [
+        "src-000035"
+      ],
+      "period": "2026 대회"
+    },
+    {
+      "id": "person-000018",
+      "name": "Alberto Casa Balboa",
+      "role": "공식 결과표 Farmer / Representative",
+      "farm_id": "farm-000016",
+      "source_ids": [
+        "src-000035"
+      ],
+      "period": "2026 대회"
+    },
+    {
+      "id": "person-000019",
+      "name": "Eduar Troyes Puelles",
+      "role": "공식 결과표 Farmer / Representative",
+      "farm_id": "farm-000017",
+      "source_ids": [
+        "src-000035"
+      ],
+      "period": "2026 대회"
+    },
+    {
+      "id": "person-000020",
+      "name": "Jaime Perez Linares",
+      "role": "공식 결과표 Farmer / Representative",
+      "farm_id": "farm-000018",
+      "source_ids": [
+        "src-000035"
+      ],
+      "period": "2026 대회"
+    },
+    {
+      "id": "person-000021",
+      "name": "Octavio Cayotopa Olano",
+      "role": "공식 결과표 Farmer / Representative",
+      "farm_id": "farm-000019",
+      "source_ids": [
+        "src-000035"
+      ],
+      "period": "2026 대회"
+    },
+    {
+      "id": "person-000022",
+      "name": "Teresa Livaque Tarrillo",
+      "role": "공식 결과표 Farmer / Representative",
+      "farm_id": "farm-000020",
+      "source_ids": [
+        "src-000035"
+      ],
+      "period": "2026 대회"
+    },
+    {
+      "id": "person-000023",
+      "name": "Juan Padilla Guerrero",
+      "role": "공식 결과표 Farmer / Representative",
+      "farm_id": "farm-000021",
+      "source_ids": [
+        "src-000035"
+      ],
+      "period": "2026 대회"
+    },
+    {
+      "id": "person-000024",
+      "name": "Ricardo Chavez Candia",
+      "role": "공식 결과표 Farmer / Representative",
+      "farm_id": "farm-000022",
+      "source_ids": [
+        "src-000035"
+      ],
+      "period": "2026 대회"
+    },
+    {
+      "id": "person-000025",
+      "name": "Filadelfo Cordova Mejia",
+      "role": "공식 결과표 Farmer / Representative",
+      "farm_id": "farm-000023",
+      "source_ids": [
+        "src-000035"
+      ],
+      "period": "2026 대회"
+    },
+    {
+      "id": "person-000026",
+      "name": "Jose Santos Requejo Villanueva",
+      "role": "공식 결과표 Farmer / Representative",
+      "farm_id": "farm-000024",
+      "source_ids": [
+        "src-000035"
+      ],
+      "period": "2026 대회"
+    },
+    {
+      "id": "person-000027",
+      "name": "Marcos Severo Uscamayta Malpartida",
+      "role": "공식 결과표 Farmer / Representative",
+      "farm_id": "farm-000025",
+      "source_ids": [
+        "src-000035"
+      ],
+      "period": "2026 대회"
+    },
+    {
+      "id": "person-000028",
+      "name": "Pablo Neira Melendrez",
+      "role": "공식 결과표 Farmer / Representative",
+      "farm_id": "farm-000026",
+      "source_ids": [
+        "src-000035"
+      ],
+      "period": "2026 대회"
+    },
+    {
+      "id": "person-000029",
+      "name": "Eli Espinosa Soberon",
+      "role": "공식 결과표 Farmer / Representative",
+      "farm_id": "farm-000027",
+      "source_ids": [
+        "src-000035"
+      ],
+      "period": "2026 대회"
+    },
+    {
+      "id": "person-000030",
+      "name": "Yoniser Mego Silva",
+      "role": "공식 결과표 Farmer / Representative",
+      "farm_id": "farm-000028",
+      "source_ids": [
+        "src-000035"
+      ],
+      "period": "2026 대회"
+    },
+    {
+      "id": "person-000031",
+      "name": "Demostenes Tantalean Acuña",
+      "role": "공식 결과표 Farmer / Representative",
+      "farm_id": "farm-000029",
+      "source_ids": [
+        "src-000035"
+      ],
+      "period": "2026 대회"
+    },
+    {
+      "id": "person-000032",
+      "name": "Orlando Pedraza Ramirez",
+      "role": "공식 결과표 Farmer / Representative",
+      "farm_id": "farm-000030",
+      "source_ids": [
+        "src-000035"
+      ],
+      "period": "2026 대회"
+    },
+    {
+      "id": "person-000033",
+      "name": "Nevado Palacios Carrasco",
+      "role": "공식 결과표 Farmer / Representative",
+      "farm_id": "farm-000031",
+      "source_ids": [
+        "src-000035"
+      ],
+      "period": "2026 대회"
+    },
+    {
+      "id": "person-000034",
+      "name": "Abel Raymundo Arotaype Huayllas",
+      "role": "공식 결과표 Farmer / Representative",
+      "farm_id": "farm-000032",
+      "source_ids": [
+        "src-000035"
+      ],
+      "period": "2026 대회"
+    },
+    {
+      "id": "person-000035",
+      "name": "Gilber Huayllas Huaman",
+      "role": "공식 결과표 Farmer / Representative",
+      "farm_id": "farm-000033",
+      "source_ids": [
+        "src-000035"
+      ],
+      "period": "2026 대회"
+    },
+    {
+      "id": "person-000036",
+      "name": "Camilo Almanza Ccahua",
+      "role": "공식 결과표 Farmer / Representative",
+      "farm_id": "farm-000034",
+      "source_ids": [
+        "src-000035"
+      ],
+      "period": "2026 대회"
+    },
+    {
+      "id": "person-000037",
+      "name": "Wilbert Almanza Cabrera",
+      "role": "공식 결과표 Farmer / Representative",
+      "farm_id": "farm-000035",
+      "source_ids": [
+        "src-000035"
+      ],
+      "period": "2026 대회"
+    },
+    {
+      "id": "person-000038",
+      "name": "Wilian Ivan Guerrero Santos",
+      "role": "공식 결과표 Farmer / Representative",
+      "farm_id": "farm-000036",
+      "source_ids": [
+        "src-000035"
+      ],
+      "period": "2026 대회"
+    },
+    {
+      "id": "person-000039",
+      "name": "Sinhtya Montalvo Alcarras",
+      "role": "공식 결과표 Farmer / Representative",
+      "farm_id": "farm-000037",
+      "source_ids": [
+        "src-000035"
+      ],
+      "period": "2026 대회"
+    },
+    {
+      "id": "person-000040",
+      "name": "Richard Velasque Damiano",
+      "role": "공식 결과표 Farmer / Representative",
+      "farm_id": "farm-000038",
+      "source_ids": [
+        "src-000035"
+      ],
+      "period": "2026 대회"
+    },
+    {
+      "id": "person-000041",
+      "name": "Juan Pablo Luque Vargas",
+      "role": "공식 결과표 Farmer / Representative",
+      "farm_id": "farm-000039",
+      "source_ids": [
+        "src-000035"
+      ],
+      "period": "2026 대회"
+    },
+    {
+      "id": "person-000042",
+      "name": "Lidia Venero Azorsa",
+      "role": "공식 결과표 Farmer / Representative",
+      "farm_id": "farm-000040",
+      "source_ids": [
+        "src-000035"
+      ],
+      "period": "2026 대회"
+    },
+    {
+      "id": "person-000043",
+      "name": "Angel Antonio Manosalva Palomino",
+      "role": "공식 결과표 Farmer / Representative",
+      "farm_id": "farm-000041",
+      "source_ids": [
+        "src-000035"
+      ],
+      "period": "2026 대회"
+    },
+    {
+      "id": "person-000044",
+      "name": "Hermitaño Casa Urbina",
+      "role": "공식 결과표 Farmer / Representative",
+      "farm_id": "farm-000042",
+      "source_ids": [
+        "src-000035"
+      ],
+      "period": "2026 대회"
+    },
+    {
+      "id": "person-000045",
+      "name": "Guillermo Masape Quispe",
+      "role": "공식 결과표 Farmer / Representative",
+      "farm_id": "farm-000043",
+      "source_ids": [
+        "src-000035"
+      ],
+      "period": "2026 대회"
+    },
+    {
+      "id": "person-000046",
+      "name": "Jaime Meliton Huayllas Huaman",
+      "role": "공식 결과표 Farmer / Representative",
+      "farm_id": "farm-000044",
+      "source_ids": [
+        "src-000035"
+      ],
+      "period": "2026 대회"
+    },
+    {
+      "id": "person-000047",
+      "name": "Genaro Cahuana Quispe",
+      "role": "공식 결과표 Farmer / Representative",
+      "farm_id": "farm-000045",
+      "source_ids": [
+        "src-000035"
+      ],
+      "period": "2026 대회"
+    },
+    {
+      "id": "person-000048",
+      "name": "Andres Abarca Gomez",
+      "role": "공식 결과표 Farmer / Representative",
+      "farm_id": "farm-000046",
+      "source_ids": [
+        "src-000035"
+      ],
+      "period": "2026 대회"
+    },
+    {
+      "id": "person-000049",
+      "name": "Elvis Edwin Davila Horna",
+      "role": "공식 결과표 Farmer / Representative",
+      "farm_id": "farm-000047",
+      "source_ids": [
+        "src-000035"
+      ],
+      "period": "2026 대회"
+    },
+    {
+      "id": "person-000050",
+      "name": "Mateo Carpio Pacocha",
+      "role": "공식 결과표 Farmer / Representative",
+      "farm_id": "farm-000048",
+      "source_ids": [
+        "src-000035"
+      ],
+      "period": "2026 대회"
+    },
+    {
+      "id": "person-000051",
+      "name": "Esgar Jesus Delgado Saucedo",
+      "role": "공식 결과표 Farmer / Representative",
+      "farm_id": "farm-000049",
+      "source_ids": [
+        "src-000035"
+      ],
+      "period": "2026 대회"
     }
   ],
   "organizations": [
@@ -1328,6 +2588,646 @@
       "verified_at": "2026-11-09",
       "fictional": false,
       "supersedes": null
+    },
+    {
+      "id": "clm-000045",
+      "entity_id": "farm-000011",
+      "section": "geography",
+      "title": "공식 결과표의 지역",
+      "text": "Cajamarca. 공식 COE Results 표 1행의 표기이며 고도는 미확인입니다.",
+      "source_ids": [
+        "src-000035"
+      ],
+      "applicable_period": "2026 대회",
+      "status": "source_claim",
+      "evidence_level": "E1",
+      "verified_at": "2026-11-10",
+      "fictional": false,
+      "supersedes": null
+    },
+    {
+      "id": "clm-000046",
+      "entity_id": "farm-000012",
+      "section": "geography",
+      "title": "공식 결과표의 지역",
+      "text": "Huanuco. 공식 COE Results 표 2행의 표기이며 고도는 미확인입니다.",
+      "source_ids": [
+        "src-000035"
+      ],
+      "applicable_period": "2026 대회",
+      "status": "source_claim",
+      "evidence_level": "E1",
+      "verified_at": "2026-11-10",
+      "fictional": false,
+      "supersedes": null
+    },
+    {
+      "id": "clm-000047",
+      "entity_id": "farm-000012",
+      "section": "people",
+      "title": "DEVIDA 보도의 생산자 지역",
+      "text": "caserío San Vicente, distrito de Cholón, provincia de Marañón, Huánuco. 생산자 관련 보도이며 농장의 경계는 미확인입니다.",
+      "source_ids": [
+        "src-000036"
+      ],
+      "applicable_period": "2026 대회",
+      "status": "source_claim",
+      "evidence_level": "E1",
+      "verified_at": "2026-11-10",
+      "fictional": false,
+      "supersedes": null
+    },
+    {
+      "id": "clm-000048",
+      "entity_id": "farm-000013",
+      "section": "geography",
+      "title": "공식 결과표의 지역",
+      "text": "Cajamarca. 공식 COE Results 표 3행의 표기이며 고도는 미확인입니다.",
+      "source_ids": [
+        "src-000035"
+      ],
+      "applicable_period": "2026 대회",
+      "status": "source_claim",
+      "evidence_level": "E1",
+      "verified_at": "2026-11-10",
+      "fictional": false,
+      "supersedes": null
+    },
+    {
+      "id": "clm-000049",
+      "entity_id": "farm-000014",
+      "section": "geography",
+      "title": "공식 결과표의 지역",
+      "text": "Cusco. 공식 COE Results 표 4행의 표기이며 고도는 미확인입니다.",
+      "source_ids": [
+        "src-000035"
+      ],
+      "applicable_period": "2026 대회",
+      "status": "source_claim",
+      "evidence_level": "E1",
+      "verified_at": "2026-11-10",
+      "fictional": false,
+      "supersedes": null
+    },
+    {
+      "id": "clm-000050",
+      "entity_id": "farm-000015",
+      "section": "geography",
+      "title": "공식 결과표의 지역",
+      "text": "Cusco. 공식 COE Results 표 5행의 표기이며 고도는 미확인입니다.",
+      "source_ids": [
+        "src-000035"
+      ],
+      "applicable_period": "2026 대회",
+      "status": "source_claim",
+      "evidence_level": "E1",
+      "verified_at": "2026-11-10",
+      "fictional": false,
+      "supersedes": null
+    },
+    {
+      "id": "clm-000051",
+      "entity_id": "farm-000016",
+      "section": "geography",
+      "title": "공식 결과표의 지역",
+      "text": "Cusco. 공식 COE Results 표 6행의 표기이며 고도는 미확인입니다.",
+      "source_ids": [
+        "src-000035"
+      ],
+      "applicable_period": "2026 대회",
+      "status": "source_claim",
+      "evidence_level": "E1",
+      "verified_at": "2026-11-10",
+      "fictional": false,
+      "supersedes": null
+    },
+    {
+      "id": "clm-000052",
+      "entity_id": "farm-000017",
+      "section": "geography",
+      "title": "공식 결과표의 지역",
+      "text": "Cajamarca. 공식 COE Results 표 7행의 표기이며 고도는 미확인입니다.",
+      "source_ids": [
+        "src-000035"
+      ],
+      "applicable_period": "2026 대회",
+      "status": "source_claim",
+      "evidence_level": "E1",
+      "verified_at": "2026-11-10",
+      "fictional": false,
+      "supersedes": null
+    },
+    {
+      "id": "clm-000053",
+      "entity_id": "farm-000018",
+      "section": "geography",
+      "title": "공식 결과표의 지역",
+      "text": "Cajamarca. 공식 COE Results 표 8행의 표기이며 고도는 미확인입니다.",
+      "source_ids": [
+        "src-000035"
+      ],
+      "applicable_period": "2026 대회",
+      "status": "source_claim",
+      "evidence_level": "E1",
+      "verified_at": "2026-11-10",
+      "fictional": false,
+      "supersedes": null
+    },
+    {
+      "id": "clm-000054",
+      "entity_id": "farm-000019",
+      "section": "geography",
+      "title": "공식 결과표의 지역",
+      "text": "Cajamarca. 공식 COE Results 표 9행의 표기이며 고도는 미확인입니다.",
+      "source_ids": [
+        "src-000035"
+      ],
+      "applicable_period": "2026 대회",
+      "status": "source_claim",
+      "evidence_level": "E1",
+      "verified_at": "2026-11-10",
+      "fictional": false,
+      "supersedes": null
+    },
+    {
+      "id": "clm-000055",
+      "entity_id": "farm-000020",
+      "section": "geography",
+      "title": "공식 결과표의 지역",
+      "text": "Cajamarca. 공식 COE Results 표 10행의 표기이며 고도는 미확인입니다.",
+      "source_ids": [
+        "src-000035"
+      ],
+      "applicable_period": "2026 대회",
+      "status": "source_claim",
+      "evidence_level": "E1",
+      "verified_at": "2026-11-10",
+      "fictional": false,
+      "supersedes": null
+    },
+    {
+      "id": "clm-000056",
+      "entity_id": "farm-000021",
+      "section": "geography",
+      "title": "공식 결과표의 지역",
+      "text": "Cajamarca. 공식 COE Results 표 11행의 표기이며 고도는 미확인입니다.",
+      "source_ids": [
+        "src-000035"
+      ],
+      "applicable_period": "2026 대회",
+      "status": "source_claim",
+      "evidence_level": "E1",
+      "verified_at": "2026-11-10",
+      "fictional": false,
+      "supersedes": null
+    },
+    {
+      "id": "clm-000057",
+      "entity_id": "farm-000022",
+      "section": "geography",
+      "title": "공식 결과표의 지역",
+      "text": "Cusco. 공식 COE Results 표 12행의 표기이며 고도는 미확인입니다.",
+      "source_ids": [
+        "src-000035"
+      ],
+      "applicable_period": "2026 대회",
+      "status": "source_claim",
+      "evidence_level": "E1",
+      "verified_at": "2026-11-10",
+      "fictional": false,
+      "supersedes": null
+    },
+    {
+      "id": "clm-000058",
+      "entity_id": "farm-000023",
+      "section": "geography",
+      "title": "공식 결과표의 지역",
+      "text": "Cajamarca. 공식 COE Results 표 13행의 표기이며 고도는 미확인입니다.",
+      "source_ids": [
+        "src-000035"
+      ],
+      "applicable_period": "2026 대회",
+      "status": "source_claim",
+      "evidence_level": "E1",
+      "verified_at": "2026-11-10",
+      "fictional": false,
+      "supersedes": null
+    },
+    {
+      "id": "clm-000059",
+      "entity_id": "farm-000024",
+      "section": "geography",
+      "title": "공식 결과표의 지역",
+      "text": "Amazonas. 공식 COE Results 표 14행의 표기이며 고도는 미확인입니다.",
+      "source_ids": [
+        "src-000035"
+      ],
+      "applicable_period": "2026 대회",
+      "status": "source_claim",
+      "evidence_level": "E1",
+      "verified_at": "2026-11-10",
+      "fictional": false,
+      "supersedes": null
+    },
+    {
+      "id": "clm-000060",
+      "entity_id": "farm-000025",
+      "section": "geography",
+      "title": "공식 결과표의 지역",
+      "text": "Junin. 공식 COE Results 표 15행의 표기이며 고도는 미확인입니다.",
+      "source_ids": [
+        "src-000035"
+      ],
+      "applicable_period": "2026 대회",
+      "status": "source_claim",
+      "evidence_level": "E1",
+      "verified_at": "2026-11-10",
+      "fictional": false,
+      "supersedes": null
+    },
+    {
+      "id": "clm-000061",
+      "entity_id": "farm-000026",
+      "section": "geography",
+      "title": "공식 결과표의 지역",
+      "text": "Cajamarca. 공식 COE Results 표 16행의 표기이며 고도는 미확인입니다.",
+      "source_ids": [
+        "src-000035"
+      ],
+      "applicable_period": "2026 대회",
+      "status": "source_claim",
+      "evidence_level": "E1",
+      "verified_at": "2026-11-10",
+      "fictional": false,
+      "supersedes": null
+    },
+    {
+      "id": "clm-000062",
+      "entity_id": "farm-000027",
+      "section": "geography",
+      "title": "공식 결과표의 지역",
+      "text": "Cajamarca. 공식 COE Results 표 17행의 표기이며 고도는 미확인입니다.",
+      "source_ids": [
+        "src-000035"
+      ],
+      "applicable_period": "2026 대회",
+      "status": "source_claim",
+      "evidence_level": "E1",
+      "verified_at": "2026-11-10",
+      "fictional": false,
+      "supersedes": null
+    },
+    {
+      "id": "clm-000063",
+      "entity_id": "farm-000028",
+      "section": "geography",
+      "title": "공식 결과표의 지역",
+      "text": "Cajamarca. 공식 COE Results 표 18행의 표기이며 고도는 미확인입니다.",
+      "source_ids": [
+        "src-000035"
+      ],
+      "applicable_period": "2026 대회",
+      "status": "source_claim",
+      "evidence_level": "E1",
+      "verified_at": "2026-11-10",
+      "fictional": false,
+      "supersedes": null
+    },
+    {
+      "id": "clm-000064",
+      "entity_id": "farm-000029",
+      "section": "geography",
+      "title": "공식 결과표의 지역",
+      "text": "Cajamarca. 공식 COE Results 표 19행의 표기이며 고도는 미확인입니다.",
+      "source_ids": [
+        "src-000035"
+      ],
+      "applicable_period": "2026 대회",
+      "status": "source_claim",
+      "evidence_level": "E1",
+      "verified_at": "2026-11-10",
+      "fictional": false,
+      "supersedes": null
+    },
+    {
+      "id": "clm-000065",
+      "entity_id": "farm-000030",
+      "section": "geography",
+      "title": "공식 결과표의 지역",
+      "text": "Cajamarca. 공식 COE Results 표 20행의 표기이며 고도는 미확인입니다.",
+      "source_ids": [
+        "src-000035"
+      ],
+      "applicable_period": "2026 대회",
+      "status": "source_claim",
+      "evidence_level": "E1",
+      "verified_at": "2026-11-10",
+      "fictional": false,
+      "supersedes": null
+    },
+    {
+      "id": "clm-000066",
+      "entity_id": "farm-000031",
+      "section": "geography",
+      "title": "공식 결과표의 지역",
+      "text": "Cajamarca. 공식 COE Results 표 21행의 표기이며 고도는 미확인입니다.",
+      "source_ids": [
+        "src-000035"
+      ],
+      "applicable_period": "2026 대회",
+      "status": "source_claim",
+      "evidence_level": "E1",
+      "verified_at": "2026-11-10",
+      "fictional": false,
+      "supersedes": null
+    },
+    {
+      "id": "clm-000067",
+      "entity_id": "farm-000032",
+      "section": "geography",
+      "title": "공식 결과표의 지역",
+      "text": "Cusco. 공식 COE Results 표 22행의 표기이며 고도는 미확인입니다.",
+      "source_ids": [
+        "src-000035"
+      ],
+      "applicable_period": "2026 대회",
+      "status": "source_claim",
+      "evidence_level": "E1",
+      "verified_at": "2026-11-10",
+      "fictional": false,
+      "supersedes": null
+    },
+    {
+      "id": "clm-000068",
+      "entity_id": "farm-000033",
+      "section": "geography",
+      "title": "공식 결과표의 지역",
+      "text": "Cusco. 공식 COE Results 표 23행의 표기이며 고도는 미확인입니다.",
+      "source_ids": [
+        "src-000035"
+      ],
+      "applicable_period": "2026 대회",
+      "status": "source_claim",
+      "evidence_level": "E1",
+      "verified_at": "2026-11-10",
+      "fictional": false,
+      "supersedes": null
+    },
+    {
+      "id": "clm-000069",
+      "entity_id": "farm-000034",
+      "section": "geography",
+      "title": "공식 결과표의 지역",
+      "text": "Cusco. 공식 COE Results 표 24행의 표기이며 고도는 미확인입니다.",
+      "source_ids": [
+        "src-000035"
+      ],
+      "applicable_period": "2026 대회",
+      "status": "source_claim",
+      "evidence_level": "E1",
+      "verified_at": "2026-11-10",
+      "fictional": false,
+      "supersedes": null
+    },
+    {
+      "id": "clm-000070",
+      "entity_id": "farm-000035",
+      "section": "geography",
+      "title": "공식 결과표의 지역",
+      "text": "Cusco. 공식 COE Results 표 25행의 표기이며 고도는 미확인입니다.",
+      "source_ids": [
+        "src-000035"
+      ],
+      "applicable_period": "2026 대회",
+      "status": "source_claim",
+      "evidence_level": "E1",
+      "verified_at": "2026-11-10",
+      "fictional": false,
+      "supersedes": null
+    },
+    {
+      "id": "clm-000071",
+      "entity_id": "farm-000036",
+      "section": "geography",
+      "title": "공식 결과표의 지역",
+      "text": "Cajamarca. 공식 COE Results 표 26행의 표기이며 고도는 미확인입니다.",
+      "source_ids": [
+        "src-000035"
+      ],
+      "applicable_period": "2026 대회",
+      "status": "source_claim",
+      "evidence_level": "E1",
+      "verified_at": "2026-11-10",
+      "fictional": false,
+      "supersedes": null
+    },
+    {
+      "id": "clm-000072",
+      "entity_id": "farm-000037",
+      "section": "geography",
+      "title": "공식 결과표의 지역",
+      "text": "Cusco. 공식 COE Results 표 27행의 표기이며 고도는 미확인입니다.",
+      "source_ids": [
+        "src-000035"
+      ],
+      "applicable_period": "2026 대회",
+      "status": "source_claim",
+      "evidence_level": "E1",
+      "verified_at": "2026-11-10",
+      "fictional": false,
+      "supersedes": null
+    },
+    {
+      "id": "clm-000073",
+      "entity_id": "farm-000038",
+      "section": "geography",
+      "title": "공식 결과표의 지역",
+      "text": "Junin. 공식 COE Results 표 28행의 표기이며 고도는 미확인입니다.",
+      "source_ids": [
+        "src-000035"
+      ],
+      "applicable_period": "2026 대회",
+      "status": "source_claim",
+      "evidence_level": "E1",
+      "verified_at": "2026-11-10",
+      "fictional": false,
+      "supersedes": null
+    },
+    {
+      "id": "clm-000074",
+      "entity_id": "farm-000039",
+      "section": "geography",
+      "title": "공식 결과표의 지역",
+      "text": "Cusco. 공식 COE Results 표 29행의 표기이며 고도는 미확인입니다.",
+      "source_ids": [
+        "src-000035"
+      ],
+      "applicable_period": "2026 대회",
+      "status": "source_claim",
+      "evidence_level": "E1",
+      "verified_at": "2026-11-10",
+      "fictional": false,
+      "supersedes": null
+    },
+    {
+      "id": "clm-000075",
+      "entity_id": "farm-000040",
+      "section": "geography",
+      "title": "공식 결과표의 지역",
+      "text": "Cusco. 공식 COE Results 표 30행의 표기이며 고도는 미확인입니다.",
+      "source_ids": [
+        "src-000035"
+      ],
+      "applicable_period": "2026 대회",
+      "status": "source_claim",
+      "evidence_level": "E1",
+      "verified_at": "2026-11-10",
+      "fictional": false,
+      "supersedes": null
+    },
+    {
+      "id": "clm-000076",
+      "entity_id": "farm-000041",
+      "section": "geography",
+      "title": "공식 결과표의 지역",
+      "text": "Cajamarca. 공식 NW Results 표 1행의 표기이며 고도는 미확인입니다.",
+      "source_ids": [
+        "src-000035"
+      ],
+      "applicable_period": "2026 대회",
+      "status": "source_claim",
+      "evidence_level": "E1",
+      "verified_at": "2026-11-10",
+      "fictional": false,
+      "supersedes": null
+    },
+    {
+      "id": "clm-000077",
+      "entity_id": "farm-000042",
+      "section": "geography",
+      "title": "공식 결과표의 지역",
+      "text": "Cusco. 공식 NW Results 표 2행의 표기이며 고도는 미확인입니다.",
+      "source_ids": [
+        "src-000035"
+      ],
+      "applicable_period": "2026 대회",
+      "status": "source_claim",
+      "evidence_level": "E1",
+      "verified_at": "2026-11-10",
+      "fictional": false,
+      "supersedes": null
+    },
+    {
+      "id": "clm-000078",
+      "entity_id": "farm-000043",
+      "section": "geography",
+      "title": "공식 결과표의 지역",
+      "text": "Cajamarca. 공식 NW Results 표 3행의 표기이며 고도는 미확인입니다.",
+      "source_ids": [
+        "src-000035"
+      ],
+      "applicable_period": "2026 대회",
+      "status": "source_claim",
+      "evidence_level": "E1",
+      "verified_at": "2026-11-10",
+      "fictional": false,
+      "supersedes": null
+    },
+    {
+      "id": "clm-000079",
+      "entity_id": "farm-000044",
+      "section": "geography",
+      "title": "공식 결과표의 지역",
+      "text": "Cusco. 공식 NW Results 표 4행의 표기이며 고도는 미확인입니다.",
+      "source_ids": [
+        "src-000035"
+      ],
+      "applicable_period": "2026 대회",
+      "status": "source_claim",
+      "evidence_level": "E1",
+      "verified_at": "2026-11-10",
+      "fictional": false,
+      "supersedes": null
+    },
+    {
+      "id": "clm-000080",
+      "entity_id": "farm-000045",
+      "section": "geography",
+      "title": "공식 결과표의 지역",
+      "text": "Puno. 공식 NW Results 표 5행의 표기이며 고도는 미확인입니다.",
+      "source_ids": [
+        "src-000035"
+      ],
+      "applicable_period": "2026 대회",
+      "status": "source_claim",
+      "evidence_level": "E1",
+      "verified_at": "2026-11-10",
+      "fictional": false,
+      "supersedes": null
+    },
+    {
+      "id": "clm-000081",
+      "entity_id": "farm-000046",
+      "section": "geography",
+      "title": "공식 결과표의 지역",
+      "text": "Cajamarca. 공식 NW Results 표 6행의 표기이며 고도는 미확인입니다.",
+      "source_ids": [
+        "src-000035"
+      ],
+      "applicable_period": "2026 대회",
+      "status": "source_claim",
+      "evidence_level": "E1",
+      "verified_at": "2026-11-10",
+      "fictional": false,
+      "supersedes": null
+    },
+    {
+      "id": "clm-000082",
+      "entity_id": "farm-000047",
+      "section": "geography",
+      "title": "공식 결과표의 지역",
+      "text": "Cajamarca. 공식 NW Results 표 7행의 표기이며 고도는 미확인입니다.",
+      "source_ids": [
+        "src-000035"
+      ],
+      "applicable_period": "2026 대회",
+      "status": "source_claim",
+      "evidence_level": "E1",
+      "verified_at": "2026-11-10",
+      "fictional": false,
+      "supersedes": null
+    },
+    {
+      "id": "clm-000083",
+      "entity_id": "farm-000048",
+      "section": "geography",
+      "title": "공식 결과표의 지역",
+      "text": "Cusco. 공식 NW Results 표 8행의 표기이며 고도는 미확인입니다.",
+      "source_ids": [
+        "src-000035"
+      ],
+      "applicable_period": "2026 대회",
+      "status": "source_claim",
+      "evidence_level": "E1",
+      "verified_at": "2026-11-10",
+      "fictional": false,
+      "supersedes": null
+    },
+    {
+      "id": "clm-000084",
+      "entity_id": "farm-000049",
+      "section": "geography",
+      "title": "공식 결과표의 지역",
+      "text": "Cajamarca. 공식 NW Results 표 9행의 표기이며 고도는 미확인입니다.",
+      "source_ids": [
+        "src-000035"
+      ],
+      "applicable_period": "2026 대회",
+      "status": "source_claim",
+      "evidence_level": "E1",
+      "verified_at": "2026-11-10",
+      "fictional": false,
+      "supersedes": null
     }
   ],
   "lots": [
@@ -1575,6 +3475,903 @@
       "verified_at": "2026-10-07",
       "note": "대회연도는 수확연도와 다름. 순위는 로트번호가 아님. 고도 상세는 검토자료 참조.",
       "competition_rank_display": "3"
+    },
+    {
+      "id": "lot-000012",
+      "farm_id": "farm-000011",
+      "label": "Finca La Esperanza · Peru COE 2026",
+      "competition_year": 2026,
+      "crop_year": null,
+      "crop_year_status": "미확인",
+      "sale_year": null,
+      "arrival_date": null,
+      "original_lot_id": null,
+      "lot_id_type": null,
+      "variety": "Geisha",
+      "process": "Washed",
+      "representative": "Fidel Huancas Huancas",
+      "source_ids": [
+        "src-000035"
+      ],
+      "verified_at": "2026-11-10",
+      "note": "COE Results 표 1행. 대회 연도이며 수확연도·경매 로트 번호는 미확인.",
+      "competition_rank_display": "1",
+      "reviewed_candidate_id": "peru2026-lot-001",
+      "award_id": "awd-000012"
+    },
+    {
+      "id": "lot-000013",
+      "farm_id": "farm-000012",
+      "label": "Palma Pampa · Peru COE 2026",
+      "competition_year": 2026,
+      "crop_year": null,
+      "crop_year_status": "미확인",
+      "sale_year": null,
+      "arrival_date": null,
+      "original_lot_id": null,
+      "lot_id_type": null,
+      "variety": "Geisha",
+      "process": "Washed",
+      "representative": "Alcides Nicki Rodriguez Melgarejo",
+      "source_ids": [
+        "src-000035"
+      ],
+      "verified_at": "2026-11-10",
+      "note": "COE Results 표 2행. 대회 연도이며 수확연도·경매 로트 번호는 미확인.",
+      "competition_rank_display": "2",
+      "reviewed_candidate_id": "peru2026-lot-002",
+      "award_id": "awd-000013"
+    },
+    {
+      "id": "lot-000014",
+      "farm_id": "farm-000013",
+      "label": "Finca La Ponderosa · Peru COE 2026",
+      "competition_year": 2026,
+      "crop_year": null,
+      "crop_year_status": "미확인",
+      "sale_year": null,
+      "arrival_date": null,
+      "original_lot_id": null,
+      "lot_id_type": null,
+      "variety": "Geisha",
+      "process": "Washed",
+      "representative": "Dreyde Perez Delgado",
+      "source_ids": [
+        "src-000035"
+      ],
+      "verified_at": "2026-11-10",
+      "note": "COE Results 표 3행. 대회 연도이며 수확연도·경매 로트 번호는 미확인.",
+      "competition_rank_display": "3",
+      "reviewed_candidate_id": "peru2026-lot-003",
+      "award_id": "awd-000014"
+    },
+    {
+      "id": "lot-000015",
+      "farm_id": "farm-000014",
+      "label": "Caminos del Inka Coffee Estate · Peru COE 2026",
+      "competition_year": 2026,
+      "crop_year": null,
+      "crop_year_status": "미확인",
+      "sale_year": null,
+      "arrival_date": null,
+      "original_lot_id": null,
+      "lot_id_type": null,
+      "variety": "Geisha",
+      "process": "Washed",
+      "representative": "Samuel Smith Perez Aragon",
+      "source_ids": [
+        "src-000035"
+      ],
+      "verified_at": "2026-11-10",
+      "note": "COE Results 표 4행. 대회 연도이며 수확연도·경매 로트 번호는 미확인.",
+      "competition_rank_display": "4",
+      "reviewed_candidate_id": "peru2026-lot-004",
+      "award_id": "awd-000015"
+    },
+    {
+      "id": "lot-000016",
+      "farm_id": "farm-000015",
+      "label": "Campo Verde · Peru COE 2026",
+      "competition_year": 2026,
+      "crop_year": null,
+      "crop_year_status": "미확인",
+      "sale_year": null,
+      "arrival_date": null,
+      "original_lot_id": null,
+      "lot_id_type": null,
+      "variety": "SL-09",
+      "process": "Washed",
+      "representative": "Wilfredo Arias Candia",
+      "source_ids": [
+        "src-000035"
+      ],
+      "verified_at": "2026-11-10",
+      "note": "COE Results 표 5행. 대회 연도이며 수확연도·경매 로트 번호는 미확인.",
+      "competition_rank_display": "5",
+      "reviewed_candidate_id": "peru2026-lot-005",
+      "award_id": "awd-000016"
+    },
+    {
+      "id": "lot-000017",
+      "farm_id": "farm-000016",
+      "label": "La Florentina · Peru COE 2026",
+      "competition_year": 2026,
+      "crop_year": null,
+      "crop_year_status": "미확인",
+      "sale_year": null,
+      "arrival_date": null,
+      "original_lot_id": null,
+      "lot_id_type": null,
+      "variety": "SL-09",
+      "process": "Washed",
+      "representative": "Alberto Casa Balboa",
+      "source_ids": [
+        "src-000035"
+      ],
+      "verified_at": "2026-11-10",
+      "note": "COE Results 표 6행. 대회 연도이며 수확연도·경매 로트 번호는 미확인.",
+      "competition_rank_display": "6",
+      "reviewed_candidate_id": "peru2026-lot-006",
+      "award_id": "awd-000017"
+    },
+    {
+      "id": "lot-000018",
+      "farm_id": "farm-000017",
+      "label": "El Romerillo 2 · Peru COE 2026",
+      "competition_year": 2026,
+      "crop_year": null,
+      "crop_year_status": "미확인",
+      "sale_year": null,
+      "arrival_date": null,
+      "original_lot_id": null,
+      "lot_id_type": null,
+      "variety": "Geisha",
+      "process": "Washed",
+      "representative": "Eduar Troyes Puelles",
+      "source_ids": [
+        "src-000035"
+      ],
+      "verified_at": "2026-11-10",
+      "note": "COE Results 표 7행. 대회 연도이며 수확연도·경매 로트 번호는 미확인.",
+      "competition_rank_display": "7",
+      "reviewed_candidate_id": "peru2026-lot-007",
+      "award_id": "awd-000018"
+    },
+    {
+      "id": "lot-000019",
+      "farm_id": "farm-000018",
+      "label": "Finca Los Pinos · Peru COE 2026",
+      "competition_year": 2026,
+      "crop_year": null,
+      "crop_year_status": "미확인",
+      "sale_year": null,
+      "arrival_date": null,
+      "original_lot_id": null,
+      "lot_id_type": null,
+      "variety": "Geisha",
+      "process": "Washed",
+      "representative": "Jaime Perez Linares",
+      "source_ids": [
+        "src-000035"
+      ],
+      "verified_at": "2026-11-10",
+      "note": "COE Results 표 8행. 대회 연도이며 수확연도·경매 로트 번호는 미확인.",
+      "competition_rank_display": "8",
+      "reviewed_candidate_id": "peru2026-lot-008",
+      "award_id": "awd-000019"
+    },
+    {
+      "id": "lot-000020",
+      "farm_id": "farm-000019",
+      "label": "La Palmera · Peru COE 2026",
+      "competition_year": 2026,
+      "crop_year": null,
+      "crop_year_status": "미확인",
+      "sale_year": null,
+      "arrival_date": null,
+      "original_lot_id": null,
+      "lot_id_type": null,
+      "variety": "Geisha",
+      "process": "Washed",
+      "representative": "Octavio Cayotopa Olano",
+      "source_ids": [
+        "src-000035"
+      ],
+      "verified_at": "2026-11-10",
+      "note": "COE Results 표 9행. 대회 연도이며 수확연도·경매 로트 번호는 미확인.",
+      "competition_rank_display": "9",
+      "reviewed_candidate_id": "peru2026-lot-009",
+      "award_id": "awd-000020"
+    },
+    {
+      "id": "lot-000021",
+      "farm_id": "farm-000020",
+      "label": "Yuzu · Peru COE 2026",
+      "competition_year": 2026,
+      "crop_year": null,
+      "crop_year_status": "미확인",
+      "sale_year": null,
+      "arrival_date": null,
+      "original_lot_id": null,
+      "lot_id_type": null,
+      "variety": "Geisha",
+      "process": "Washed",
+      "representative": "Teresa Livaque Tarrillo",
+      "source_ids": [
+        "src-000035"
+      ],
+      "verified_at": "2026-11-10",
+      "note": "COE Results 표 10행. 대회 연도이며 수확연도·경매 로트 번호는 미확인.",
+      "competition_rank_display": "10",
+      "reviewed_candidate_id": "peru2026-lot-010",
+      "award_id": "awd-000021"
+    },
+    {
+      "id": "lot-000022",
+      "farm_id": "farm-000021",
+      "label": "El Mirador · Peru COE 2026",
+      "competition_year": 2026,
+      "crop_year": null,
+      "crop_year_status": "미확인",
+      "sale_year": null,
+      "arrival_date": null,
+      "original_lot_id": null,
+      "lot_id_type": null,
+      "variety": "Geisha, Caturra",
+      "process": "Washed",
+      "representative": "Juan Padilla Guerrero",
+      "source_ids": [
+        "src-000035"
+      ],
+      "verified_at": "2026-11-10",
+      "note": "COE Results 표 11행. 대회 연도이며 수확연도·경매 로트 번호는 미확인.",
+      "competition_rank_display": "11",
+      "reviewed_candidate_id": "peru2026-lot-011",
+      "award_id": "awd-000022"
+    },
+    {
+      "id": "lot-000023",
+      "farm_id": "farm-000022",
+      "label": "Cheqreccpampa · Peru COE 2026",
+      "competition_year": 2026,
+      "crop_year": null,
+      "crop_year_status": "미확인",
+      "sale_year": null,
+      "arrival_date": null,
+      "original_lot_id": null,
+      "lot_id_type": null,
+      "variety": "SL-09",
+      "process": "Natural",
+      "representative": "Ricardo Chavez Candia",
+      "source_ids": [
+        "src-000035"
+      ],
+      "verified_at": "2026-11-10",
+      "note": "COE Results 표 12행. 대회 연도이며 수확연도·경매 로트 번호는 미확인.",
+      "competition_rank_display": "12",
+      "reviewed_candidate_id": "peru2026-lot-012",
+      "award_id": "awd-000023"
+    },
+    {
+      "id": "lot-000024",
+      "farm_id": "farm-000023",
+      "label": "Agua Colorada I · Peru COE 2026",
+      "competition_year": 2026,
+      "crop_year": null,
+      "crop_year_status": "미확인",
+      "sale_year": null,
+      "arrival_date": null,
+      "original_lot_id": null,
+      "lot_id_type": null,
+      "variety": "Geisha",
+      "process": "Washed",
+      "representative": "Filadelfo Cordova Mejia",
+      "source_ids": [
+        "src-000035"
+      ],
+      "verified_at": "2026-11-10",
+      "note": "COE Results 표 13행. 대회 연도이며 수확연도·경매 로트 번호는 미확인.",
+      "competition_rank_display": "13",
+      "reviewed_candidate_id": "peru2026-lot-013",
+      "award_id": "awd-000024"
+    },
+    {
+      "id": "lot-000025",
+      "farm_id": "farm-000024",
+      "label": "Finca Los Santos SAC · Peru COE 2026",
+      "competition_year": 2026,
+      "crop_year": null,
+      "crop_year_status": "미확인",
+      "sale_year": null,
+      "arrival_date": null,
+      "original_lot_id": null,
+      "lot_id_type": null,
+      "variety": "Geisha",
+      "process": "Honey",
+      "representative": "Jose Santos Requejo Villanueva",
+      "source_ids": [
+        "src-000035"
+      ],
+      "verified_at": "2026-11-10",
+      "note": "COE Results 표 14행. 대회 연도이며 수확연도·경매 로트 번호는 미확인.",
+      "competition_rank_display": "14",
+      "reviewed_candidate_id": "peru2026-lot-014",
+      "award_id": "awd-000025"
+    },
+    {
+      "id": "lot-000026",
+      "farm_id": "farm-000025",
+      "label": "Uscamayta · Peru COE 2026",
+      "competition_year": 2026,
+      "crop_year": null,
+      "crop_year_status": "미확인",
+      "sale_year": null,
+      "arrival_date": null,
+      "original_lot_id": null,
+      "lot_id_type": null,
+      "variety": "Geisha",
+      "process": "Washed",
+      "representative": "Marcos Severo Uscamayta Malpartida",
+      "source_ids": [
+        "src-000035"
+      ],
+      "verified_at": "2026-11-10",
+      "note": "COE Results 표 15행. 대회 연도이며 수확연도·경매 로트 번호는 미확인.",
+      "competition_rank_display": "15",
+      "reviewed_candidate_id": "peru2026-lot-015",
+      "award_id": "awd-000026"
+    },
+    {
+      "id": "lot-000027",
+      "farm_id": "farm-000026",
+      "label": "La Naranja · Peru COE 2026",
+      "competition_year": 2026,
+      "crop_year": null,
+      "crop_year_status": "미확인",
+      "sale_year": null,
+      "arrival_date": null,
+      "original_lot_id": null,
+      "lot_id_type": null,
+      "variety": "Geisha",
+      "process": "Washed",
+      "representative": "Pablo Neira Melendrez",
+      "source_ids": [
+        "src-000035"
+      ],
+      "verified_at": "2026-11-10",
+      "note": "COE Results 표 16행. 대회 연도이며 수확연도·경매 로트 번호는 미확인.",
+      "competition_rank_display": "16",
+      "reviewed_candidate_id": "peru2026-lot-016",
+      "award_id": "awd-000027"
+    },
+    {
+      "id": "lot-000028",
+      "farm_id": "farm-000027",
+      "label": "La Palmera · Peru COE 2026",
+      "competition_year": 2026,
+      "crop_year": null,
+      "crop_year_status": "미확인",
+      "sale_year": null,
+      "arrival_date": null,
+      "original_lot_id": null,
+      "lot_id_type": null,
+      "variety": "Geisha",
+      "process": "Washed",
+      "representative": "Eli Espinosa Soberon",
+      "source_ids": [
+        "src-000035"
+      ],
+      "verified_at": "2026-11-10",
+      "note": "COE Results 표 17행. 대회 연도이며 수확연도·경매 로트 번호는 미확인.",
+      "competition_rank_display": "17",
+      "reviewed_candidate_id": "peru2026-lot-017",
+      "award_id": "awd-000028"
+    },
+    {
+      "id": "lot-000029",
+      "farm_id": "farm-000028",
+      "label": "El Mirador · Peru COE 2026",
+      "competition_year": 2026,
+      "crop_year": null,
+      "crop_year_status": "미확인",
+      "sale_year": null,
+      "arrival_date": null,
+      "original_lot_id": null,
+      "lot_id_type": null,
+      "variety": "Geisha",
+      "process": "Washed",
+      "representative": "Yoniser Mego Silva",
+      "source_ids": [
+        "src-000035"
+      ],
+      "verified_at": "2026-11-10",
+      "note": "COE Results 표 18행. 대회 연도이며 수확연도·경매 로트 번호는 미확인.",
+      "competition_rank_display": "18",
+      "reviewed_candidate_id": "peru2026-lot-018",
+      "award_id": "awd-000029"
+    },
+    {
+      "id": "lot-000030",
+      "farm_id": "farm-000029",
+      "label": "La Huaca · Peru COE 2026",
+      "competition_year": 2026,
+      "crop_year": null,
+      "crop_year_status": "미확인",
+      "sale_year": null,
+      "arrival_date": null,
+      "original_lot_id": null,
+      "lot_id_type": null,
+      "variety": "Geisha",
+      "process": "Washed",
+      "representative": "Demostenes Tantalean Acuña",
+      "source_ids": [
+        "src-000035"
+      ],
+      "verified_at": "2026-11-10",
+      "note": "COE Results 표 19행. 대회 연도이며 수확연도·경매 로트 번호는 미확인.",
+      "competition_rank_display": "19",
+      "reviewed_candidate_id": "peru2026-lot-019",
+      "award_id": "awd-000030"
+    },
+    {
+      "id": "lot-000031",
+      "farm_id": "farm-000030",
+      "label": "La Lucma · Peru COE 2026",
+      "competition_year": 2026,
+      "crop_year": null,
+      "crop_year_status": "미확인",
+      "sale_year": null,
+      "arrival_date": null,
+      "original_lot_id": null,
+      "lot_id_type": null,
+      "variety": "Geisha",
+      "process": "Natural",
+      "representative": "Orlando Pedraza Ramirez",
+      "source_ids": [
+        "src-000035"
+      ],
+      "verified_at": "2026-11-10",
+      "note": "COE Results 표 20행. 대회 연도이며 수확연도·경매 로트 번호는 미확인.",
+      "competition_rank_display": "20",
+      "reviewed_candidate_id": "peru2026-lot-020",
+      "award_id": "awd-000031"
+    },
+    {
+      "id": "lot-000032",
+      "farm_id": "farm-000031",
+      "label": "Los Cedros · Peru COE 2026",
+      "competition_year": 2026,
+      "crop_year": null,
+      "crop_year_status": "미확인",
+      "sale_year": null,
+      "arrival_date": null,
+      "original_lot_id": null,
+      "lot_id_type": null,
+      "variety": "Geisha",
+      "process": "Washed",
+      "representative": "Nevado Palacios Carrasco",
+      "source_ids": [
+        "src-000035"
+      ],
+      "verified_at": "2026-11-10",
+      "note": "COE Results 표 21행. 대회 연도이며 수확연도·경매 로트 번호는 미확인.",
+      "competition_rank_display": "21",
+      "reviewed_candidate_id": "peru2026-lot-021",
+      "award_id": "awd-000032"
+    },
+    {
+      "id": "lot-000033",
+      "farm_id": "farm-000032",
+      "label": "Pedregal · Peru COE 2026",
+      "competition_year": 2026,
+      "crop_year": null,
+      "crop_year_status": "미확인",
+      "sale_year": null,
+      "arrival_date": null,
+      "original_lot_id": null,
+      "lot_id_type": null,
+      "variety": "SL-09",
+      "process": "Washed",
+      "representative": "Abel Raymundo Arotaype Huayllas",
+      "source_ids": [
+        "src-000035"
+      ],
+      "verified_at": "2026-11-10",
+      "note": "COE Results 표 22행. 대회 연도이며 수확연도·경매 로트 번호는 미확인.",
+      "competition_rank_display": "22",
+      "reviewed_candidate_id": "peru2026-lot-022",
+      "award_id": "awd-000033"
+    },
+    {
+      "id": "lot-000034",
+      "farm_id": "farm-000033",
+      "label": "Llaqtapata · Peru COE 2026",
+      "competition_year": 2026,
+      "crop_year": null,
+      "crop_year_status": "미확인",
+      "sale_year": null,
+      "arrival_date": null,
+      "original_lot_id": null,
+      "lot_id_type": null,
+      "variety": "SL-09",
+      "process": "Washed",
+      "representative": "Gilber Huayllas Huaman",
+      "source_ids": [
+        "src-000035"
+      ],
+      "verified_at": "2026-11-10",
+      "note": "COE Results 표 23행. 대회 연도이며 수확연도·경매 로트 번호는 미확인.",
+      "competition_rank_display": "23",
+      "reviewed_candidate_id": "peru2026-lot-023",
+      "award_id": "awd-000034"
+    },
+    {
+      "id": "lot-000035",
+      "farm_id": "farm-000034",
+      "label": "Ollaytay Baja · Peru COE 2026",
+      "competition_year": 2026,
+      "crop_year": null,
+      "crop_year_status": "미확인",
+      "sale_year": null,
+      "arrival_date": null,
+      "original_lot_id": null,
+      "lot_id_type": null,
+      "variety": "Geisha",
+      "process": "Washed",
+      "representative": "Camilo Almanza Ccahua",
+      "source_ids": [
+        "src-000035"
+      ],
+      "verified_at": "2026-11-10",
+      "note": "COE Results 표 24행. 대회 연도이며 수확연도·경매 로트 번호는 미확인.",
+      "competition_rank_display": "24",
+      "reviewed_candidate_id": "peru2026-lot-024",
+      "award_id": "awd-000035"
+    },
+    {
+      "id": "lot-000036",
+      "farm_id": "farm-000035",
+      "label": "Bella Rosa · Peru COE 2026",
+      "competition_year": 2026,
+      "crop_year": null,
+      "crop_year_status": "미확인",
+      "sale_year": null,
+      "arrival_date": null,
+      "original_lot_id": null,
+      "lot_id_type": null,
+      "variety": "SL-09",
+      "process": "Natural",
+      "representative": "Wilbert Almanza Cabrera",
+      "source_ids": [
+        "src-000035"
+      ],
+      "verified_at": "2026-11-10",
+      "note": "COE Results 표 25행. 대회 연도이며 수확연도·경매 로트 번호는 미확인.",
+      "competition_rank_display": "25",
+      "reviewed_candidate_id": "peru2026-lot-025",
+      "award_id": "awd-000036"
+    },
+    {
+      "id": "lot-000037",
+      "farm_id": "farm-000036",
+      "label": "El Pino · Peru COE 2026",
+      "competition_year": 2026,
+      "crop_year": null,
+      "crop_year_status": "미확인",
+      "sale_year": null,
+      "arrival_date": null,
+      "original_lot_id": null,
+      "lot_id_type": null,
+      "variety": "Geisha",
+      "process": "Natural",
+      "representative": "Wilian Ivan Guerrero Santos",
+      "source_ids": [
+        "src-000035"
+      ],
+      "verified_at": "2026-11-10",
+      "note": "COE Results 표 26행. 대회 연도이며 수확연도·경매 로트 번호는 미확인.",
+      "competition_rank_display": "26",
+      "reviewed_candidate_id": "peru2026-lot-026",
+      "award_id": "awd-000037"
+    },
+    {
+      "id": "lot-000038",
+      "farm_id": "farm-000037",
+      "label": "San Sebastian · Peru COE 2026",
+      "competition_year": 2026,
+      "crop_year": null,
+      "crop_year_status": "미확인",
+      "sale_year": null,
+      "arrival_date": null,
+      "original_lot_id": null,
+      "lot_id_type": null,
+      "variety": "SL-09",
+      "process": "Washed",
+      "representative": "Sinhtya Montalvo Alcarras",
+      "source_ids": [
+        "src-000035"
+      ],
+      "verified_at": "2026-11-10",
+      "note": "COE Results 표 27행. 대회 연도이며 수확연도·경매 로트 번호는 미확인.",
+      "competition_rank_display": "27",
+      "reviewed_candidate_id": "peru2026-lot-027",
+      "award_id": "awd-000038"
+    },
+    {
+      "id": "lot-000039",
+      "farm_id": "farm-000038",
+      "label": "Finca’s Remi · Peru COE 2026",
+      "competition_year": 2026,
+      "crop_year": null,
+      "crop_year_status": "미확인",
+      "sale_year": null,
+      "arrival_date": null,
+      "original_lot_id": null,
+      "lot_id_type": null,
+      "variety": "Geisha",
+      "process": "Washed",
+      "representative": "Richard Velasque Damiano",
+      "source_ids": [
+        "src-000035"
+      ],
+      "verified_at": "2026-11-10",
+      "note": "COE Results 표 28행. 대회 연도이며 수확연도·경매 로트 번호는 미확인.",
+      "competition_rank_display": "28",
+      "reviewed_candidate_id": "peru2026-lot-028",
+      "award_id": "awd-000039"
+    },
+    {
+      "id": "lot-000040",
+      "farm_id": "farm-000039",
+      "label": "Huallhuayocc · Peru COE 2026",
+      "competition_year": 2026,
+      "crop_year": null,
+      "crop_year_status": "미확인",
+      "sale_year": null,
+      "arrival_date": null,
+      "original_lot_id": null,
+      "lot_id_type": null,
+      "variety": "SL-09",
+      "process": "Washed",
+      "representative": "Juan Pablo Luque Vargas",
+      "source_ids": [
+        "src-000035"
+      ],
+      "verified_at": "2026-11-10",
+      "note": "COE Results 표 29행. 대회 연도이며 수확연도·경매 로트 번호는 미확인.",
+      "competition_rank_display": "29",
+      "reviewed_candidate_id": "peru2026-lot-029",
+      "award_id": "awd-000040"
+    },
+    {
+      "id": "lot-000041",
+      "farm_id": "farm-000040",
+      "label": "Pedregal · Peru COE 2026",
+      "competition_year": 2026,
+      "crop_year": null,
+      "crop_year_status": "미확인",
+      "sale_year": null,
+      "arrival_date": null,
+      "original_lot_id": null,
+      "lot_id_type": null,
+      "variety": "SL-09",
+      "process": "Washed",
+      "representative": "Lidia Venero Azorsa",
+      "source_ids": [
+        "src-000035"
+      ],
+      "verified_at": "2026-11-10",
+      "note": "COE Results 표 30행. 대회 연도이며 수확연도·경매 로트 번호는 미확인.",
+      "competition_rank_display": "30",
+      "reviewed_candidate_id": "peru2026-lot-030",
+      "award_id": "awd-000041"
+    },
+    {
+      "id": "lot-000042",
+      "farm_id": "farm-000041",
+      "label": "La Pomarrosa · Peru COE 2026",
+      "competition_year": 2026,
+      "crop_year": null,
+      "crop_year_status": "미확인",
+      "sale_year": null,
+      "arrival_date": null,
+      "original_lot_id": null,
+      "lot_id_type": null,
+      "variety": "Geisha",
+      "process": "Washed",
+      "representative": "Angel Antonio Manosalva Palomino",
+      "source_ids": [
+        "src-000035"
+      ],
+      "verified_at": "2026-11-10",
+      "note": "NW Results 표 1행. 대회 연도이며 수확연도·경매 로트 번호는 미확인.",
+      "competition_rank_display": "NW",
+      "reviewed_candidate_id": "peru2026-lot-031",
+      "award_id": "awd-000042"
+    },
+    {
+      "id": "lot-000043",
+      "farm_id": "farm-000042",
+      "label": "El Descanso · Peru COE 2026",
+      "competition_year": 2026,
+      "crop_year": null,
+      "crop_year_status": "미확인",
+      "sale_year": null,
+      "arrival_date": null,
+      "original_lot_id": null,
+      "lot_id_type": null,
+      "variety": "SL-09",
+      "process": "Washed",
+      "representative": "Hermitaño Casa Urbina",
+      "source_ids": [
+        "src-000035"
+      ],
+      "verified_at": "2026-11-10",
+      "note": "NW Results 표 2행. 대회 연도이며 수확연도·경매 로트 번호는 미확인.",
+      "competition_rank_display": "NW",
+      "reviewed_candidate_id": "peru2026-lot-032",
+      "award_id": "awd-000043"
+    },
+    {
+      "id": "lot-000044",
+      "farm_id": "farm-000043",
+      "label": "El Romerillo · Peru COE 2026",
+      "competition_year": 2026,
+      "crop_year": null,
+      "crop_year_status": "미확인",
+      "sale_year": null,
+      "arrival_date": null,
+      "original_lot_id": null,
+      "lot_id_type": null,
+      "variety": "Geisha",
+      "process": "Washed",
+      "representative": "Guillermo Masape Quispe",
+      "source_ids": [
+        "src-000035"
+      ],
+      "verified_at": "2026-11-10",
+      "note": "NW Results 표 3행. 대회 연도이며 수확연도·경매 로트 번호는 미확인.",
+      "competition_rank_display": "NW",
+      "reviewed_candidate_id": "peru2026-lot-033",
+      "award_id": "awd-000044"
+    },
+    {
+      "id": "lot-000045",
+      "farm_id": "farm-000044",
+      "label": "Montaña Alta · Peru COE 2026",
+      "competition_year": 2026,
+      "crop_year": null,
+      "crop_year_status": "미확인",
+      "sale_year": null,
+      "arrival_date": null,
+      "original_lot_id": null,
+      "lot_id_type": null,
+      "variety": "SL-09",
+      "process": "Washed",
+      "representative": "Jaime Meliton Huayllas Huaman",
+      "source_ids": [
+        "src-000035"
+      ],
+      "verified_at": "2026-11-10",
+      "note": "NW Results 표 4행. 대회 연도이며 수확연도·경매 로트 번호는 미확인.",
+      "competition_rank_display": "NW",
+      "reviewed_candidate_id": "peru2026-lot-034",
+      "award_id": "awd-000045"
+    },
+    {
+      "id": "lot-000046",
+      "farm_id": "farm-000045",
+      "label": "Santa Yamileth · Peru COE 2026",
+      "competition_year": 2026,
+      "crop_year": null,
+      "crop_year_status": "미확인",
+      "sale_year": null,
+      "arrival_date": null,
+      "original_lot_id": null,
+      "lot_id_type": null,
+      "variety": "Bourbon, Geisha",
+      "process": "Washed",
+      "representative": "Genaro Cahuana Quispe",
+      "source_ids": [
+        "src-000035"
+      ],
+      "verified_at": "2026-11-10",
+      "note": "NW Results 표 5행. 대회 연도이며 수확연도·경매 로트 번호는 미확인.",
+      "competition_rank_display": "NW",
+      "reviewed_candidate_id": "peru2026-lot-035",
+      "award_id": "awd-000046"
+    },
+    {
+      "id": "lot-000047",
+      "farm_id": "farm-000046",
+      "label": "El Jazmin · Peru COE 2026",
+      "competition_year": 2026,
+      "crop_year": null,
+      "crop_year_status": "미확인",
+      "sale_year": null,
+      "arrival_date": null,
+      "original_lot_id": null,
+      "lot_id_type": null,
+      "variety": "Geisha",
+      "process": "Washed",
+      "representative": "Andres Abarca Gomez",
+      "source_ids": [
+        "src-000035"
+      ],
+      "verified_at": "2026-11-10",
+      "note": "NW Results 표 6행. 대회 연도이며 수확연도·경매 로트 번호는 미확인.",
+      "competition_rank_display": "NW",
+      "reviewed_candidate_id": "peru2026-lot-036",
+      "award_id": "awd-000047"
+    },
+    {
+      "id": "lot-000048",
+      "farm_id": "farm-000047",
+      "label": "El Morerillo · Peru COE 2026",
+      "competition_year": 2026,
+      "crop_year": null,
+      "crop_year_status": "미확인",
+      "sale_year": null,
+      "arrival_date": null,
+      "original_lot_id": null,
+      "lot_id_type": null,
+      "variety": "Geisha",
+      "process": "Washed",
+      "representative": "Elvis Edwin Davila Horna",
+      "source_ids": [
+        "src-000035"
+      ],
+      "verified_at": "2026-11-10",
+      "note": "NW Results 표 7행. 대회 연도이며 수확연도·경매 로트 번호는 미확인.",
+      "competition_rank_display": "NW",
+      "reviewed_candidate_id": "peru2026-lot-037",
+      "award_id": "awd-000048"
+    },
+    {
+      "id": "lot-000049",
+      "farm_id": "farm-000048",
+      "label": "Wallpa Wasi · Peru COE 2026",
+      "competition_year": 2026,
+      "crop_year": null,
+      "crop_year_status": "미확인",
+      "sale_year": null,
+      "arrival_date": null,
+      "original_lot_id": null,
+      "lot_id_type": null,
+      "variety": "SL-09",
+      "process": "Washed",
+      "representative": "Mateo Carpio Pacocha",
+      "source_ids": [
+        "src-000035"
+      ],
+      "verified_at": "2026-11-10",
+      "note": "NW Results 표 8행. 대회 연도이며 수확연도·경매 로트 번호는 미확인.",
+      "competition_rank_display": "NW",
+      "reviewed_candidate_id": "peru2026-lot-038",
+      "award_id": "awd-000049"
+    },
+    {
+      "id": "lot-000050",
+      "farm_id": "farm-000049",
+      "label": "Don Thiago · Peru COE 2026",
+      "competition_year": 2026,
+      "crop_year": null,
+      "crop_year_status": "미확인",
+      "sale_year": null,
+      "arrival_date": null,
+      "original_lot_id": null,
+      "lot_id_type": null,
+      "variety": "Geisha",
+      "process": "Washed",
+      "representative": "Esgar Jesus Delgado Saucedo",
+      "source_ids": [
+        "src-000035"
+      ],
+      "verified_at": "2026-11-10",
+      "note": "NW Results 표 9행. 대회 연도이며 수확연도·경매 로트 번호는 미확인.",
+      "competition_rank_display": "NW",
+      "reviewed_candidate_id": "peru2026-lot-039",
+      "award_id": "awd-000050"
     }
   ],
   "awards": [
@@ -1743,6 +4540,592 @@
       "source_ids": [
         "src-000020",
         "src-000026"
+      ],
+      "status": "verified"
+    },
+    {
+      "id": "awd-000012",
+      "lot_id": "lot-000012",
+      "farm_id": "farm-000011",
+      "event": "Peru Cup of Excellence",
+      "organizer": "Alliance for Coffee Excellence / Cup of Excellence",
+      "event_year": 2026,
+      "category": "COE 수상",
+      "rank": "1",
+      "score": "91.71",
+      "source_ids": [
+        "src-000035"
+      ],
+      "status": "verified"
+    },
+    {
+      "id": "awd-000013",
+      "lot_id": "lot-000013",
+      "farm_id": "farm-000012",
+      "event": "Peru Cup of Excellence",
+      "organizer": "Alliance for Coffee Excellence / Cup of Excellence",
+      "event_year": 2026,
+      "category": "COE 수상",
+      "rank": "2",
+      "score": "91.45",
+      "source_ids": [
+        "src-000035"
+      ],
+      "status": "verified"
+    },
+    {
+      "id": "awd-000014",
+      "lot_id": "lot-000014",
+      "farm_id": "farm-000013",
+      "event": "Peru Cup of Excellence",
+      "organizer": "Alliance for Coffee Excellence / Cup of Excellence",
+      "event_year": 2026,
+      "category": "COE 수상",
+      "rank": "3",
+      "score": "90.93",
+      "source_ids": [
+        "src-000035"
+      ],
+      "status": "verified"
+    },
+    {
+      "id": "awd-000015",
+      "lot_id": "lot-000015",
+      "farm_id": "farm-000014",
+      "event": "Peru Cup of Excellence",
+      "organizer": "Alliance for Coffee Excellence / Cup of Excellence",
+      "event_year": 2026,
+      "category": "COE 수상",
+      "rank": "4",
+      "score": "90.23",
+      "source_ids": [
+        "src-000035"
+      ],
+      "status": "verified"
+    },
+    {
+      "id": "awd-000016",
+      "lot_id": "lot-000016",
+      "farm_id": "farm-000015",
+      "event": "Peru Cup of Excellence",
+      "organizer": "Alliance for Coffee Excellence / Cup of Excellence",
+      "event_year": 2026,
+      "category": "COE 수상",
+      "rank": "5",
+      "score": "90.22",
+      "source_ids": [
+        "src-000035"
+      ],
+      "status": "verified"
+    },
+    {
+      "id": "awd-000017",
+      "lot_id": "lot-000017",
+      "farm_id": "farm-000016",
+      "event": "Peru Cup of Excellence",
+      "organizer": "Alliance for Coffee Excellence / Cup of Excellence",
+      "event_year": 2026,
+      "category": "COE 수상",
+      "rank": "6",
+      "score": "89.85",
+      "source_ids": [
+        "src-000035"
+      ],
+      "status": "verified"
+    },
+    {
+      "id": "awd-000018",
+      "lot_id": "lot-000018",
+      "farm_id": "farm-000017",
+      "event": "Peru Cup of Excellence",
+      "organizer": "Alliance for Coffee Excellence / Cup of Excellence",
+      "event_year": 2026,
+      "category": "COE 수상",
+      "rank": "7",
+      "score": "89.71",
+      "source_ids": [
+        "src-000035"
+      ],
+      "status": "verified"
+    },
+    {
+      "id": "awd-000019",
+      "lot_id": "lot-000019",
+      "farm_id": "farm-000018",
+      "event": "Peru Cup of Excellence",
+      "organizer": "Alliance for Coffee Excellence / Cup of Excellence",
+      "event_year": 2026,
+      "category": "COE 수상",
+      "rank": "8",
+      "score": "89.57",
+      "source_ids": [
+        "src-000035"
+      ],
+      "status": "verified"
+    },
+    {
+      "id": "awd-000020",
+      "lot_id": "lot-000020",
+      "farm_id": "farm-000019",
+      "event": "Peru Cup of Excellence",
+      "organizer": "Alliance for Coffee Excellence / Cup of Excellence",
+      "event_year": 2026,
+      "category": "COE 수상",
+      "rank": "9",
+      "score": "89.52",
+      "source_ids": [
+        "src-000035"
+      ],
+      "status": "verified"
+    },
+    {
+      "id": "awd-000021",
+      "lot_id": "lot-000021",
+      "farm_id": "farm-000020",
+      "event": "Peru Cup of Excellence",
+      "organizer": "Alliance for Coffee Excellence / Cup of Excellence",
+      "event_year": 2026,
+      "category": "COE 수상",
+      "rank": "10",
+      "score": "89.35",
+      "source_ids": [
+        "src-000035"
+      ],
+      "status": "verified"
+    },
+    {
+      "id": "awd-000022",
+      "lot_id": "lot-000022",
+      "farm_id": "farm-000021",
+      "event": "Peru Cup of Excellence",
+      "organizer": "Alliance for Coffee Excellence / Cup of Excellence",
+      "event_year": 2026,
+      "category": "COE 수상",
+      "rank": "11",
+      "score": "88.86",
+      "source_ids": [
+        "src-000035"
+      ],
+      "status": "verified"
+    },
+    {
+      "id": "awd-000023",
+      "lot_id": "lot-000023",
+      "farm_id": "farm-000022",
+      "event": "Peru Cup of Excellence",
+      "organizer": "Alliance for Coffee Excellence / Cup of Excellence",
+      "event_year": 2026,
+      "category": "COE 수상",
+      "rank": "12",
+      "score": "88.85",
+      "source_ids": [
+        "src-000035"
+      ],
+      "status": "verified"
+    },
+    {
+      "id": "awd-000024",
+      "lot_id": "lot-000024",
+      "farm_id": "farm-000023",
+      "event": "Peru Cup of Excellence",
+      "organizer": "Alliance for Coffee Excellence / Cup of Excellence",
+      "event_year": 2026,
+      "category": "COE 수상",
+      "rank": "13",
+      "score": "88.83",
+      "source_ids": [
+        "src-000035"
+      ],
+      "status": "verified"
+    },
+    {
+      "id": "awd-000025",
+      "lot_id": "lot-000025",
+      "farm_id": "farm-000024",
+      "event": "Peru Cup of Excellence",
+      "organizer": "Alliance for Coffee Excellence / Cup of Excellence",
+      "event_year": 2026,
+      "category": "COE 수상",
+      "rank": "14",
+      "score": "88.66",
+      "source_ids": [
+        "src-000035"
+      ],
+      "status": "verified"
+    },
+    {
+      "id": "awd-000026",
+      "lot_id": "lot-000026",
+      "farm_id": "farm-000025",
+      "event": "Peru Cup of Excellence",
+      "organizer": "Alliance for Coffee Excellence / Cup of Excellence",
+      "event_year": 2026,
+      "category": "COE 수상",
+      "rank": "15",
+      "score": null,
+      "source_ids": [
+        "src-000035",
+        "src-000036"
+      ],
+      "status": "conflict"
+    },
+    {
+      "id": "awd-000027",
+      "lot_id": "lot-000027",
+      "farm_id": "farm-000026",
+      "event": "Peru Cup of Excellence",
+      "organizer": "Alliance for Coffee Excellence / Cup of Excellence",
+      "event_year": 2026,
+      "category": "COE 수상",
+      "rank": "16",
+      "score": "88.56",
+      "source_ids": [
+        "src-000035"
+      ],
+      "status": "verified"
+    },
+    {
+      "id": "awd-000028",
+      "lot_id": "lot-000028",
+      "farm_id": "farm-000027",
+      "event": "Peru Cup of Excellence",
+      "organizer": "Alliance for Coffee Excellence / Cup of Excellence",
+      "event_year": 2026,
+      "category": "COE 수상",
+      "rank": "17",
+      "score": "88.55",
+      "source_ids": [
+        "src-000035"
+      ],
+      "status": "verified"
+    },
+    {
+      "id": "awd-000029",
+      "lot_id": "lot-000029",
+      "farm_id": "farm-000028",
+      "event": "Peru Cup of Excellence",
+      "organizer": "Alliance for Coffee Excellence / Cup of Excellence",
+      "event_year": 2026,
+      "category": "COE 수상",
+      "rank": "18",
+      "score": "88.25",
+      "source_ids": [
+        "src-000035"
+      ],
+      "status": "verified"
+    },
+    {
+      "id": "awd-000030",
+      "lot_id": "lot-000030",
+      "farm_id": "farm-000029",
+      "event": "Peru Cup of Excellence",
+      "organizer": "Alliance for Coffee Excellence / Cup of Excellence",
+      "event_year": 2026,
+      "category": "COE 수상",
+      "rank": "19",
+      "score": "88.23",
+      "source_ids": [
+        "src-000035"
+      ],
+      "status": "verified"
+    },
+    {
+      "id": "awd-000031",
+      "lot_id": "lot-000031",
+      "farm_id": "farm-000030",
+      "event": "Peru Cup of Excellence",
+      "organizer": "Alliance for Coffee Excellence / Cup of Excellence",
+      "event_year": 2026,
+      "category": "COE 수상",
+      "rank": "20",
+      "score": "88.15",
+      "source_ids": [
+        "src-000035"
+      ],
+      "status": "verified"
+    },
+    {
+      "id": "awd-000032",
+      "lot_id": "lot-000032",
+      "farm_id": "farm-000031",
+      "event": "Peru Cup of Excellence",
+      "organizer": "Alliance for Coffee Excellence / Cup of Excellence",
+      "event_year": 2026,
+      "category": "COE 수상",
+      "rank": "21",
+      "score": "87.99",
+      "source_ids": [
+        "src-000035"
+      ],
+      "status": "verified"
+    },
+    {
+      "id": "awd-000033",
+      "lot_id": "lot-000033",
+      "farm_id": "farm-000032",
+      "event": "Peru Cup of Excellence",
+      "organizer": "Alliance for Coffee Excellence / Cup of Excellence",
+      "event_year": 2026,
+      "category": "COE 수상",
+      "rank": "22",
+      "score": "87.95",
+      "source_ids": [
+        "src-000035"
+      ],
+      "status": "verified"
+    },
+    {
+      "id": "awd-000034",
+      "lot_id": "lot-000034",
+      "farm_id": "farm-000033",
+      "event": "Peru Cup of Excellence",
+      "organizer": "Alliance for Coffee Excellence / Cup of Excellence",
+      "event_year": 2026,
+      "category": "COE 수상",
+      "rank": "23",
+      "score": "87.93",
+      "source_ids": [
+        "src-000035"
+      ],
+      "status": "verified"
+    },
+    {
+      "id": "awd-000035",
+      "lot_id": "lot-000035",
+      "farm_id": "farm-000034",
+      "event": "Peru Cup of Excellence",
+      "organizer": "Alliance for Coffee Excellence / Cup of Excellence",
+      "event_year": 2026,
+      "category": "COE 수상",
+      "rank": "24",
+      "score": "87.86",
+      "source_ids": [
+        "src-000035"
+      ],
+      "status": "verified"
+    },
+    {
+      "id": "awd-000036",
+      "lot_id": "lot-000036",
+      "farm_id": "farm-000035",
+      "event": "Peru Cup of Excellence",
+      "organizer": "Alliance for Coffee Excellence / Cup of Excellence",
+      "event_year": 2026,
+      "category": "COE 수상",
+      "rank": "25",
+      "score": "87.84",
+      "source_ids": [
+        "src-000035"
+      ],
+      "status": "verified"
+    },
+    {
+      "id": "awd-000037",
+      "lot_id": "lot-000037",
+      "farm_id": "farm-000036",
+      "event": "Peru Cup of Excellence",
+      "organizer": "Alliance for Coffee Excellence / Cup of Excellence",
+      "event_year": 2026,
+      "category": "COE 수상",
+      "rank": "26",
+      "score": "87.82",
+      "source_ids": [
+        "src-000035"
+      ],
+      "status": "verified"
+    },
+    {
+      "id": "awd-000038",
+      "lot_id": "lot-000038",
+      "farm_id": "farm-000037",
+      "event": "Peru Cup of Excellence",
+      "organizer": "Alliance for Coffee Excellence / Cup of Excellence",
+      "event_year": 2026,
+      "category": "COE 수상",
+      "rank": "27",
+      "score": "87.82",
+      "source_ids": [
+        "src-000035"
+      ],
+      "status": "verified"
+    },
+    {
+      "id": "awd-000039",
+      "lot_id": "lot-000039",
+      "farm_id": "farm-000038",
+      "event": "Peru Cup of Excellence",
+      "organizer": "Alliance for Coffee Excellence / Cup of Excellence",
+      "event_year": 2026,
+      "category": "COE 수상",
+      "rank": "28",
+      "score": "87.75",
+      "source_ids": [
+        "src-000035"
+      ],
+      "status": "verified"
+    },
+    {
+      "id": "awd-000040",
+      "lot_id": "lot-000040",
+      "farm_id": "farm-000039",
+      "event": "Peru Cup of Excellence",
+      "organizer": "Alliance for Coffee Excellence / Cup of Excellence",
+      "event_year": 2026,
+      "category": "COE 수상",
+      "rank": "29",
+      "score": "87.75",
+      "source_ids": [
+        "src-000035"
+      ],
+      "status": "verified"
+    },
+    {
+      "id": "awd-000041",
+      "lot_id": "lot-000041",
+      "farm_id": "farm-000040",
+      "event": "Peru Cup of Excellence",
+      "organizer": "Alliance for Coffee Excellence / Cup of Excellence",
+      "event_year": 2026,
+      "category": "COE 수상",
+      "rank": "30",
+      "score": "87.69",
+      "source_ids": [
+        "src-000035"
+      ],
+      "status": "verified"
+    },
+    {
+      "id": "awd-000042",
+      "lot_id": "lot-000042",
+      "farm_id": "farm-000041",
+      "event": "Peru Cup of Excellence",
+      "organizer": "Alliance for Coffee Excellence / Cup of Excellence",
+      "event_year": 2026,
+      "category": "National Winners",
+      "rank": "NW",
+      "score": "87.68",
+      "source_ids": [
+        "src-000035"
+      ],
+      "status": "verified"
+    },
+    {
+      "id": "awd-000043",
+      "lot_id": "lot-000043",
+      "farm_id": "farm-000042",
+      "event": "Peru Cup of Excellence",
+      "organizer": "Alliance for Coffee Excellence / Cup of Excellence",
+      "event_year": 2026,
+      "category": "National Winners",
+      "rank": "NW",
+      "score": "87.55",
+      "source_ids": [
+        "src-000035"
+      ],
+      "status": "verified"
+    },
+    {
+      "id": "awd-000044",
+      "lot_id": "lot-000044",
+      "farm_id": "farm-000043",
+      "event": "Peru Cup of Excellence",
+      "organizer": "Alliance for Coffee Excellence / Cup of Excellence",
+      "event_year": 2026,
+      "category": "National Winners",
+      "rank": "NW",
+      "score": "87.52",
+      "source_ids": [
+        "src-000035"
+      ],
+      "status": "verified"
+    },
+    {
+      "id": "awd-000045",
+      "lot_id": "lot-000045",
+      "farm_id": "farm-000044",
+      "event": "Peru Cup of Excellence",
+      "organizer": "Alliance for Coffee Excellence / Cup of Excellence",
+      "event_year": 2026,
+      "category": "National Winners",
+      "rank": "NW",
+      "score": "87.52",
+      "source_ids": [
+        "src-000035"
+      ],
+      "status": "verified"
+    },
+    {
+      "id": "awd-000046",
+      "lot_id": "lot-000046",
+      "farm_id": "farm-000045",
+      "event": "Peru Cup of Excellence",
+      "organizer": "Alliance for Coffee Excellence / Cup of Excellence",
+      "event_year": 2026,
+      "category": "National Winners",
+      "rank": "NW",
+      "score": "87.51",
+      "source_ids": [
+        "src-000035"
+      ],
+      "status": "verified"
+    },
+    {
+      "id": "awd-000047",
+      "lot_id": "lot-000047",
+      "farm_id": "farm-000046",
+      "event": "Peru Cup of Excellence",
+      "organizer": "Alliance for Coffee Excellence / Cup of Excellence",
+      "event_year": 2026,
+      "category": "National Winners",
+      "rank": "NW",
+      "score": "87.50",
+      "source_ids": [
+        "src-000035"
+      ],
+      "status": "verified"
+    },
+    {
+      "id": "awd-000048",
+      "lot_id": "lot-000048",
+      "farm_id": "farm-000047",
+      "event": "Peru Cup of Excellence",
+      "organizer": "Alliance for Coffee Excellence / Cup of Excellence",
+      "event_year": 2026,
+      "category": "National Winners",
+      "rank": "NW",
+      "score": "87.14",
+      "source_ids": [
+        "src-000035"
+      ],
+      "status": "verified"
+    },
+    {
+      "id": "awd-000049",
+      "lot_id": "lot-000049",
+      "farm_id": "farm-000048",
+      "event": "Peru Cup of Excellence",
+      "organizer": "Alliance for Coffee Excellence / Cup of Excellence",
+      "event_year": 2026,
+      "category": "National Winners",
+      "rank": "NW",
+      "score": "86.80",
+      "source_ids": [
+        "src-000035"
+      ],
+      "status": "verified"
+    },
+    {
+      "id": "awd-000050",
+      "lot_id": "lot-000050",
+      "farm_id": "farm-000049",
+      "event": "Peru Cup of Excellence",
+      "organizer": "Alliance for Coffee Excellence / Cup of Excellence",
+      "event_year": 2026,
+      "category": "National Winners",
+      "rank": "NW",
+      "score": "86.73",
+      "source_ids": [
+        "src-000035"
       ],
       "status": "verified"
     }
@@ -1930,6 +5313,19 @@
         "src-000034"
       ],
       "question": "시설·개별 로트 직접 자료가 제공되면 별도 대조. 확정 신원은 재질문하지 않음.",
+      "status": "open"
+    },
+    {
+      "id": "issue-000015",
+      "farm_id": "farm-000025",
+      "title": "15위 점수 표기 차이",
+      "severity": "확정 보류",
+      "text": "ACE 결과표 88.62점, DEVIDA 보도 88.63점입니다.",
+      "source_ids": [
+        "src-000035",
+        "src-000036"
+      ],
+      "question": "주최기관의 확정 점수 확인",
       "status": "open"
     }
   ],
@@ -2647,6 +6043,48 @@
       "record_path": "data/source-records/src-000034.json",
       "record_sha256": "16df96d29e7a7c5b471e24719cdf7b47e3bbc6625f00a2360b9427f00939e01c",
       "hash_scope": "저장한 서지·요약 카드 바이트; 웹 원문 해시 아님."
+    },
+    {
+      "id": "src-000035",
+      "title": "Peru 2026 · COE 및 National Winners 공식 결과",
+      "publisher": "Alliance for Coffee Excellence / Cup of Excellence",
+      "url": "https://allianceforcoffeeexcellence.org/peru-2026/",
+      "type": "대회 공식 결과",
+      "published_at": null,
+      "accessed_at": "2026-11-10T04:24:43.512920+00:00",
+      "fact_period": "2026 대회",
+      "location": "COE Results 30행 및 NW Results 9행",
+      "language": "en",
+      "read_scope": "COE Results 30행 및 NW Results 9행",
+      "access": "public",
+      "rights": "서지정보와 자체 요약만 보존.",
+      "summary": "공개 결과표 39행. 전체 출품 명단과 별개이며 소개문의 부문 구분은 결과표에서 확인되지 않는다.",
+      "revision": 1,
+      "supersedes": null,
+      "record_path": "data/source-records/src-000035.json",
+      "record_sha256": "f203ffcbcf1d3b8a5e0fe1ee4dc77e60fca11b35fc2cf0c7f0e2bda2ea45a547",
+      "hash_scope": "저장한 서지·요약 카드의 바이트. 웹 원문 해시가 아님."
+    },
+    {
+      "id": "src-000036",
+      "title": "DEVIDA · 2026 페루 COE 보도",
+      "publisher": "DEVIDA / Gobierno del Perú",
+      "url": "https://www.gob.pe/institucion/devida/noticias/1471059-cafe-huanuqueno-del-desarrollo-alternativo-alcanza-el-segundo-lugar-en-la-taza-de-excelencia-peru-2026",
+      "type": "기관 공식 보도",
+      "published_at": "2026-11-07",
+      "accessed_at": "2026-11-10T04:27:46.947606+00:00",
+      "fact_period": "2026 대회",
+      "location": "2위 생산자 지역 및 15위 결과 문단",
+      "language": "es",
+      "read_scope": "2위 생산자 지역 및 15위 결과 문단",
+      "access": "public",
+      "rights": "서지정보와 자체 요약만 보존.",
+      "summary": "2위 생산자의 지역을 서술한다. 15위 점수는 ACE 표와 달라 확정 표시를 보류한다.",
+      "revision": 1,
+      "supersedes": null,
+      "record_path": "data/source-records/src-000036.json",
+      "record_sha256": "d64823fe72faa84f0118624759bb4d7bb51a91b4098e60d38b8f587cc19f49b7",
+      "hash_scope": "저장한 서지·요약 카드의 바이트. 웹 원문 해시가 아님."
     }
   ],
   "changes": [
@@ -2948,6 +6386,20 @@
       ],
       "previous_revision": "2026-10-07.review-1",
       "snapshot_path": "data/snapshots/2026-11-09.ethiopia-1.json"
+    },
+    {
+      "id": "change-000006",
+      "date": "2026-11-10",
+      "revision": "2026-11-10.peru-coe-1",
+      "type": "editorial_publication",
+      "title": "페루 2026 COE 공개 결과 39행 반영",
+      "summary": "COE 수상 30행과 National Winners 9행을 등록. 전체 출품 명단은 공개 확인 범위 밖이며, 15위 확정 점수와 새 평가 연결은 보류.",
+      "source_ids": [
+        "src-000035",
+        "src-000036"
+      ],
+      "previous_revision": "2026-11-09.ethiopia-1",
+      "snapshot_path": "data/snapshots/2026-11-10.peru-coe-1.json"
     }
   ]
 }
