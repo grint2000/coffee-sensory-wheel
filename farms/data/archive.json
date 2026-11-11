@@ -1,8 +1,8 @@
 {
   "schema_version": "1.0.0",
   "archive_id": "noel-farm-knowledge",
-  "revision": "2026-11-10.peru-coe-1",
-  "updated_at": "2026-11-10",
+  "revision": "2026-11-11.peru-profile-review-1",
+  "updated_at": "2026-11-11",
   "fictional": false,
   "owner_label": "Noel",
   "scope": "질문·관심 농장부터 확인된 자료를 누적",
@@ -539,34 +539,36 @@
     {
       "id": "farm-000011",
       "name": "Finca La Esperanza",
-      "name_ko": "Fidel Huancas Huancas",
+      "name_ko": "Finca La Esperanza",
       "aliases": [],
       "country_id": "country-000004",
       "region_ids": [
         "region-000014"
       ],
       "related_region_ids": [],
-      "summary": "2026 페루 COE COE 수상 공식 결과표의 농장 표기. 지역 Cajamarca.",
+      "summary": "Cajamarca의 La Esperanza. 공식 결과표와 Kima의 소개에 Fidel Huancas Huancas가 연결됩니다. 2026 대회 Geisha·Washed와 Kima 판매 상품 Caturra·Natural은 서로 다른 범위의 기록입니다.",
       "source_ids": [
-        "src-000035"
+        "src-000035",
+        "src-000039"
       ],
-      "updated_at": "2026-11-10",
+      "updated_at": "2026-11-11",
       "entity_type": "farm",
       "notes_status": "대회 결과표 기반 잠정 식별 · 평가 연결 보류",
       "evaluation_status": "deferred",
-      "reviewed_candidate_id": "peru2026-farm-001"
+      "reviewed_candidate_id": "peru2026-farm-001",
+      "name_ko_status": "한글 음역 미확정 · 원문 농장명 표시"
     },
     {
       "id": "farm-000012",
       "name": "Palma Pampa",
-      "name_ko": "Alcides Nicki Rodriguez Melgarejo",
+      "name_ko": "Palma Pampa",
       "aliases": [],
       "country_id": "country-000004",
       "region_ids": [
         "region-000015"
       ],
       "related_region_ids": [],
-      "summary": "2026 페루 COE COE 수상 공식 결과표의 농장 표기. 지역 Huanuco.",
+      "summary": "2026 페루 COE 수상 공식 결과표의 농장 표기. 지역 Huanuco.",
       "source_ids": [
         "src-000035",
         "src-000036"
@@ -575,19 +577,20 @@
       "entity_type": "farm",
       "notes_status": "대회 결과표 기반 잠정 식별 · 평가 연결 보류",
       "evaluation_status": "deferred",
-      "reviewed_candidate_id": "peru2026-farm-002"
+      "reviewed_candidate_id": "peru2026-farm-002",
+      "name_ko_status": "한글 음역 미확정 · 원문 농장명 표시"
     },
     {
       "id": "farm-000013",
       "name": "Finca La Ponderosa",
-      "name_ko": "Dreyde Perez Delgado",
+      "name_ko": "Finca La Ponderosa",
       "aliases": [],
       "country_id": "country-000004",
       "region_ids": [
         "region-000014"
       ],
       "related_region_ids": [],
-      "summary": "2026 페루 COE COE 수상 공식 결과표의 농장 표기. 지역 Cajamarca.",
+      "summary": "2026 페루 COE 수상 공식 결과표의 농장 표기. 지역 Cajamarca.",
       "source_ids": [
         "src-000035"
       ],
@@ -595,39 +598,43 @@
       "entity_type": "farm",
       "notes_status": "대회 결과표 기반 잠정 식별 · 평가 연결 보류",
       "evaluation_status": "deferred",
-      "reviewed_candidate_id": "peru2026-farm-003"
+      "reviewed_candidate_id": "peru2026-farm-003",
+      "name_ko_status": "한글 음역 미확정 · 원문 농장명 표시"
     },
     {
       "id": "farm-000014",
       "name": "Caminos del Inka Coffee Estate",
-      "name_ko": "Samuel Smith Perez Aragon",
+      "name_ko": "Caminos del Inka Coffee Estate",
       "aliases": [],
       "country_id": "country-000004",
       "region_ids": [
         "region-000016"
       ],
       "related_region_ids": [],
-      "summary": "2026 페루 COE COE 수상 공식 결과표의 농장 표기. 지역 Cusco.",
+      "summary": "Cusco의 Caminos del Inka. SEY의 생산자 소개와 Coro의 2024년 방문기는 Santa Teresa 위치와 Gesha/Geisha 재배를 함께 뒷받침합니다. 아래에서 농장 소개, 2026 대회 로트, 별도 판매 로트를 구분해 읽으세요.",
       "source_ids": [
-        "src-000035"
+        "src-000035",
+        "src-000037",
+        "src-000038"
       ],
-      "updated_at": "2026-11-10",
+      "updated_at": "2026-11-11",
       "entity_type": "farm",
       "notes_status": "대회 결과표 기반 잠정 식별 · 평가 연결 보류",
       "evaluation_status": "deferred",
-      "reviewed_candidate_id": "peru2026-farm-004"
+      "reviewed_candidate_id": "peru2026-farm-004",
+      "name_ko_status": "한글 음역 미확정 · 원문 농장명 표시"
     },
     {
       "id": "farm-000015",
       "name": "Campo Verde",
-      "name_ko": "Wilfredo Arias Candia",
+      "name_ko": "Campo Verde",
       "aliases": [],
       "country_id": "country-000004",
       "region_ids": [
         "region-000016"
       ],
       "related_region_ids": [],
-      "summary": "2026 페루 COE COE 수상 공식 결과표의 농장 표기. 지역 Cusco.",
+      "summary": "2026 페루 COE 수상 공식 결과표의 농장 표기. 지역 Cusco.",
       "source_ids": [
         "src-000035"
       ],
@@ -635,19 +642,20 @@
       "entity_type": "farm",
       "notes_status": "대회 결과표 기반 잠정 식별 · 평가 연결 보류",
       "evaluation_status": "deferred",
-      "reviewed_candidate_id": "peru2026-farm-005"
+      "reviewed_candidate_id": "peru2026-farm-005",
+      "name_ko_status": "한글 음역 미확정 · 원문 농장명 표시"
     },
     {
       "id": "farm-000016",
       "name": "La Florentina",
-      "name_ko": "Alberto Casa Balboa",
+      "name_ko": "La Florentina",
       "aliases": [],
       "country_id": "country-000004",
       "region_ids": [
         "region-000016"
       ],
       "related_region_ids": [],
-      "summary": "2026 페루 COE COE 수상 공식 결과표의 농장 표기. 지역 Cusco.",
+      "summary": "2026 페루 COE 수상 공식 결과표의 농장 표기. 지역 Cusco.",
       "source_ids": [
         "src-000035"
       ],
@@ -655,19 +663,20 @@
       "entity_type": "farm",
       "notes_status": "대회 결과표 기반 잠정 식별 · 평가 연결 보류",
       "evaluation_status": "deferred",
-      "reviewed_candidate_id": "peru2026-farm-006"
+      "reviewed_candidate_id": "peru2026-farm-006",
+      "name_ko_status": "한글 음역 미확정 · 원문 농장명 표시"
     },
     {
       "id": "farm-000017",
       "name": "El Romerillo 2",
-      "name_ko": "Eduar Troyes Puelles",
+      "name_ko": "El Romerillo 2",
       "aliases": [],
       "country_id": "country-000004",
       "region_ids": [
         "region-000014"
       ],
       "related_region_ids": [],
-      "summary": "2026 페루 COE COE 수상 공식 결과표의 농장 표기. 지역 Cajamarca.",
+      "summary": "2026 페루 COE 수상 공식 결과표의 농장 표기. 지역 Cajamarca.",
       "source_ids": [
         "src-000035"
       ],
@@ -675,19 +684,20 @@
       "entity_type": "farm",
       "notes_status": "대회 결과표 기반 잠정 식별 · 평가 연결 보류",
       "evaluation_status": "deferred",
-      "reviewed_candidate_id": "peru2026-farm-007"
+      "reviewed_candidate_id": "peru2026-farm-007",
+      "name_ko_status": "한글 음역 미확정 · 원문 농장명 표시"
     },
     {
       "id": "farm-000018",
       "name": "Finca Los Pinos",
-      "name_ko": "Jaime Perez Linares",
+      "name_ko": "Finca Los Pinos",
       "aliases": [],
       "country_id": "country-000004",
       "region_ids": [
         "region-000014"
       ],
       "related_region_ids": [],
-      "summary": "2026 페루 COE COE 수상 공식 결과표의 농장 표기. 지역 Cajamarca.",
+      "summary": "2026 페루 COE 수상 공식 결과표의 농장 표기. 지역 Cajamarca.",
       "source_ids": [
         "src-000035"
       ],
@@ -695,19 +705,20 @@
       "entity_type": "farm",
       "notes_status": "대회 결과표 기반 잠정 식별 · 평가 연결 보류",
       "evaluation_status": "deferred",
-      "reviewed_candidate_id": "peru2026-farm-008"
+      "reviewed_candidate_id": "peru2026-farm-008",
+      "name_ko_status": "한글 음역 미확정 · 원문 농장명 표시"
     },
     {
       "id": "farm-000019",
       "name": "La Palmera",
-      "name_ko": "Octavio Cayotopa Olano",
+      "name_ko": "La Palmera",
       "aliases": [],
       "country_id": "country-000004",
       "region_ids": [
         "region-000014"
       ],
       "related_region_ids": [],
-      "summary": "2026 페루 COE COE 수상 공식 결과표의 농장 표기. 지역 Cajamarca.",
+      "summary": "2026 페루 COE 수상 공식 결과표의 농장 표기. 지역 Cajamarca.",
       "source_ids": [
         "src-000035"
       ],
@@ -715,19 +726,20 @@
       "entity_type": "farm",
       "notes_status": "대회 결과표 기반 잠정 식별 · 평가 연결 보류",
       "evaluation_status": "deferred",
-      "reviewed_candidate_id": "peru2026-farm-009"
+      "reviewed_candidate_id": "peru2026-farm-009",
+      "name_ko_status": "한글 음역 미확정 · 원문 농장명 표시"
     },
     {
       "id": "farm-000020",
       "name": "Yuzu",
-      "name_ko": "Teresa Livaque Tarrillo",
+      "name_ko": "Yuzu",
       "aliases": [],
       "country_id": "country-000004",
       "region_ids": [
         "region-000014"
       ],
       "related_region_ids": [],
-      "summary": "2026 페루 COE COE 수상 공식 결과표의 농장 표기. 지역 Cajamarca.",
+      "summary": "2026 페루 COE 수상 공식 결과표의 농장 표기. 지역 Cajamarca.",
       "source_ids": [
         "src-000035"
       ],
@@ -735,19 +747,20 @@
       "entity_type": "farm",
       "notes_status": "대회 결과표 기반 잠정 식별 · 평가 연결 보류",
       "evaluation_status": "deferred",
-      "reviewed_candidate_id": "peru2026-farm-010"
+      "reviewed_candidate_id": "peru2026-farm-010",
+      "name_ko_status": "한글 음역 미확정 · 원문 농장명 표시"
     },
     {
       "id": "farm-000021",
       "name": "El Mirador",
-      "name_ko": "Juan Padilla Guerrero",
+      "name_ko": "El Mirador",
       "aliases": [],
       "country_id": "country-000004",
       "region_ids": [
         "region-000014"
       ],
       "related_region_ids": [],
-      "summary": "2026 페루 COE COE 수상 공식 결과표의 농장 표기. 지역 Cajamarca.",
+      "summary": "2026 페루 COE 수상 공식 결과표의 농장 표기. 지역 Cajamarca.",
       "source_ids": [
         "src-000035"
       ],
@@ -755,19 +768,20 @@
       "entity_type": "farm",
       "notes_status": "대회 결과표 기반 잠정 식별 · 평가 연결 보류",
       "evaluation_status": "deferred",
-      "reviewed_candidate_id": "peru2026-farm-011"
+      "reviewed_candidate_id": "peru2026-farm-011",
+      "name_ko_status": "한글 음역 미확정 · 원문 농장명 표시"
     },
     {
       "id": "farm-000022",
       "name": "Cheqreccpampa",
-      "name_ko": "Ricardo Chavez Candia",
+      "name_ko": "Cheqreccpampa",
       "aliases": [],
       "country_id": "country-000004",
       "region_ids": [
         "region-000016"
       ],
       "related_region_ids": [],
-      "summary": "2026 페루 COE COE 수상 공식 결과표의 농장 표기. 지역 Cusco.",
+      "summary": "2026 페루 COE 수상 공식 결과표의 농장 표기. 지역 Cusco.",
       "source_ids": [
         "src-000035"
       ],
@@ -775,19 +789,20 @@
       "entity_type": "farm",
       "notes_status": "대회 결과표 기반 잠정 식별 · 평가 연결 보류",
       "evaluation_status": "deferred",
-      "reviewed_candidate_id": "peru2026-farm-012"
+      "reviewed_candidate_id": "peru2026-farm-012",
+      "name_ko_status": "한글 음역 미확정 · 원문 농장명 표시"
     },
     {
       "id": "farm-000023",
       "name": "Agua Colorada I",
-      "name_ko": "Filadelfo Cordova Mejia",
+      "name_ko": "Agua Colorada I",
       "aliases": [],
       "country_id": "country-000004",
       "region_ids": [
         "region-000014"
       ],
       "related_region_ids": [],
-      "summary": "2026 페루 COE COE 수상 공식 결과표의 농장 표기. 지역 Cajamarca.",
+      "summary": "2026 페루 COE 수상 공식 결과표의 농장 표기. 지역 Cajamarca.",
       "source_ids": [
         "src-000035"
       ],
@@ -795,19 +810,20 @@
       "entity_type": "farm",
       "notes_status": "대회 결과표 기반 잠정 식별 · 평가 연결 보류",
       "evaluation_status": "deferred",
-      "reviewed_candidate_id": "peru2026-farm-013"
+      "reviewed_candidate_id": "peru2026-farm-013",
+      "name_ko_status": "한글 음역 미확정 · 원문 농장명 표시"
     },
     {
       "id": "farm-000024",
       "name": "Finca Los Santos SAC",
-      "name_ko": "Jose Santos Requejo Villanueva",
+      "name_ko": "Finca Los Santos SAC",
       "aliases": [],
       "country_id": "country-000004",
       "region_ids": [
         "region-000017"
       ],
       "related_region_ids": [],
-      "summary": "2026 페루 COE COE 수상 공식 결과표의 농장 표기. 지역 Amazonas.",
+      "summary": "2026 페루 COE 수상 공식 결과표의 농장 표기. 지역 Amazonas.",
       "source_ids": [
         "src-000035"
       ],
@@ -815,19 +831,20 @@
       "entity_type": "farm",
       "notes_status": "대회 결과표 기반 잠정 식별 · 평가 연결 보류",
       "evaluation_status": "deferred",
-      "reviewed_candidate_id": "peru2026-farm-014"
+      "reviewed_candidate_id": "peru2026-farm-014",
+      "name_ko_status": "한글 음역 미확정 · 원문 농장명 표시"
     },
     {
       "id": "farm-000025",
       "name": "Uscamayta",
-      "name_ko": "Marcos Severo Uscamayta Malpartida",
+      "name_ko": "Uscamayta",
       "aliases": [],
       "country_id": "country-000004",
       "region_ids": [
         "region-000018"
       ],
       "related_region_ids": [],
-      "summary": "2026 페루 COE COE 수상 공식 결과표의 농장 표기. 지역 Junin.",
+      "summary": "2026 페루 COE 수상 공식 결과표의 농장 표기. 지역 Junin.",
       "source_ids": [
         "src-000035",
         "src-000036"
@@ -836,19 +853,20 @@
       "entity_type": "farm",
       "notes_status": "대회 결과표 기반 잠정 식별 · 평가 연결 보류",
       "evaluation_status": "deferred",
-      "reviewed_candidate_id": "peru2026-farm-015"
+      "reviewed_candidate_id": "peru2026-farm-015",
+      "name_ko_status": "한글 음역 미확정 · 원문 농장명 표시"
     },
     {
       "id": "farm-000026",
       "name": "La Naranja",
-      "name_ko": "Pablo Neira Melendrez",
+      "name_ko": "La Naranja",
       "aliases": [],
       "country_id": "country-000004",
       "region_ids": [
         "region-000014"
       ],
       "related_region_ids": [],
-      "summary": "2026 페루 COE COE 수상 공식 결과표의 농장 표기. 지역 Cajamarca.",
+      "summary": "2026 페루 COE 수상 공식 결과표의 농장 표기. 지역 Cajamarca.",
       "source_ids": [
         "src-000035"
       ],
@@ -856,19 +874,20 @@
       "entity_type": "farm",
       "notes_status": "대회 결과표 기반 잠정 식별 · 평가 연결 보류",
       "evaluation_status": "deferred",
-      "reviewed_candidate_id": "peru2026-farm-016"
+      "reviewed_candidate_id": "peru2026-farm-016",
+      "name_ko_status": "한글 음역 미확정 · 원문 농장명 표시"
     },
     {
       "id": "farm-000027",
       "name": "La Palmera",
-      "name_ko": "Eli Espinosa Soberon",
+      "name_ko": "La Palmera",
       "aliases": [],
       "country_id": "country-000004",
       "region_ids": [
         "region-000014"
       ],
       "related_region_ids": [],
-      "summary": "2026 페루 COE COE 수상 공식 결과표의 농장 표기. 지역 Cajamarca.",
+      "summary": "2026 페루 COE 수상 공식 결과표의 농장 표기. 지역 Cajamarca.",
       "source_ids": [
         "src-000035"
       ],
@@ -876,19 +895,20 @@
       "entity_type": "farm",
       "notes_status": "대회 결과표 기반 잠정 식별 · 평가 연결 보류",
       "evaluation_status": "deferred",
-      "reviewed_candidate_id": "peru2026-farm-017"
+      "reviewed_candidate_id": "peru2026-farm-017",
+      "name_ko_status": "한글 음역 미확정 · 원문 농장명 표시"
     },
     {
       "id": "farm-000028",
       "name": "El Mirador",
-      "name_ko": "Yoniser Mego Silva",
+      "name_ko": "El Mirador",
       "aliases": [],
       "country_id": "country-000004",
       "region_ids": [
         "region-000014"
       ],
       "related_region_ids": [],
-      "summary": "2026 페루 COE COE 수상 공식 결과표의 농장 표기. 지역 Cajamarca.",
+      "summary": "2026 페루 COE 수상 공식 결과표의 농장 표기. 지역 Cajamarca.",
       "source_ids": [
         "src-000035"
       ],
@@ -896,19 +916,20 @@
       "entity_type": "farm",
       "notes_status": "대회 결과표 기반 잠정 식별 · 평가 연결 보류",
       "evaluation_status": "deferred",
-      "reviewed_candidate_id": "peru2026-farm-018"
+      "reviewed_candidate_id": "peru2026-farm-018",
+      "name_ko_status": "한글 음역 미확정 · 원문 농장명 표시"
     },
     {
       "id": "farm-000029",
       "name": "La Huaca",
-      "name_ko": "Demostenes Tantalean Acuña",
+      "name_ko": "La Huaca",
       "aliases": [],
       "country_id": "country-000004",
       "region_ids": [
         "region-000014"
       ],
       "related_region_ids": [],
-      "summary": "2026 페루 COE COE 수상 공식 결과표의 농장 표기. 지역 Cajamarca.",
+      "summary": "2026 페루 COE 수상 공식 결과표의 농장 표기. 지역 Cajamarca.",
       "source_ids": [
         "src-000035"
       ],
@@ -916,19 +937,20 @@
       "entity_type": "farm",
       "notes_status": "대회 결과표 기반 잠정 식별 · 평가 연결 보류",
       "evaluation_status": "deferred",
-      "reviewed_candidate_id": "peru2026-farm-019"
+      "reviewed_candidate_id": "peru2026-farm-019",
+      "name_ko_status": "한글 음역 미확정 · 원문 농장명 표시"
     },
     {
       "id": "farm-000030",
       "name": "La Lucma",
-      "name_ko": "Orlando Pedraza Ramirez",
+      "name_ko": "La Lucma",
       "aliases": [],
       "country_id": "country-000004",
       "region_ids": [
         "region-000014"
       ],
       "related_region_ids": [],
-      "summary": "2026 페루 COE COE 수상 공식 결과표의 농장 표기. 지역 Cajamarca.",
+      "summary": "2026 페루 COE 수상 공식 결과표의 농장 표기. 지역 Cajamarca.",
       "source_ids": [
         "src-000035"
       ],
@@ -936,19 +958,20 @@
       "entity_type": "farm",
       "notes_status": "대회 결과표 기반 잠정 식별 · 평가 연결 보류",
       "evaluation_status": "deferred",
-      "reviewed_candidate_id": "peru2026-farm-020"
+      "reviewed_candidate_id": "peru2026-farm-020",
+      "name_ko_status": "한글 음역 미확정 · 원문 농장명 표시"
     },
     {
       "id": "farm-000031",
       "name": "Los Cedros",
-      "name_ko": "Nevado Palacios Carrasco",
+      "name_ko": "Los Cedros",
       "aliases": [],
       "country_id": "country-000004",
       "region_ids": [
         "region-000014"
       ],
       "related_region_ids": [],
-      "summary": "2026 페루 COE COE 수상 공식 결과표의 농장 표기. 지역 Cajamarca.",
+      "summary": "2026 페루 COE 수상 공식 결과표의 농장 표기. 지역 Cajamarca.",
       "source_ids": [
         "src-000035"
       ],
@@ -956,19 +979,20 @@
       "entity_type": "farm",
       "notes_status": "대회 결과표 기반 잠정 식별 · 평가 연결 보류",
       "evaluation_status": "deferred",
-      "reviewed_candidate_id": "peru2026-farm-021"
+      "reviewed_candidate_id": "peru2026-farm-021",
+      "name_ko_status": "한글 음역 미확정 · 원문 농장명 표시"
     },
     {
       "id": "farm-000032",
       "name": "Pedregal",
-      "name_ko": "Abel Raymundo Arotaype Huayllas",
+      "name_ko": "Pedregal",
       "aliases": [],
       "country_id": "country-000004",
       "region_ids": [
         "region-000016"
       ],
       "related_region_ids": [],
-      "summary": "2026 페루 COE COE 수상 공식 결과표의 농장 표기. 지역 Cusco.",
+      "summary": "2026 페루 COE 수상 공식 결과표의 농장 표기. 지역 Cusco.",
       "source_ids": [
         "src-000035"
       ],
@@ -976,19 +1000,20 @@
       "entity_type": "farm",
       "notes_status": "대회 결과표 기반 잠정 식별 · 평가 연결 보류",
       "evaluation_status": "deferred",
-      "reviewed_candidate_id": "peru2026-farm-022"
+      "reviewed_candidate_id": "peru2026-farm-022",
+      "name_ko_status": "한글 음역 미확정 · 원문 농장명 표시"
     },
     {
       "id": "farm-000033",
       "name": "Llaqtapata",
-      "name_ko": "Gilber Huayllas Huaman",
+      "name_ko": "Llaqtapata",
       "aliases": [],
       "country_id": "country-000004",
       "region_ids": [
         "region-000016"
       ],
       "related_region_ids": [],
-      "summary": "2026 페루 COE COE 수상 공식 결과표의 농장 표기. 지역 Cusco.",
+      "summary": "2026 페루 COE 수상 공식 결과표의 농장 표기. 지역 Cusco.",
       "source_ids": [
         "src-000035"
       ],
@@ -996,19 +1021,20 @@
       "entity_type": "farm",
       "notes_status": "대회 결과표 기반 잠정 식별 · 평가 연결 보류",
       "evaluation_status": "deferred",
-      "reviewed_candidate_id": "peru2026-farm-023"
+      "reviewed_candidate_id": "peru2026-farm-023",
+      "name_ko_status": "한글 음역 미확정 · 원문 농장명 표시"
     },
     {
       "id": "farm-000034",
       "name": "Ollaytay Baja",
-      "name_ko": "Camilo Almanza Ccahua",
+      "name_ko": "Ollaytay Baja",
       "aliases": [],
       "country_id": "country-000004",
       "region_ids": [
         "region-000016"
       ],
       "related_region_ids": [],
-      "summary": "2026 페루 COE COE 수상 공식 결과표의 농장 표기. 지역 Cusco.",
+      "summary": "2026 페루 COE 수상 공식 결과표의 농장 표기. 지역 Cusco.",
       "source_ids": [
         "src-000035"
       ],
@@ -1016,19 +1042,20 @@
       "entity_type": "farm",
       "notes_status": "대회 결과표 기반 잠정 식별 · 평가 연결 보류",
       "evaluation_status": "deferred",
-      "reviewed_candidate_id": "peru2026-farm-024"
+      "reviewed_candidate_id": "peru2026-farm-024",
+      "name_ko_status": "한글 음역 미확정 · 원문 농장명 표시"
     },
     {
       "id": "farm-000035",
       "name": "Bella Rosa",
-      "name_ko": "Wilbert Almanza Cabrera",
+      "name_ko": "Bella Rosa",
       "aliases": [],
       "country_id": "country-000004",
       "region_ids": [
         "region-000016"
       ],
       "related_region_ids": [],
-      "summary": "2026 페루 COE COE 수상 공식 결과표의 농장 표기. 지역 Cusco.",
+      "summary": "2026 페루 COE 수상 공식 결과표의 농장 표기. 지역 Cusco.",
       "source_ids": [
         "src-000035"
       ],
@@ -1036,19 +1063,20 @@
       "entity_type": "farm",
       "notes_status": "대회 결과표 기반 잠정 식별 · 평가 연결 보류",
       "evaluation_status": "deferred",
-      "reviewed_candidate_id": "peru2026-farm-025"
+      "reviewed_candidate_id": "peru2026-farm-025",
+      "name_ko_status": "한글 음역 미확정 · 원문 농장명 표시"
     },
     {
       "id": "farm-000036",
       "name": "El Pino",
-      "name_ko": "Wilian Ivan Guerrero Santos",
+      "name_ko": "El Pino",
       "aliases": [],
       "country_id": "country-000004",
       "region_ids": [
         "region-000014"
       ],
       "related_region_ids": [],
-      "summary": "2026 페루 COE COE 수상 공식 결과표의 농장 표기. 지역 Cajamarca.",
+      "summary": "2026 페루 COE 수상 공식 결과표의 농장 표기. 지역 Cajamarca.",
       "source_ids": [
         "src-000035"
       ],
@@ -1056,19 +1084,20 @@
       "entity_type": "farm",
       "notes_status": "대회 결과표 기반 잠정 식별 · 평가 연결 보류",
       "evaluation_status": "deferred",
-      "reviewed_candidate_id": "peru2026-farm-026"
+      "reviewed_candidate_id": "peru2026-farm-026",
+      "name_ko_status": "한글 음역 미확정 · 원문 농장명 표시"
     },
     {
       "id": "farm-000037",
       "name": "San Sebastian",
-      "name_ko": "Sinhtya Montalvo Alcarras",
+      "name_ko": "San Sebastian",
       "aliases": [],
       "country_id": "country-000004",
       "region_ids": [
         "region-000016"
       ],
       "related_region_ids": [],
-      "summary": "2026 페루 COE COE 수상 공식 결과표의 농장 표기. 지역 Cusco.",
+      "summary": "2026 페루 COE 수상 공식 결과표의 농장 표기. 지역 Cusco.",
       "source_ids": [
         "src-000035"
       ],
@@ -1076,19 +1105,20 @@
       "entity_type": "farm",
       "notes_status": "대회 결과표 기반 잠정 식별 · 평가 연결 보류",
       "evaluation_status": "deferred",
-      "reviewed_candidate_id": "peru2026-farm-027"
+      "reviewed_candidate_id": "peru2026-farm-027",
+      "name_ko_status": "한글 음역 미확정 · 원문 농장명 표시"
     },
     {
       "id": "farm-000038",
       "name": "Finca’s Remi",
-      "name_ko": "Richard Velasque Damiano",
+      "name_ko": "Finca’s Remi",
       "aliases": [],
       "country_id": "country-000004",
       "region_ids": [
         "region-000018"
       ],
       "related_region_ids": [],
-      "summary": "2026 페루 COE COE 수상 공식 결과표의 농장 표기. 지역 Junin.",
+      "summary": "2026 페루 COE 수상 공식 결과표의 농장 표기. 지역 Junin.",
       "source_ids": [
         "src-000035"
       ],
@@ -1096,19 +1126,20 @@
       "entity_type": "farm",
       "notes_status": "대회 결과표 기반 잠정 식별 · 평가 연결 보류",
       "evaluation_status": "deferred",
-      "reviewed_candidate_id": "peru2026-farm-028"
+      "reviewed_candidate_id": "peru2026-farm-028",
+      "name_ko_status": "한글 음역 미확정 · 원문 농장명 표시"
     },
     {
       "id": "farm-000039",
       "name": "Huallhuayocc",
-      "name_ko": "Juan Pablo Luque Vargas",
+      "name_ko": "Huallhuayocc",
       "aliases": [],
       "country_id": "country-000004",
       "region_ids": [
         "region-000016"
       ],
       "related_region_ids": [],
-      "summary": "2026 페루 COE COE 수상 공식 결과표의 농장 표기. 지역 Cusco.",
+      "summary": "2026 페루 COE 수상 공식 결과표의 농장 표기. 지역 Cusco.",
       "source_ids": [
         "src-000035"
       ],
@@ -1116,19 +1147,20 @@
       "entity_type": "farm",
       "notes_status": "대회 결과표 기반 잠정 식별 · 평가 연결 보류",
       "evaluation_status": "deferred",
-      "reviewed_candidate_id": "peru2026-farm-029"
+      "reviewed_candidate_id": "peru2026-farm-029",
+      "name_ko_status": "한글 음역 미확정 · 원문 농장명 표시"
     },
     {
       "id": "farm-000040",
       "name": "Pedregal",
-      "name_ko": "Lidia Venero Azorsa",
+      "name_ko": "Pedregal",
       "aliases": [],
       "country_id": "country-000004",
       "region_ids": [
         "region-000016"
       ],
       "related_region_ids": [],
-      "summary": "2026 페루 COE COE 수상 공식 결과표의 농장 표기. 지역 Cusco.",
+      "summary": "2026 페루 COE 수상 공식 결과표의 농장 표기. 지역 Cusco.",
       "source_ids": [
         "src-000035"
       ],
@@ -1136,12 +1168,13 @@
       "entity_type": "farm",
       "notes_status": "대회 결과표 기반 잠정 식별 · 평가 연결 보류",
       "evaluation_status": "deferred",
-      "reviewed_candidate_id": "peru2026-farm-030"
+      "reviewed_candidate_id": "peru2026-farm-030",
+      "name_ko_status": "한글 음역 미확정 · 원문 농장명 표시"
     },
     {
       "id": "farm-000041",
       "name": "La Pomarrosa",
-      "name_ko": "Angel Antonio Manosalva Palomino",
+      "name_ko": "La Pomarrosa",
       "aliases": [],
       "country_id": "country-000004",
       "region_ids": [
@@ -1156,12 +1189,13 @@
       "entity_type": "farm",
       "notes_status": "대회 결과표 기반 잠정 식별 · 평가 연결 보류",
       "evaluation_status": "deferred",
-      "reviewed_candidate_id": "peru2026-farm-031"
+      "reviewed_candidate_id": "peru2026-farm-031",
+      "name_ko_status": "한글 음역 미확정 · 원문 농장명 표시"
     },
     {
       "id": "farm-000042",
       "name": "El Descanso",
-      "name_ko": "Hermitaño Casa Urbina",
+      "name_ko": "El Descanso",
       "aliases": [],
       "country_id": "country-000004",
       "region_ids": [
@@ -1176,12 +1210,13 @@
       "entity_type": "farm",
       "notes_status": "대회 결과표 기반 잠정 식별 · 평가 연결 보류",
       "evaluation_status": "deferred",
-      "reviewed_candidate_id": "peru2026-farm-032"
+      "reviewed_candidate_id": "peru2026-farm-032",
+      "name_ko_status": "한글 음역 미확정 · 원문 농장명 표시"
     },
     {
       "id": "farm-000043",
       "name": "El Romerillo",
-      "name_ko": "Guillermo Masape Quispe",
+      "name_ko": "El Romerillo",
       "aliases": [],
       "country_id": "country-000004",
       "region_ids": [
@@ -1196,12 +1231,13 @@
       "entity_type": "farm",
       "notes_status": "대회 결과표 기반 잠정 식별 · 평가 연결 보류",
       "evaluation_status": "deferred",
-      "reviewed_candidate_id": "peru2026-farm-033"
+      "reviewed_candidate_id": "peru2026-farm-033",
+      "name_ko_status": "한글 음역 미확정 · 원문 농장명 표시"
     },
     {
       "id": "farm-000044",
       "name": "Montaña Alta",
-      "name_ko": "Jaime Meliton Huayllas Huaman",
+      "name_ko": "Montaña Alta",
       "aliases": [],
       "country_id": "country-000004",
       "region_ids": [
@@ -1216,12 +1252,13 @@
       "entity_type": "farm",
       "notes_status": "대회 결과표 기반 잠정 식별 · 평가 연결 보류",
       "evaluation_status": "deferred",
-      "reviewed_candidate_id": "peru2026-farm-034"
+      "reviewed_candidate_id": "peru2026-farm-034",
+      "name_ko_status": "한글 음역 미확정 · 원문 농장명 표시"
     },
     {
       "id": "farm-000045",
       "name": "Santa Yamileth",
-      "name_ko": "Genaro Cahuana Quispe",
+      "name_ko": "Santa Yamileth",
       "aliases": [],
       "country_id": "country-000004",
       "region_ids": [
@@ -1236,12 +1273,13 @@
       "entity_type": "farm",
       "notes_status": "대회 결과표 기반 잠정 식별 · 평가 연결 보류",
       "evaluation_status": "deferred",
-      "reviewed_candidate_id": "peru2026-farm-035"
+      "reviewed_candidate_id": "peru2026-farm-035",
+      "name_ko_status": "한글 음역 미확정 · 원문 농장명 표시"
     },
     {
       "id": "farm-000046",
       "name": "El Jazmin",
-      "name_ko": "Andres Abarca Gomez",
+      "name_ko": "El Jazmin",
       "aliases": [],
       "country_id": "country-000004",
       "region_ids": [
@@ -1256,12 +1294,13 @@
       "entity_type": "farm",
       "notes_status": "대회 결과표 기반 잠정 식별 · 평가 연결 보류",
       "evaluation_status": "deferred",
-      "reviewed_candidate_id": "peru2026-farm-036"
+      "reviewed_candidate_id": "peru2026-farm-036",
+      "name_ko_status": "한글 음역 미확정 · 원문 농장명 표시"
     },
     {
       "id": "farm-000047",
       "name": "El Morerillo",
-      "name_ko": "Elvis Edwin Davila Horna",
+      "name_ko": "El Morerillo",
       "aliases": [],
       "country_id": "country-000004",
       "region_ids": [
@@ -1276,12 +1315,13 @@
       "entity_type": "farm",
       "notes_status": "대회 결과표 기반 잠정 식별 · 평가 연결 보류",
       "evaluation_status": "deferred",
-      "reviewed_candidate_id": "peru2026-farm-037"
+      "reviewed_candidate_id": "peru2026-farm-037",
+      "name_ko_status": "한글 음역 미확정 · 원문 농장명 표시"
     },
     {
       "id": "farm-000048",
       "name": "Wallpa Wasi",
-      "name_ko": "Mateo Carpio Pacocha",
+      "name_ko": "Wallpa Wasi",
       "aliases": [],
       "country_id": "country-000004",
       "region_ids": [
@@ -1296,12 +1336,13 @@
       "entity_type": "farm",
       "notes_status": "대회 결과표 기반 잠정 식별 · 평가 연결 보류",
       "evaluation_status": "deferred",
-      "reviewed_candidate_id": "peru2026-farm-038"
+      "reviewed_candidate_id": "peru2026-farm-038",
+      "name_ko_status": "한글 음역 미확정 · 원문 농장명 표시"
     },
     {
       "id": "farm-000049",
       "name": "Don Thiago",
-      "name_ko": "Esgar Jesus Delgado Saucedo",
+      "name_ko": "Don Thiago",
       "aliases": [],
       "country_id": "country-000004",
       "region_ids": [
@@ -1316,7 +1357,8 @@
       "entity_type": "farm",
       "notes_status": "대회 결과표 기반 잠정 식별 · 평가 연결 보류",
       "evaluation_status": "deferred",
-      "reviewed_candidate_id": "peru2026-farm-039"
+      "reviewed_candidate_id": "peru2026-farm-039",
+      "name_ko_status": "한글 음역 미확정 · 원문 농장명 표시"
     }
   ],
   "people": [
@@ -3226,6 +3268,126 @@
       "status": "source_claim",
       "evidence_level": "E1",
       "verified_at": "2026-11-10",
+      "fictional": false,
+      "supersedes": null
+    },
+    {
+      "id": "clm-000085",
+      "entity_id": "farm-000014",
+      "section": "geography",
+      "title": "Santa Teresa · 독립 발행처 교차확인",
+      "text": "SEY는 Santa Teresa, La Convención, Cusco를 표기합니다. Coro는 2024년 5월 Santa Teresa의 Finca Caminos del Inka를 직접 방문했다고 기록합니다. 서로 다른 발행처의 소개가 위치를 뒷받침하며 2026 대회표의 Cusco와도 일치합니다.",
+      "source_ids": [
+        "src-000035",
+        "src-000037",
+        "src-000038"
+      ],
+      "applicable_period": "Coro 2024년 방문 / SEY 상품 소개",
+      "status": "source_claim",
+      "evidence_level": "E2",
+      "verified_at": "2026-11-11",
+      "fictional": false,
+      "supersedes": null
+    },
+    {
+      "id": "clm-000086",
+      "entity_id": "farm-000014",
+      "section": "people",
+      "title": "생산자 이름 · 출처별 원문 보존",
+      "text": "ACE 2026 결과표는 Samuel Smith Perez Aragon, SEY는 Samuel Aragon, Coro 방문기는 Samuel Smith로 표기합니다. 같은 농장과 산지에 연결되는 표기이나 단축 이름을 법적 동일인 확인이나 소유권 증명으로 취급하지 않습니다.",
+      "source_ids": [
+        "src-000035",
+        "src-000037",
+        "src-000038"
+      ],
+      "applicable_period": "출처별 표기; 법적 신원 미확인",
+      "status": "source_claim",
+      "evidence_level": "E2",
+      "verified_at": "2026-11-11",
+      "fictional": false,
+      "supersedes": null
+    },
+    {
+      "id": "clm-000087",
+      "entity_id": "farm-000014",
+      "section": "varieties",
+      "title": "농장 재배 · Gesha / Geisha",
+      "text": "SEY는 Samuel Aragon의 Gesha 재배를, Coro는 방문한 농장의 Geisha 재배를 설명합니다. 재배 품종에 대한 두 발행처의 교차확인입니다. 농장 전체 품종 목록이나 현재 수확 중인 품종·물량까지 확인된 것은 아닙니다.",
+      "source_ids": [
+        "src-000037",
+        "src-000038"
+      ],
+      "applicable_period": "Coro 2024년 방문 / SEY 상품 소개",
+      "status": "source_claim",
+      "evidence_level": "E2",
+      "verified_at": "2026-11-11",
+      "fictional": false,
+      "supersedes": null
+    },
+    {
+      "id": "clm-000088",
+      "entity_id": "farm-000014",
+      "section": "processing",
+      "title": "별도 판매 로트 · SEY의 수확·가공",
+      "text": "SEY 상품은 2025년 12월 수확, 완숙 체리 수작업 수확, 부유 선별, 당일 과육 제거, 32시간 건식 발효, 수세, 레이즈드 베드 건조로 설명됩니다. 판매 로트 단일 출처 정보이며 2026 COE 로트나 농장 전체의 공통 공정으로 적용하지 않습니다.",
+      "source_ids": [
+        "src-000037"
+      ],
+      "applicable_period": "SEY 판매 로트 · 2025년 12월 수확",
+      "status": "source_claim",
+      "evidence_level": "E2",
+      "verified_at": "2026-11-11",
+      "fictional": false,
+      "supersedes": null
+    },
+    {
+      "id": "clm-000089",
+      "entity_id": "farm-000011",
+      "section": "people",
+      "title": "La Esperanza와 Fidel Huancas Huancas",
+      "text": "2026 공식 결과표의 농장·생산자 조합이 Kima의 La Esperanza 소개에서도 확인됩니다. Kima의 소유자 서술을 법적 소유권 증명으로 채택하지 않습니다.",
+      "source_ids": [
+        "src-000035",
+        "src-000039"
+      ],
+      "applicable_period": "ACE 2026 결과 / Kima 게시일 미상",
+      "status": "source_claim",
+      "evidence_level": "E2",
+      "verified_at": "2026-11-11",
+      "fictional": false,
+      "supersedes": null
+    },
+    {
+      "id": "clm-000090",
+      "entity_id": "farm-000011",
+      "section": "varieties",
+      "title": "별도 판매 상품 · Caturra",
+      "text": "Kima는 이 La Esperanza 상품의 품종을 Caturra로 표기합니다. 농장 소개에는 Caturra Amarillo로의 갱신이 서술되지만 시점이 고정되지 않고 독립 교차근거가 부족해 현재 농장 전체 재배 품종으로 확정하지 않습니다. 2026 COE 로트의 Geisha 표기를 바꾸지 않습니다.",
+      "source_ids": [
+        "src-000039",
+        "src-000035"
+      ],
+      "applicable_period": "Kima 판매 상품 · 수확연도 미상",
+      "status": "source_claim",
+      "evidence_level": "E2",
+      "verified_at": "2026-11-11",
+      "fictional": false,
+      "supersedes": null
+    },
+    {
+      "id": "clm-000091",
+      "entity_id": "farm-000011",
+      "section": "processing",
+      "title": "별도 판매 상품 · Natural",
+      "text": "Kima 판매 상품의 가공은 Natural입니다. 2026 COE 결과표의 La Esperanza 로트는 Washed입니다. 연도·로트가 같다는 근거가 없으므로 충돌로 단정하거나 하나로 합치지 않습니다. 수확 시기와 대회 로트의 세부 발효·건조 조건은 미확인입니다.",
+      "source_ids": [
+        "src-000039",
+        "src-000035"
+      ],
+      "applicable_period": "Kima 판매 상품 / 2026 COE 로트 분리",
+      "status": "source_claim",
+      "evidence_level": "E2",
+      "verified_at": "2026-11-11",
       "fictional": false,
       "supersedes": null
     }
@@ -6085,6 +6247,69 @@
       "record_path": "data/source-records/src-000036.json",
       "record_sha256": "d64823fe72faa84f0118624759bb4d7bb51a91b4098e60d38b8f587cc19f49b7",
       "hash_scope": "저장한 서지·요약 카드의 바이트. 웹 원문 해시가 아님."
+    },
+    {
+      "id": "src-000037",
+      "title": "2026 Samuel Aragon · Caminos del Inka Gesha",
+      "publisher": "SEY",
+      "url": "https://www.seycoffee.com/products/2026-samuel-aragon-caminos-del-inka-gesha-peru",
+      "published_at": null,
+      "accessed_at": "2026-11-11T02:22:59.031742+00:00",
+      "location": "상품 소개·REGION·HARVEST·PROCESSING",
+      "fact_period": "2025년 12월 수확 판매 로트; 농장 소개",
+      "summary": "Santa Teresa의 Samuel Aragon과 Gesha 재배 소개. 2025년 12월 수확 및 32시간 건식 발효는 이 판매 로트에만 적용.",
+      "rights": "서지정보와 자체 요약만 공개. 회수 원문은 검토용 evidence 디렉터리에서만 보관.",
+      "type": "로스터 판매 로트·생산자 소개",
+      "language": "en",
+      "read_scope": "상품 소개·REGION·HARVEST·PROCESSING",
+      "access": "public",
+      "revision": 1,
+      "supersedes": null,
+      "record_path": "data/source-records/src-000037.json",
+      "record_sha256": "5f8d3902c21f9074d0695f030d3f373190fd6a0f96313cbe16903fdd070e63c1",
+      "hash_scope": "저장한 서지·요약 카드의 바이트. 웹 원문 해시가 아님."
+    },
+    {
+      "id": "src-000038",
+      "title": "Nuestra aventura en Santa Teresa, Perú: Conociendo el café de Caminos del Inka",
+      "publisher": "Coro Coffee",
+      "url": "https://coro.coffee/blogs/noticias/finca-caminos-del-inka-excelencia-cafetera-desde-santa-teresa-peru",
+      "published_at": "2024-12-14",
+      "accessed_at": "2026-11-11T02:22:59.031742+00:00",
+      "location": "2024년 5월 농장 방문 서술",
+      "fact_period": "2024년 5월 방문; 2024-12-14 발행",
+      "summary": "직접 방문한 Caminos del Inka 농장의 Santa Teresa 위치, Samuel Smith, Geisha 재배를 소개. 2026 대회 로트의 가공 증거가 아님.",
+      "rights": "서지정보와 자체 요약만 공개. 회수 원문은 검토용 evidence 디렉터리에서만 보관.",
+      "type": "로스터 직접 방문기",
+      "language": "es",
+      "read_scope": "2024년 5월 농장 방문 서술",
+      "access": "public",
+      "revision": 1,
+      "supersedes": null,
+      "record_path": "data/source-records/src-000038.json",
+      "record_sha256": "f0880643697125c74a61d89c8c199f893aaca60d7ae05b6b6c1d1c8fbcb6f33e",
+      "hash_scope": "저장한 서지·요약 카드의 바이트. 웹 원문 해시가 아님."
+    },
+    {
+      "id": "src-000039",
+      "title": "La Esperanza. Café de Perú",
+      "publisher": "Kima Coffee",
+      "url": "https://kimacoffee.com/products/la-esperanza-cafe-de-peru-tostado-en-malaga-por-kima-coffee",
+      "published_at": null,
+      "accessed_at": "2026-11-11T02:22:59.031742+00:00",
+      "location": "상품 Proceso·Varietal 및 농장 소개",
+      "fact_period": "판매 로트; 수확연도·게시일 미상",
+      "summary": "La Esperanza와 Fidel Huancas Huancas를 연결하고 Caturra·Natural 판매 상품을 소개. 2026 COE Geisha·Washed와 별개.",
+      "rights": "서지정보와 자체 요약만 공개. 회수 원문은 검토용 evidence 디렉터리에서만 보관.",
+      "type": "로스터 판매 로트·생산자 소개",
+      "language": "es",
+      "read_scope": "상품 Proceso·Varietal 및 농장 소개",
+      "access": "public",
+      "revision": 1,
+      "supersedes": null,
+      "record_path": "data/source-records/src-000039.json",
+      "record_sha256": "6e6ef788fc87ff8e0568ff1cc51a1cbf936b1ae7dfb490002b711d72c8737856",
+      "hash_scope": "저장한 서지·요약 카드의 바이트. 웹 원문 해시가 아님."
     }
   ],
   "changes": [
@@ -6400,6 +6625,21 @@
       ],
       "previous_revision": "2026-11-09.ethiopia-1",
       "snapshot_path": "data/snapshots/2026-11-10.peru-coe-1.json"
+    },
+    {
+      "id": "chg-000007",
+      "date": "2026-11-11",
+      "revision": "2026-11-11.peru-profile-review-1",
+      "previous_revision": "2026-11-10.peru-coe-1",
+      "title": "페루 농장 소개 보완 · 검토 사본",
+      "summary": "Caminos del Inka·La Esperanza의 농장/대회/판매 로트 설명 분리. 생산자명을 농장 한글명으로 표시한 오류는 원문 농장명 표시로 대체. 기존 39개 페루 대회 로트 및 기존 10농장 기록 보존.",
+      "source_ids": [
+        "src-000035",
+        "src-000037",
+        "src-000038",
+        "src-000039"
+      ],
+      "snapshot_path": "data/snapshots/2026-11-11.peru-profile-review-1.json"
     }
   ]
 }
