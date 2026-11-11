@@ -1,7 +1,7 @@
 {
   "schema_version": "1.0.0",
   "archive_id": "noel-farm-knowledge",
-  "revision": "2026-11-11.peru-profile-review-1",
+  "revision": "2026-11-11.ethiopia-profile-review-1",
   "updated_at": "2026-11-11",
   "fictional": false,
   "owner_label": "Noel",
@@ -444,9 +444,14 @@
       "related_region_ids": [],
       "summary": "알로 커피는 Tamiru Tadesse와 그의 아내 Messi의 이야기를 바탕으로 한 에티오피아 생산·수출 사업체다. 공식 소개는 시다마 벤사의 알로 마을을 기반으로 설명한다. 단일 농장이나 모든 취급 로트의 공통 원산지로 해석하지 않는다.",
       "source_ids": [
-        "src-000028"
+        "src-000028",
+        "src-000040",
+        "src-000047",
+        "src-000048",
+        "src-000051",
+        "src-000053"
       ],
-      "updated_at": "2026-11-09",
+      "updated_at": "2026-11-11",
       "entity_type": "producer_exporter_network",
       "notes_status": "공개 아카이브 · 회사/인물 유형 · 세부 지역 미확인 · 평가 연결 보류",
       "evaluation_status": "deferred"
@@ -468,9 +473,14 @@
       "summary": "카라모 커피는 Niguse Gemeda와 연결된 에티오피아 생산·수출 사업체다. 공식 사이트는 설립자를 Niguse Gemeda Mude로, 생산 기반을 Sidama Regional Bura Wereda Keramo Kebele로 소개한다. Daye Bensa의 Keramo·Adara Keramo·Keramo Gatta와 별개 대상이다.",
       "source_ids": [
         "src-000029",
-        "src-000030"
+        "src-000030",
+        "src-000041",
+        "src-000050",
+        "src-000042",
+        "src-000052",
+        "src-000055"
       ],
-      "updated_at": "2026-11-09",
+      "updated_at": "2026-11-11",
       "entity_type": "producer_exporter_network",
       "notes_status": "공개 아카이브 · 회사/인물 유형 · 세부 지역 미확인 · 평가 연결 보류",
       "evaluation_status": "deferred"
@@ -490,9 +500,12 @@
       "summary": "부르사 커피는 에티오피아 시다마 아르베고나의 부르사 지역과 연결된 생산·수출 사업체다. 공식 소개는 Mulugeta Muntasha와 그의 아들 Degefu Mulugeta 및 주변 농가와의 협업을 설명한다. 자가 농장과 인근 생산자의 커피를 구분해 기록한다.",
       "source_ids": [
         "src-000031",
-        "src-000032"
+        "src-000032",
+        "src-000043",
+        "src-000044",
+        "src-000051"
       ],
-      "updated_at": "2026-11-09",
+      "updated_at": "2026-11-11",
       "entity_type": "producer_exporter_network",
       "notes_status": "공개 아카이브 · 회사/인물 유형 · 세부 지역 미확인 · 평가 연결 보류",
       "evaluation_status": "deferred"
@@ -510,9 +523,11 @@
       "related_region_ids": [],
       "summary": "타리쿠 카레는 에티오피아의 커피 생산자이자 가공시설 운영자다. 수입사 소개는 오로미아 넨세보의 Refisa 스테이션과 주변 마을 소농 조달을 설명한다. 고향 Bombe의 시설과 Refisa의 커피를 같은 로트로 취급하지 않는다.",
       "source_ids": [
-        "src-000033"
+        "src-000033",
+        "src-000045",
+        "src-000054"
       ],
-      "updated_at": "2026-11-09",
+      "updated_at": "2026-11-11",
       "entity_type": "person_station_operator",
       "notes_status": "공개 아카이브 · 회사/인물 유형 · 세부 지역 미확인 · 평가 연결 보류",
       "evaluation_status": "deferred"
@@ -529,9 +544,12 @@
       "related_region_ids": [],
       "summary": "YKM Coffee Trading은 에티오피아의 가족 경영 커피 생산·수출사다. 공식 소개는 여러 생산지의 가공시설과 Bonga의 자가 커피 농장을 설명한다. 회사의 전체 취급 커피를 한 농장산으로 표시하지 않는다.",
       "source_ids": [
-        "src-000034"
+        "src-000034",
+        "src-000046",
+        "src-000049",
+        "src-000052"
       ],
-      "updated_at": "2026-11-09",
+      "updated_at": "2026-11-11",
       "entity_type": "producer_exporter_company",
       "notes_status": "공개 아카이브 · 회사/인물 유형 · 세부 지역 미확인 · 평가 연결 보류",
       "evaluation_status": "deferred"
@@ -3385,6 +3403,481 @@
         "src-000035"
       ],
       "applicable_period": "Kima 판매 상품 / 2026 COE 로트 분리",
+      "status": "source_claim",
+      "evidence_level": "E2",
+      "verified_at": "2026-11-11",
+      "fictional": false,
+      "supersedes": null
+    },
+    {
+      "id": "clm-000092",
+      "entity_id": "farm-000006",
+      "section": "people",
+      "title": "대상과 시설",
+      "text": "Tamiru Tadesse와 Messi의 생산·수출 사업체로, 공식 소개는 Bensa의 Alo 마을 출품 로트가 2021 Ethiopia CoE에서 우승했다고 설명한다. 해당 연도의 로트 이력이지 현재 모든 Alo 상품의 수상은 아니다.",
+      "source_ids": [
+        "src-000040"
+      ],
+      "applicable_period": "공개 소개 · 게시일 미상 / 2026-11-11 검토",
+      "status": "source_claim",
+      "evidence_level": "E2",
+      "verified_at": "2026-11-11",
+      "fictional": false,
+      "supersedes": null
+    },
+    {
+      "id": "clm-000093",
+      "entity_id": "farm-000006",
+      "section": "geography",
+      "title": "운영망",
+      "text": "공식 Our Coffee는 Alo Main·Chilaka(Alo), Murago Adilo 1·2(Murago), Miriga(Hamasho), Hatessa, Bombe, Gute(Bona Zuria), Morkie(Burra)를 네트워크로 열거하고 West Arsi Nensebo도 사업 범위로 적는다. 네트워크 목록을 토지 소유농장 목록으로 바꾸지 않는다.",
+      "source_ids": [
+        "src-000047"
+      ],
+      "applicable_period": "공개 소개 · 게시일 미상 / 2026-11-11 검토",
+      "status": "source_claim",
+      "evidence_level": "E2",
+      "verified_at": "2026-11-11",
+      "fictional": false,
+      "supersedes": null
+    },
+    {
+      "id": "clm-000094",
+      "entity_id": "farm-000006",
+      "section": "processing",
+      "title": "품종·가공",
+      "text": "공식 주력 품종은 JARC 74158이다. 내추럴·워시드 및 Mossto·cascara·mucilage 등 커피 유래 물질을 이용한 controlled fermentation 소량 로트를 소개한다. 발효시간·첨가량·개별 로트 공정은 확인되지 않았으므로 기재하지 않는다.",
+      "source_ids": [
+        "src-000047"
+      ],
+      "applicable_period": "공개 소개 · 게시일 미상 / 2026-11-11 검토",
+      "status": "source_claim",
+      "evidence_level": "E2",
+      "verified_at": "2026-11-11",
+      "fictional": false,
+      "supersedes": null
+    },
+    {
+      "id": "clm-000095",
+      "entity_id": "farm-000006",
+      "section": "geography",
+      "title": "고도·소유 미확인",
+      "text": "이번 공식 페이지는 고지대 생산을 설명하지만 시설별 수치·토지권원은 제시하지 않는다. Elida 유래 종자 도입 서술을 상업 수확 중인 특정 품종으로 확정하지 않는다.",
+      "source_ids": [
+        "src-000047"
+      ],
+      "applicable_period": "공개 소개 · 게시일 미상 / 2026-11-11 검토",
+      "status": "source_claim",
+      "evidence_level": "E2",
+      "verified_at": "2026-11-11",
+      "fictional": false,
+      "supersedes": null
+    },
+    {
+      "id": "clm-000096",
+      "entity_id": "farm-000006",
+      "section": "people",
+      "title": "방문 문의",
+      "text": "공식 영업창구 sales@alo-coffee.com, Addis Ababa의 Jackros MebratHail 사무소를 먼저 이용한다. 현장 방문 허가나 농장 주소로 해석하지 않는다.",
+      "source_ids": [
+        "src-000048"
+      ],
+      "applicable_period": "공개 소개 · 게시일 미상 / 2026-11-11 검토",
+      "status": "source_claim",
+      "evidence_level": "E2",
+      "verified_at": "2026-11-11",
+      "fictional": false,
+      "supersedes": null
+    },
+    {
+      "id": "clm-000097",
+      "entity_id": "farm-000007",
+      "section": "people",
+      "title": "대상과 시설",
+      "text": "Niguse Gemeda Mude의 회사. 공식 사이트는 Keramo Kebele의 Farmland와 Washing Station, Bensa의 Processing Mill을 구분하며 생산 기반 고도를 약 2,380m로 소개한다. 면적·토지 소유권·각 시설 좌표는 이번 자료로 미확인이다.",
+      "source_ids": [
+        "src-000041"
+      ],
+      "applicable_period": "공개 소개 · 게시일 미상 / 2026-11-11 검토",
+      "status": "source_claim",
+      "evidence_level": "E2",
+      "verified_at": "2026-11-11",
+      "fictional": false,
+      "supersedes": null
+    },
+    {
+      "id": "clm-000098",
+      "entity_id": "farm-000007",
+      "section": "processing",
+      "title": "가공과 품종",
+      "text": "공식 상품 범위는 Sidama·Nensebo·Yirgacheffe·Gujji의 washed 및 sundried(natural)다. 이는 수출 상품군이지 전 산지의 시설 소유 증거가 아니다.",
+      "source_ids": [
+        "src-000050"
+      ],
+      "applicable_period": "공개 소개 · 게시일 미상 / 2026-11-11 검토",
+      "status": "source_claim",
+      "evidence_level": "E2",
+      "verified_at": "2026-11-11",
+      "fictional": false,
+      "supersedes": null
+    },
+    {
+      "id": "clm-000099",
+      "entity_id": "farm-000007",
+      "section": "processing",
+      "title": "로트 예시 — Morke Natural",
+      "text": "The Coffee Quest는 Sidama Bura Morke Drying Station에 약 1,000농가가 공급하고 74158, 평균 2,300m 이상이라고 소개한다. 해당 Natural 로트는 선별 체리를 raised bed에서 18–20일 건조한다고 적는다. 이 값은 Morke 소개에만 한정하며 Karamo 전체나 2020 수상 로트로 전용하지 않는다.",
+      "source_ids": [
+        "src-000042"
+      ],
+      "applicable_period": "공개 소개 · 게시일 미상 / 2026-11-11 검토",
+      "status": "source_claim",
+      "evidence_level": "E2",
+      "verified_at": "2026-11-11",
+      "fictional": false,
+      "supersedes": null
+    },
+    {
+      "id": "clm-000100",
+      "entity_id": "farm-000007",
+      "section": "history",
+      "title": "수상·충돌",
+      "text": "공식 및 수입사는 Niguse의 2020 Ethiopia CoE 1위·91.04점을 함께 설명한다. 설립연도는 공식 2017, 수입사 2020으로 불일치하여 확정하지 않는다. 공식의 ‘CoE 세계 역대 최고점’ 문구는 독립 근거가 없어 채택하지 않는다.",
+      "source_ids": [
+        "src-000041",
+        "src-000042"
+      ],
+      "applicable_period": "공개 소개 · 게시일 미상 / 2026-11-11 검토",
+      "status": "source_claim",
+      "evidence_level": "E2",
+      "verified_at": "2026-11-11",
+      "fictional": false,
+      "supersedes": null
+    },
+    {
+      "id": "clm-000101",
+      "entity_id": "farm-000007",
+      "section": "people",
+      "title": "방문 문의",
+      "text": "info@karamocoffeeexport.com. 공식 본사 표기는 Addis Ababa Bole, Medanialem Mole, 10층이다. 먼저 실제 방문 시설명·현장 담당자·이동 경로를 확인해야 하며 사무소 주소를 농장 위치로 사용하지 않는다.",
+      "source_ids": [
+        "src-000041"
+      ],
+      "applicable_period": "공개 소개 · 게시일 미상 / 2026-11-11 검토",
+      "status": "source_claim",
+      "evidence_level": "E2",
+      "verified_at": "2026-11-11",
+      "fictional": false,
+      "supersedes": null
+    },
+    {
+      "id": "clm-000102",
+      "entity_id": "farm-000008",
+      "section": "people",
+      "title": "조달·소유·운영",
+      "text": "공식 소개는 Mulugeta Muntasha와 아들 Degefu Mulugeta, Bursa/Arbegona의 약 300농가 협업을 설명한다. Crop to Cup은 Mullugeta가 2021년 Dawencho 건조장을 설립했고 자가농장과 인근 농가의 커피를 함께 가공한다고 적는다. 회사·자가농장·Dawencho·공급농가를 각각 구분한다.",
+      "source_ids": [
+        "src-000043",
+        "src-000044"
+      ],
+      "applicable_period": "공개 소개 · 게시일 미상 / 2026-11-11 검토",
+      "status": "source_claim",
+      "evidence_level": "E2",
+      "verified_at": "2026-11-11",
+      "fictional": false,
+      "supersedes": null
+    },
+    {
+      "id": "clm-000103",
+      "entity_id": "farm-000008",
+      "section": "geography",
+      "title": "고도·품종",
+      "text": "공식은 농가 생산 고도 2,350m와 74158을 적고, Crop to Cup 프로필은 2,150 MASL·74158을 적는다. 다른 적용 범위일 수 있으나 원인이 확인되지 않아 하나의 고도나 범위로 합치지 않는다. 공식 organic farming 문구는 유기 인증 확인이 아니다.",
+      "source_ids": [
+        "src-000043",
+        "src-000044"
+      ],
+      "applicable_period": "공개 소개 · 게시일 미상 / 2026-11-11 검토",
+      "status": "source_claim",
+      "evidence_level": "E2",
+      "verified_at": "2026-11-11",
+      "fictional": false,
+      "supersedes": null
+    },
+    {
+      "id": "clm-000104",
+      "entity_id": "farm-000008",
+      "section": "processing",
+      "title": "가공",
+      "text": "이번 수입사 본문에서 확인되는 것은 Dawencho drying station 및 자가·인근 농가 커피의 가공 구조다. 구체 로트의 내추럴/워시드 여부·발효시간은 이 페이지에 없으므로 추가하지 않는다.",
+      "source_ids": [
+        "src-000044"
+      ],
+      "applicable_period": "공개 소개 · 게시일 미상 / 2026-11-11 검토",
+      "status": "source_claim",
+      "evidence_level": "E2",
+      "verified_at": "2026-11-11",
+      "fictional": false,
+      "supersedes": null
+    },
+    {
+      "id": "clm-000105",
+      "entity_id": "farm-000008",
+      "section": "history",
+      "title": "수상 구분",
+      "text": "Crop to Cup은 2021년 Dawencho 농가그룹 2위, Mullugeta 개인 명의 6위, 2022년 상위 10개 중 4개가 Dawencho 가공이며 1위는 처남 Legesse Botola의 로트라고 설명한다. 공식 사이트의 관련 수상 소개와 맞물리지만 명의 표기가 다르므로 이력은 수입사 귀속으로 기록하며 모두 Bursa 개인 소유농장 수상으로 합치지 않는다.",
+      "source_ids": [
+        "src-000043",
+        "src-000044"
+      ],
+      "applicable_period": "공개 소개 · 게시일 미상 / 2026-11-11 검토",
+      "status": "source_claim",
+      "evidence_level": "E2",
+      "verified_at": "2026-11-11",
+      "fictional": false,
+      "supersedes": null
+    },
+    {
+      "id": "clm-000106",
+      "entity_id": "farm-000008",
+      "section": "people",
+      "title": "방문 문의",
+      "text": "공식 창구 bursaspecialitycoffee@gmail.com. 방문 목적에 따라 자가농장·Dawencho 건조장·공급농가 중 방문지를 지정하고 담당자 확인이 필요하다. 수상 로트나 현 입고 로트의 동일성도 별도 확인한다.",
+      "source_ids": [
+        "src-000043",
+        "src-000044"
+      ],
+      "applicable_period": "공개 소개 · 게시일 미상 / 2026-11-11 검토",
+      "status": "source_claim",
+      "evidence_level": "E2",
+      "verified_at": "2026-11-11",
+      "fictional": false,
+      "supersedes": null
+    },
+    {
+      "id": "clm-000107",
+      "entity_id": "farm-000009",
+      "section": "people",
+      "title": "시설·공급망",
+      "text": "Crop to Cup은 Tariku 소유의 Refisa washing station(Nensebo)이 Refisa·Roricho·Bulga·Riripa 네 마을 593소농의 체리를 구매한다고 설명한다. 고향 Bombe에 후속 워싱스테이션을 지었다는 별도 이력이 있다. 조달관계는 농가 토지 소유나 현재 독점 공급계약을 의미하지 않는다.",
+      "source_ids": [
+        "src-000045"
+      ],
+      "applicable_period": "공개 소개 · 게시일 미상 / 2026-11-11 검토",
+      "status": "source_claim",
+      "evidence_level": "E2",
+      "verified_at": "2026-11-11",
+      "fictional": false,
+      "supersedes": null
+    },
+    {
+      "id": "clm-000108",
+      "entity_id": "farm-000009",
+      "section": "geography",
+      "title": "고도·품종",
+      "text": "본문은 Nensebo 지역 농가를 최대 2,200m, 평균 농장 2ha, 지역 품종 혼합으로 설명하고 상단 품종란은 Heirloom이다. 지역 최대치를 Refisa 시설의 고도로, Heirloom을 74158로 바꾸지 않는다.",
+      "source_ids": [
+        "src-000045"
+      ],
+      "applicable_period": "공개 소개 · 게시일 미상 / 2026-11-11 검토",
+      "status": "source_claim",
+      "evidence_level": "E2",
+      "verified_at": "2026-11-11",
+      "fictional": false,
+      "supersedes": null
+    },
+    {
+      "id": "clm-000109",
+      "entity_id": "farm-000009",
+      "section": "processing",
+      "title": "가공·지리 충돌",
+      "text": "워싱스테이션 운영은 확인되지만 현재 로트별 공정·발효시간은 미확인이다. 상단 ‘SNNPR, Sidama West Arsi, Nensebo’와 본문 ‘Oromia’가 달라 행정계층은 정규화하지 않는다.",
+      "source_ids": [
+        "src-000045"
+      ],
+      "applicable_period": "공개 소개 · 게시일 미상 / 2026-11-11 검토",
+      "status": "source_claim",
+      "evidence_level": "E2",
+      "verified_at": "2026-11-11",
+      "fictional": false,
+      "supersedes": null
+    },
+    {
+      "id": "clm-000110",
+      "entity_id": "farm-000009",
+      "section": "people",
+      "title": "수상·방문",
+      "text": "이번 열람한 소개에는 검증 가능한 연도별 수상 이력과 생산자 직접 예약창구가 없다. Crop to Cup의 생산자 소개를 통한 중개 문의가 가능하다는 수준으로 안내하되 생산자 공식 예약처로 표시하지 않는다. 방문 전 Refisa와 Bombe 중 대상, 현장 좌표·동행 담당자를 확인할 것.",
+      "source_ids": [
+        "src-000045"
+      ],
+      "applicable_period": "공개 소개 · 게시일 미상 / 2026-11-11 검토",
+      "status": "source_claim",
+      "evidence_level": "E2",
+      "verified_at": "2026-11-11",
+      "fictional": false,
+      "supersedes": null
+    },
+    {
+      "id": "clm-000111",
+      "entity_id": "farm-000010",
+      "section": "people",
+      "title": "회사와 농장 구분",
+      "text": "공식은 Yirgacheffe·Guji Hambela·Gedeb(Taretu)·Sidam의 washing station 3개와 sundried station 6개, 가족 소유 Bonga 농장 450ha를 소개한다. 수치는 회사 자체 소개이며 각 시설의 이름·토지권원·현행 가동 상태를 독립 검증한 것은 아니다.",
+      "source_ids": [
+        "src-000046"
+      ],
+      "applicable_period": "공개 소개 · 게시일 미상 / 2026-11-11 검토",
+      "status": "source_claim",
+      "evidence_level": "E2",
+      "verified_at": "2026-11-11",
+      "fictional": false,
+      "supersedes": null
+    },
+    {
+      "id": "clm-000112",
+      "entity_id": "farm-000010",
+      "section": "geography",
+      "title": "고도·가공·품종",
+      "text": "공식 Bonga 설명에 1,600–1,900m가 제시된다. 다른 산지 상품에 적용하지 않는다. 회사의 washed/sundried 시설 구성은 확인되나 Bonga 개별 로트의 공정과 품종은 이 자료로 확정되지 않는다.",
+      "source_ids": [
+        "src-000046"
+      ],
+      "applicable_period": "공개 소개 · 게시일 미상 / 2026-11-11 검토",
+      "status": "source_claim",
+      "evidence_level": "E2",
+      "verified_at": "2026-11-11",
+      "fictional": false,
+      "supersedes": null
+    },
+    {
+      "id": "clm-000113",
+      "entity_id": "farm-000010",
+      "section": "history",
+      "title": "수상 범위",
+      "text": "공식 Awards 페이지는 2020 Ethiopia CoE에 Guji Alaka, Hambela Wamenna 시료를 공동창업자 Yednkachew Seleshi 명의로 출품해 ‘top 40 finalists’에 들었다고 설명한다. 이는 회사 자기보고이며 특정 순위 우승·Bonga 수상·현재 로트 수상으로 바꾸지 않는다.",
+      "source_ids": [
+        "src-000049"
+      ],
+      "applicable_period": "공개 소개 · 게시일 미상 / 2026-11-11 검토",
+      "status": "source_claim",
+      "evidence_level": "E2",
+      "verified_at": "2026-11-11",
+      "fictional": false,
+      "supersedes": null
+    },
+    {
+      "id": "clm-000114",
+      "entity_id": "farm-000010",
+      "section": "people",
+      "title": "인증·방문",
+      "text": "Bonga 지역의 UNESCO Biosphere 서술과 회사의 organic 지향은 개별 농장 또는 로트 인증서가 아니다. 공식 info@ykmcoffee.com으로 농장·스테이션 고유명, 방문 담당자, 품종·가공별 시료 및 추적서류를 요청할 수 있다. 실제 연락이나 예약은 수행하지 않았다.",
+      "source_ids": [
+        "src-000046"
+      ],
+      "applicable_period": "공개 소개 · 게시일 미상 / 2026-11-11 검토",
+      "status": "source_claim",
+      "evidence_level": "E2",
+      "verified_at": "2026-11-11",
+      "fictional": false,
+      "supersedes": null
+    },
+    {
+      "id": "clm-000115",
+      "entity_id": "farm-000006",
+      "section": "history",
+      "title": "2021 CoE 공식 결과 · 우승과 5위 로트 분리",
+      "text": "공식 결과표의 Tamiru Tadesse Tesema 1a·1b는 90.60점, Sidama / Bensa / Bensa, 74165, Anaerobic이다. 같은 명의의 5위는 90.10점, 74158, Natural로 별개다. Alo의 현재 주력 품종이나 모든 판매 로트에 우승 로트 정보를 적용하지 않는다.",
+      "source_ids": [
+        "src-000051",
+        "src-000040"
+      ],
+      "applicable_period": "2021 Ethiopia CoE",
+      "status": "source_claim",
+      "evidence_level": "E1",
+      "verified_at": "2026-11-11",
+      "fictional": false,
+      "supersedes": null
+    },
+    {
+      "id": "clm-000116",
+      "entity_id": "farm-000006",
+      "section": "processing",
+      "title": "SEY 판매 로트 · 2025년 2월 수확",
+      "text": "SEY의 Alo Village, Bensa, Sidama 상품은 74158, 2,410 masl, 2025년 2월 수확, Classic Washed로 표시된다. 이 고도·품종·가공은 해당 상업 로트의 정보이며 2021 CoE 1a·1b의 74165·Anaerobic과 합치지 않는다. 농장 전체나 모든 스테이션의 공통값도 아니다.",
+      "source_ids": [
+        "src-000053",
+        "src-000051"
+      ],
+      "applicable_period": "SEY 2025년 2월 수확 판매 로트 / 2021 대회 분리",
+      "status": "source_claim",
+      "evidence_level": "E2",
+      "verified_at": "2026-11-11",
+      "fictional": false,
+      "supersedes": null
+    },
+    {
+      "id": "clm-000117",
+      "entity_id": "farm-000007",
+      "section": "history",
+      "title": "2020 CoE 공식 결과 · Niguse Gemeda Mude",
+      "text": "주최기관의 2020 결과표는 Niguse Gemeda Mude 1a·1b를 91.04점, Sidama / Bura, 74158, Natural로 기록한다. 회사 About us는 같은 이름을 설립자로 명시한다. 생산자와 회사의 연결은 이 명시적 근거에 한정하며 현재 Karamo의 모든 상품 또는 Morke 판매 로트가 이 수상 로트라는 뜻은 아니다.",
+      "source_ids": [
+        "src-000052",
+        "src-000055"
+      ],
+      "applicable_period": "2020 Ethiopia CoE / 회사 소개",
+      "status": "source_claim",
+      "evidence_level": "E2",
+      "verified_at": "2026-11-11",
+      "fictional": false,
+      "supersedes": null
+    },
+    {
+      "id": "clm-000118",
+      "entity_id": "farm-000008",
+      "section": "history",
+      "title": "2021 공식 결과 · Dawencho 명의와 Bursa 구분",
+      "text": "공식 2a·2b는 Dawencho G/H/D Bunna Amrach, 90.50점, Sidama / Arbegona / Arbegona, 74110, Natural이다. Crop to Cup은 Mullugeta와 Dawencho 농가그룹의 관계를 설명한다. 이는 Bursa 회사 또는 개인 소유농장 명의의 우승으로 치환할 수 없고, 현재 프로필의 74158을 이 74110 대회 로트에 적용하지 않는다.",
+      "source_ids": [
+        "src-000051",
+        "src-000044"
+      ],
+      "applicable_period": "2021 Ethiopia CoE / 거래사 관계 설명",
+      "status": "source_claim",
+      "evidence_level": "E2",
+      "verified_at": "2026-11-11",
+      "fictional": false,
+      "supersedes": null
+    },
+    {
+      "id": "clm-000119",
+      "entity_id": "farm-000009",
+      "section": "people",
+      "title": "Refisa 교차 서술 · 독립 실사와 구분",
+      "text": "Crop to Cup과 XLIII Coffee는 Tariku Kare의 Nensebo Refisa, Refisa·Roricho·Bulga·Riripa 네 마을 및 593농가를 함께 설명한다. XLIII는 거래 방식을 Indirect Trade로 표기한다. 두 거래사 설명은 공통 원자료를 이용했을 수 있어 독립 현장 검증으로 보지 않는다. Bombe의 후속 스테이션과 구분하며 정확한 시설 고도·검증 가능한 수상 이력은 미확인이다.",
+      "source_ids": [
+        "src-000045",
+        "src-000054"
+      ],
+      "applicable_period": "공개 소개 · 게시일 미상 / 2026-11-11 검토",
+      "status": "source_claim",
+      "evidence_level": "E2",
+      "verified_at": "2026-11-11",
+      "fictional": false,
+      "supersedes": null
+    },
+    {
+      "id": "clm-000120",
+      "entity_id": "farm-000010",
+      "section": "history",
+      "title": "2020 National Winners · 이름·산지 연결의 한계",
+      "text": "주최기관의 2020 National Winners 표에는 Yidnekachew Selshi Alemu, 85.39점, West Guji / Ha/Wamana, 74110, Natural이 기재된다. YKM은 공동창업자 Yednkachew Seleshi 명의의 Guji Alaka, Hambela Wamenna 시료가 top 40 finalists에 들었다고 설명한다. 표기 차이를 보존하며 이 연결만으로 법적 동일인이나 동일 로트임을 확정하지 않는다. CoE 우승·Bonga 농장 수상·현재 판매 로트 수상으로 확대하지 않는다.",
+      "source_ids": [
+        "src-000052",
+        "src-000049"
+      ],
+      "applicable_period": "2020 National Winners / YKM 자기보고",
       "status": "source_claim",
       "evidence_level": "E2",
       "verified_at": "2026-11-11",
@@ -6310,6 +6803,342 @@
       "record_path": "data/source-records/src-000039.json",
       "record_sha256": "6e6ef788fc87ff8e0568ff1cc51a1cbf936b1ae7dfb490002b711d72c8737856",
       "hash_scope": "저장한 서지·요약 카드의 바이트. 웹 원문 해시가 아님."
+    },
+    {
+      "id": "src-000040",
+      "title": "Our Story",
+      "publisher": "Alo Coffee",
+      "url": "https://alo-coffee.com/about",
+      "published_at": null,
+      "accessed_at": "2026-11-11",
+      "location": "검토본에서 열람한 소개 본문",
+      "fact_period": "게시일 미상 · 2026-11-11 열람 소개",
+      "summary": "기존 검토본의 공개 원문 열람 근거를 재사용. 회사·시설·농가·판매 로트의 적용 범위를 구분한다.",
+      "rights": "서지정보와 자체 요약만 공개. 원문은 검토 증빙으로만 보관.",
+      "type": "생산자·거래사 공개 소개",
+      "language": "en",
+      "read_scope": "검토본에서 열람한 소개 본문",
+      "access": "public",
+      "revision": 1,
+      "supersedes": null,
+      "record_path": "data/source-records/src-000040.json",
+      "record_sha256": "9163a223b14ede78f4eb1e2a4e5ec936d630bbda951d01fd92bb6d9e085f14be",
+      "hash_scope": "저장한 서지·요약 카드의 바이트. 웹 원문 해시가 아님."
+    },
+    {
+      "id": "src-000041",
+      "title": "Company and sites",
+      "publisher": "Karamo Coffee",
+      "url": "https://karamocoffeeexport.com",
+      "published_at": null,
+      "accessed_at": "2026-11-11",
+      "location": "검토본에서 열람한 소개 본문",
+      "fact_period": "게시일 미상 · 2026-11-11 열람 소개",
+      "summary": "기존 검토본의 공개 원문 열람 근거를 재사용. 회사·시설·농가·판매 로트의 적용 범위를 구분한다.",
+      "rights": "서지정보와 자체 요약만 공개. 원문은 검토 증빙으로만 보관.",
+      "type": "생산자·거래사 공개 소개",
+      "language": "en",
+      "read_scope": "검토본에서 열람한 소개 본문",
+      "access": "public",
+      "revision": 1,
+      "supersedes": null,
+      "record_path": "data/source-records/src-000041.json",
+      "record_sha256": "d60020036911ca51fde16cee9d32a491c678ea0be9000a6317493c1b8271889f",
+      "hash_scope": "저장한 서지·요약 카드의 바이트. 웹 원문 해시가 아님."
+    },
+    {
+      "id": "src-000042",
+      "title": "Morke Natural",
+      "publisher": "The Coffee Quest",
+      "url": "https://www.thecoffeequest.com/morke-natural",
+      "published_at": null,
+      "accessed_at": "2026-11-11",
+      "location": "검토본에서 열람한 소개 본문",
+      "fact_period": "게시일 미상 · 2026-11-11 열람 소개",
+      "summary": "기존 검토본의 공개 원문 열람 근거를 재사용. 회사·시설·농가·판매 로트의 적용 범위를 구분한다.",
+      "rights": "서지정보와 자체 요약만 공개. 원문은 검토 증빙으로만 보관.",
+      "type": "생산자·거래사 공개 소개",
+      "language": "en",
+      "read_scope": "검토본에서 열람한 소개 본문",
+      "access": "public",
+      "revision": 1,
+      "supersedes": null,
+      "record_path": "data/source-records/src-000042.json",
+      "record_sha256": "b1515a8620b22497ee17afe1e45e6a0a5ca50fe6cec5cfb5730f0d2e9f1b7ab6",
+      "hash_scope": "저장한 서지·요약 카드의 바이트. 웹 원문 해시가 아님."
+    },
+    {
+      "id": "src-000043",
+      "title": "Company profile",
+      "publisher": "Bursa Specialty Coffee",
+      "url": "https://bursaspecialitycoffee.com",
+      "published_at": null,
+      "accessed_at": "2026-11-11",
+      "location": "검토본에서 열람한 소개 본문",
+      "fact_period": "게시일 미상 · 2026-11-11 열람 소개",
+      "summary": "기존 검토본의 공개 원문 열람 근거를 재사용. 회사·시설·농가·판매 로트의 적용 범위를 구분한다.",
+      "rights": "서지정보와 자체 요약만 공개. 원문은 검토 증빙으로만 보관.",
+      "type": "생산자·거래사 공개 소개",
+      "language": "en",
+      "read_scope": "검토본에서 열람한 소개 본문",
+      "access": "public",
+      "revision": 1,
+      "supersedes": null,
+      "record_path": "data/source-records/src-000043.json",
+      "record_sha256": "e291681e217eb83e1c39f81a58dd2967f6e74ab64ebbaa38cf0fc2de15edec0c",
+      "hash_scope": "저장한 서지·요약 카드의 바이트. 웹 원문 해시가 아님."
+    },
+    {
+      "id": "src-000044",
+      "title": "Mullugeta Muntasha",
+      "publisher": "Crop to Cup",
+      "url": "https://www.croptocup.com/community/mullugeta-muntasha",
+      "published_at": null,
+      "accessed_at": "2026-11-11",
+      "location": "검토본에서 열람한 소개 본문",
+      "fact_period": "게시일 미상 · 2026-11-11 열람 소개",
+      "summary": "기존 검토본의 공개 원문 열람 근거를 재사용. 회사·시설·농가·판매 로트의 적용 범위를 구분한다.",
+      "rights": "서지정보와 자체 요약만 공개. 원문은 검토 증빙으로만 보관.",
+      "type": "생산자·거래사 공개 소개",
+      "language": "en",
+      "read_scope": "검토본에서 열람한 소개 본문",
+      "access": "public",
+      "revision": 1,
+      "supersedes": null,
+      "record_path": "data/source-records/src-000044.json",
+      "record_sha256": "5efd79a328f9e80e6e0764a8bcefc22ae828f7dcb7b18b56a8a71e6d31f488e7",
+      "hash_scope": "저장한 서지·요약 카드의 바이트. 웹 원문 해시가 아님."
+    },
+    {
+      "id": "src-000045",
+      "title": "Tariku Kare",
+      "publisher": "Crop to Cup",
+      "url": "https://www.croptocup.com/community/tariku-kare",
+      "published_at": null,
+      "accessed_at": "2026-11-11",
+      "location": "검토본에서 열람한 소개 본문",
+      "fact_period": "게시일 미상 · 2026-11-11 열람 소개",
+      "summary": "기존 검토본의 공개 원문 열람 근거를 재사용. 회사·시설·농가·판매 로트의 적용 범위를 구분한다.",
+      "rights": "서지정보와 자체 요약만 공개. 원문은 검토 증빙으로만 보관.",
+      "type": "생산자·거래사 공개 소개",
+      "language": "en",
+      "read_scope": "검토본에서 열람한 소개 본문",
+      "access": "public",
+      "revision": 1,
+      "supersedes": null,
+      "record_path": "data/source-records/src-000045.json",
+      "record_sha256": "10b022c64342c1879f2622bc0e480a22529096d4ffadebbb07ffe0bc49e1759d",
+      "hash_scope": "저장한 서지·요약 카드의 바이트. 웹 원문 해시가 아님."
+    },
+    {
+      "id": "src-000046",
+      "title": "About YKM Coffee Trading",
+      "publisher": "YKM Coffee",
+      "url": "https://ykmcoffee.com/about-us",
+      "published_at": null,
+      "accessed_at": "2026-11-11",
+      "location": "검토본에서 열람한 소개 본문",
+      "fact_period": "게시일 미상 · 2026-11-11 열람 소개",
+      "summary": "기존 검토본의 공개 원문 열람 근거를 재사용. 회사·시설·농가·판매 로트의 적용 범위를 구분한다.",
+      "rights": "서지정보와 자체 요약만 공개. 원문은 검토 증빙으로만 보관.",
+      "type": "생산자·거래사 공개 소개",
+      "language": "en",
+      "read_scope": "검토본에서 열람한 소개 본문",
+      "access": "public",
+      "revision": 1,
+      "supersedes": null,
+      "record_path": "data/source-records/src-000046.json",
+      "record_sha256": "b8690182a717efc718685aa8298f80aff0104d72edb2e7333a7d766850c85af0",
+      "hash_scope": "저장한 서지·요약 카드의 바이트. 웹 원문 해시가 아님."
+    },
+    {
+      "id": "src-000047",
+      "title": "Our Coffee",
+      "publisher": "Alo Coffee",
+      "url": "https://alo-coffee.com/our-coffee",
+      "published_at": null,
+      "accessed_at": "2026-11-11",
+      "location": "검토본에서 열람한 소개 본문",
+      "fact_period": "게시일 미상 · 2026-11-11 열람 소개",
+      "summary": "기존 검토본의 공개 원문 열람 근거를 재사용. 회사·시설·농가·판매 로트의 적용 범위를 구분한다.",
+      "rights": "서지정보와 자체 요약만 공개. 원문은 검토 증빙으로만 보관.",
+      "type": "생산자·거래사 공개 소개",
+      "language": "en",
+      "read_scope": "검토본에서 열람한 소개 본문",
+      "access": "public",
+      "revision": 1,
+      "supersedes": null,
+      "record_path": "data/source-records/src-000047.json",
+      "record_sha256": "ec3f39cad20601b51f4bf9659dae63098cadb5374975f2eaad73a33e6807a9d6",
+      "hash_scope": "저장한 서지·요약 카드의 바이트. 웹 원문 해시가 아님."
+    },
+    {
+      "id": "src-000048",
+      "title": "Contact",
+      "publisher": "Alo Coffee",
+      "url": "https://alo-coffee.com/contact",
+      "published_at": null,
+      "accessed_at": "2026-11-11",
+      "location": "검토본에서 열람한 소개 본문",
+      "fact_period": "게시일 미상 · 2026-11-11 열람 소개",
+      "summary": "기존 검토본의 공개 원문 열람 근거를 재사용. 회사·시설·농가·판매 로트의 적용 범위를 구분한다.",
+      "rights": "서지정보와 자체 요약만 공개. 원문은 검토 증빙으로만 보관.",
+      "type": "생산자·거래사 공개 소개",
+      "language": "en",
+      "read_scope": "검토본에서 열람한 소개 본문",
+      "access": "public",
+      "revision": 1,
+      "supersedes": null,
+      "record_path": "data/source-records/src-000048.json",
+      "record_sha256": "7b141d7b96e1966e2c614157eb454a5ec7c523c9b385bc4fdea321d157c51420",
+      "hash_scope": "저장한 서지·요약 카드의 바이트. 웹 원문 해시가 아님."
+    },
+    {
+      "id": "src-000049",
+      "title": "Awards & Certification",
+      "publisher": "YKM Coffee",
+      "url": "https://ykmcoffee.com/about-us/awards-certification",
+      "published_at": null,
+      "accessed_at": "2026-11-11",
+      "location": "검토본에서 열람한 소개 본문",
+      "fact_period": "게시일 미상 · 2026-11-11 열람 소개",
+      "summary": "기존 검토본의 공개 원문 열람 근거를 재사용. 회사·시설·농가·판매 로트의 적용 범위를 구분한다.",
+      "rights": "서지정보와 자체 요약만 공개. 원문은 검토 증빙으로만 보관.",
+      "type": "생산자·거래사 공개 소개",
+      "language": "en",
+      "read_scope": "검토본에서 열람한 소개 본문",
+      "access": "public",
+      "revision": 1,
+      "supersedes": null,
+      "record_path": "data/source-records/src-000049.json",
+      "record_sha256": "491b22957dc23ddd4e0fa061f1173b1a22117b4500518ca9150686760b6393c8",
+      "hash_scope": "저장한 서지·요약 카드의 바이트. 웹 원문 해시가 아님."
+    },
+    {
+      "id": "src-000050",
+      "title": "Our Coffee",
+      "publisher": "Karamo Coffee",
+      "url": "https://karamocoffeeexport.com/index.php/our-coffee",
+      "published_at": null,
+      "accessed_at": "2026-11-11",
+      "location": "검토본에서 열람한 소개 본문",
+      "fact_period": "게시일 미상 · 2026-11-11 열람 소개",
+      "summary": "기존 검토본의 공개 원문 열람 근거를 재사용. 회사·시설·농가·판매 로트의 적용 범위를 구분한다.",
+      "rights": "서지정보와 자체 요약만 공개. 원문은 검토 증빙으로만 보관.",
+      "type": "생산자·거래사 공개 소개",
+      "language": "en",
+      "read_scope": "검토본에서 열람한 소개 본문",
+      "access": "public",
+      "revision": 1,
+      "supersedes": null,
+      "record_path": "data/source-records/src-000050.json",
+      "record_sha256": "2d3d9d2ce261b7617d40aa56a2e2261ba2a106a6f0946a983771b36ab0f47de1",
+      "hash_scope": "저장한 서지·요약 카드의 바이트. 웹 원문 해시가 아님."
+    },
+    {
+      "id": "src-000051",
+      "title": "Ethiopia 2021 — Winning Farms",
+      "publisher": "Alliance for Coffee Excellence",
+      "url": "https://cupofexcellence.org/ethiopia-2021/",
+      "published_at": null,
+      "accessed_at": "2026-11-11T05:50:56.803454+00:00",
+      "location": "본문 소개 및 해당 결과표",
+      "fact_period": "2021 대회",
+      "summary": "2021 공식 결과: Tamiru 1a/1b와 5위, Dawencho 2a/2b는 별개 명의·품종·가공의 대회 로트.",
+      "rights": "서지정보와 자체 요약만 공개. 원문은 검토 증빙으로만 보관.",
+      "type": "주최기관 공식 결과",
+      "language": "en",
+      "read_scope": "본문 소개 및 해당 결과표",
+      "access": "public",
+      "revision": 1,
+      "supersedes": null,
+      "record_path": "data/source-records/src-000051.json",
+      "record_sha256": "ca6ac2c6c5c7bc7416bc6c89d6ed98ef152c8c36ce59ba2b28190d9d9c6230b3",
+      "hash_scope": "저장한 서지·요약 카드의 바이트. 웹 원문 해시가 아님."
+    },
+    {
+      "id": "src-000052",
+      "title": "Ethiopia 2020 — Winning Farms / National Winners",
+      "publisher": "Alliance for Coffee Excellence",
+      "url": "https://cupofexcellence.org/ethiopia-2020/",
+      "published_at": null,
+      "accessed_at": "2026-11-11T05:50:56.803454+00:00",
+      "location": "본문 소개 및 해당 결과표",
+      "fact_period": "2020 대회 / National Winners",
+      "summary": "2020 공식 결과: Niguse 1a/1b 및 National Winners의 Yidnekachew는 별개 범주.",
+      "rights": "서지정보와 자체 요약만 공개. 원문은 검토 증빙으로만 보관.",
+      "type": "주최기관 공식 결과",
+      "language": "en",
+      "read_scope": "본문 소개 및 해당 결과표",
+      "access": "public",
+      "revision": 1,
+      "supersedes": null,
+      "record_path": "data/source-records/src-000052.json",
+      "record_sha256": "4ad3309aea27c210c345cf89abc3774b92dafc3a7c0126640c527ada3bc0dffb",
+      "hash_scope": "저장한 서지·요약 카드의 바이트. 웹 원문 해시가 아님."
+    },
+    {
+      "id": "src-000053",
+      "title": "2025 Tamiru Tadesse Tesema — Alo Village Washed",
+      "publisher": "SEY",
+      "url": "https://www.seycoffee.com/products/2025-tamiru-tadesse-tesema-alo-village-washed-ethiopia",
+      "published_at": null,
+      "accessed_at": "2026-11-11T05:50:56.803454+00:00",
+      "location": "본문 소개 및 해당 결과표",
+      "fact_period": "2025년 2월 수확 판매 로트",
+      "summary": "2025년 2월 수확 Alo Village 판매 로트: 74158, 2,410m, Classic Washed.",
+      "rights": "서지정보와 자체 요약만 공개. 원문은 검토 증빙으로만 보관.",
+      "type": "생산자·거래사 공개 소개",
+      "language": "en",
+      "read_scope": "본문 소개 및 해당 결과표",
+      "access": "public",
+      "revision": 1,
+      "supersedes": null,
+      "record_path": "data/source-records/src-000053.json",
+      "record_sha256": "3c5726ebaa3cf602bbbb5ff86aba971f4427a2f4b7e905ebe7c3f4a243b5c635",
+      "hash_scope": "저장한 서지·요약 카드의 바이트. 웹 원문 해시가 아님."
+    },
+    {
+      "id": "src-000054",
+      "title": "Refisa Washing Station",
+      "publisher": "XLIII Coffee",
+      "url": "https://xliiicoffee.com/en/collaboration/refisa/",
+      "published_at": null,
+      "accessed_at": "2026-11-11T05:50:56.803454+00:00",
+      "location": "본문 소개 및 해당 결과표",
+      "fact_period": "게시일 미상 · 2026-11-11 열람 소개",
+      "summary": "Refisa의 Tariku Kare·네 마을·593농가 소개. 거래사 설명은 공통 원자료 가능성이 있어 독립 실사로 간주하지 않는다.",
+      "rights": "서지정보와 자체 요약만 공개. 원문은 검토 증빙으로만 보관.",
+      "type": "생산자·거래사 공개 소개",
+      "language": "en",
+      "read_scope": "본문 소개 및 해당 결과표",
+      "access": "public",
+      "revision": 1,
+      "supersedes": null,
+      "record_path": "data/source-records/src-000054.json",
+      "record_sha256": "a0b35e22b885fb66ba3ff2f90a16b4ac46d049cabcd4e6db2e93b866b16e2543",
+      "hash_scope": "저장한 서지·요약 카드의 바이트. 웹 원문 해시가 아님."
+    },
+    {
+      "id": "src-000055",
+      "title": "About us",
+      "publisher": "Karamo Coffee",
+      "url": "https://karamocoffeeexport.com/index.php/about-uss/",
+      "published_at": null,
+      "accessed_at": "2026-11-11T05:50:56.803454+00:00",
+      "location": "본문 소개 및 해당 결과표",
+      "fact_period": "게시일 미상 · 2026-11-11 열람 소개",
+      "summary": "Niguse Gemeda Mude 설립자, 2017 설립 및 생산 기반에 관한 회사 자체 설명.",
+      "rights": "서지정보와 자체 요약만 공개. 원문은 검토 증빙으로만 보관.",
+      "type": "생산자·거래사 공개 소개",
+      "language": "en",
+      "read_scope": "본문 소개 및 해당 결과표",
+      "access": "public",
+      "revision": 1,
+      "supersedes": null,
+      "record_path": "data/source-records/src-000055.json",
+      "record_sha256": "64de802a7a0f73ef14350c3c6ef49cfb83f1af058af0371f2f34c482c4ccb1c8",
+      "hash_scope": "저장한 서지·요약 카드의 바이트. 웹 원문 해시가 아님."
     }
   ],
   "changes": [
@@ -6640,6 +7469,33 @@
         "src-000039"
       ],
       "snapshot_path": "data/snapshots/2026-11-11.peru-profile-review-1.json"
+    },
+    {
+      "id": "chg-000008",
+      "date": "2026-11-11",
+      "revision": "2026-11-11.ethiopia-profile-review-1",
+      "previous_revision": "2026-11-11.peru-profile-review-1",
+      "title": "에티오피아 5개 생산자·네트워크 소개 보완",
+      "summary": "검토본31332: Alo·Karamo·Bursa·Tariku·YKM의 운영·가공·문의 정보를 보완하고 공식 대회 결과와 별도 판매 로트를 분리. 기존 49농장·50로트와 평가 연결 보류 유지.",
+      "source_ids": [
+        "src-000040",
+        "src-000041",
+        "src-000042",
+        "src-000043",
+        "src-000044",
+        "src-000045",
+        "src-000046",
+        "src-000047",
+        "src-000048",
+        "src-000049",
+        "src-000050",
+        "src-000051",
+        "src-000052",
+        "src-000053",
+        "src-000054",
+        "src-000055"
+      ],
+      "snapshot_path": "data/snapshots/2026-11-11.ethiopia-profile-review-1.json"
     }
   ]
 }
